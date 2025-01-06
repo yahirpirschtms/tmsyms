@@ -10,9 +10,9 @@ class GenericCatalogController extends Controller
     //
     public function getAvailabilityIndicators()
     {
-        $data = GenericCatalog::where('gnct_group', 'availability_indicator')
+        $data = GenericCatalog::where('gntc_group', 'availability_indicator')
             //->where('gntc_status', 1) // Filtrar sólo registros activos
-            ->select('gnct_id', 'gnct_description')
+            ->select('gnct_id', 'gntc_description')
             ->get();
             
             // Obtener los registros del grupo 'availability_indicator' con el campo `gntc_status` activo
