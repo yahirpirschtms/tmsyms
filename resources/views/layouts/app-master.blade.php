@@ -174,24 +174,66 @@
 </html>
 
 
-    <!--Script para buscar el availability indicator en la pantalla de empty trailer-->
+<!--Script para buscar el availability indicator en la pantalla de empty trailer-->
 <script>
         $(document).ready(function () {
-            $('#inputavailabilityindicator').on('focus', function () {
+            $('#inputavailabilityindicator').on('click', function () {
                 $.ajax({
-                    url: '/availability-indicators',
+                    url: "{{ route('availabilityindicators-emptytrailer') }}",
                     method: 'GET',
                     success: function (data) {
-                        let options = '<option selected>Open this select menu</option>';
-                        data.forEach(item => {
-                            options += `<option value="${item.gnct_id}">${item.gntc_description}</option>`;
-                        });
-                        $('#inputavailabilityindicator').html(options);
+                      let select = $('#inputavailabilityindicator');
+                      select.empty(); // Limpia el select eliminando todas las opciones
+
+                      if (data.length === 0) {
+                          // Si no hay datos, muestra un mensaje de "No options available"
+                          select.append('<option disabled>No options available</option>');
+                      } else {
+                          // Si hay datos, agrega "Choose an option" como la primera opción
+                          select.append('<option selected disabled>Choose an option</option>');
+
+                          // Agrega las opciones provenientes de la petición
+                          data.forEach(item => {
+                              select.append(`<option value="${item.gnct_id}">${item.gntc_description}</option>`);
+                          });
+                      }
                     },
                     error: function (xhr, status, error) {
-                        console.error('Error al cargar los datos:', error);
+                        console.error('Error fetching data Availability Indicators:', error);
                     }
                 });
             });
         });
+</script>
+
+<!--Script para buscar las locations en la pantalla de empty trailer-->
+<script>
+    $(document).ready(function () {
+        $('#inputlocation').on('click', function () {
+          $.ajax({
+              url: "{{ route('locations-emptytrailer') }}", // Cambia esta URL según tu ruta
+              type: 'GET',
+              success: function (data) {
+                      let select = $('#inputlocation');
+                      select.empty(); // Limpia el select eliminando todas las opciones
+
+                      if (data.length === 0) {
+                          // Si no hay datos, muestra un mensaje de "No options available"
+                          select.append('<option disabled>No options available</option>');
+                      } else {
+                          // Si hay datos, agrega "Choose an option" como la primera opción
+                          select.append('<option selected disabled>Choose an option</option>');
+
+                          // Agrega las opciones provenientes de la petición
+                          data.forEach(item => {
+                              select.append(`<option value="${location.id_company}">${location.CoName}</option>`);
+                          });
+                      }
+                    },
+              error: function (xhr, status, error) {
+                        console.error('Error fetching data locations:', error);
+                    }
+          });
+        });
+    });
 </script>
