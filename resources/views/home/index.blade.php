@@ -59,7 +59,7 @@
                             <label for="inputavailabilityindicator" class="col-sm-2 col-form-label ">Availability Indicator</label>
                             <div class="col-sm-10">
                                 <select class="form-select" aria-label="Default select example"  id="inputavailabilityindicator" name="inputavailabilityindicator">
-                                    <option selected>Open this select menu</option>
+                                    <option selected>Choose an option</option>
                                 </select>
                             </div>
                         </div>
@@ -67,7 +67,7 @@
                             <label for="inputlocation" class="col-sm-2 col-form-label ">Location</label>
                             <div class="col-sm-10">
                                 <select class="form-select" aria-label="Default select example"  id="inputlocation" name="inputlocation">
-                                    <option selected>Open this select menu</option>
+                                    <option selected>Choose an option</option>
                                 </select>
                             </div>
                         </div>
