@@ -168,8 +168,8 @@
         @yield('content')
       </div>
 
-      
-      
+
+
 </body>
 </html>
 
@@ -184,7 +184,7 @@
                     success: function (data) {
                         let options = '<option selected>Open this select menu</option>';
                         data.forEach(item => {
-                            options += `<option value="${item.gnct_id}">${item.gnct_description}</option>`;
+                            options += `<option value="${item.gnct_id}">${item.gntc_description}</option>`;
                         });
                         $('#inputavailabilityindicator').html(options);
                     },
@@ -194,4 +194,8 @@
                 });
             });
         });
+</script>
+
+//
+
 </script>

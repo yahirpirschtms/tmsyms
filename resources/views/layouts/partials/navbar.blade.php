@@ -27,16 +27,15 @@
                   </li>
 
                   <!--options shipments-->
-                  <!--<li class="nav-item dropdown ">
+                  <li class="nav-item dropdown">
                     <a class="nav-link mx-lg-2 text-light" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                      Shipments
+                        Shipments
                     </a>
                     <ul class="ms-4 dropdown-menu dropdown-menu-start" style="background-color: #1e4877; border:none">
-                      <li><a class="dropdown-item" href="#">Traffic Workflow Start</a></li>
-                      <li><a class="dropdown-item" href="#">Live Shipments</a></li>
-                      <li><a class="dropdown-item" href="#">All Shipments</a></li>
+                        <li><a class="dropdown-item" href="#">Traffic Workflow Start</a></li>
+                        <li><a class="dropdown-item" href="#">Live Shipments</a></li>
                     </ul>
-                  </li>-->
+                </li>
 
                   <!--options catalog-->
                   <li class="nav-item mx-lg-2 dropdown ">
@@ -98,7 +97,7 @@
             </div>
             <div class="modal-body">
             <p>Bienvenido {{auth()->user()->username ?? auth()->user()->username}}</p>
-                
+
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
