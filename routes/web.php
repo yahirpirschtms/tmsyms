@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CompaniesController;
+use App\Http\Controllers\EmptyTrailerController;
 use App\Http\Controllers\GenericCatalogController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoginController;
@@ -28,4 +29,7 @@ Route::get('/shipments', [ShipmentController::class, 'allshipmentsshow'])->name(
 
 Route::get('/availability-indicators', [GenericCatalogController::class, 'getAvailabilityIndicators'])->name('availabilityindicators-emptytrailer');
 
-Route::get('/locations', [CompaniesController::class, 'getLocations'])->name('locations-emptytrailer');
+Route::get('/locations-emptytrailer', [CompaniesController::class, 'getLocations'])->name('locations-emptytrailer');
+
+Route::get('/carrier-emptytrailer', [CompaniesController::class, 'getLocations'])->name('carrier-emptytrailer');
+

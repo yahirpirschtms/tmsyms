@@ -184,13 +184,15 @@
                     success: function (data) {
                       let select = $('#inputavailabilityindicator');
                       select.empty(); // Limpia el select eliminando todas las opciones
+                      // Agregar una opción vacía como marcador inicial
+                      select.append('<option selected disabled hidden></option>');
 
                       if (data.length === 0) {
                           // Si no hay datos, muestra un mensaje de "No options available"
                           select.append('<option disabled>No options available</option>');
                       } else {
                           // Si hay datos, agrega "Choose an option" como la primera opción
-                          select.append('<option selected disabled>Choose an option</option>');
+                          //select.append('<option selected disabled>Choose an option</option>');
 
                           // Agrega las opciones provenientes de la petición
                           data.forEach(item => {
@@ -216,13 +218,15 @@
               success: function (data) {
                       let select = $('#inputlocation');
                       select.empty(); // Limpia el select eliminando todas las opciones
+                      // Agregar una opción vacía como marcador inicial
+                      select.append('<option selected disabled hidden></option>');
 
                       if (data.length === 0) {
                           // Si no hay datos, muestra un mensaje de "No options available"
                           select.append('<option disabled>No options available</option>');
                       } else {
                           // Si hay datos, agrega "Choose an option" como la primera opción
-                          select.append('<option selected disabled>Choose an option</option>');
+                          //select.append('<option selected disabled>Choose an option</option>');
 
                           // Agrega las opciones provenientes de la petición
                           data.forEach(item => {
@@ -237,3 +241,38 @@
         });
     });
 </script>
+
+<!--Script para buscar los Carriers en la pantalla de empty trailer-->
+<script>
+    $(document).ready(function () {
+        $('#inputcarrier').on('click', function () {
+          $.ajax({
+              url: "{{ route('carrier-emptytrailer') }}", // Cambia esta URL según tu ruta
+              type: 'GET',
+              success: function (data) {
+                      let select = $('#inputcarrier');
+                      select.empty(); // Limpia el select eliminando todas las opciones
+                      // Agregar una opción vacía como marcador inicial
+                      select.append('<option selected disabled hidden></option>');
+
+                      if (data.length === 0) {
+                          // Si no hay datos, muestra un mensaje de "No options available"
+                          select.append('<option disabled>No options available</option>');
+                      } else {
+                          // Si hay datos, agrega "Choose an option" como la primera opción
+                          //select.append('<option selected disabled>Choose an option</option>');
+
+                          // Agrega las opciones provenientes de la petición
+                          data.forEach(item => {
+                              select.append(`<option value="${location.id_company}">${location.CoName}</option>`);
+                          });
+                      }
+                    },
+              error: function (xhr, status, error) {
+                        console.error('Error fetching data locations:', error);
+                    }
+          });
+        });
+    });
+</script>
+
