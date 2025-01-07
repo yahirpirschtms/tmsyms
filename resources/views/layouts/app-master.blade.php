@@ -300,7 +300,7 @@
                   tbody.innerHTML = ''; // Limpia la tabla
                   data.forEach(trailer => {
                       const row = `
-                          <tr>
+                          <tr id="trailer-${trailer.pk_trailer}">
                               <td>${trailer.trailer_num}</td>
                               <td>${trailer.status}</td>
                               <td>${trailer.pallets_on_trailer}</td>
@@ -312,6 +312,8 @@
                               <td>${trailer.date_out}</td>
                               <td>${trailer.transaction_date}</td>
                               <td>${trailer.username}</td>
+                              <td><button type="button" class="btn btn-danger delete-btn" data-id="${trailer.pk_trailer}">Delete</button></td>
+
                           </tr>
                       `;
                       tbody.innerHTML += row;
@@ -328,7 +330,7 @@
                   tbody.innerHTML = '';
                   data.forEach(trailer => {
                       const row = `
-                          <tr>
+                          <tr id="trailer-${ $trailer.pk_trailer }">
                               <td>${trailer.trailer_num}</td>
                               <td>${trailer.status}</td>
                               <td>${trailer.pallets_on_trailer}</td>
@@ -340,6 +342,8 @@
                               <td>${trailer.date_out}</td>
                               <td>${trailer.transaction_date}</td>
                               <td>${trailer.username}</td>
+                              <td><button type="button" class="btn btn-danger delete-btn" data-id="${trailer.pk_trailer}">Delete</button></td>
+
                           </tr>
                       `;
                       tbody.innerHTML += row;
@@ -358,11 +362,13 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
-    const deleteButtons = document.querySelectorAll('.delete-btn');
+    // Delegación de eventos para manejar clics en botones dinámicos
+    const tableBody = document.getElementById('emptyTrailerTableBody');
 
-    deleteButtons.forEach(button => {
-        button.addEventListener('click', function () {
-            const trailerId = this.getAttribute('data-id');
+    tableBody.addEventListener('click', function (event) {
+        // Verificar si el clic proviene de un botón con la clase "delete-btn"
+        if (event.target.classList.contains('delete-btn')) {
+            const trailerId = event.target.getAttribute('data-id');
             
             // Confirmación antes de eliminar
             if (confirm("Are you sure you want to delete this trailer?")) {
@@ -379,7 +385,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     if (data.success) {
                         // Si la eliminación fue exitosa, eliminar la fila de la tabla
                         const row = document.getElementById(`trailer-${trailerId}`);
-                        row.remove();
+                        if (row) row.remove();
                     } else {
                         alert(data.error || 'An error occurred while deleting the trailer');
                     }
@@ -389,9 +395,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     alert('An error occurred while deleting the trailer');
                 });
             }
-        });
+        }
     });
 });
+
 
 </script>
 
