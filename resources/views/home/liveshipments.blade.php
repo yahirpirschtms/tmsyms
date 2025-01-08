@@ -22,9 +22,9 @@
                                 <div class="d-flex justify-content-between">
                                     <button class="btn btn-primary btn-sm" data-bs-toggle="offcanvas"
                                         data-bs-target="#offcanvasUpdateStatus"
-                                        onclick="populateOffcanvas({{ json_encode($shipment) }})">Update Status</button>
-                                    <a href="{{ route('shipments.details', $shipment->pk_shipment) }}" class="btn btn-secondary btn-sm" data-bs-toggle="offcanvas"
-                                        data-bs-target="#offcanvasDetails">Details</a>
+                                        onclick="populateOffcanvas({{ json_encode($shipment) }})">Update Status & Details</button>
+
+
                                 </div>
                             </div>
                         </div>
@@ -48,6 +48,9 @@
                 </li>
                 <li class="nav-item" role="presentation">
                     <a class="nav-link" id="pills-update-status-tab" data-bs-toggle="pill" href="#pills-update-status" role="tab" aria-controls="pills-update-status" aria-selected="false">Update Shipment Status</a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="pills-shipment-details-tab" data-bs-toggle="pill" href="#pills-shipment-details" role="tab" aria-controls="pills-shipment-details" aria-selected="false">Shipment Details</a>
                 </li>
             </ul>
             <div class="tab-content" id="pills-tabContent">
@@ -219,144 +222,131 @@
                 </div>
 
         <!-- Offcanvas para Details -->
-        <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasDetails" aria-labelledby="offcanvasDetailsLabel">
-            <div class="offcanvas-header">
-                <h5 id="offcanvasDetailsLabel">Shipment Details</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        <ul class="nav nav-pills" id="pills-tab" role="tablist">
+            <li class="nav-item" role="presentation">
+            </li>
+            <li class="nav-item" role="presentation">
+
+            </li>
+        </ul>
+
+        <div class="tab-content" id="pills-tabContent">
+            <!-- Shipment Details Tab Content -->
+            <div class="tab-pane fade show active" id="pills-shipment-details" role="tabpanel" aria-labelledby="pills-shipment-details-tab">
+                <div class="mb-3">
+                    <label class="form-label">STM ID</label>
+                    <p>{{ $shipment->stm_id }}</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Reference</label>
+                    <p>{{ $shipment->reference }}</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Bonded</label>
+                    <p>{{ $shipment->bonded }}</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Origin</label>
+                    <p>{{ $shipment->origin }}</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Destination</label>
+                    <p>{{ $shipment->destination }}</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Pre-Alerted Date & Time</label>
+                    <p>{{ $shipment->pre_alerted_datetime }}</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Trailer ID</label>
+                    <p>{{ $shipment->id_trailer }}</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Company ID</label>
+                    <p>{{ $shipment->id_company }}</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Trailer</label>
+                    <p>{{ $shipment->trailer }}</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Truck</label>
+                    <p>{{ $shipment->truck }}</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Driver ID</label>
+                    <p>{{ $shipment->id_driver }}</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">ETD (Estimated Time of Departure)</label>
+                    <p>{{ $shipment->etd }}</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Units</label>
+                    <p>{{ $shipment->units }}</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Pallets</label>
+                    <p>{{ $shipment->pallets }}</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Security Seals</label>
+                    <p>{{ $shipment->security_seals }}</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Overhaul ID</label>
+                    <p>{{ $shipment->overhaul_id }}</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Device Number</label>
+                    <p>{{ $shipment->device_number }}</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Secondary Shipment ID</label>
+                    <p>{{ $shipment->secondary_shipment_id }}</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Driver Assigned Date</label>
+                    <p>{{ $shipment->driver_assigned_date }}</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Pick-Up Date</label>
+                    <p>{{ $shipment->pick_up_date }}</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">In Transit Date</label>
+                    <p>{{ $shipment->intransit_date }}</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Secured Yard Date</label>
+                    <p>{{ $shipment->secured_yarddate }}</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Current Status (GNCT ID)</label>
+                    <p>{{ $shipment->gnct_id_current_status }}</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Shipment Type (GNCT ID)</label>
+                    <p>{{ $shipment->gnct_id_shipment_type }}</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Delivered Date</label>
+                    <p>{{ $shipment->delivered_date }}</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">At Door Date</label>
+                    <p>{{ $shipment->at_door_date }}</p>
+                </div>
             </div>
-            <div class="offcanvas-body">
-                <ul class="nav nav-tabs" id="shipmentDetailsTab" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <a class="nav-link active" id="general-tab" data-bs-toggle="tab" href="#general" role="tab" aria-controls="general" aria-selected="true">General</a>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <a class="nav-link" id="notes-tab" data-bs-toggle="tab" href="#notes" role="tab" aria-controls="notes" aria-selected="false">Notes</a>
-                    </li>
-                </ul>
-                <div class="tab-content mt-3" id="shipmentDetailsTabContent">
-                    <!-- General Tab -->
-                    <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
-                        <div class="mb-3">
-                            <label class="form-label">STM ID</label>
-                            <p>{{ $shipment->stm_id }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Reference</label>
-                            <p>{{ $shipment->reference }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Bonded</label>
-                            <p>{{ $shipment->bonded }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Origin</label>
-                            <p>{{ $shipment->origin }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Destination</label>
-                            <p>{{ $shipment->destination }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Pre-Alerted Date & Time</label>
-                            <p>{{ $shipment->pre_alerted_datetime }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Trailer ID</label>
-                            <p>{{ $shipment->id_trailer }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Company ID</label>
-                            <p>{{ $shipment->id_company }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Trailer</label>
-                            <p>{{ $shipment->trailer }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Truck</label>
-                            <p>{{ $shipment->truck }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Driver ID</label>
-                            <p>{{ $shipment->id_driver }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">ETD (Estimated Time of Departure)</label>
-                            <p>{{ $shipment->etd }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Units</label>
-                            <p>{{ $shipment->units }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Pallets</label>
-                            <p>{{ $shipment->pallets }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Security Seals</label>
-                            <p>{{ $shipment->security_seals }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Overhaul ID</label>
-                            <p>{{ $shipment->overhaul_id }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Device Number</label>
-                            <p>{{ $shipment->device_number }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Secondary Shipment ID</label>
-                            <p>{{ $shipment->secondary_shipment_id }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Driver Assigned Date</label>
-                            <p>{{ $shipment->driver_assigned_date }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Pick-Up Date</label>
-                            <p>{{ $shipment->pick_up_date }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">In Transit Date</label>
-                            <p>{{ $shipment->intransit_date }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Secured Yard Date</label>
-                            <p>{{ $shipment->secured_yarddate }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Current Status (GNCT ID)</label>
-                            <p>{{ $shipment->gnct_id_current_status }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Shipment Type (GNCT ID)</label>
-                            <p>{{ $shipment->gnct_id_shipment_type }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Delivered Date</label>
-                            <p>{{ $shipment->delivered_date }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">At Door Date</label>
-                            <p>{{ $shipment->at_door_date }}</p>
-                        </div>
-                    </div>
-                    <!-- Notes Tab -->
-                    <div class="tab-pane fade" id="notes" role="tabpanel" aria-labelledby="notes-tab">
-                        <div class="mb-3">
-                            <label class="form-label">Notes</label>
-                            <p>{{ $shipment->notes ?? 'No notes available.' }}</p>
-                        </div>
-                    </div>
+
+            <!-- Notes Tab Content -->
+            <div class="tab-pane fade" id="notes" role="tabpanel" aria-labelledby="notes-tab">
+                <div class="mb-3">
+                    <label class="form-label">Notes</label>
+                    <p>{{ $shipment->notes ?? 'No notes available.' }}</p>
                 </div>
             </div>
         </div>
-
-        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
-
-    </body>
-
 
 
     @endauth

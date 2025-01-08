@@ -72,6 +72,26 @@
         color: white;
         position: relative;
       }
+
+
+      .offcanvasUpdateStatus {
+            background-color: #212529;
+            color: white;
+            width: 300px;
+        }
+
+        .offcanvasUpdateStatus .form-label {
+            color: #f8f9fa;
+        }
+        .offcanvasDetails {
+            background-color: #212529;
+            color: white;
+            width: 300px;
+        }
+
+        .ooffcanvasDetails .form-label {
+            color: #f8f9fa;
+        }
       .nav-link:hover, .nav-link:active, .dropdown-item:hover, .dropdown-item:active{
         /*color: #000;*/
         color: white;
@@ -159,6 +179,31 @@
         bottom: 0;
         left: 0;
       }*/
+
+                #pills-tabContent {
+                padding-top: 0;
+                margin-top: 0;
+            }
+
+            /* Ajustar márgenes en los elementos dentro de las pestañas */
+            .tab-pane {
+                padding-top: 10px; /* Ajusta según necesites */
+            }
+
+            /* Reducir espacio extra en los p y labels dentro de los detalles */
+            .tab-pane .form-label {
+                margin-bottom: 5px; /* Menos margen entre label y p */
+            }
+
+            .tab-pane .mb-3 {
+                margin-bottom: 10px; /* Menos margen entre cada bloque */
+            }
+
+            /* Si el espacio es muy grande en los márgenes, también puedes probar ajustando el padding global */
+            body {
+                margin: 0;
+                padding: 0;
+            }
     </style>
 </head>
 <body>
@@ -171,8 +216,10 @@
 
 
 </body>
-</html>
 
+
+</html>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
 
     <!--Script para buscar el availability indicator en la pantalla de empty trailer-->
 <script>
@@ -196,6 +243,3 @@
         });
 </script>
 
-//
-
-</script>

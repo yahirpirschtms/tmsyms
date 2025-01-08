@@ -30,7 +30,7 @@ Route::get('/all-shipments', [ShipmentController::class, 'allshipmentsshow'])->n
 Route::get('/availability-indicators', [GenericCatalogController::class, 'getAvailabilityIndicators'])->name('availability.indicators');
 
 
-Route::get('/shipments/details/{id}', [ShipmentController::class, 'details'])->name('shipments.details');
+Route::get('/shipments/details/{pk_shipment}', [ShipmentController::class, 'details'])->name('shipments.details');
 Route::put('/shipments/{id}', [ShipmentController::class, 'update'])->name('shipments.update');
 Route::put('/shipments/{shipment}/updateNotes', [ShipmentController::class, 'updateNotes'])->name('shipments.updateNotes');
 Route::put('/update-status-endpoint/{pk_shipment}', [ShipmentController::class, 'update'])->name('update.status');
