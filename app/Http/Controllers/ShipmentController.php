@@ -83,17 +83,17 @@ class ShipmentController extends Controller
     }
 
     // Mostrar los detalles de un envío
-    public function details($pk_shipment)
-{
-    // Obtener el envío con la relación de currentStatus
-    $shipment = Shipment::with('currentStatus')->findOrFail($pk_shipment);
+        public function details($pk_shipment)
+    {
+        // Obtener el envío con las relaciones de currentStatus, driver y originCatalog
+        $shipment = Shipment::with(['currentStatus', 'driver', 'originCatalog'])->findOrFail($pk_shipment);
 
-    // Obtener los estatus disponibles bajo el grupo 'STATUS_E_REPORT'
-    $currentStatus = GenericCatalog::where('gntc_group', 'STATUS_E_REPORT')->get();
+        // Obtener los estatus disponibles bajo el grupo 'STATUS_E_REPORT'
+        $currentStatus = GenericCatalog::where('gntc_group', 'STATUS_E_REPORT')->get();
 
-    // Pasar las variables a la vista
-    return view('shipments.details', compact('shipment', 'currentStatus'));
-}
+        // Pasar las variables a la vista
+        return view('shipments.details', compact('shipment', 'currentStatus'));
+    }
 public function update(Request $request, $pk_shipment)
 {
     // Depurar los datos recibidos

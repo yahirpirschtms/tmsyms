@@ -87,6 +87,16 @@ class Shipment extends Model
         return $this->shipmentType ? $this->shipmentType->gntc_value : null;
     }
 
+    public function driver()
+    {
+        return $this->belongsTo(Driver::class, 'id_driver', 'pk_driver'); // Ajustado a id_driver
+    }
+
+        public function originCatalog()
+    {
+        return $this->belongsTo(GenericCatalog::class, 'origin', 'gnct_id'); // Relación con la tabla generic_catalogs
+    }
+
     // Formateo de la fecha de entrega
     public function getFormattedDeliveredDateAttribute()
     {

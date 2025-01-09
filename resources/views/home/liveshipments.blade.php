@@ -13,18 +13,17 @@
                 @foreach ($shipments as $shipment)
                     <div class="col">
                         <div class="card">
-                            <div class="card-body">
+                            <div class="card-body text-white bg-dark">
                                 <h5 class="card-title">{{ $shipment->stm_id }}</h5>
                                 <p class="card-subtitle mb-2">{{ $shipment->shipment_type }}</p>
                                 <h6 class="card-text">{{ $shipment->status }}</h6>
-                                <p>{{ $shipment->suggested_delivery_date }}</p>
-                                <p>{{ $shipment->destination }}</p>
+                                <p>{{ $shipment->originCatalog->gntc_value ?? 'Origen no disponible' }}</p>
+                                <p>{{ $shipment->currentStatus->gntc_description ?? 'Estado no disponible' }}</p>
+                                <p>{{ $shipment->driver->drivername ?? 'Conductor no asignado' }}</p>
                                 <div class="d-flex justify-content-between">
                                     <button class="btn btn-primary btn-sm" data-bs-toggle="offcanvas"
                                         data-bs-target="#offcanvasUpdateStatus"
                                         onclick="populateOffcanvas({{ json_encode($shipment) }})">Update Status & Details</button>
-
-
                                 </div>
                             </div>
                         </div>
@@ -37,7 +36,7 @@
         <!-- Offcanvas para Update Status -->
     <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasUpdateStatus" aria-labelledby="offcanvasUpdateStatusLabel">
         <div class="offcanvas-header">
-            <h5 id="offcanvasUpdateStatusLabel">Shipment Status</h5>
+            <h5 id="offcanvasUpdateStatusLabel">Shipment Status & Details</h5>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">
@@ -73,7 +72,7 @@
 
                         <div class="mb-3">
                             <label for="origin" class="form-label">Origin</label>
-                            <input type="text" class="form-control" id="origin" value="{{ $shipment->origin }}" readonly>
+                            <input type="text" class="form-control" id="origin" value="{{ $shipment->originCatalog->gntc_value ?? 'Origen no disponible' }}" readonly>
                         </div>
 
                         <div class="mb-3">
@@ -247,7 +246,7 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Origin</label>
-                    <p>{{ $shipment->origin }}</p>
+                    <p>{{ $shipment->originCatalog->gntc_value ?? 'Origen no disponible' }}</p>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Destination</label>
@@ -322,8 +321,8 @@
                     <p>{{ $shipment->secured_yarddate }}</p>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Current Status (GNCT ID)</label>
-                    <p>{{ $shipment->gnct_id_current_status }}</p>
+                    <label class="form-label">Current Status</label>
+                    <p>{{ $shipment->currentStatus->gntc_description ?? 'Unknown' }}</p>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Shipment Type (GNCT ID)</label>

@@ -243,3 +243,42 @@
         });
 </script>
 
+<script>
+    $(document).ready(function () {
+        // Interceptar el envío del formulario
+        $('#shipmentForm').on('submit', function (event) {
+            event.preventDefault(); // Evitar el envío estándar del formulario
+
+            // Obtener la URL del formulario
+            let formAction = $(this).attr('action');
+
+            // Serializar los datos del formulario
+            let formData = $(this).serialize();
+
+            // Enviar los datos mediante AJAX
+            $.ajax({
+                url: formAction,
+                method: 'PUT',
+                data: formData,
+                beforeSend: function () {
+                    // Puedes agregar un indicador de carga aquí si lo necesitas
+                    console.log('Enviando datos...');
+                },
+                success: function (response) {
+                    // Manejar la respuesta exitosa
+                    alert(response.message);
+                    console.log(response);
+
+                    // Actualizar la página o realizar alguna acción adicional
+                    location.reload(); // Recargar la página para ver los cambios
+                },
+                error: function (xhr) {
+                    // Manejar errores
+                    let errorMessage = xhr.responseJSON?.message || 'Ocurrió un error al actualizar el envío.';
+                    alert(errorMessage);
+                    console.error(xhr.responseJSON?.error || xhr.responseText);
+                },
+            });
+        });
+    });
+</script>
