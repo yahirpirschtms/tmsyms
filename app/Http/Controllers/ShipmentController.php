@@ -12,31 +12,16 @@ class ShipmentController extends Controller
 {
 
     //
-    public function workflowtrafficstartshow()
+      public function allshipmentsshow()
     {
-        if(Auth::check()){
-            return view('home.trafficworkflowstart');
-        }
-        return redirect('/login');
-
-    }
-    public function allshipmentsshow()
-{
     if (Auth::check()) {
         $shipments = Shipment::all();  // Obtén los envíos desde la base de datos
           // Esto te ayudará a verificar si los envíos se están obteniendo correctamente
         return view('home.all-shipments', compact('shipments'));  // Cambia aquí el nombre de la vista
     }
     return redirect('/login');
-}
-    public function emptytrailershow()
-    {
-        if(Auth::check()){
-            return view('home.index');
-        }
-        return redirect('/login');
-
     }
+
 
     public function liveshipmentsshow()
 {

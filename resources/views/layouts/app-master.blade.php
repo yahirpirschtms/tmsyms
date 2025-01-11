@@ -204,6 +204,17 @@
                 margin: 0;
                 padding: 0;
             }
+
+
+            .table {
+    table-layout: auto;
+    width: 100%;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
     </style>
 </head>
 <body>
@@ -211,6 +222,11 @@
       @include('layouts.partials.navbar')
       <div style="margin-top: 120px;">
         @yield('content')
+
+        <style>
+
+
+        </style>
       </div>
 
 
