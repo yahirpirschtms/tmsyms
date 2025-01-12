@@ -39,4 +39,10 @@ class Companies extends Model
     //Esto desactiva la protección contra asignación masiva, pero se debe usar con precaución.
     protected $guarded = [];
 
+    // Relación inversa con EmptyTrailer
+    public function trailers()
+    {
+        return $this->hasMany(EmptyTrailer::class, 'location', 'id_company');
+    }
+
 }
