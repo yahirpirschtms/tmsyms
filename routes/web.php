@@ -17,7 +17,7 @@ Route::get('/login', [LoginController::class, 'show']);
 
 Route::post('/login', [LoginController::class, 'login']);
 
-Route::get('/home', [HomeController::class, 'index']);
+//Route::get('/home', [HomeController::class, 'index']);
 
 Route::post('/emptytrailer/store', [HomeController::class, 'store'])->name('emptytrailer.store');
 
@@ -39,11 +39,17 @@ Route::get('/carrier-emptytrailer', [CompaniesController::class, 'getLocations']
 //Ruta actualizacion de Tabla EmptyTrailer con boton refresh o automaticamente
 Route::get('/emptytrailer/data', [HomeController::class, 'getEmptyTrailers'])->name('emptytrailer.data');
 
-//Ruta validacion formulario Empty Trailer
-Route::post('/emptytrailer/validate', [HomeController::class, 'validateField'])->name('emptytrailer.validate');
-
 //Eliminar el empty trailer
-Route::delete('/empty-trailer/{id}', [HomeController::class, 'destroy'])->name('emptytrailer.destroy');
+Route::delete('/trailers/{id}', [HomeController::class, 'destroy'])->name('trailers.destroy');
+
+//Ruta para mostrar los detalles de un Empty trailer en el offcanvas
+Route::get('/getTrailerDetails/{id}', [HomeController::class, 'getTrailerDetails']);
+
+//Actualizar empty trailer
+Route::put('/emptytrailer/update', [HomeController::class, 'update'])->name('emptytrailer.update');
+
+// Ruta para crear el flujo de "workflow start" con un empty trailer
+Route::get('/createworkflowstartwithemptytrailer', [ShipmentController::class, 'createWorkflowStartWithEmptyTrailer'])->name('createworkflowstartwithemptytrailer');
 
 
 

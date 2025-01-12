@@ -8,7 +8,7 @@
             <div class="my-4 d-flex justify-content-center align-items-center">
                 <h2 class="gradient-text text-capitalize fw-bolder" >Traffic Workflow Start</h2>
             </div>
-            <form>
+            <form id="createnewshipmentform">
             <div class="mb-3 row ">
                 <label for="inputstmid" class="col-sm-2 col-form-label ">STM ID</label>
                 <div class="col-sm-10">
@@ -39,7 +39,7 @@
             <div class="mb-3 row ">
                 <label for="inputorigin" class="col-sm-2 col-form-label ">Origin</label>
                 <div class="col-sm-10">
-                    <select class="form-select" aria-label="Default select example"  id="inputorigin" name="inputorigin">
+                    <select class="form-select" aria-label="Default select example"  id="inputorigin" name="inputorigin" value="{{ old('inputorigin', $origin ?? '') }}">
                         <option selected>Open this select menu</option>
                     </select>
                 </div>
@@ -61,7 +61,7 @@
             <div class="mb-3 row ">
                 <label for="inputidtrailer" class="col-sm-2 col-form-label ">Trailer ID</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" id="inputidtrailer" name="inputidtrailer">
+                    <input type="text" class="form-control" id="inputidtrailer" name="inputidtrailer" value="{{ old('inputidtrailer', $from_button == 1 ? $trailerId : '') }}">
                 </div>
             </div>
             <div class="mb-3 row ">
@@ -150,3 +150,8 @@
     @endguest
 @endsection
 
+
+@section('scripts')
+    <!-- Referencia al archivo JS de manera directa -->
+    <script src="{{ asset('js/trafficworkflowstart.js') }}"></script> <!-- Asegúrate que el archivo esté en public/js -->
+@endsection

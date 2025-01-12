@@ -14,7 +14,7 @@
                 <button type="button" class="btn-close position-absolute top-0 end-0 " data-bs-dismiss="offcanvas" aria-label="Close" style="padding-top: 3.5rem; padding-right: 3.1rem"></button>
                 </div>
               </div>
-              <div class="offcanvas-body">
+              <div class="offcanvas-body offcanvas-bodyy">
                 <ul class="navbar-nav justify-content-center flex-grow-1 pe-3">
                   <!--Trailer Status-->
                   <li class="nav-item ">

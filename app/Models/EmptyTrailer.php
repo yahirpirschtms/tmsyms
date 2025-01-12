@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -17,7 +18,7 @@ class EmptyTrailer extends Model
     protected $primaryKey = 'pk_trailer';
 
     // Si la clave primaria no es autoincremental
-    public $incrementing = false;
+    public $incrementing = true;
 
     // Define el tipo de la clave primaria
     protected $keyType = 'int';
@@ -46,8 +47,30 @@ class EmptyTrailer extends Model
             return $this->belongsTo(GenericCatalog::class, 'gnct_id_avaibility_indicator', 'gnct_id');
         }
     
-        public function location()
+        public function locations()
         {
             return $this->belongsTo(Companies::class, 'location', 'id_company');
+        }
+
+
+        //Convertir Fechas
+            public function getStatusAttribute($value)
+        {
+            return Carbon::parse($value)->format('m/d/Y');
+        }
+
+        public function getDateInAttribute($value)
+        {
+            return Carbon::parse($value)->format('m/d/Y H:i:s');
+        }
+
+        public function getDateOutAttribute($value)
+        {
+            return Carbon::parse($value)->format('m/d/Y H:i:s');
+        }
+
+        public function getTransactionDateAttribute($value)
+        {
+            return Carbon::parse($value)->format('m/d/Y H:i:s');
         }
 }
