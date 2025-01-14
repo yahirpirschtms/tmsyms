@@ -19,7 +19,11 @@ Route::post('/login', [LoginController::class, 'login']);
 
 //Route::get('/home', [HomeController::class, 'index']);
 
+//Ruta guardar un nuveo Empty Trailer
 Route::post('/emptytrailer/store', [HomeController::class, 'store'])->name('emptytrailer.store');
+
+//Ruta guardar un nuevo Shipment
+Route::post('/shipment/store', [ShipmentController::class, 'store'])->name('shipment.store');
 
 Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
@@ -50,6 +54,9 @@ Route::put('/emptytrailer/update', [HomeController::class, 'update'])->name('emp
 
 // Ruta para crear el flujo de "workflow start" con un empty trailer
 Route::get('/createworkflowstartwithemptytrailer', [ShipmentController::class, 'createWorkflowStartWithEmptyTrailer'])->name('createworkflowstartwithemptytrailer');
+
+//Rutas nutrir selects para la pantalla de Shipments
+Route::get('/shipment-types', [GenericCatalogController::class, 'getShipmentTypes'])->name('shipmenttypes-shipment');
 
 
 

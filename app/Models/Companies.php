@@ -45,4 +45,11 @@ class Companies extends Model
         return $this->hasMany(EmptyTrailer::class, 'location', 'id_company');
     }
 
+    // Relación inversa con Shipments
+    public function shipments()
+    {
+        return $this->hasMany(Shipments::class, 'gnct_id_avaibility_indicator', 'gnct_id');
+    }
+
+
 }

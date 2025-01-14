@@ -17,13 +17,102 @@
 
             <!--Botones Añadir y refresh-->
             <div class="d-flex justify-content-end my-4">
-            <input class="form-control me-2" type="search" placeholder="Search" id="searchemptytrailer" aria-label="Search">
+                <input class="form-control me-2" type="search" placeholder="Search By Filters" id="searchemptytrailer" aria-label="Search">
                 <button type="button" class="btn btn-primary me-2" id="refreshemptytrailertable" data-url="{{ route('emptytrailer.data') }}">
                     Refresh
                 </button>
-                <button class="btn btn-primary" id="addnewemptytrailer" type="button" data-bs-toggle="offcanvas" data-bs-target="#newtrailerempty" aria-controls="offcanvasWithBothOptions">
+                <button class="btn btn-primary me-2" id="addnewemptytrailer" type="button" data-bs-toggle="offcanvas" data-bs-target="#newtrailerempty" aria-controls="offcanvasWithBothOptions">
                     Add
                 </button>
+                <button class="btn btn-primary" id="addmorefiltersemptytrailer" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasaddmorefilters" aria-controls="offcanvasaddmorefilters">
+                    +Filters
+                </button>
+            </div>
+
+            
+            
+            <!--<div id="filtersapplied" class="mb-3 col-md-11">-->
+            <div id="filtersapplied" class=" mb-3">
+                <!--<div class="row">-->
+
+                    <div id="emptytrailerfilterdividtrailer" style="background-color:white;display:none" class="input-group mb-3 me-2">
+                        <btn id="emptytrailerfilterbtnidtrailer" style="background-color: unset; color:black" class="ms-2 me-2">ID Trailer:</btn>
+                        <input id="emptytrailerfilterinputidtrailer" name="emptytrailerfilterinputidtrailer" value="" style="border:unset; color:black; max-width:150px" type="text" class="form-control me-2" aria-label="">
+                        <button id="emptytrailerfilterbuttonidtrailer" style="border-radius:0.5rem; background-color:rgb(13, 82, 200); color:white" class="btn me-2">X</button>
+                    </div>
+
+                    <div id="emptytrailerfilterdivdateofstatus" style="background-color:white;display:none" class="input-group mb-3 me-2">
+                        <btn id="emptytrailerfilterbtndateofstatus" style="background-color: unset; color:black" class="ms-2 me-2">Date Of Status:</btn>
+                        <input id="emptytrailerfilterinputdateofstartstatus" name="emptytrailerfilterinputdateofstartstatus" value="" style="border:unset; color:black; max-width:150px" type="text" class="form-control me-2" aria-label=""> 
+                        <p>-</p>
+                        <input id="emptytrailerfilterinputdateofendstatus" name="emptytrailerfilterinputdateofendstatus" value="" style="border:unset; color:black; max-width:150px" type="text" class="form-control mx-2" aria-label="">
+                        <button id="emptytrailerfilterbuttondateofstatus" style="border-radius:0.5rem; background-color:rgb(13, 82, 200); color:white" class="btn me-2">X</button>
+                    </div>
+                    
+                    <div id="emptytrailerfilterdivpalletsontrailer" style="background-color:white;display:none" class="input-group mb-3 me-2">
+                        <btn id="emptytrailerfilterbtnpalletsontrailer" style="background-color: unset; color:black" class="ms-2 me-2">Pallets On Trailer:</btn>
+                        <input id="emptytrailerfilterinputpalletsontrailer" name="emptytrailerfilterinputpalletsontrailer" value="" style="border:unset; color:black; max-width:150px" type="text" class="form-control me-2" aria-label="">
+                        <button id="emptytrailerfilterbuttonpalletsontrailer" style="border-radius:0.5rem; background-color:rgb(13, 82, 200); color:white" class="btn me-2">X</button>
+                    </div>
+
+                    <div id="emptytrailerfilterdivpalletsonfloor" style="background-color:white;display:none" class="input-group mb-3 me-2">
+                        <btn id="emptytrailerfilterbtnpalletsonfloor" style="background-color: unset; color:black" class="ms-2 me-2">Pallets On Floor</btn>
+                        <input id="emptytrailerfilterinputpalletsonfloor" name="emptytrailerfilterinputpalletsonfloor" value="" style="border:unset; color:black; max-width:150px" type="text" class="form-control me-2" aria-label="">
+                        <button id="emptytrailerfilterbuttonpalletsonfloor" style="border-radius:0.5rem; background-color:rgb(13, 82, 200); color:white" class="btn me-2">X</button>
+                    </div>
+
+                    <div id="emptytrailerfilterdivcarrier" style="background-color:white" class="input-group mb-3 me-2">
+                        <btn id="emptytrailerfilterbtncarrier" style="background-color: unset; color:black" class="ms-2 me-2">Carrier:</btn>
+                        <input id="emptytrailerfilterinputcarrier" name="" value="" style="border:unset; color:black; max-width:150px" type="text" class="form-control me-2" aria-label="">
+                        <input type="text" name="emptytrailerfilterinputcarrierpk" id="emptytrailerfilterinputcarrierpk" value="">
+                        <button id="emptytrailerfilterbuttoncarrier" style="border-radius:0.5rem; background-color:rgb(13, 82, 200); color:white" class="btn me-2">X</button>
+                    </div>
+
+                    <div id="emptytrailerfilterdivavailabilityindicator" style="background-color:white" class="input-group mb-3 me-2">
+                        <btn id="emptytrailerfilterbtnavailabilityindicator" style="background-color: unset; color:black" class="ms-2 me-2">Availability Indicator:</btn>
+                        <input id="emptytrailerfilterinputavailabilityindicator" value="" style="border:unset; color:black; max-width:150px" type="text" class="form-control me-2" aria-label="">
+                        <input type="text" name="emptytrailerfilterinputavailabilityindicatorpk" id="emptytrailerfilterinputavailabilityindicatorpk" value="">
+                        <button id="emptytrailerfilterbuttonavailabilityindicator" style="border-radius:0.5rem; background-color:rgb(13, 82, 200); color:white" class="btn me-2">X</button>
+                    </div>
+
+                    <div id="emptytrailerfilterdivlocation" style="background-color:white" class="input-group mb-3 me-2">
+                        <btn id="emptytrailerfilterbtnlocation" style="background-color: unset; color:black" class="ms-2 me-2">Location:</btn>
+                        <input id="emptytrailerfilterinputlocation" value="" style="border:unset; color:black; max-width:150px" type="text" class="form-control me-2" aria-label="">
+                        <input type="text" name="emptytrailerfilterinputlocationpk" id="emptytrailerfilterinputlocationpk" value="">
+                        <button id="emptytrailerfilterbuttonlocation" style="border-radius:0.5rem; background-color:rgb(13, 82, 200); color:white" class="btn me-2">X</button>
+                    </div>
+
+                    <div id="emptytrailerfilterdivdatein" style="background-color:white;display:none" class="input-group mb-3 me-2">
+                        <btn id="emptytrailerfilterbtndatein" style="background-color: unset; color:black" class="ms-2 me-2">Date In:</btn>
+                        <input id="emptytrailerfilterinputstartdatein" name="emptytrailerfilterinputstartdatein" value="" style="border:unset; color:black; max-width:150px" type="text" class="form-control me-2" aria-label="">
+                        <p>-</p>
+                        <input id="emptytrailerfilterinputenddatein" name="emptytrailerfilterinputenddatein" value="" style="border:unset; color:black; max-width:150px" type="text" class="form-control me-2" aria-label="">
+                        <button id="emptytrailerfilterbuttondatein" style="border-radius:0.5rem; background-color:rgb(13, 82, 200); color:white" class="btn mx-2">X</button>
+                    </div>
+
+                    <div id="emptytrailerfilterdivdateout" style="background-color:white;display:none" class="input-group mb-3 me-2">
+                        <btn id="emptytrailerfilterbtndateout" style="background-color: unset; color:black" class="ms-2 me-2">Date Out:</btn>
+                        <input id="emptytrailerfilterinputstartdateout" name="emptytrailerfilterinputstartdateout" value="" style="border:unset; color:black; max-width:150px" type="text" class="form-control me-2" aria-label="">
+                        <p>-</p>
+                        <input id="emptytrailerfilterinputenddateout" name="emptytrailerfilterinputenddateout" value="" style="border:unset; color:black; max-width:150px" type="text" class="form-control me-2" aria-label="">
+                        <button id="emptytrailerfilterbuttondateout" style="border-radius:0.5rem; background-color:rgb(13, 82, 200); color:white" class="btn mx-2">X</button>
+                    </div>
+
+                    <div id="emptytrailerfilterdivtransactiondate" style="background-color:white;display:none" class="input-group mb-3 me-2">
+                        <btn id="emptytrailerfilterbtntransactiondate" style="background-color: unset; color:black" class="ms-2 me-2">Transaction Date:</btn>
+                        <input id="emptytrailerfilterinputstarttransactiondate" name="emptytrailerfilterinputstarttransactiondate" value="" style="border:unset; color:black; max-width:150px" type="text" class="form-control me-2" aria-label="">
+                        <p>-</p>
+                        <input id="emptytrailerfilterinputendtransactiondate" name="emptytrailerfilterinputendtransactiondate" value="" style="border:unset; color:black; max-width:150px" type="text" class="form-control me-2" aria-label="">
+                        <button id="emptytrailerfilterbuttontransactiondate" style="border-radius:0.5rem; background-color:rgb(13, 82, 200); color:white" class="btn mx-2">X</button>
+                    </div>
+
+                    <div id="emptytrailerfilterdivusername" style="background-color:white;display:none" class="input-group mb-3 me-2">
+                        <btn id="emptytrailerfilterbtnusername" style="background-color: unset; color:black" class="ms-2 me-2">Username:</btn>
+                        <input id="emptytrailerfilterinputusername" name="emptytrailerfilterinputusername" value="" style="border:unset; color:black; max-width:150px" type="text" class="form-control me-2" aria-label="">
+                        <button id="emptytrailerfilterbuttonusername" style="border-radius:0.5rem; background-color:rgb(13, 82, 200); color:white" class="btn me-2">X</button>
+                    </div>
+                    
+                <!--</div>-->
             </div>
 
             <!--Alerta de añadido exitoso-->
@@ -39,6 +128,150 @@
                     });
                 </script>
             @endif
+
+            <!--OffCanvas añadir mas filtros-->
+            <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasaddmorefilters" aria-labelledby="offcanvasaddmorefiltersLabel">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title" id="offcanvasaddmorefiltersLabel">Add More Filters</h5>
+                    <button type="button" id="offcanvasaddmorefiltersclosebutton" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <div>
+                        <button class="btn btn-primary w-100 mb-2" id="closeapplytraileridfilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapseapplytraileridfilter" aria-expanded="false" aria-controls="multiCollapseapplytraileridfilter">ID Trailer</button>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="collapse multi-collapse" id="multiCollapseapplytraileridfilter">
+                                <input type="text" class="form-control" id="inputapplytraileridfilter">
+                                <button class="btn btn-primary mt-2" type="button" id="applytraileridfilter">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary w-100 mb-2" id="closeapplystatusfilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapseapplystatusfilter" aria-expanded="false" aria-controls="multiCollapseapplystatusfilter">Date Of Status</button>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="collapse multi-collapse" id="multiCollapseapplystatusfilter">
+                                    <div class="d-flex">
+                                    <input type="text" class="form-control datetms me-2" value="" id="inputapplystatusstfilter" placeholder="Start Date">
+                                    <input type="text" class="form-control datetms ms-2" value="" id="inputapplystatusedfilter" placeholder="End Date">
+                                    </div>
+                                <button class="btn btn-primary mt-2" type="button" id="applystatusfilter">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary w-100 mb-2" id="closeapplypoffilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapseapplypoffilter" aria-expanded="false" aria-controls="multiCollapseapplypoffilter">Pallets On Floor</button>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="collapse multi-collapse" id="multiCollapseapplypoffilter">
+                                <input type="text" class="form-control" id="inputapplypoffilter">
+                                <button class="btn btn-primary mt-2" type="button" id="applypoffilter">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary w-100 mb-2" id="closeapplypotfilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapseapplypotfilter" aria-expanded="false" aria-controls="multiCollapseapplypotfilter">Pallets On Trailer</button>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="collapse multi-collapse" id="multiCollapseapplypotfilter">
+                                <input type="text" class="form-control" id="inputapplypotfilter">
+                                <button class="btn btn-primary mt-2" type="button" id="applypotfilter">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary w-100 mb-2" id="closeapplycarrierfilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapseapplycarrierfilter" aria-expanded="false" aria-controls="multiCollapseapplycarrierfilter">Carrier</button>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="collapse multi-collapse" id="multiCollapseapplycarrierfilter">
+                                <select class="form-select" aria-label="Default select example" id="inputapplycarrierfilter" name="inputapplycarrierfilter" data-url="{{ route('carrier-emptytrailer') }}"></select>
+                                <button class="btn btn-primary mt-2" type="button" id="applycarrierfilter">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary w-100 mb-2" id="closeapplyaifilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapseapplyaifilter" aria-expanded="false" aria-controls="multiCollapseapplyaifilter">Availability Indicator</button>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="collapse multi-collapse" id="multiCollapseapplyaifilter">
+                                <select class="form-select" aria-label="Default select example" id="inputapplyaifilter" name="inputapplyaifilter" data-url="{{ route('availabilityindicators-emptytrailer') }}"></select>
+                                <button class="btn btn-primary mt-2" type="button" id="applyaifilter">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary w-100 mb-2" id="closeapplylocationfilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapseapplylocationfilter" aria-expanded="false" aria-controls="multiCollapseapplylocationfilter">Location</button>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="collapse multi-collapse" id="multiCollapseapplylocationfilter">
+                                <select class="form-select searchlocation" aria-label="Default select example" id="inputapplylocationfilter" name="inputapplylocationfilter" data-url="{{ route('locations-emptytrailer') }}"></select>
+                                <button class="btn btn-primary mt-2" type="button" id="applylocationfilter">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary w-100 mb-2" id="closeapplydifilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapseapplydifilter" aria-expanded="false" aria-controls="multiCollapseapplydifilter">Date In</button>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="collapse multi-collapse" id="multiCollapseapplydifilter">
+                                <div class="d-flex">
+                                <input type="text" class="form-control datetimepicker me-2" value="" id="inputapplydistfilter" name="inputapplydistfilter" placeholder="Start Date">
+                                <input type="text" class="form-control datetimepicker ms-2" value="" id="inputapplydienfilter" name="inputapplydienfilter" placeholder="End Date">
+                                </div>
+                                <button class="btn btn-primary mt-2" type="button" id="applydifilter">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary w-100 mb-2" id="closeapplydofilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapseapplydofilter" aria-expanded="false" aria-controls="multiCollapseapplydofilter">Date Out</button>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="collapse multi-collapse" id="multiCollapseapplydofilter">
+                                <div class="d-flex">
+                                <input type="text" class="form-control datetimepicker me-2" value="" id="inputapplydostfilter" name="inputapplydostfilter" placeholder="Start Date">
+                                <input type="text" class="form-control datetimepicker ms-2" value="" id="inputapplydoedfilter" name="inputapplydoedfilter" placeholder="End Date">
+                                </div>
+                                <button class="btn btn-primary mt-2" type="button" id="applydofilter">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary w-100 mb-2" id="closeapplytdfilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapseapplytdfilter" aria-expanded="false" aria-controls="multiCollapseapplytdfilter">Transaction Date</button>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="collapse multi-collapse" id="multiCollapseapplytdfilter">
+                                    <div class="d-flex">
+                                    <input type="text" class="form-control datetimepicker me-2" value="" placeholder="Start Date" id="inputapplytdstfilter" name="inputapplytdstfilter">
+                                    <input type="text" class="form-control datetimepicker ms-2" value="" placeholder="End Date" id="inputapplytdedfilter" name="inputapplytdedfilter">
+                                    </div>
+                                    <button class="btn btn-primary mt-2" type="button" id="applytdfilter">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary w-100 mb-2" id="closeapplyusernamefilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapseapplyusernamefilter" aria-expanded="false" aria-controls="multiCollapseapplyusernamefilter">Username</button>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="collapse multi-collapse" id="multiCollapseapplyusernamefilter">
+                                <input type="text" class="form-control" id="inputusernamefilter">
+                                <button class="btn btn-primary mt-2" type="button" id="applyusernamefilter">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
 
             <!--Tabla mostrar los emptytrailers existentes-->
             <div>
@@ -97,6 +330,9 @@
                         </div>
                     <div class="offcanvas-body">
                         <p id="pk_trailer" style="display:none;"></p>
+                        <p id="pk_availability" style="display:none;"></p>
+                        <p id="pk_location" style="display:none;"></p>
+                        <p id="pk_carrier" style="display:none;"></p>
                         <p><strong>ID Trailer:</strong> <span id="offcanvas-id"></span></p>
                         <p><strong>Status:</strong> <span id="offcanvas-status"></span></p>
                         <p><strong>Pallets on Trailer:</strong> <span id="offcanvas-pallets-on-trailer"></span></p>
