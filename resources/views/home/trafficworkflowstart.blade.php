@@ -30,7 +30,7 @@
                 </div>
 
                 <div class="form-check mb-3">
-                    <input class="form-check-input" type="checkbox" value="" id="inputshipmentcheckbonded" name="inputshipmentcheckbonded">
+                    <input class="form-check-input" type="checkbox" id="inputshipmentcheckbonded" name="inputshipmentcheckbonded">
                     <label class="form-check-label" for="inputshipmentcheckbonded">
                         Bounded
                     </label>

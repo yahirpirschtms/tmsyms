@@ -129,14 +129,14 @@ class ShipmentController extends Controller
         $prealertdatetime = Carbon::createFromFormat('m/d/y H:i:s', $request->inputshipmentprealertdatetime)->format('Y-m-d H:i:s'); // Fecha y hora con minutos y segundos
         $estimateddateofdeparture = Carbon::createFromFormat('m/d/y H:i:s', $request->inputshipmentetd)->format('Y-m-d H:i:s'); // Fecha y hora con minutos y segundos
 
-    
+        $bounded = $request->has('inputshipmentcheckbonded') ? true : false;
         // Crear un nuevo registro
         Shipments::create([
             //'pk_trailer' => $request->inputidtrailer,
             'stm_id' => $request->inputshipmentstmid,
             'gnct_id_shipment_type' => $request->inputshipmentshipmenttype,
             'reference' => $request->inputshipmentreference,
-            'bonded' => $request->inputshipmentcheckbonded,
+            'bonded' => $bounded,
             'origin' => $request->inputorigin,
             'destination' => $request->inputshipmentdestination,
             'pre_alerted_datetime' => $prealertdatetime,
