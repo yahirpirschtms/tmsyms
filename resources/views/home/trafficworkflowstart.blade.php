@@ -9,132 +9,130 @@
                 <h2 class="gradient-text text-capitalize fw-bolder" >Traffic Workflow Start</h2>
             </div>
             <form id="createnewshipmentform">
-            <div class="mb-3 row ">
-                <label for="inputstmid" class="col-sm-2 col-form-label ">STM ID</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" id="inputstmid" name="inputstmid">
+            @csrf
+                <div class="mb-3">
+                    <label for="inputshipmentstmid" class="form-label ">STM ID</label>
+                    <input type="text" class="form-control" id="inputshipmentstmid" name="inputshipmentstmid">
+                    <div class="invalid-feedback"></div>
                 </div>
-            </div>
-            <div class="mb-3 row ">
-                <label for="inputshipmenttype" class="col-sm-2 col-form-label ">Shipment Type</label>
-                <div class="col-sm-10">
-                    <select class="form-select" aria-label="Default select example"  id="inputshipmenttype" name="inputshipmenttype">
-                        <option selected>Open this select menu</option>
-                        <option value="1">One</option>
+
+                <div class="mb-3">
+                    <label for="inputshipmentshipmenttype" class="form-label ">Shipment Type</label>
+                    <select class="form-select" aria-label="Default select example"  id="inputshipmentshipmenttype" name="inputshipmentshipmenttype" data-url="{{ route('shipmenttypes-shipment') }}">
                     </select>
+                    <div class="invalid-feedback"></div>
                 </div>
-            </div>
-            <div class="mb-3 row ">
-                <label for="inputreference" class="col-sm-2 col-form-label ">Reference</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" id="inputreference" name="inputreference">
+
+                <div class="mb-3">
+                    <label for="inputshipmentreference" class="form-label ">Reference</label>
+                    <input type="text" class="form-control" id="inputshipmentreference" name="inputshipmentreference">
+                    <div class="invalid-feedback"></div>
                 </div>
-            </div>
-            <div class="form-check mb-3">
-                <input class="form-check-input" type="checkbox" value="" id="boundedCheckDefault" name="boundedCheckDefault">
-                <label class="form-check-label" for="boundedCheckDefault">
-                    Bounded
-                </label>
-            </div>
-            <div class="mb-3 row ">
-                <label for="inputorigin" class="col-sm-2 col-form-label ">Origin</label>
-                <div class="col-sm-10">
-                    <select class="form-select" aria-label="Default select example"  id="inputorigin" name="inputorigin" value="{{ old('inputorigin', $origin ?? '') }}">
-                        <option selected>Open this select menu</option>
+
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" value="" id="inputshipmentcheckbonded" name="inputshipmentcheckbonded">
+                    <label class="form-check-label" for="inputshipmentcheckbonded">
+                        Bounded
+                    </label>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="inputorigin" class="form-label ">Origin</label>
+                    <select class="form-select" aria-label="Default select example"  id="inputorigin" name="inputorigin" value="{{ old('inputorigin', $from_button == 1 ? $location : '') }}" data-url="{{ route('locations-emptytrailer') }}">
                     </select>
+                    <div class="invalid-feedback"></div>
                 </div>
-            </div>
-            <div class="mb-3 row ">
-                <label for="inputdestination" class="col-sm-2 col-form-label ">Destination</label>
-                <div class="col-sm-10">
-                    <select class="form-select" aria-label="Default select example"  id="inputdestination" name="inputdestination">
-                        <option selected>Open this select menu</option>
+
+                <div class="mb-3">
+                    <label for="inputshipmentdestination" class="form-label ">Destination</label>
+                    <select class="form-select" aria-label="Default select example"  id="inputshipmentdestination" name="inputshipmentdestination">
                     </select>
+                    <div class="invalid-feedback"></div>
                 </div>
-            </div>
-            <div class="mb-3 row ">
-                <label for="inputprealertdatetime" class="col-sm-2 col-form-label ">PreAlert DateTime</label>
-                <div class="col-sm-10">
-                    <input type="datetime-local" class="form-control" id="inputprealertdatetime" name="inputprealertdatetime">
+
+                <div class="mb-3">
+                    <label for="inputshipmentprealertdatetime" class="form-label ">PreAlert DateTime</label>
+                    <input type="text" class="form-control datetimepicker" id="inputshipmentprealertdatetime" name="inputshipmentprealertdatetime">
+                    <div class="invalid-feedback"></div>
                 </div>
-            </div>
-            <div class="mb-3 row ">
-                <label for="inputidtrailer" class="col-sm-2 col-form-label ">Trailer ID</label>
-                <div class="col-sm-10">
+
+                <div class="mb-3">
+                    <label for="inputidtrailer" class="form-label ">Trailer ID</label>
                     <input type="text" class="form-control" id="inputidtrailer" name="inputidtrailer" value="{{ old('inputidtrailer', $from_button == 1 ? $trailerId : '') }}">
+                    <div class="invalid-feedback"></div>
                 </div>
-            </div>
-            <div class="mb-3 row ">
-                <label for="inputcarrier" class="col-sm-2 col-form-label ">Carrier Dropping Trailer</label>
-                <div class="col-sm-10">
-                    <select class="form-select" aria-label="Default select example"  id="inputcarrier" name="inputcarrier">
-                        <option selected>Open this select menu</option>
+
+                <div class="mb-3">
+                    <label for="inputshipmentcarrier" class="form-label ">Carrier Dropping Trailer</label>
+                    <select class="form-select" aria-label="Default select example"  id="inputshipmentcarrier" name="inputshipmentcarrier" value="{{ old('inputshipmentcarrier', $from_button == 1 ? $carrier : '') }}" data-url="{{ route('locations-emptytrailer') }}">
+                    </select>
+                    <div class="invalid-feedback"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="inputshipmentdriver" class="form-label ">Driver</label>
+                    <select class="form-select" aria-label="Default select example"  id="inputshipmentdriver" name="inputshipmentdriver">
                     </select>
                 </div>
-            </div>
-            <div class="mb-3 row ">
-                <label for="inputdriver" class="col-sm-2 col-form-label ">Driver</label>
-                <div class="col-sm-10">
-                    <select class="form-select" aria-label="Default select example"  id="inputdriver" name="inputdriver">
-                        <option selected>Open this select menu</option>
+
+                <div class="mb-3">
+                    <label for="inputshipmenttrailer" class="form-label ">Trailer</label>
+                    <select class="form-select" aria-label="Default select example"  id="inputshipmenttrailer" name="inputshipmenttrailer">
                     </select>
+                    <div class="invalid-feedback"></div>
                 </div>
-            </div>
-            <div class="mb-3 row ">
-                <label for="inputtrailer" class="col-sm-2 col-form-label ">Trailer</label>
-                <div class="col-sm-10">
-                    <select class="form-select" aria-label="Default select example"  id="inputtrailer" name="inputtrailer">
-                        <option selected>Open this select menu</option>
+
+                <div class="mb-3">
+                    <label for="inputshipmenttruck" class="form-label ">Truck</label>
+                    <select class="form-select" aria-label="Default select example"  id="inputshipmenttruck" name="inputshipmenttruck">
                     </select>
+                    <div class="invalid-feedback"></div>
+               </div>
+
+                <div class="mb-3">
+                    <label for="inputshipmentetd" class="form-label ">Estimated date of departure</label>
+                    <input type="text" class="form-control datetimepicker" id="inputshipmentetd" name="inputshipmentetd">
+                    <div class="invalid-feedback"></div>
                 </div>
-            </div>
-            <div class="mb-3 row ">
-                <label for="inputtruck" class="col-sm-2 col-form-label ">Truck</label>
-                <div class="col-sm-10">
-                    <select class="form-select" aria-label="Default select example"  id="inputtruck" name="inputtruck">
-                        <option selected>Open this select menu</option>
-                    </select>
+
+                <div class="mb-3">
+                    <label for="inputshipmentsunits" class="form-label ">Units</label>
+                    <input type="text" class="form-control" id="inputshipmentsunits" name="inputshipmentsunits">
+                    <div class="invalid-feedback"></div>
                 </div>
-            </div>
-            <div class="mb-3 row ">
-                <label for="inputetd" class="col-sm-2 col-form-label ">Estimated date of departure</label>
-                <div class="col-sm-10">
-                    <input type="datetime-local" class="form-control" id="inputetd" name="inputetd">
+
+                <div class="mb-3">
+                    <label for="inputpallets" class="form-label ">Pallets</label>
+                    <input type="text" class="form-control" id="inputpallets" name="inputpallets" value="{{ old('inputpallets', $from_button == 1 ? $palletsontrailer : '') }}">
+                    <div class="invalid-feedback"></div>
                 </div>
-            </div>
-            <div class="mb-3 row ">
-                <label for="inputunits" class="col-sm-2 col-form-label ">Units</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" id="inputunits" name="inputunits">
+
+                <div class="mb-3">
+                    <label for="inputshipmentsecurityseals" class="form-label ">Security Seals</label>
+                    <input type="text" class="form-control" id="inputshipmentsecurityseals" name="inputshipmentsecurityseals">
+                    <div class="invalid-feedback"></div>
                 </div>
-            </div>
-            <div class="mb-3 row ">
-                <label for="inputpallets" class="col-sm-2 col-form-label ">Pallets</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" id="inputpallets" name="inputpallets">
+
+                <div class="mb-3">
+                    <label for="inputshipmentdevicenumber" class="form-label ">Device Number</label>
+                    <input type="text" class="form-control" id="inputshipmentdevicenumber" name="inputshipmentdevicenumber">
+                    <div class="invalid-feedback"></div>
                 </div>
-            </div>
-            <div class="mb-3 row ">
-                <label for="inputsecurityseals" class="col-sm-2 col-form-label ">Security Seals</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" id="inputsecurityseals" name="inputsecurityseals">
+
+                <div class="mb-3">
+                    <label for="inputshipmentnotes" class="form-label ">Notes</label>
+                    <input type="text" class="form-control" id="inputshipmentnotes" name="inputshipmentnotes">
+                    <div class="invalid-feedback"></div>
                 </div>
-            </div>
-            <div class="mb-3 row ">
-                <label for="inputdevicenumber" class="col-sm-2 col-form-label ">Device Number</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" id="inputdevicenumber" name="inputdevicenumber">
+
+                <div class="mb-3">
+                    <label for="inputshipmentoverhaulid" class="form-label ">Overhaul ID</label>
+                    <input type="text" class="form-control" id="inputshipmentoverhaulid" name="inputshipmentoverhaulid">
+                    <div class="invalid-feedback"></div>
                 </div>
-            </div>
-            <div class="mb-3 row ">
-                <label for="inputoverhaulid" class="col-sm-2 col-form-label ">Overhaul ID</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" id="inputoverhaulid" name="inputoverhaulid">
-                </div>
-            </div>
 
 
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="btn btn-primary" id="saveButtonShipment" data-url="{{ route('shipment.store') }}">Submit</button>
 
             <a href="{{ route('all-shipments') }}" class="btn btn-primary">All Shipments</a>
 

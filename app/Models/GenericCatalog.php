@@ -39,5 +39,11 @@ class GenericCatalog extends Model
         {
             return $this->hasMany(EmptyTrailer::class, 'gnct_id_avaibility_indicator', 'gnct_id');
         }
+
+        // Relación inversa con Shipments
+        public function shipments()
+        {
+            return $this->hasMany(Shipments::class, 'gnct_id_avaibility_indicator', 'gnct_id');
+        }
     
 }

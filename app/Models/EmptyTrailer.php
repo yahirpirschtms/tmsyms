@@ -41,6 +41,21 @@ class EmptyTrailer extends Model
         'username',
     ];
 
+        protected static function boot(){
+            parent::boot();
+
+            // Evento para cuando se crea un nuevo registro
+            static::creating(function ($model) {
+                $model->dateCreated = now();
+                $model->dateUpdated = now();
+            });
+
+            // Evento para cuando se actualiza un registro
+            static::updating(function ($model) {
+                $model->dateUpdated = now();
+            });
+        }
+
         // Relaciones si las hay
         public function availabilityIndicator()
         {
@@ -50,6 +65,12 @@ class EmptyTrailer extends Model
         public function locations()
         {
             return $this->belongsTo(Companies::class, 'location', 'id_company');
+        }
+
+        // Relación inversa con Shipments
+        public function shipments()
+        {
+            return $this->hasMany(Shipments::class, 'gnct_id_avaibility_indicator', 'gnct_id');
         }
 
 
