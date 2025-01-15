@@ -50,6 +50,9 @@ class Shipment extends Model
         'gnct_id_shipment_type',
         'delivered_date',
         'at_door_date',
+        'offload_date',
+        'approved_eta_date',
+        'approved_eta_time',
     ];
 
     // Atributos que son fechas y deben ser manejados como instancias de Carbon
@@ -61,6 +64,9 @@ class Shipment extends Model
         'secured_yarddate',
         'delivered_date',
         'at_door_date',
+        'offload_date',
+        'approved_eta_date',
+        'approved_eta_time',
     ];
 
     // Relación con GenericCatalog (estatus actual)
@@ -91,6 +97,8 @@ class Shipment extends Model
     {
         return $this->belongsTo(Driver::class, 'id_driver', 'pk_driver'); // Ajustado a id_driver
     }
+
+
 
         public function originCatalog()
     {

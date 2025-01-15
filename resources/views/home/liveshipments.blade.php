@@ -168,7 +168,9 @@
                         <input type="hidden" name="_method" value="PUT">
 
                         <select class="form-select" id="currentStatus" name="gnct_id_current_status">
+
                             @foreach ($currentStatus as $status)
+                                <label for="currentStatus" class="form-label">Current Status</label>
                                 <option value="{{ $status->gnct_id }}" {{ old('gnct_id_current_status', $shipment->gnct_id_current_status) == $status->gnct_id ? 'selected' : '' }}>
                                     {{ $status->gntc_description }}
                                 </option>
@@ -220,14 +222,7 @@
                     </form>
                 </div>
 
-        <!-- Offcanvas para Details -->
-        <ul class="nav nav-pills" id="pills-tab" role="tablist">
-            <li class="nav-item" role="presentation">
-            </li>
-            <li class="nav-item" role="presentation">
 
-            </li>
-        </ul>
 
         <div class="tab-content" id="pills-tabContent">
             <!-- Shipment Details Tab Content -->
@@ -354,3 +349,49 @@
         <p>Para ver el contenido <a href="/login">Inicia Sesión</a></p>
     @endguest
 @endsection
+
+@section('scripts')
+    <script>
+        $(document).ready(function () {
+            // Interceptar el envío del formulario
+            $('#shipmentForm').on('submit', function (event) {
+                event.preventDefault(); // Evitar el envío estándar del formulario
+
+                // Obtener la URL del formulario
+                let formAction = $(this).attr('action');
+
+                // Serializar los datos del formulario
+                let formData = $(this).serialize();
+
+                // Enviar los datos mediante AJAX
+                $.ajax({
+                    url: formAction,
+                    method: 'PUT',
+                    data: formData,
+                    beforeSend: function () {
+                        // Puedes agregar un indicador de carga aquí si lo necesitas
+                        console.log('Enviando datos...');
+                    },
+                    success: function (response) {
+                        // Manejar la respuesta exitosa
+                        alert(response.message);
+                        console.log(response);
+
+                        // Actualizar la página o realizar alguna acción adicional
+                        location.reload(); // Recargar la página para ver los cambios
+                    },
+                    error: function (xhr) {
+                        // Manejar errores
+                        let errorMessage = xhr.responseJSON?.message || 'Ocurrió un error al actualizar el envío.';
+                        alert(errorMessage);
+                        console.error(xhr.responseJSON?.error || xhr.responseText);
+                    },
+                });
+            });
+        });
+    </script>
+@endsection
+
+@section('custom-css')
+
+

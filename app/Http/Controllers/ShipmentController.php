@@ -69,7 +69,7 @@ class ShipmentController extends Controller
 
     // Mostrar los detalles de un envío
         public function details($pk_shipment)
-    {
+        {
         // Obtener el envío con las relaciones de currentStatus, driver y originCatalog
         $shipment = Shipment::with(['currentStatus', 'driver', 'originCatalog'])->findOrFail($pk_shipment);
 
@@ -78,9 +78,9 @@ class ShipmentController extends Controller
 
         // Pasar las variables a la vista
         return view('shipments.details', compact('shipment', 'currentStatus'));
-    }
-public function update(Request $request, $pk_shipment)
-{
+        }
+    public function update(Request $request, $pk_shipment)
+    {
     // Depurar los datos recibidos
 
 
@@ -119,7 +119,7 @@ public function update(Request $request, $pk_shipment)
 
         return response()->json(['message' => 'Failed to update shipment', 'error' => $e->getMessage()], 500);
     }
-}
+    }
     // Método para actualizar las notas del envío
     public function updateNotes(Request $request, Shipment $shipment)
     {

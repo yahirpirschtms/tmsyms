@@ -10,7 +10,13 @@
         'resources/sass/app.scss',
         'resources/js/app.js'
         ])
+    <!-- Cargar FullCalendar 5.x con los plugins necesarios -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/interaction@5.11.0/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@5.11.0/main.min.js"></script>
 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
       .gradient-text {
         background: linear-gradient(135deg, #1e4877, rgb(13, 82, 200));
@@ -180,30 +186,7 @@
         left: 0;
       }*/
 
-                #pills-tabContent {
-                padding-top: 0;
-                margin-top: 0;
-            }
 
-            /* Ajustar márgenes en los elementos dentro de las pestañas */
-            .tab-pane {
-                padding-top: 10px; /* Ajusta según necesites */
-            }
-
-            /* Reducir espacio extra en los p y labels dentro de los detalles */
-            .tab-pane .form-label {
-                margin-bottom: 5px; /* Menos margen entre label y p */
-            }
-
-            .tab-pane .mb-3 {
-                margin-bottom: 10px; /* Menos margen entre cada bloque */
-            }
-
-            /* Si el espacio es muy grande en los márgenes, también puedes probar ajustando el padding global */
-            body {
-                margin: 0;
-                padding: 0;
-            }
 
 
             .table {
@@ -215,7 +198,9 @@
     overflow-x: auto;
 }
 
-    </style>
+
+
+</style>
 </head>
 <body>
 
@@ -223,19 +208,18 @@
       <div style="margin-top: 120px;">
         @yield('content')
 
-        <style>
-
-
-        </style>
       </div>
 
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script> <!-- Requerido para los componentes de Bootstrap -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+      @yield('scripts')
 
 
 </body>
 
 
 </html>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+
 
     <!--Script para buscar el availability indicator en la pantalla de empty trailer-->
 <script>
@@ -259,42 +243,6 @@
         });
 </script>
 
-<script>
-    $(document).ready(function () {
-        // Interceptar el envío del formulario
-        $('#shipmentForm').on('submit', function (event) {
-            event.preventDefault(); // Evitar el envío estándar del formulario
 
-            // Obtener la URL del formulario
-            let formAction = $(this).attr('action');
 
-            // Serializar los datos del formulario
-            let formData = $(this).serialize();
 
-            // Enviar los datos mediante AJAX
-            $.ajax({
-                url: formAction,
-                method: 'PUT',
-                data: formData,
-                beforeSend: function () {
-                    // Puedes agregar un indicador de carga aquí si lo necesitas
-                    console.log('Enviando datos...');
-                },
-                success: function (response) {
-                    // Manejar la respuesta exitosa
-                    alert(response.message);
-                    console.log(response);
-
-                    // Actualizar la página o realizar alguna acción adicional
-                    location.reload(); // Recargar la página para ver los cambios
-                },
-                error: function (xhr) {
-                    // Manejar errores
-                    let errorMessage = xhr.responseJSON?.message || 'Ocurrió un error al actualizar el envío.';
-                    alert(errorMessage);
-                    console.error(xhr.responseJSON?.error || xhr.responseText);
-                },
-            });
-        });
-    });
-</script>
