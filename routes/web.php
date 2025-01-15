@@ -40,4 +40,4 @@ Route::put('/update-status-endpoint/{pk_shipment}', [ShipmentController::class, 
 Route::get('/shipment/status', [GenericCatalogController::class, 'getOrigin']);
 
 Route::get('/shipment/{pk_shipment}', [CalendarController::class, 'getShipmentDetails'])->name('shipment.details');
-Route::put('/update-offloading-status/{pk_shipment}', [CalendarController::class, 'updateOffloadingStatus'])->name('update.offloadingStatus');
+Route::put('/update-status/{pk_shipment}', [CalendarController::class, 'updateOffloadingStatus'])->name('update.status');

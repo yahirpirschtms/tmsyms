@@ -78,7 +78,9 @@ class ShipmentController extends Controller
 
         // Pasar las variables a la vista
         return view('shipments.details', compact('shipment', 'currentStatus'));
-        }
+    }
+
+
     public function update(Request $request, $pk_shipment)
     {
     // Depurar los datos recibidos

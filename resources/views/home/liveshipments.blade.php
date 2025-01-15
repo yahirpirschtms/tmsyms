@@ -216,9 +216,6 @@
                         <div class="d-flex justify-content-end">
                             <button type="submit" class="btn btn-primary">Save</button>
                         </div>
-                        <script>
-                            console.log("Shipment ID: {{ $shipment->pk_shipment }}");
-                        </script>
                     </form>
                 </div>
 

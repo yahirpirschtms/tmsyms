@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'App')</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="icon" type="image/png" href="{!! asset('/icons/tms_logo.png')!!}">
@@ -221,27 +222,7 @@
 </html>
 
 
-    <!--Script para buscar el availability indicator en la pantalla de empty trailer-->
-<script>
-        $(document).ready(function () {
-            $('#inputavailabilityindicator').on('focus', function () {
-                $.ajax({
-                    url: '/availability-indicators',
-                    method: 'GET',
-                    success: function (data) {
-                        let options = '<option selected>Open this select menu</option>';
-                        data.forEach(item => {
-                            options += `<option value="${item.gnct_id}">${item.gntc_description}</option>`;
-                        });
-                        $('#inputavailabilityindicator').html(options);
-                    },
-                    error: function (xhr, status, error) {
-                        console.error('Error al cargar los datos:', error);
-                    }
-                });
-            });
-        });
-</script>
+
 
 
 
