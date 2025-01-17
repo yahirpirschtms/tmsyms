@@ -9,10 +9,19 @@
         <div class="d-flex justify-content-center my-4">
             <h2 class="gradient-text text-capitalize fw-bolder">All Shipments</h2>
         </div>
+        <div class="container my-4">
+            <!-- Centrar contenido horizontalmente -->
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <!-- Barra de búsqueda -->
+                    <input type="text" id="searchByShipment" class="form-control" placeholder="Search all shipments">
+                </div>
+            </div>
+        </div>
 
         <div class="container-fluid px-0">
             <div class="table-responsive">
-                <table class="table table-striped table-hover table-bordered table-sm w-100">
+                <table class="table table-striped table-hover table-bordered table-sm w-100" id="shipmentsTable">
                     <thead class="thead-dark">
                         <tr>
                             <th>Shipment Type</th>
@@ -405,6 +414,29 @@
 @endsection
 
 @section('scripts')
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('searchByShipment');
+            const table = document.getElementById('shipmentsTable');
+            const rows = table.querySelectorAll('tbody tr');
+
+            searchInput.addEventListener('input', function () {
+                const searchText = this.value.toLowerCase();
+
+                rows.forEach(row => {
+                    // Verificar si alguna celda contiene el texto buscado
+                    const cells = row.querySelectorAll('td');
+                    const match = Array.from(cells).some(cell =>
+                        cell.textContent.toLowerCase().includes(searchText)
+                    );
+
+                    // Mostrar u ocultar la fila dependiendo de si coincide
+                    row.style.display = match ? '' : 'none';
+                });
+            });
+        });
+    </script>
     <script>
         $(document).ready(function () {
             // Interceptar el envío del formulario

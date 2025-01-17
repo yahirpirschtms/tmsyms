@@ -8,6 +8,15 @@
             <div class="my-4 d-flex justify-content-center align-items-center">
                 <h2 class="gradient-text text-capitalize fw-bolder" >WH Appointment Viewer</h2>
             </div>
+            <div class="container my-4">
+                <!-- Centrar contenido horizontalmente -->
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <!-- Barra de búsqueda -->
+                        <input type="text" id="searchByStmId" class="form-control" placeholder="Search WH appt viewer">
+                    </div>
+                </div>
+            </div>
             <!-- Contenido del Calendario -->
     <div class="container-fluid" style="margin-top: 100px;">
         <div class="row">
@@ -84,6 +93,7 @@
 
                    <!-- Update Shipment Status -->
                    <div class="tab-pane fade" id="pills-update-status{{ $shipment->stm_id }}" role="tabpanel" aria-labelledby="pills-update-status-tab{{ $shipment->stm_id }}">
+                    @if ($shipment)
                     <form id="offloadingForm{{ $shipment->stm_id }}" method="POST" action="{{ route('update.status', ['pk_shipment' => $shipment->pk_shipment]) }}">
                         @method('PUT')
                         @csrf
@@ -125,6 +135,9 @@
                             <button type="submit" class="btn btn-primary" id="saveButton{{ $shipment->stm_id }}">Save</button>
                         </div>
                     </form>
+                    @else
+                        <p>No hay envíos disponibles actualmente.</p>
+                    @endif
                     </div>
                 </div>
             </div>
@@ -145,88 +158,96 @@
         var statusCatalog = @json($statusCatalog);
     </script>
     <script>
-     document.addEventListener('DOMContentLoaded', function () {
-    const events = {!! json_encode($events) !!};
+            document.addEventListener('DOMContentLoaded', function () {
+            const events = {!! json_encode($events) !!};
 
-    var calendarEl = document.getElementById('calendar');
+            var calendarEl = document.getElementById('calendar');
 
-    var calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'timeGridDay',
-        headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'timeGridDay,timeGridWeek,dayGridMonth'
-        },
-        events: events,
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'timeGridDay',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'timeGridDay,timeGridWeek,dayGridMonth'
+                },
+                events: events,
 
-        eventTimeFormat: {
-            hour: '2-digit',
-            minute: '2-digit',
-            meridiem: 'short',
-            hour12: true
-        },
+                eventTimeFormat: {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    meridiem: 'short',
+                    hour12: true
+                },
 
-        eventClick: function(info) {
-            var event = info.event;
-            var props = event.extendedProps;
+                eventClick: function(info) {
+                    var event = info.event;
+                    var props = event.extendedProps;
 
-            var modalTarget = "#shipmentModal" + props.stm_id;
+                    var modalTarget = "#shipmentModal" + props.stm_id;
 
-            // Verificar si el modal existe en el DOM antes de intentar mostrarlo
-            var modalElement = document.getElementById(modalTarget.substring(1)); // Eliminar el "#" para obtener el ID correcto
-            if (modalElement) {
-                var modal = new bootstrap.Modal(modalElement); // Usar la API de Bootstrap para abrir el modal
-                modal.show();
-            } else {
-                console.error("Modal no encontrado: " + modalTarget);
-            }
-        }
-    });
+                    // Verificar si el modal existe en el DOM antes de intentar mostrarlo
+                    var modalElement = document.getElementById(modalTarget.substring(1)); // Eliminar el "#" para obtener el ID correcto
+                    if (modalElement) {
+                        var modal = new bootstrap.Modal(modalElement); // Usar la API de Bootstrap para abrir el modal
+                        modal.show();
+                    } else {
+                        console.error("Modal no encontrado: " + modalTarget);
+                    }
+                }
+            });
 
-    calendar.render();
-});
+            calendar.render();
+            // Filtrar eventos por STM ID
+            document.getElementById('searchByStmId').addEventListener('input', function (e) {
+                const searchValue = e.target.value.toLowerCase();
+
+                const filteredEvents = events.filter(event =>
+                    event.extendedProps.stm_id.toLowerCase().includes(searchValue)
+                );
+
+                calendar.removeAllEvents();
+                calendar.addEventSource(filteredEvents);
+            });
+        });
     </script>
 
 <script>
+    $(document).ready(function () {
+        // Delegación de eventos para formularios con id dinámico
+        $(document).on('submit', 'form[id^="offloadingForm"]', function (event) {
+            event.preventDefault(); // Evitar el envío estándar del formulario
 
-$(document).ready(function () {
-            // Interceptar el envío del formulario
-            $('#offloadingForm').on('submit', function (event) {
-                event.preventDefault(); // Evitar el envío estándar del formulario
+            // Obtener la URL del formulario
+            let formAction = $(this).attr('action');
 
-                // Obtener la URL del formulario
-                let formAction = $(this).attr('action');
+            // Serializar los datos del formulario
+            let formData = $(this).serialize();
 
-                // Serializar los datos del formulario
-                let formData = $(this).serialize();
+            // Enviar los datos mediante AJAX
+            $.ajax({
+                url: formAction,
+                method: 'PUT', // Asegúrate de que coincida con el método de tu ruta
+                data: formData,
+                beforeSend: function () {
+                    console.log('Enviando datos...');
+                },
+                success: function (response) {
+                    // Manejar la respuesta exitosa
+                    alert(response.message);
+                    console.log(response);
 
-                // Enviar los datos mediante AJAX
-                $.ajax({
-                    url: formAction,
-                    method: 'PUT',
-                    data: formData,
-                    beforeSend: function () {
-                        // Puedes agregar un indicador de carga aquí si lo necesitas
-                        console.log('Enviando datos...');
-                    },
-                    success: function (response) {
-                        // Manejar la respuesta exitosa
-                        alert(response.message);
-                        console.log(response);
-
-                        // Actualizar la página o realizar alguna acción adicional
-                        location.reload(); // Recargar la página para ver los cambios
-                    },
-                    error: function (xhr) {
-                        // Manejar errores
-                        let errorMessage = xhr.responseJSON?.message || 'Ocurrió un error al actualizar el envío.';
-                        alert(errorMessage);
-                        console.error(xhr.responseJSON?.error || xhr.responseText);
-                    },
-                });
+                    // Opcional: Actualizar algo sin recargar
+                    location.reload(); // Recargar la página para ver los cambios
+                },
+                error: function (xhr) {
+                    // Manejar errores
+                    let errorMessage = xhr.responseJSON?.message || 'Ocurrió un error al actualizar el envío.';
+                    alert(errorMessage);
+                    console.error(xhr.responseJSON?.error || xhr.responseText);
+                },
             });
         });
-
+    });
 </script>
 
 
@@ -260,5 +281,55 @@ $(document).ready(function () {
 .fc-event:hover {
     background-color: #45a049;
 }
+
+ /* Estilo para las pestañas nav-pills */
+ .nav-pills .nav-link {
+        font-weight: 600;
+        background-color: #f8f9fa;
+        color: #007bff;
+        border: 1px solid #ddd;
+        border-radius: 50px;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    /* Estilo para la pestaña activa */
+    .nav-pills .nav-link.active {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+
+    /* Estilo para la pestaña cuando se pasa el cursor */
+    .nav-pills .nav-link:hover {
+        background-color: #e2e6ea;
+        color: #0056b3;
+    }
+
+    /* Estilo para el modal */
+    .modal-header {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .modal-title {
+        font-weight: 600;
+    }
+
+    .modal-footer .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .modal-footer .btn-secondary:hover {
+        background-color: #5a6268;
+    }
+
+    /* Estilo de contenido dentro de las pestañas */
+    .tab-content p {
+        font-size: 14px;
+        line-height: 1.6;
+    }
 </style>
+
+
 

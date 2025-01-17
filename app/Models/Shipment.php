@@ -21,6 +21,10 @@ class Shipment extends Model
     // Tipo de clave primaria si no es un entero
     protected $keyType = 'string';
 
+    // Configuración de timestamps personalizados
+    const CREATED_AT = 'dataCreated';
+    const UPDATED_AT = 'dataUpdated';
+
     // Atributos que pueden ser asignados masivamente
     protected $fillable = [
         'stm_id',
@@ -53,6 +57,9 @@ class Shipment extends Model
         'offload_date',
         'approved_eta_date',
         'approved_eta_time',
+        'dataCreated',
+        'dataUpdated',
+        'wh_auth_date',
     ];
 
     // Atributos que son fechas y deben ser manejados como instancias de Carbon
@@ -67,6 +74,9 @@ class Shipment extends Model
         'offload_date',
         'approved_eta_date',
         'approved_eta_time',
+        'dataCreated',
+        'dataUpdated',
+        'wh_auth_date',
     ];
 
     // Relación con GenericCatalog (estatus actual)
@@ -81,7 +91,7 @@ class Shipment extends Model
         return $this->belongsTo(GenericCatalog::class, 'gnct_id_shipment_type', 'gnct_id');
     }
 
-     // Método para obtener el estatus actual
+    // Método para obtener el estatus actual
     public function getCurrentStatusValueAttribute()
     {
         return $this->currentStatus ? $this->currentStatus->gntc_value : null;
@@ -98,9 +108,7 @@ class Shipment extends Model
         return $this->belongsTo(Driver::class, 'id_driver', 'pk_driver'); // Ajustado a id_driver
     }
 
-
-
-        public function originCatalog()
+    public function originCatalog()
     {
         return $this->belongsTo(GenericCatalog::class, 'origin', 'gnct_id'); // Relación con la tabla generic_catalogs
     }
@@ -112,7 +120,4 @@ class Shipment extends Model
             ? $this->delivered_date->format('m/d/Y H:i')
             : null;
     }
-
-
-    public $timestamps = false;
 }

@@ -8,10 +8,21 @@
             <div class="my-4 d-flex justify-content-center align-items-center">
                 <h2 class="gradient-text text-capitalize fw-bolder" >Live Shipments</h2>
             </div>
+            <div class="container my-4">
+                <!-- Centrar contenido horizontalmente -->
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <!-- Barra de búsqueda -->
+                        <input type="text" id="searchByShipment" class="form-control" placeholder="Search live shipments">
+                    </div>
+                </div>
+            </div>
 
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+           <!-- Contenedor de tarjetas -->
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="cardsContainer">
                 @foreach ($shipments as $shipment)
-                    <div class="col">
+                    <div class="col shipment-card"
+                        data-search="{{ $shipment->stm_id }} {{ $shipment->shipment_type }} {{ $shipment->status }} {{ $shipment->originCatalog->gntc_value ?? '' }} {{ $shipment->currentStatus->gntc_description ?? '' }} {{ $shipment->driver->drivername ?? '' }}">
                         <div class="card">
                             <div class="card-body text-white bg-dark">
                                 <h5 class="card-title">{{ $shipment->stm_id }}</h5>
@@ -383,6 +394,27 @@
                         alert(errorMessage);
                         console.error(xhr.responseJSON?.error || xhr.responseText);
                     },
+                });
+            });
+        });
+    </script>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('searchByShipment');
+            const cards = document.querySelectorAll('.shipment-card');
+
+            searchInput.addEventListener('keyup', function () {
+                const query = this.value.toLowerCase();
+
+                cards.forEach(card => {
+                    const cardText = card.innerText.toLowerCase();
+                    if (cardText.includes(query)) {
+                        card.style.display = ''; // Mostrar tarjeta
+                    } else {
+                        card.style.display = 'none'; // Ocultar tarjeta
+                    }
                 });
             });
         });
