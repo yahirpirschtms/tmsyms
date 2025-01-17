@@ -20,6 +20,8 @@ Route::get('/home', [HomeController::class, 'index']);
 
 Route::get('/calendar', [CalendarController::class, 'calendarshow'])->name('calendar.view');
 
+Route::get('/historicalcalendar', [CalendarController::class, 'historicalcalendarshow'])->name('historicalcalendar.view');
+
 Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
 Route::get('/trafficworkflowstart', [ShipmentController::class, 'workflowtrafficstartshow'])->name('workflowtrafficstart');

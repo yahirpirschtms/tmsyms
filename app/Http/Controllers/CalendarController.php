@@ -13,22 +13,37 @@ class CalendarController extends Controller
     public function calendarshow()
     {
         if (Auth::check()) {
-            // Obtener todos los envíos
-            $shipments = Shipment::all();
+            // Obtener el ID del estado 'Finalized' desde el catálogo
+            $finalizedStatus = GenericCatalog::where('gntc_value', 'Finalized')
+                ->where('gntc_group', 'STATUS_E_REPORT') // Ajustar si hay más grupos
+                ->first();
 
+            // Filtrar los envíos que no tienen el estado 'Finalized'
+            $shipments = Shipment::where('gnct_id_current_status', '!=', $finalizedStatus->gnct_id)->get();
+            $currentStatus = GenericCatalog::where('gntc_group', 'STATUS_E_REPORT')->get();
             // Obtener los catálogos para 'MWD_LOCATION' (origen) y 'STATUS_E_REPORT' (estado actual)
             $originCatalog = GenericCatalog::where('gntc_group', 'MWD_LOCATION')->get()->keyBy('gnct_id');
             $statusCatalog = GenericCatalog::where('gntc_group', 'STATUS_E_REPORT')->get()->keyBy('gnct_id');
 
-            // Obtener el primer envío (o uno en específico si lo prefieres)
-            $shipment = $shipments->first(); // O ajusta este código según tu lógica para obtener el envío adecuado
+            // Obtener el primer envío
+            // Obtener el primer envío, o dejar $shipment como null si no hay envíos
+             $shipment = $shipments->first() ?? null;
+
+
+
+            if (empty($shipment->approved_eta_date)) {
+                $shipment->approved_eta_date = null;
+            }
+            if (empty($shipment->approved_eta_time)) {
+                $shipment->approved_eta_time = null;
+            }
 
             // Mapear los datos al formato esperado por FullCalendar
             $events = $shipments->map(function ($shipment) use ($originCatalog, $statusCatalog) {
                 // Parsear fechas relevantes con Carbon
                 $suggestedDeliveryDate = Carbon::parse($shipment->suggesteddeliverydate);
-                $approvedETADate = Carbon::parse($shipment->approved_eta_date); // Si está disponible
-                $approvedETATime = Carbon::parse($shipment->approved_eta_time); // Si está disponible
+                $approvedETADate = $shipment->approved_eta_date ? Carbon::parse($shipment->approved_eta_date) : null;
+                $approvedETATime = $shipment->approved_eta_time ? Carbon::parse($shipment->approved_eta_time) : null;
 
                 // Obtener las descripciones para 'origin' y 'gnct_id_current_status'
                 $originDescription = isset($originCatalog[$shipment->origin])
@@ -46,9 +61,9 @@ class CalendarController extends Controller
                     'extendedProps' => [
                         'stm_id' => $shipment->stm_id,
                         'reference' => $shipment->reference,
-                        'origin' => $originDescription, // Origen traducido
+                        'origin' => $originDescription,
                         'destination' => $shipment->destination,
-                        'current_status' => $statusDescription, // Estado traducido
+                        'current_status' => $statusDescription,
                         'suggested_delivery_date' => $suggestedDeliveryDate->format('m/d/Y H:i'),
                         'approved_eta_date' => $approvedETADate ? $approvedETADate->format('m/d/Y') : 'N/A',
                         'approved_eta_time' => $approvedETATime ? $approvedETATime->format('H:i') : 'N/A',
@@ -59,18 +74,20 @@ class CalendarController extends Controller
                 ];
             });
 
-            // Retornar la vista con los datos necesarios, incluyendo $shipment
+            // Retornar la vista con los datos necesarios
             return view('home.calendar', [
                 'events' => $events->toArray(),
                 'shipments' => $shipments,
                 'originCatalog' => $originCatalog,
-                'statusCatalog' => $statusCatalog, // Pasamos los catálogos al front
-                'shipment' => $shipment, // Aquí se pasa el primer envío o el que se necesite
+                'statusCatalog' => $statusCatalog,
+                'shipment' => $shipment,
+                'currentStatus'=> $currentStatus, // Se conserva la variable $shipment
             ]);
         }
 
         return redirect('/login');
     }
+
 
     public function getShipmentDetails($pk_shipment)
     {
