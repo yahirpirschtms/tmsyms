@@ -96,19 +96,17 @@ class HomeController extends Controller
     }
 
     //Funcion para traer todos los empty trailers registrados 
-    public function getEmptyTrailers(){
+    /*public function getEmptyTrailers(){
         // Obtiene los trailers con las relaciones
         $emptyTrailers = EmptyTrailer::with(['availabilityIndicator', 'locations'])->get();
         
         // Devuelve la respuesta en formato JSON
         return response()->json($emptyTrailers);
-    }
+    }*/
         
     public function index(){
         if (Auth::check()) {
             $emptyTrailers = EmptyTrailer::with(['availabilityIndicator', 'locations'])->get();
-            //$emptyTrailers = EmptyTrailer::all(); // Obtén todos los registros
-            //dd($emptyTrailers);
             return view('home.index', compact('emptyTrailers'));
         }
         return redirect('/login');
@@ -173,9 +171,9 @@ class HomeController extends Controller
     
         // Convertir las fechas al formato 'm/d/Y'
         $dateOfStatus = Carbon::createFromFormat('m/d/Y', $request->inputdateofstatus)->format('Y-m-d'); // Solo fecha
-        $dateIn = Carbon::createFromFormat('m/d/y H:i:s', $request->inputdatein)->format('Y-m-d H:i:s'); // Fecha y hora con minutos y segundos
-        $dateOut = Carbon::createFromFormat('m/d/y H:i:s', $request->inputdateout)->format('Y-m-d H:i:s'); // Fecha y hora con minutos y segundos
-        $transactionDate = Carbon::createFromFormat('m/d/y H:i:s', $request->inputtransactiondate)->format('Y-m-d H:i:s'); // Fecha y hora con minutos y segundos
+        $dateIn = Carbon::createFromFormat('m/d/Y H:i:s', $request->inputdatein)->format('Y-m-d H:i:s'); // Fecha y hora con minutos y segundos
+        $dateOut = Carbon::createFromFormat('m/d/Y H:i:s', $request->inputdateout)->format('Y-m-d H:i:s'); // Fecha y hora con minutos y segundos
+        $transactionDate = Carbon::createFromFormat('m/d/Y H:i:s', $request->inputtransactiondate)->format('Y-m-d H:i:s'); // Fecha y hora con minutos y segundos
 
     
         // Crear un nuevo registro
@@ -198,4 +196,127 @@ class HomeController extends Controller
         return redirect()->route('emptytrailer')->with('success', 'Trailer successfully added!');
     }
     
+
+    public function getEmptyTrailers(Request $request){
+                $query = EmptyTrailer::with(['availabilityIndicator', 'locations']);
+                
+                // Filtros generales (searchemptytrailergeneral)
+                if ($request->has('search')) {
+                    $search = $request->input('search');
+                    $formattedDate = null;
+                    $formattedDateTime = null;
+                    $formattedDate = \DateTime::createFromFormat('m/d/Y', $search);
+                    $formattedDateTime = \DateTime::createFromFormat('m/d/Y H:i:s',$search);
+                    
+                    //$finalstatus = $date->format('Y-m-d');
+                    $query->where(function($q) use ($search, $formattedDate, $formattedDateTime) {
+                        $q->where('trailer_num', 'like', "%$search%")
+                        ->orWhereDate('status', 'like', $formattedDate)
+                        //->orWhereDate('date_in', 'like', $formattedDate)
+                        //->orWhereDate('date_out', 'like', $formattedDate)
+                        //->orWhereDate('transaction_date', 'like', $formattedDate)
+                        ->orWhere('date_in', 'like', $formattedDateTime)
+                        ->orWhere('date_out', 'like', $formattedDateTime)
+                        ->orWhere('transaction_date', 'like', $formattedDateTime)
+                        ->orWhere('pallets_on_trailer', 'like', "%$search%")
+                        ->orWhere('pallets_on_floor', 'like', "%$search%")
+                        ->orWhere('carrier', 'like', "%$search%")
+                        ->orWhereHas('availabilityIndicator', function($q) use ($search) {
+                            $q->where('gntc_description', 'like', "%$search%");
+                        })
+                        ->orWhereHas('locations', function($q) use ($search) {
+                            $q->where('CoName', 'like', "%$search%");
+                        })
+                        ->orWhere('username', 'like', "%$search%");
+                    });
+                }
+
+                /// Filtros específicos de parámetros (inputs de filtros aplicados)
+        if ($request->has('trailer_num') && $request->input('trailer_num') != '') {
+            $query->where('trailer_num', 'like', "%{$request->input('trailer_num')}%");
+        }
+
+        // Filtro de fechas para el status
+        if ($request->has('status_start') && $request->has('status_end') &&
+            $request->input('status_start') != '' && $request->input('status_end') != '') {
+            $query->whereBetween('status', [
+                Carbon::parse($request->input('status_start'))->startOfDay(),
+                Carbon::parse($request->input('status_end'))->endOfDay()
+            ]);
+        }
+
+        // Otros filtros
+        if ($request->has('pallets_on_trailer') && $request->input('pallets_on_trailer') != '') {
+            $query->where('pallets_on_trailer', 'like', "%{$request->input('pallets_on_trailer')}%");
+        }
+        if ($request->has('pallets_on_floor') && $request->input('pallets_on_floor') != '') {
+            $query->where('pallets_on_floor', 'like', "%{$request->input('pallets_on_floor')}%");
+        }
+        if ($request->has('carrier') && $request->input('carrier') != '') {
+            $query->where('carrier', 'like', "%{$request->input('carrier')}%");
+        }
+        if ($request->has('gnct_id_availability_indicator') && $request->input('gnct_id_availability_indicator') != '') {
+            $query->whereHas('availabilityIndicator', function($q) use ($request) {
+                $q->where('gnct_id', $request->input('gnct_id_availability_indicator'));
+            });
+        }
+        if ($request->has('location') && $request->input('location') != '') {
+            $query->whereHas('locations', function($q) use ($request) {
+                $q->where('location', 'like', "%{$request->input('location')}%");
+            });
+        }
+        if ($request->has('username') && $request->input('username') != '') {
+            $query->where('username', 'like', "%{$request->input('username')}%");
+        }
+        
+        // Filtro de fechas para date_in
+        if ($request->has('date_in_start') && $request->has('date_in_end') &&
+            $request->input('date_in_start') != '' && $request->input('date_in_end') != '') {
+
+                $startDate = Carbon::createFromFormat('m/d/Y H:i:s',$request->input('date_in_start'));
+                $endDate = Carbon::createFromFormat('m/d/Y H:i:s',$request->input('date_in_end'));
+            $query->whereBetween('date_in', [
+                $startDate,
+                $endDate
+            ]);
+        }
+
+        // Filtro de fechas para date_out
+        if ($request->has('date_out_start') && $request->has('date_out_end') &&
+            $request->input('date_out_start') != '' && $request->input('date_out_end') != '') {
+            /*$query->whereBetween('date_out', [
+                Carbon::parse($request->input('date_out_start'))->startOfDay(),
+                Carbon::parse($request->input('date_out_end'))->endOfDay()
+            ]);*/
+            $startDate = Carbon::createFromFormat('m/d/Y H:i:s',$request->input('date_out_start'));
+                $endDate = Carbon::createFromFormat('m/d/Y H:i:s',$request->input('date_out_end'));
+            $query->whereBetween('date_out', [
+                $startDate,
+                $endDate
+            ]);
+        }
+
+        // Filtro de fechas para transaction_date
+        if ($request->has('transaction_date_start') && $request->has('transaction_date_end') &&
+            $request->input('transaction_date_start') != '' && $request->input('transaction_date_end') != '') {
+            /*$query->whereBetween('transaction_date', [
+                Carbon::parse($request->input('transaction_date_start'))->startOfDay(),
+                Carbon::parse($request->input('transaction_date_end'))->endOfDay()
+            ]);*/
+
+            $startDate = Carbon::createFromFormat('m/d/Y H:i:s',$request->input('transaction_date_start'));
+                $endDate = Carbon::createFromFormat('m/d/Y H:i:s',$request->input('transaction_date_end'));
+            $query->whereBetween('transaction_date', [
+                $startDate,
+                $endDate
+            ]);
+        }
+        
+        // Obtener los trailers con los filtros aplicados
+        $emptyTrailers = $query->get();
+        
+        // Devolver los datos en formato JSON
+        return response()->json($emptyTrailers);
+    }
+
 }

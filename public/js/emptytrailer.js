@@ -8,7 +8,7 @@ $(document).ready(function() {
     
     flatpickr(".datetimepicker", {
     enableTime: true,         // Habilita la selección de hora
-    dateFormat: "m/d/y H:i:S",  // Establece el formato para incluir año, mes, día, hora, minuto y segundo
+    dateFormat: "m/d/Y H:i:S",  // Establece el formato para incluir año, mes, día, hora, minuto y segundo
     time_24hr: true,          // Si quieres el formato de 24 horas
     enableSeconds: true,      // Habilita la selección de segundos
     //defaultDate: new Date(),
@@ -369,7 +369,7 @@ $(document).ready(function() {
     
     //Funcion para actualizar los datos de la tabla empty trailer al picarle al boton refresh
     // Función para actualizar la tabla y trailersData
-    function updateTrailerTable() {
+    /*function updateTrailerTable() {
         const url = document.getElementById('refreshemptytrailertable').getAttribute('data-url'); // Obtén la URL desde el atributo data-url
         fetch(url)
             .then(response => response.json())
@@ -444,8 +444,143 @@ $(document).ready(function() {
     document.getElementById('refreshemptytrailertable').addEventListener('click', updateTrailerTable);
 
     // Configura la actualización automática cada 5 minutos (300,000 ms)
-    setInterval(updateTrailerTable, 300000); // 300,000 ms = 5 minutos
+    setInterval(updateTrailerTable, 300000); // 300,000 ms = 5 minutos*/
 
+    function updateTrailerTable() {
+        // Obtener los valores de los filtros
+        const search = document.getElementById('searchemptytrailergeneral').value;
+        const trailerNum = document.getElementById('emptytrailerfilterinputidtrailer').value;
+        const statusStart = document.getElementById('emptytrailerfilterinputdateofstartstatus').value;
+        const statusEnd = document.getElementById('emptytrailerfilterinputdateofendstatus').value;
+        const palletsOnTrailer = document.getElementById('emptytrailerfilterinputpalletsontrailer').value;
+        const palletsOnFloor = document.getElementById('emptytrailerfilterinputpalletsonfloor').value;
+        const carrier = document.getElementById('emptytrailerfilterinputcarrierpk').value;
+        const availabilityIndicator = document.getElementById('emptytrailerfilterinputavailabilityindicatorpk').value;
+        const location = document.getElementById('emptytrailerfilterinputlocationpk').value;
+        const username = document.getElementById('emptytrailerfilterinputusername').value;
+        const dateInStart = document.getElementById('emptytrailerfilterinputstartdatein').value;
+        const dateInEnd = document.getElementById('emptytrailerfilterinputenddatein').value;
+        const dateOutStart = document.getElementById('emptytrailerfilterinputstartdateout').value;
+        const dateOutEnd = document.getElementById('emptytrailerfilterinputenddateout').value;
+        const transactionDateStart = document.getElementById('emptytrailerfilterinputstarttransactiondate').value;
+        const transactionDateEnd = document.getElementById('emptytrailerfilterinputendtransactiondate').value;
+        
+        // Construir la URL con los parámetros de filtro
+        const url = new URL(document.getElementById('refreshemptytrailertable').getAttribute('data-url'));
+        const params = new URLSearchParams(url.search);
+    
+        // Agregar los filtros a los parámetros de la URL
+        params.set('search', search);
+        params.set('trailer_num', trailerNum);
+        params.set('status_start', statusStart);
+        params.set('status_end', statusEnd);
+        params.set('pallets_on_trailer', palletsOnTrailer);
+        params.set('pallets_on_floor', palletsOnFloor);
+        params.set('carrier', carrier);
+        params.set('gnct_id_availability_indicator', availabilityIndicator);
+        params.set('location', location);
+        params.set('username', username);
+        params.set('date_in_start', dateInStart);
+        params.set('date_in_end', dateInEnd);
+        params.set('date_out_start', dateOutStart);
+        params.set('date_out_end', dateOutEnd);
+        params.set('transaction_date_start', transactionDateStart);
+        params.set('transaction_date_end', transactionDateEnd);
+    
+        url.search = params.toString();
+        //console.log(url);
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+
+                // Aquí va el código para actualizar trailersData
+                trailersData = data.reduce((acc, trailer) => {
+                    acc[trailer.pk_trailer] = trailer;
+                    return acc;
+                }, {});
+                // Actualizar la tabla con los datos filtrados
+                const tbody = document.getElementById('emptyTrailerTableBody');
+                tbody.innerHTML = ''; // Limpiar la tabla antes de agregar nuevas filas
+    
+                data.forEach(trailer => {
+                    const row = `
+                        <tr id="trailer-${trailer.pk_trailer}" class="clickable-row" 
+                            data-bs-toggle="offcanvas" 
+                            data-bs-target="#emptytrailer" 
+                            aria-controls="emptytrailer" 
+                            data-id="${trailer.pk_trailer}">
+                            <td>${trailer.trailer_num}</td>
+                            <td>${trailer.status}</td>
+                            <td>${trailer.pallets_on_trailer}</td>
+                            <td>${trailer.pallets_on_floor}</td>
+                            <td>${trailer.carrier}</td>
+                            <td>${trailer.availability_indicator?.gntc_description ?? 'N/A'}</td>
+                            <td>${trailer.locations?.CoName ?? 'N/A'}</td>
+                            <td>${trailer.date_in}</td>
+                            <td>${trailer.date_out}</td>
+                            <td>${trailer.transaction_date}</td>
+                            <td>${trailer.username}</td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+
+                // Vuelve a agregar los listeners de clic después de actualizar la tabla
+                const rows = document.querySelectorAll(".clickable-row");
+                rows.forEach(row => {
+                    row.addEventListener("click", function () {
+                        const id = this.getAttribute("data-id");
+                        const trailer = trailersData[id]; // Busca los datos del tráiler
+                        //console.log(trailer);
+                        if (trailer) {
+                            // Asigna los datos al offcanvas
+                            document.getElementById("pk_trailer").textContent = trailer.pk_trailer;
+                            document.getElementById("offcanvas-id").textContent = trailer.trailer_num;
+                            document.getElementById("offcanvas-status").textContent = trailer.status;
+                            document.getElementById("offcanvas-pallets-on-trailer").textContent = trailer.pallets_on_trailer;
+                            document.getElementById("offcanvas-pallets-on-floor").textContent = trailer.pallets_on_floor;
+                            document.getElementById("offcanvas-carrier").textContent = trailer.carrier;
+                            document.getElementById("offcanvas-availability").textContent = trailer.availability_indicator && trailer.availability_indicator.gntc_description ? trailer.availability_indicator.gntc_description : 'N/A';
+                            document.getElementById("offcanvas-location").textContent = trailer.locations && trailer.locations.CoName ? trailer.locations.CoName : 'N/A';
+                            document.getElementById("offcanvas-date-in").textContent = trailer.date_in;
+                            document.getElementById("offcanvas-date-out").textContent = trailer.date_out;
+                            document.getElementById("offcanvas-transaction-date").textContent = trailer.transaction_date;
+                            document.getElementById("offcanvas-username").textContent = trailer.username;
+                            document.getElementById("pk_availability").textContent = trailer.availability_indicator && trailer.availability_indicator.gnct_id ? trailer.availability_indicator.gnct_id : 'N/A';
+                            document.getElementById("pk_location").textContent = trailer.location;
+                            document.getElementById("pk_carrier").textContent = trailer.carrier;
+                        } else {
+                            console.error(`No data found for trailer ID ${id}`);
+                        }
+                    });
+                });
+
+            })
+            .catch(error => console.error('Error:', error));
+    }
+    
+    // Llamar la función cuando se hace clic en el botón de "Refresh" o cuando cambian los filtros
+    document.getElementById('refreshemptytrailertable').addEventListener('click', updateTrailerTable);
+
+    //Refresh de la tabla al aplicar un filtro
+    //document.querySelectorAll('.filterapply').addEventListener('click', updateTrailerTable);
+
+    //document.getElementById('applytraileridfilter').addEventListener('click', updateTrailerTable);
+    
+    // Configurar los eventos de cambio de los inputs
+    const filterInputs = document.querySelectorAll('#filtersapplied input');
+    filterInputs.forEach(input => {
+        input.addEventListener('input', updateTrailerTable);
+    });
+
+    const filterGeneralInputs = document.querySelectorAll('#searchemptytrailergeneral');
+    filterGeneralInputs.forEach(input => {
+        input.addEventListener('input', updateTrailerTable);
+    });
+    
+    // Actualización automática cada 5 minutos (300,000 ms)
+    setInterval(updateTrailerTable, 5000000);
+    
 
   //Resetear Off Canvas al cerrarlo
   document.addEventListener("DOMContentLoaded", function () {
@@ -1029,6 +1164,8 @@ $(document).ready(function() {
     
     //Manejo de filtros de inputs simples
     $(document).ready(function () {
+
+        const updatetab = document.getElementById("refreshemptytrailertable");
         // Función genérica para habilitar o deshabilitar botones
         function toggleApplyButton(inputSelector, buttonSelector) {
             if ($(inputSelector).val()) {
@@ -1046,16 +1183,19 @@ $(document).ready(function() {
                 // Si el div del filtro ya está visible, actualiza el valor
                 if ($(divSelector).is(':visible')) {
                     $(inputFilterSelector).val(inputValue);
+                    updatetab.click();
                 } else {
                     // Si el div no está visible, muestra el div y coloca el valor
                     $(inputFilterSelector).val(inputValue);
                     $(divSelector).show();
+                    updatetab.click();
                 }
             } else {
                 // Si el campo está vacío, vacía el input del filtro y oculta el div
                 $(inputFilterSelector).val('');
                 $(divSelector).hide();
                 $(closeButtonSelector).click(); // Simula un clic en Collapse
+                updatetab.click();
             }
         }
     
@@ -1065,6 +1205,7 @@ $(document).ready(function() {
             $(divSelector).hide();
             $(closeButtonSelector).prop('disabled', false); // Habilita el botón
             $(applyButtonSelector).click(); // Simula clic en Apply
+            updatetab.click();
         }
     
         // Función genérica para abrir el offcanvas y enfocar el input
@@ -1079,6 +1220,7 @@ $(document).ready(function() {
             if (!$(inputSelector).val()) {
                 $(inputFilterSelector).val(''); // Limpia el input asociado al filtro
                 $(divSelector).hide(); // Oculta el div del filtro
+                updatetab.click();
             }
         }
     
@@ -1279,6 +1421,7 @@ $(document).ready(function() {
     
     //Manejo mejorado de Date of Status
     $(document).ready(function () {
+        const updatetab = document.getElementById("refreshemptytrailertable");
         // Función para manejar el estado de los botones (habilitar/deshabilitar)
         function toggleDateRangeButtons(startInputSelector, endInputSelector, closeButtonSelector, applyButtonSelector) {
             if ($(startInputSelector).val() || $(endInputSelector).val()) {
@@ -1304,16 +1447,19 @@ $(document).ready(function() {
                 if ($(divSelector).is(':visible')) {
                     $(startFilterInputSelector).val(startDate); // Actualiza el input del filtro con el Start Date
                     $(endFilterInputSelector).val(endDate); // Actualiza el input del filtro con el End Date
+                    updatetab.click();
                 } else {
                     $(startFilterInputSelector).val(startDate);
                     $(endFilterInputSelector).val(endDate);
                     $(divSelector).show(); // Muestra el div del filtro
+                    updatetab.click();
                 }
             } else {
                 $(startFilterInputSelector).val(''); // Limpia el input del Start Date asociado al filtro
                 $(endFilterInputSelector).val(''); // Limpia el input del End Date asociado al filtro
                 $(divSelector).hide(); // Oculta el div del filtro
                 $(closeButtonSelector).click(); // Simula un clic en Collapse
+                updatetab.click();
             }
             toggleDateRangeButtons(startInputSelector, endInputSelector, closeButtonSelector, applyButtonSelector);
         }
@@ -1326,6 +1472,7 @@ $(document).ready(function() {
             $(closeButtonSelector).prop('disabled', false); // Habilita el botón
             $(closeButtonSelector).click();
             $(applyButtonSelector).prop('disabled', true); // Deshabilita el botón Apply
+            updatetab.click();
         }
     
         // Función para manejar clics en botones de cerrar Collapse
@@ -1334,6 +1481,7 @@ $(document).ready(function() {
                 $(startFilterInputSelector).val(''); // Limpia el Start Date del filtro
                 $(endFilterInputSelector).val(''); // Limpia el End Date del filtro
                 $(divSelector).hide(); // Oculta el div del filtro
+                updatetab.click();
             }
         }
     
@@ -1398,6 +1546,7 @@ $(document).ready(function() {
 
     //Manejo Filtro de fechas datetime 
     $(document).ready(function () {
+        const updatetab = document.getElementById("refreshemptytrailertable");
         // Función para manejar el estado de los botones (habilitar/deshabilitar)
         function toggleDateRangeButtons(startInputSelector, endInputSelector, closeButtonSelector, applyButtonSelector) {
             if ($(startInputSelector).val() || $(endInputSelector).val()) {
@@ -1424,16 +1573,19 @@ $(document).ready(function() {
                     // Actualiza los inputs del filtro con los valores de fecha seleccionados
                     $(startFilterInputSelector).val(startDate); // Actualiza el Start Date en el div de filtros
                     $(endFilterInputSelector).val(endDate); // Actualiza el End Date en el div de filtros
+                    updatetab.click();
                 } else {
                     $(startFilterInputSelector).val(startDate); // Actualiza el Start Date en el div de filtros
                     $(endFilterInputSelector).val(endDate); // Actualiza el End Date en el div de filtros
                     $(divSelector).show(); // Muestra el div del filtro
+                    updatetab.click();
                 }
             } else {
                 $(startFilterInputSelector).val(''); // Limpia el input del Start Date asociado al filtro
                 $(endFilterInputSelector).val(''); // Limpia el input del End Date asociado al filtro
                 $(divSelector).hide(); // Oculta el div del filtro
                 $(closeButtonSelector).click(); // Simula un clic en Collapse
+                updatetab.click();
             }
             toggleDateRangeButtons(startInputSelector, endInputSelector, closeButtonSelector, applyButtonSelector);
         }
@@ -1446,6 +1598,7 @@ $(document).ready(function() {
             $(closeButtonSelector).prop('disabled', false); // Habilita el botón Collapse
             $(closeButtonSelector).click(); // Simula un clic en Collapse
             $(applyButtonSelector).prop('disabled', true); // Deshabilita el botón Apply
+            updatetab.click();
         }
     
         // Función para manejar clics en botones de cerrar Collapse
@@ -1454,6 +1607,7 @@ $(document).ready(function() {
                 $(startFilterInputSelector).val(''); // Limpia el Start Date del filtro
                 $(endFilterInputSelector).val(''); // Limpia el End Date del filtro
                 $(divSelector).hide(); // Oculta el div del filtro
+                updatetab.click();
             }
         }
     
@@ -1618,12 +1772,13 @@ $(document).ready(function() {
                 let selectedValue = select.val();
                 //let selectedValue = "{{ old('inputcarrier') }}"; // Recupera el valor previo
                 select.empty();
-                select.append('<option selected disabled hidden></option>');
+                //select.append('<option selected disabled hidden></option>');
 
                 if (data.length === 0) {
-                    select.append('<option disabled>No options available</option>');
+                    select.append('<option disabled >No options available</option>');
                 } else {
-                    select.append('<option value="">Remove filter</option>');
+                    select.append('<option value="">Choose a filter</option>');
+                    //select.append('<option value="">Remove filter</option>');
                     data.forEach(item => {
                         select.append(`<option value="${item.id_company}">${item.CoName}</option>`);
                     });
@@ -1654,12 +1809,12 @@ $(document).ready(function() {
                 let selectedValue = select.val();
                 //let selectedValue = "{{ old('inputlocation') }}"; // Recupera el valor previo
                 select.empty();
-                select.append('<option selected disabled hidden></option>');
+                //select.append('<option selected disabled hidden></option>');
 
                 if (data.length === 0) {
                     select.append('<option disabled>No options available</option>');
                 } else {
-                    select.append('<option value="">Remove filter</option>');
+                    select.append('<option value="">Choose a filter</option>');
                     data.forEach(item => {
                         select.append(`<option value="${item.id_company}">${item.CoName}</option>`);
                     });
@@ -1690,12 +1845,12 @@ $(document).ready(function() {
                   let selectedValue = select.val();
                   //let selectedValue = "{{ old('inputavailabilityindicator') }}"; // Recupera el valor previo
                   select.empty(); // Limpia el select eliminando todas las opciones
-                  select.append('<option selected disabled hidden></option>'); // Opción inicial
+                  //select.append('<option selected disabled hidden></option>'); // Opción inicial
 
                   if (data.length === 0) {
                       select.append('<option disabled>No options available</option>');
                   } else {
-                    select.append('<option value="">Remove filter</option>');
+                    select.append('<option value="">Choose a filter</option>');
                       data.forEach(item => {
                           select.append(`<option value="${item.gnct_id}">${item.gntc_description}</option>`);
                       });
@@ -1715,17 +1870,760 @@ $(document).ready(function() {
     $('#inputapplyaifilter').on('focus', loadAvailabilityIndicatorFilter);
     loadAvailabilityIndicatorFilter();
 
+    //Filtros de selects
+    //jhgbwvefqvrjrhegwvfeqcwdfevwgrbehtrnjymrnthegvwfeqcvwgrbet
+    $(document).ready(function () {
+        // Obtenemos los elementos
+        const updatetab = document.getElementById("refreshemptytrailertable");
+        const $selectElement = $("#inputapplylocationfilter");
+        const $filterDiv = $("#emptytrailerfilterdivlocation");
+        const $inputPk = $("#emptytrailerfilterinputlocationpk");
+        const $inputLocation = $("#emptytrailerfilterinputlocation");
+        const $applyButton = $("#applylocationfilter");
+        const $closeButton = $("#closeapplylocationfilter");
+        const $offcanvas = $("#offcanvasaddmorefilters");
+        const $clearButton = $("#emptytrailerfilterbuttonlocation");
+    
+        // Variable que guarda los elementos que abrirán el offcanvas
+        const openOffcanvasElements = $("#emptytrailerfilterinputlocation, #emptytrailerfilterbtnlocation");
+    
+        // Escuchamos el cambio del select
+        $selectElement.on("change", function () {
+            const selectedValue = $selectElement.val(); // Valor del select
+    
+            if (selectedValue !== "") {
+                // Inhabilitar el botón Close cuando el valor del select no sea vacío
+                $closeButton.prop("disabled", true);
+            } else {
+                // Habilitar el botón Close si el valor del select es vacío
+                $closeButton.prop("disabled", false);
+            }
+        });
+    
+        // Escuchamos el click del botón Apply
+        $applyButton.on("click", function () {
+            const selectedValue = $selectElement.val(); // Valor del select
+            const selectedText = $selectElement.find("option:selected").text(); // Texto del select
+    
+            if (selectedValue !== "") {
+                // Mostrar el div
+                $filterDiv.show();
+                // Rellenar los inputs
+                $inputPk.val(selectedValue);
+                $inputLocation.val(selectedText);
+                updatetab.click();
+            } else {
+                // Limpiar los inputs y ocultar el div si el select está vacío
+                $inputPk.val("");
+                $inputLocation.val("");
+                $filterDiv.hide();
+                // Simular clic en el botón Close
+                $closeButton.click();
+                updatetab.click();
+            }
+        });
+    
+        // Escuchamos el clic en el botón Close
+        $closeButton.on("click", function () {
+            const selectedValue = $selectElement.val(); // Valor del select
+    
+            if (selectedValue === "" && ($inputLocation.val() !== "" || $inputPk.val() !== "")) {
+                // Limpiar los inputs si el select está vacío pero los inputs tienen datos
+                $inputLocation.val("");
+                $inputPk.val("");
+                updatetab.click();
+            }
+    
+            // Ocultar el div si está visible
+            if ($filterDiv.is(":visible")) {
+                $filterDiv.hide();
+                updatetab.click();
+            }
+        });
+    
+        // Escuchar clic en los elementos que abrirán el offcanvas
+        openOffcanvasElements.on("click", function () {
+            // Verificar si el div está visible
+            if ($filterDiv.is(":visible")) {
+                // Abrir el offcanvas y enfocar el input
+                $offcanvas.offcanvas("show"); // Abrir el offcanvas
+                $selectElement.focus(); // Enfocar el input de selección
+            }
+        });
+    
+        // Escuchar clic en el botón de limpiar (vaciar inputs y ocultar el div)
+        $clearButton.on("click", function () {
+            // Verificar si el div está visible y los inputs tienen datos
+            if ($filterDiv.is(":visible") && ($inputLocation.val() !== "" || $inputPk.val() !== "")) {
+                // Limpiar los inputs
+                $inputLocation.val("");
+                $inputPk.val("");
+                // Ocultar el div
+                $filterDiv.hide();
+                // Vaciar el select
+                $selectElement.val("");
+                // Habilitar el botón Close si está deshabilitado
+                if ($closeButton.prop("disabled")) {
+                    $closeButton.prop("disabled", false);
+                }
+                // Simular clic en el botón Close
+                $closeButton.click();
+                updatetab.click();
+            }
+        });
+    });
+
+    $(document).ready(function () {
+        const updatetab = document.getElementById("refreshemptytrailertable");
+        // Obtenemos los elementos para Carrier
+        const $selectCarrier = $("#inputapplycarrierfilter");
+        const $filterDivCarrier = $("#emptytrailerfilterdivcarrier");
+        const $inputCarrier = $("#emptytrailerfilterinputcarrier");
+        const $inputCarrierPk = $("#emptytrailerfilterinputcarrierpk");
+        const $applyCarrierButton = $("#applycarrierfilter");
+        const $closeCarrierButton = $("#closeapplycarrierfilter");
+        const $clearCarrierButton = $("#emptytrailerfilterbuttoncarrier");
+    
+        // Obtenemos los elementos para Availability Indicator
+        const $selectAvailability = $("#inputapplyaifilter");
+        const $filterDivAvailability = $("#emptytrailerfilterdivavailabilityindicator");
+        const $inputAvailability = $("#emptytrailerfilterinputavailabilityindicator");
+        const $inputAvailabilityPk = $("#emptytrailerfilterinputavailabilityindicatorpk");
+        const $applyAvailabilityButton = $("#applyaifilter");
+        const $closeAvailabilityButton = $("#closeapplyaifilter");
+        const $clearAvailabilityButton = $("#emptytrailerfilterbuttonavailabilityindicator");
+    
+        // Variables que guardan los elementos que abrirán el offcanvas
+        const openOffcanvasElementsCarrier = $("#emptytrailerfilterinputcarrier, #emptytrailerfilterbtncarrier");
+        const openOffcanvasElementsAvailability = $("#emptytrailerfilterinputavailabilityindicator, #emptytrailerfilterbtnavailabilityindicator");
+    
+        // Función para los filtros Carrier
+        $selectCarrier.on("change", function () {
+            const selectedValue = $selectCarrier.val();
+    
+            if (selectedValue !== "") {
+                $closeCarrierButton.prop("disabled", true);
+            } else {
+                $closeCarrierButton.prop("disabled", false);
+            }
+        });
+    
+        $applyCarrierButton.on("click", function () {
+            const selectedValue = $selectCarrier.val();
+            const selectedText = $selectCarrier.find("option:selected").text();
+    
+            if (selectedValue !== "") {
+                $filterDivCarrier.show();
+                $inputCarrierPk.val(selectedValue);
+                $inputCarrier.val(selectedText);
+                updatetab.click();
+            } else {
+                $inputCarrierPk.val("");
+                $inputCarrier.val("");
+                $filterDivCarrier.hide();
+                $closeCarrierButton.click();
+                updatetab.click();
+            }
+        });
+    
+        $closeCarrierButton.on("click", function () {
+            const selectedValue = $selectCarrier.val();
+    
+            if (selectedValue === "" && ($inputCarrier.val() !== "" || $inputCarrierPk.val() !== "")) {
+                $inputCarrier.val("");
+                $inputCarrierPk.val("");
+                updatetab.click();
+            }
+    
+            if ($filterDivCarrier.is(":visible")) {
+                $filterDivCarrier.hide();
+                updatetab.click();
+            }
+        });
+    
+        $clearCarrierButton.on("click", function () {
+            if ($filterDivCarrier.is(":visible") && ($inputCarrier.val() !== "" || $inputCarrierPk.val() !== "")) {
+                $inputCarrier.val("");
+                $inputCarrierPk.val("");
+                $filterDivCarrier.hide();
+                $selectCarrier.val("");
+                if ($closeCarrierButton.prop("disabled")) {
+                    $closeCarrierButton.prop("disabled", false);
+                }
+                $closeCarrierButton.click();
+                updatetab.click();
+            }
+        });
+    
+        openOffcanvasElementsCarrier.on("click", function () {
+            if ($filterDivCarrier.is(":visible")) {
+                $("#offcanvasaddmorefilters").offcanvas("show");
+                $selectCarrier.focus();
+            }
+        });
+    
+        // Función para los filtros Availability Indicator
+        $selectAvailability.on("change", function () {
+            const selectedValue = $selectAvailability.val();
+    
+            if (selectedValue !== "") {
+                $closeAvailabilityButton.prop("disabled", true);
+            } else {
+                $closeAvailabilityButton.prop("disabled", false);
+            }
+        });
+    
+        $applyAvailabilityButton.on("click", function () {
+            const selectedValue = $selectAvailability.val();
+            const selectedText = $selectAvailability.find("option:selected").text();
+    
+            if (selectedValue !== "") {
+                $filterDivAvailability.show();
+                $inputAvailabilityPk.val(selectedValue);
+                $inputAvailability.val(selectedText);
+                updatetab.click();
+            } else {
+                $inputAvailabilityPk.val("");
+                $inputAvailability.val("");
+                $filterDivAvailability.hide();
+                $closeAvailabilityButton.click();
+                updatetab.click();
+            }
+        });
+    
+        $closeAvailabilityButton.on("click", function () {
+            const selectedValue = $selectAvailability.val();
+    
+            if (selectedValue === "" && ($inputAvailability.val() !== "" || $inputAvailabilityPk.val() !== "")) {
+                $inputAvailability.val("");
+                $inputAvailabilityPk.val("");
+                updatetab.click();
+            }
+    
+            if ($filterDivAvailability.is(":visible")) {
+                $filterDivAvailability.hide();
+                updatetab.click();
+            }
+        });
+    
+        $clearAvailabilityButton.on("click", function () {
+            if ($filterDivAvailability.is(":visible") && ($inputAvailability.val() !== "" || $inputAvailabilityPk.val() !== "")) {
+                $inputAvailability.val("");
+                $inputAvailabilityPk.val("");
+                $filterDivAvailability.hide();
+                $selectAvailability.val("");
+                if ($closeAvailabilityButton.prop("disabled")) {
+                    $closeAvailabilityButton.prop("disabled", false);
+                }
+                $closeAvailabilityButton.click();
+                updatetab.click();
+            }
+        });
+    
+        openOffcanvasElementsAvailability.on("click", function () {
+            if ($filterDivAvailability.is(":visible")) {
+                $("#offcanvasaddmorefilters").offcanvas("show");
+                $selectAvailability.focus();
+            }
+        });
+    });
     
     
+    //Guardar los valores de los filtros para recargas de la pagina
+    // Lista de IDs de los inputs
+    const inputIds = [
+        'searchemptytrailergeneral',
+        'emptytrailerfilterinputidtrailer',
+        'emptytrailerfilterinputdateofstartstatus',
+        'emptytrailerfilterinputdateofendstatus',
+        'emptytrailerfilterinputpalletsontrailer',
+        'emptytrailerfilterinputpalletsonfloor',
+        'emptytrailerfilterinputcarrierpk',
+        'emptytrailerfilterinputcarrier',
+        'emptytrailerfilterinputavailabilityindicator',
+        'emptytrailerfilterinputavailabilityindicatorpk',
+        'emptytrailerfilterinputlocationpk',
+        'emptytrailerfilterinputlocation',
+        'emptytrailerfilterinputstartdatein',
+        'emptytrailerfilterinputenddatein',
+        'emptytrailerfilterinputstartdateout',
+        'emptytrailerfilterinputenddateout',
+        'emptytrailerfilterinputstarttransactiondate',
+        'emptytrailerfilterinputendtransactiondate',
+        'emptytrailerfilterinputusername'
+    ];
+
+    // Al cargar la página, recuperar los valores desde sessionStorage y asignarlos a los inputs
+    window.onload = function() {
+        inputIds.forEach(id => {
+            const storedValue = sessionStorage.getItem(id);
+            if (storedValue) {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.value = storedValue;
+                }
+            }
+        });
+    };
+
+    // Antes de recargar la página, guardar los valores de los inputs en sessionStorage
+    window.addEventListener('beforeunload', function() {
+        inputIds.forEach(id => {
+            const input = document.getElementById(id);
+            if (input) {
+                sessionStorage.setItem(id, input.value);
+            }
+        });
+    });
+
+    // Limpiar los valores de sessionStorage al cambiar de ruta
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', function() {
+                inputIds.forEach(id => {
+                    sessionStorage.removeItem(id);
+                });
+            });
+        });
+    });
+
+    // Llamar a la función updateTrailerTable al cargar la página
+    window.addEventListener('load', () => {
+        updateTrailerTable();
+        applyTrailerIdFilter();
+        applypotFilter();
+        applypofFilter();
+        applyuserFilter();
+        applystatusFilter();
+        applydiFilter();
+        applydoFilter();
+        applytdFilter();
+        //applylocationFilter();
+        //applyavailabilityindicartorFilter();
+        loadCarriersFilternono(() => {
+            applycarrierFilter();
+        });
+
+        loadlocationsFilternono(() => {
+            applylocationsFilter();
+        });
+
+        loadAvailabilityFilternono(() => {
+            applyAvailabilityFilter();
+        });
+    });
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    function applyTrailerIdFilter() {
+        // Obtener elementos
+        const inputFilterValue = document.getElementById('emptytrailerfilterinputidtrailer').value;
+        const filterDiv = document.getElementById('emptytrailerfilterdividtrailer');
+        const inputApply = document.getElementById('inputapplytraileridfilter');
+        const applyButton = document.getElementById('applytraileridfilter');
+        const closeButton = document.getElementById('closeapplytraileridfilter');
+
+        // Verificar si el input tiene valor y el div está oculto
+        if (inputFilterValue && filterDiv.style.display === 'none') {
+            // Rellenar el input en el offcanvas
+            inputApply.value = inputFilterValue;
+
+            // Simular clic en el botón "Apply"
+            applyButton.click();
+
+            // Simular clic en el botón "Close"
+            closeButton.click();
+
+            // Deshabilitar el botón "Close"
+            closeButton.disabled = true;
+        }
+    }
+
+    function applypotFilter() {
+        // Obtener elementos
+        const inputFilterValue = document.getElementById('emptytrailerfilterinputpalletsontrailer').value;
+        const filterDiv = document.getElementById('emptytrailerfilterdivpalletsontrailer');
+        const inputApply = document.getElementById('inputapplypotfilter');
+        const applyButton = document.getElementById('applypotfilter');
+        const closeButton = document.getElementById('closeapplypotfilter');
+
+        // Verificar si el input tiene valor y el div está oculto
+        if (inputFilterValue && filterDiv.style.display === 'none') {
+            // Rellenar el input en el offcanvas
+            inputApply.value = inputFilterValue;
+
+            // Simular clic en el botón "Apply"
+            applyButton.click();
+
+            // Simular clic en el botón "Close"
+            closeButton.click();
+
+            // Deshabilitar el botón "Close"
+            closeButton.disabled = true;
+        }
+    }
+
+    function applyuserFilter() {
+        // Obtener elementos
+        const inputFilterValue = document.getElementById('emptytrailerfilterinputusername').value;
+        const filterDiv = document.getElementById('emptytrailerfilterdivusername');
+        const inputApply = document.getElementById('inputusernamefilter');
+        const applyButton = document.getElementById('applyusernamefilter');
+        const closeButton = document.getElementById('closeapplyusernamefilter');
+
+        // Verificar si el input tiene valor y el div está oculto
+        if (inputFilterValue && filterDiv.style.display === 'none') {
+            // Rellenar el input en el offcanvas
+            inputApply.value = inputFilterValue;
+
+            // Simular clic en el botón "Apply"
+            applyButton.click();
+
+            // Simular clic en el botón "Close"
+            closeButton.click();
+
+            // Deshabilitar el botón "Close"
+            closeButton.disabled = true;
+        }
+    }
+
+    function applypofFilter() {
+        // Obtener elementos
+        const inputFilterValue = document.getElementById('emptytrailerfilterinputpalletsonfloor').value;
+        const filterDiv = document.getElementById('emptytrailerfilterdivpalletsonfloor');
+        const inputApply = document.getElementById('inputapplypoffilter');
+        const applyButton = document.getElementById('applypoffilter');
+        const closeButton = document.getElementById('closeapplypoffilter');
+
+        // Verificar si el input tiene valor y el div está oculto
+        if (inputFilterValue && filterDiv.style.display === 'none') {
+            // Rellenar el input en el offcanvas
+            inputApply.value = inputFilterValue;
+
+            // Simular clic en el botón "Apply"
+            applyButton.click();
+
+            // Simular clic en el botón "Close"
+            closeButton.click();
+
+            // Deshabilitar el botón "Close"
+            closeButton.disabled = true;
+        }
+    }
+
+    function applystatusFilter(){
+        // Obtener elementos
+        const inputFilterValue1 = document.getElementById('emptytrailerfilterinputdateofstartstatus').value;
+        const inputFilterValue2 = document.getElementById('emptytrailerfilterinputdateofendstatus').value;
+        const filterDiv = document.getElementById('emptytrailerfilterdivdateofstatus');
+        const inputApply1 = document.getElementById('inputapplystatusstfilter');
+        const inputApply2 = document.getElementById('inputapplystatusedfilter');
+        const applyButton = document.getElementById('applystatusfilter');
+        const closeButton = document.getElementById('closeapplystatusfilter');
+
+        if(inputFilterValue1 && inputFilterValue2 && filterDiv.style.display === 'none'){
+            inputApply1.value = inputFilterValue1;
+            inputApply2.value = inputFilterValue2;
+
+            // Simular clic en el botón "Close"
+            closeButton.click();
+
+            applyButton.disabled = false;
+            // Simular clic en el botón "Apply"
+            applyButton.click();
+
+            // Deshabilitar el botón "Close"
+            closeButton.disabled = true;
+        }
+    }
+
+    function applydiFilter(){
+        // Obtener elementos
+        const inputFilterValue1 = document.getElementById('emptytrailerfilterinputstartdatein').value;
+        const inputFilterValue2 = document.getElementById('emptytrailerfilterinputenddatein').value;
+        const filterDiv = document.getElementById('emptytrailerfilterdivdatein');
+        const inputApply1 = document.getElementById('inputapplydistfilter');
+        const inputApply2 = document.getElementById('inputapplydienfilter');
+        const applyButton = document.getElementById('applydifilter');
+        const closeButton = document.getElementById('closeapplydifilter');
+
+        if(inputFilterValue1 && inputFilterValue2 && filterDiv.style.display === 'none'){
+            inputApply1.value = inputFilterValue1;
+            inputApply2.value = inputFilterValue2;
+
+            // Simular clic en el botón "Close"
+            closeButton.click();
+
+            applyButton.disabled = false;
+            // Simular clic en el botón "Apply"
+            applyButton.click();
+
+            // Deshabilitar el botón "Close"
+            closeButton.disabled = true;
+        }
+    }
+
+    function applydoFilter(){
+        // Obtener elementos
+        const inputFilterValue1 = document.getElementById('emptytrailerfilterinputstartdateout').value;
+        const inputFilterValue2 = document.getElementById('emptytrailerfilterinputenddateout').value;
+        const filterDiv = document.getElementById('emptytrailerfilterdivdateout');
+        const inputApply1 = document.getElementById('inputapplydostfilter');
+        const inputApply2 = document.getElementById('inputapplydoedfilter');
+        const applyButton = document.getElementById('applydofilter');
+        const closeButton = document.getElementById('closeapplydofilter');
+
+        if(inputFilterValue1 && inputFilterValue2 && filterDiv.style.display === 'none'){
+            inputApply1.value = inputFilterValue1;
+            inputApply2.value = inputFilterValue2;
+
+            // Simular clic en el botón "Close"
+            closeButton.click();
+
+            applyButton.disabled = false;
+            // Simular clic en el botón "Apply"
+            applyButton.click();
+
+            // Deshabilitar el botón "Close"
+            closeButton.disabled = true;
+        }
+    }
+
+    function applytdFilter(){
+        // Obtener elementos
+        const inputFilterValue1 = document.getElementById('emptytrailerfilterinputstarttransactiondate').value;
+        const inputFilterValue2 = document.getElementById('emptytrailerfilterinputendtransactiondate').value;
+        const filterDiv = document.getElementById('emptytrailerfilterdivtransactiondate');
+        const inputApply1 = document.getElementById('inputapplytdstfilter');
+        const inputApply2 = document.getElementById('inputapplytdedfilter');
+        const applyButton = document.getElementById('applytdfilter');
+        const closeButton = document.getElementById('closeapplytdfilter');
+
+        if(inputFilterValue1 && inputFilterValue2 && filterDiv.style.display === 'none'){
+            inputApply1.value = inputFilterValue1;
+            inputApply2.value = inputFilterValue2;
+
+            // Simular clic en el botón "Close"
+            closeButton.click();
+
+            applyButton.disabled = false;
+            // Simular clic en el botón "Apply"
+            applyButton.click();
+
+            // Deshabilitar el botón "Close"
+            closeButton.disabled = true;
+        }
+    }
+
+    // Función para buscar y cargar los carriers en el select
+    function loadCarriersFilternono(callback) {
+        var carrierRoute = $('#inputapplycarrierfilter').data('url');
+        $.ajax({
+            url: carrierRoute,
+            type: 'GET',
+            success: function (data) {
+                let select = $('#inputapplycarrierfilter');
+                let selectedValue = select.val();
+                select.empty();
+
+                if (data.length === 0) {
+                    select.append('<option disabled>No options available</option>');
+                } else {
+                    select.append('<option value="">Choose a filter</option>');
+                    data.forEach(item => {
+                        select.append(`<option value="${item.id_company}">${item.CoName}</option>`);
+                    });
+                }
+
+                if (selectedValue) {
+                    select.val(selectedValue); // Restaura el valor anterior
+                }
+
+                // Llama al callback si está definido
+                if (typeof callback === 'function') {
+                    callback();
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching data carriers:', error);
+            }
+        });
+    }
+        
+    function applycarrierFilter(){
+        // Obtener elementos
+        const inputFilterValue1 = document.getElementById('emptytrailerfilterinputcarrier').value;
+        const inputFilterValue2 = document.getElementById('emptytrailerfilterinputcarrierpk').value;
+        const filterDiv = document.getElementById('emptytrailerfilterdivcarrier');
+        const applyButton = document.getElementById('applycarrierfilter');
+        const closeButton = document.getElementById('closeapplycarrierfilter');
+        const inputApply2 = document.getElementById('inputapplycarrierfilter');
+
+        if (!inputApply2) {
+            console.error("El elemento select con el ID 'inputapplycarrierfilter' no existe.");
+            return;
+        }
+
+        // Esperar a que las opciones estén cargadas y luego seleccionar el valor
+        const options = Array.from(inputApply2.options);
+        
+        if(inputFilterValue1 && inputFilterValue2 && filterDiv.style.display === 'none'){
+
+        const optionToSelect = options.find(option => option.value === inputFilterValue2);
+        if (optionToSelect) {
+            inputApply2.value = inputFilterValue2; // Selecciona el valor si existe
+        } else {
+            console.warn(`El valor ${inputFilterValue2} no existe en el select inputapplycarrierfilter.`);
+        }
+
+        // Simular clic en el botón "Close"
+        closeButton.click();
+
+        // Simular clic en el botón "Apply"
+        applyButton.click();
+
+        // Deshabilitar el botón "Close"
+        closeButton.disabled = true;
+        }
+    }
+
+    // Función para buscar y cargar los Locations en el select
+    function loadlocationsFilternono(callback) {
+        var carrierRoute = $('#inputapplylocationfilter').data('url');
+        $.ajax({
+            url: carrierRoute,
+            type: 'GET',
+            success: function (data) {
+                let select = $('#inputapplylocationfilter');
+                let selectedValue = select.val();
+                select.empty();
+
+                if (data.length === 0) {
+                    select.append('<option disabled>No options available</option>');
+                } else {
+                    select.append('<option value="">Choose a filter</option>');
+                    data.forEach(item => {
+                        select.append(`<option value="${item.id_company}">${item.CoName}</option>`);
+                    });
+                }
+
+                if (selectedValue) {
+                    select.val(selectedValue); // Restaura el valor anterior
+                }
+
+                // Llama al callback si está definido
+                if (typeof callback === 'function') {
+                    callback();
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching data carriers:', error);
+            }
+        });
+    }
+        
+    function applylocationsFilter(){
+        // Obtener elementos
+        const inputFilterValue1 = document.getElementById('emptytrailerfilterinputlocation').value;
+        const inputFilterValue2 = document.getElementById('emptytrailerfilterinputlocationpk').value;
+        const filterDiv = document.getElementById('emptytrailerfilterdivlocation');
+        const applyButton = document.getElementById('applylocationfilter');
+        const closeButton = document.getElementById('closeapplylocationfilter');
+        const inputApply2 = document.getElementById('inputapplylocationfilter');
+
+        if (!inputApply2) {
+            console.error("El elemento select con el ID 'inputapplycarrierfilter' no existe.");
+            return;
+        }
+
+        // Esperar a que las opciones estén cargadas y luego seleccionar el valor
+        const options = Array.from(inputApply2.options);
+        
+        if(inputFilterValue1 && inputFilterValue2 && filterDiv.style.display === 'none'){
+        const optionToSelect = options.find(option => option.value === inputFilterValue2);
+        if (optionToSelect) {
+            inputApply2.value = inputFilterValue2; // Selecciona el valor si existe
+        } else {
+            console.warn(`El valor ${inputFilterValue2} no existe en el select inputapplyfilter.`);
+        }
+
+        // Simular clic en el botón "Close"
+        closeButton.click();
+
+        // Simular clic en el botón "Apply"
+        applyButton.click();
+
+        // Deshabilitar el botón "Close"
+        closeButton.disabled = true;
+        }
+    }
+
+
+    // Función para buscar y cargar los Locations en el select
+    function loadAvailabilityFilternono(callback) {
+        var carrierRoute = $('#inputapplyaifilter').data('url');
+        $.ajax({
+            url: carrierRoute,
+            type: 'GET',
+            success: function (data) {
+                let select = $('#inputapplyaifilter');
+                let selectedValue = select.val();
+                select.empty();
+
+                if (data.length === 0) {
+                    select.append('<option disabled>No options available</option>');
+                } else {
+                    select.append('<option value="">Choose a filter</option>');
+                    data.forEach(item => {
+                        select.append(`<option value="${item.gnct_id}">${item.gntc_description}</option>`);
+                    });
+                }
+
+                if (selectedValue) {
+                    select.val(selectedValue); // Restaura el valor anterior
+                }
+
+                // Llama al callback si está definido
+                if (typeof callback === 'function') {
+                    callback();
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching data carriers:', error);
+            }
+        });
+    }
+        
+    function applyAvailabilityFilter(){
+        // Obtener elementos
+        const inputFilterValue1 = document.getElementById('emptytrailerfilterinputavailabilityindicator').value;
+        const inputFilterValue2 = document.getElementById('emptytrailerfilterinputavailabilityindicatorpk').value;
+        const filterDiv = document.getElementById('emptytrailerfilterdivavailabilityindicator');
+        const applyButton = document.getElementById('applyaifilter');
+        const closeButton = document.getElementById('closeapplyaifilter');
+        const inputApply2 = document.getElementById('inputapplyaifilter');
+
+        if (!inputApply2) {
+            console.error("El elemento select con el ID 'Availability' no existe.");
+            return;
+        }
+
+        // Esperar a que las opciones estén cargadas y luego seleccionar el valor
+        const options = Array.from(inputApply2.options);
+        
+        if(inputFilterValue1 && inputFilterValue2 && filterDiv.style.display === 'none'){
+        const optionToSelect = options.find(option => option.value === inputFilterValue2);
+        if (optionToSelect) {
+            inputApply2.value = inputFilterValue2; // Selecciona el valor si existe
+        } else {
+            console.warn(`El valor ${inputFilterValue2} no existe en el select Availability.`);
+        }
+
+        // Simular clic en el botón "Close"
+        closeButton.click();
+
+        // Simular clic en el botón "Apply"
+        applyButton.click();
+
+        // Deshabilitar el botón "Close"
+        closeButton.disabled = true;
+        }
+    }

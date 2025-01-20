@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -55,6 +56,9 @@ class Shipments extends Model
         'delivered_date',
         'at_door_date',
         'wh_auth_date',
+        'offlanding_time',
+        'billing_id',
+        'billing_date'
     ];
 
     protected static function boot(){
@@ -72,21 +76,49 @@ class Shipments extends Model
             });
     }
 
+    //Convertir Fechas
+    /*public function getStatusAttribute($value)
+    {
+        return Carbon::parse($value)->format('m/d/Y');
+    }*/
+    public function getPickUpDateAttribute($value)
+    {
+            return Carbon::parse($value)->format('m/d/Y H:i:s');
+    }
+    public function getIntransitDateAttribute($value)
+    {
+            return Carbon::parse($value)->format('m/d/Y H:i:s');
+    }
+    public function getDriverAssignedDateAttribute($value)
+    {
+            return Carbon::parse($value)->format('m/d/Y H:i:s');
+    }
+    public function getetdAttribute($value)
+    {
+            return Carbon::parse($value)->format('m/d/Y H:i:s');
+    }
+
 
     // Relación con la tabla `services`
-    /*public function service()
+    public function services()
     {
-        return $this->belongsTo(Service::class, 'stm_id', 'id_service');
-    }*/
+        return $this->belongsTo(Services::class, 'stm_id', 'id_service');
+    }
 
     // Relación con la tabla `empty_trailer`
-    public function trailer()
+    public function emptytrailer()
     {
         return $this->belongsTo(EmptyTrailer::class, 'id_trailer', 'trailer_num');
     }
 
     // Relación con la tabla `companies`
-    public function company()
+    public function origin()
+    {
+        return $this->belongsTo(Companies::class, 'id_company', 'id_company');
+    }
+
+    // Relación con la tabla `companies`
+    public function carrier()
     {
         return $this->belongsTo(Companies::class, 'id_company', 'id_company');
     }
@@ -98,13 +130,13 @@ class Shipments extends Model
     }*/
 
     // Relación con la tabla `generic_catalogs` para el estado actual
-    public function currentStatus()
+    public function currentstatus()
     {
         return $this->belongsTo(GenericCatalog::class, 'gnct_id_current_status', 'gnct_id');
     }
 
     // Relación con la tabla `generic_catalogs` para el tipo de envío
-    public function shipmentType()
+    public function shipmenttype()
     {
         return $this->belongsTo(GenericCatalog::class, 'gnct_id_shipment_type', 'gnct_id');
     }

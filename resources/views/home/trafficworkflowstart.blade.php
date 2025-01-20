@@ -30,9 +30,9 @@
                 </div>
 
                 <div class="form-check mb-3">
-                    <input class="form-check-input" type="checkbox" value="" id="inputshipmentcheckbonded" name="inputshipmentcheckbonded">
+                    <input class="form-check-input" type="checkbox" id="inputshipmentcheckbonded" name="inputshipmentcheckbonded">
                     <label class="form-check-label" for="inputshipmentcheckbonded">
-                        Bounded
+                        Bonded
                     </label>
                 </div>
                 
@@ -65,6 +65,7 @@
                 <div class="mb-3">
                     <label for="inputshipmentcarrier" class="form-label ">Carrier Dropping Trailer</label>
                     <select class="form-select" aria-label="Default select example"  id="inputshipmentcarrier" name="inputshipmentcarrier" value="{{ old('inputshipmentcarrier', $from_button == 1 ? $carrier : '') }}" data-url="{{ route('locations-emptytrailer') }}">
+                    <option value="">Choose an option</option>
                     </select>
                     <div class="invalid-feedback"></div>
                 </div>

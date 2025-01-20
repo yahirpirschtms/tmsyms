@@ -31,14 +31,14 @@ $(document).ready(function() {
                     select.empty(); // Limpia el contenido del select
         
                     // Agrega la opción deshabilitada y oculta solo si no hay valor seleccionado
-                    if (!selectedValue) {
+                    /*if (!selectedValue) {
                         select.append('<option selected disabled hidden></option>');
-                    }
+                    }*/
         
                     if (data.length === 0) {
                         select.append('<option disabled>No options available</option>');
                     } else {
-                        select.append('<option value="">Remove filter</option>');
+                        select.append('<option value="">Choose an option</option>');
                         data.forEach(item => {
                             select.append(`<option value="${item.id_company}">${item.CoName}</option>`);
                         });

@@ -180,15 +180,55 @@
           font-size: 0.875em;
           color: #dc3545;
       }
-      /*.hero-section::before{
-        background-color: rgb(0, 0, 0, 0.6);
-        content: "";
-        position: absolute;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-      }*/
+
+      /* Eliminar bordes de la tabla y las celdas */
+  .table_style {
+    width: 100%;
+    overflow-y: auto; /* Habilita el scroll vertical */
+    overflow-x: auto; /* Habilita el desplazamiento horizontal */
+    max-height: 420px; /* Define un alto máximo para habilitar el scroll vertical */
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  td {
+    padding: 10px;
+    text-align: left;
+    border: none;
+  }
+
+  th {
+    padding: 10px;
+    text-align: left;
+    font-size: 15px;
+    background-color: #f8f9fa;
+    font-weight: bold;
+    white-space: nowrap; /* Evita que el texto se envuelva */
+    border-bottom: 2px solid #000;
+
+    /* Fija el encabezado al desplazarse verticalmente */
+    position: sticky;
+    top: 0; /* Fija el encabezado en la parte superior */
+    z-index: 1; /* Asegura que el encabezado esté sobre las celdas */
+  }
+
+  td {
+    font-size: 14px;
+    white-space: nowrap; /* Evita que el texto se envuelva */
+  }
+  /* Estilo para pantallas menores o iguales a 768px */
+  @media screen and (max-width: 768px) {
+    th {
+      font-size: 14px; /* Encabezados más pequeños */
+    }
+    
+    td {
+      font-size: 13px; /* Celdas más pequeñas */
+    }
+  }
     </style>
 </head>
 <body>

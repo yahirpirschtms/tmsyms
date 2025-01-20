@@ -43,6 +43,9 @@ Route::get('/carrier-emptytrailer', [CompaniesController::class, 'getLocations']
 //Ruta actualizacion de Tabla EmptyTrailer con boton refresh o automaticamente
 Route::get('/emptytrailer/data', [HomeController::class, 'getEmptyTrailers'])->name('emptytrailer.data');
 
+//Ruta actualizacion de Tabla ShipmentsWH con boton refresh o automaticamente
+Route::get('/shipmentwh/data', [ShipmentController::class, 'getShipmentswh'])->name('shipmentwh.data');
+
 //Eliminar el empty trailer
 Route::delete('/trailers/{id}', [HomeController::class, 'destroy'])->name('trailers.destroy');
 
@@ -57,6 +60,12 @@ Route::get('/createworkflowstartwithemptytrailer', [ShipmentController::class, '
 
 //Rutas nutrir selects para la pantalla de Shipments
 Route::get('/shipment-types', [GenericCatalogController::class, 'getShipmentTypes'])->name('shipmenttypes-shipment');
+
+//Ruta ir a WH ETA Approval sin filtros
+Route::get('/whapptapproval', [ShipmentController::class, 'indexwhapptapproval'])->name('whapptapproval');
+
+//Ruta Asignar WH ETA Approval a Shipments
+Route::put('/shipment/whetaapproval', [ShipmentController::class, 'whetaapproval'])->name('shipment.whetaapproval');
 
 
 

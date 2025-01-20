@@ -68,9 +68,9 @@ class EmptyTrailer extends Model
         }
 
         // Relación inversa con Shipments
-        public function shipments()
+        public function emptytrailer()
         {
-            return $this->hasMany(Shipments::class, 'gnct_id_avaibility_indicator', 'gnct_id');
+            return $this->hasMany(Shipments::class, 'id_trailer', 'trailer_num');
         }
 
 

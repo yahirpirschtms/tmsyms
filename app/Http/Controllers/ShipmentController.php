@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EmptyTrailer;
 use App\Models\Shipments;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ShipmentController extends Controller
 {
@@ -129,14 +131,16 @@ class ShipmentController extends Controller
         $prealertdatetime = Carbon::createFromFormat('m/d/y H:i:s', $request->inputshipmentprealertdatetime)->format('Y-m-d H:i:s'); // Fecha y hora con minutos y segundos
         $estimateddateofdeparture = Carbon::createFromFormat('m/d/y H:i:s', $request->inputshipmentetd)->format('Y-m-d H:i:s'); // Fecha y hora con minutos y segundos
 
-    
+        $bounded = $request->has('inputshipmentcheckbonded') ? true : false;
+        //$bounded = $request->has('inputshipmentcheckbonded') ? 'Bonded' : 'Not Bonded';
+
         // Crear un nuevo registro
         Shipments::create([
             //'pk_trailer' => $request->inputidtrailer,
             'stm_id' => $request->inputshipmentstmid,
             'gnct_id_shipment_type' => $request->inputshipmentshipmenttype,
             'reference' => $request->inputshipmentreference,
-            'bonded' => $request->inputshipmentcheckbonded,
+            'bonded' => $bounded,
             'origin' => $request->inputorigin,
             'destination' => $request->inputshipmentdestination,
             'pre_alerted_datetime' => $prealertdatetime,
@@ -154,9 +158,280 @@ class ShipmentController extends Controller
             'device_number' => $request->inputshipmentdevicenumber,
             
         ]);
+
+        // Actualizar la tabla `empty_trailer` para el trailer correspondiente
+        // EmptyTrailer::where('trailer_num', $request->inputidtrailer)
+        // ->update(['availability' => 'NO']);
+
     
         // Redirigir con mensaje de éxito
         return redirect()->route('workflowtrafficstart')->with('success', 'Shipment successfully added!');
+    }
+
+    public function indexwhapptapproval(){
+        if (Auth::check()) {
+            $shipments = Shipments::with(['shipmenttype', 'currentstatus', 'origin', 'carrier', 'emptytrailer', 'services'])
+            /*->whereHas('shipmenttype', function ($query) {
+                $query->where('shipment_type', 'Shipping');
+            })
+            ->whereNull('wu_auth_date') // Agregar la condición para wu_auth_date vacío
+            ->get();*/
+            //->where('shipment_type', 'Shipping') // Filtrar por shipment_type
+            //->whereNull('wh_auth_date') // Filtrar registros donde wu_auth_date esté vacío
+            ->get();
+            
+            return view('home.whapptapproval', compact('shipments'));
+            //return view('home.whapptapproval');
+        }
+        return redirect('/login');
+    }
+
+    //Funcion actualizar EmptyTrailers
+    public function whetaapproval(Request $request){
+        // Validar los datos
+        $validated = $request->validate([
+            'pk_shipment' => 'required',
+            'id_trailer' => 'required',
+            'stm_id' =>  'nullable',
+            'pallets' => 'required',
+            'units' => 'required',
+            'etd' => 'required',
+            'wh_auth_date' => 'required',
+        ], [
+            'id_trailer.required' => 'ID Trailer is required.',
+            //'trailer_num.string' => 'El campo ID Trailer debe ser una cadena de texto.',
+            //'trailer_num.max' => 'El campo ID Trailer no puede exceder los 50 caracteres.',
+            //'stm_id.required' => 'La fecha de estatus es obligatoria.',
+            //'stm_id.date' => 'El campo de fecha de estatus debe ser una fecha válida.',
+            'pallets.required' => 'Pallets are required.',
+            //'pallets_on_trailer.string' => 'El campo Pallets on Trailer debe ser una cadena de texto.',
+            //'pallets_on_trailer.max' => 'El campo Pallets on Trailer no puede exceder los 50 caracteres.',
+            //'pallets_on_floor.required' => 'El campo Pallets on Floor es obligatorio.',
+            //'pallets_on_floor.string' => 'El campo Pallets on Floor debe ser una cadena de texto.',
+            //'pallets_on_floor.max' => 'El campo Pallets on Floor no puede exceder los 50 caracteres.',
+            'units.required' => 'Units are rquired.',
+            //'carrier.string' => 'El campo Carrier debe ser una cadena de texto.',
+            //'carrier.max' => 'El campo Carrier no puede exceder los 50 caracteres.',
+            'etd.required' => 'ETD is required.',
+            
+            'wh_auth_date.required' => 'WH Auth Date is required.',
+        ]);
+    
+        // Buscar el trailer
+        $shipment = Shipments::findOrFail($validated['pk_shipment']);
+
+        // Convertir las fechas al formato adecuado
+        /*$validated['status'] = $validated['status']
+            ? Carbon::createFromFormat('m/d/Y', $validated['status'])->format('Y-m-d') 
+            : null;*/
+        $validated['etd'] = $validated['etd'] 
+            ? Carbon::createFromFormat('m/d/Y H:i:s', $validated['etd'])->format('Y-m-d H:i:s') 
+            : null;
+        $validated['wh_auth_date'] = $validated['wh_auth_date'] 
+            ? Carbon::createFromFormat('m/d/Y H:i:s', $validated['wh_auth_date'])->format('Y-m-d H:i:s') 
+            : null;
+        /*$validated['transaction_date'] = $validated['transaction_date'] 
+            ? Carbon::createFromFormat('m/d/Y H:i:s', $validated['transaction_date'])->format('Y-m-d H:i:s') 
+            : null;*/
+
+            // Log para depuración
+        Log::info('Received data:', $validated);
+
+        // Actualizar los campos
+        $shipment->update($validated);
+
+        return response()->json(['message' => 'Successfully WH ETA Approval saved succesfully'], 200);
+    }
+
+    public function getShipmentswh(Request $request){
+        $query = Shipments::with(['shipmenttype', 'currentstatus', 'origin', 'carrier', 'emptytrailer', 'services']);
+        //->where('shipment_type', 'Shipping') // Filtrar por shipment_type
+        //->whereNull('wh_auth_date') // Filtrar registros donde wu_auth_date esté vacío
+        
+        // Filtros generales (searchemptytrailergeneral)
+        if ($request->has('search')) {
+            $search = $request->input('search');
+            //$formattedDate = null;
+            $formattedDateTime = null;
+            //$formattedDate = \DateTime::createFromFormat('m/d/Y', $search);
+            $formattedDateTime = \DateTime::createFromFormat('m/d/Y H:i:s',$search);
+            
+            //$finalstatus = $date->format('Y-m-d');
+            $query->where(function($q) use ($search, $formattedDateTime) {
+                $q->where('stm_id', 'like', "%$search%")
+                //->orWhereNull('stm_id')
+                ->orWhereHas('shipmenttype', function($q) use ($search) {
+                    $q->where('gntc_description', 'like', "%$search%");
+                })
+                //->orWhereNull('shipmenttype')
+                ->orWhere('secondary_shipment_id','like',"%$search%")
+                //->orWhereNull('secondary_shipment_id')
+                ->orWhere('id_trailer','like',"%$search%")
+                //->orWhereNull('id_trailer')
+
+                ->orWhere('etd', 'like', $formattedDateTime)
+                //->orWhereNull('etd')
+
+                ->orWhere('units','like',"%$search%")
+                //->orWhereNull('units')
+                ->orWhere('pallets', 'like', "%$search%")
+                //->orWhereNull('pallets')
+
+                ->orWhere('driver_assigned_date', 'like', $formattedDateTime)
+                //->orWhereNull('driver_assigned_date')
+                ->orWhere('pick_up_date', 'like', $formattedDateTime)
+                //->orWhereNull('pick_up_date')
+                ->orWhere('intransit_date', 'like', $formattedDateTime)
+                //->orWhereNull('intransit_date')
+                ->orWhere('delivered_date', 'like', $formattedDateTime)
+                //->orWhereNull('delivered_date')
+                ->orWhere('secured_yarddate', 'like', $formattedDateTime)
+                //->orWhereNull('secured_yarddate')
+                ->orWhere('wh_auth_date', 'like', $formattedDateTime)
+                //->orWhereNull('wh_auth_date')
+
+                ->orWhere('offlanding_time', 'like', "%$search%")
+                //->orWhereNull('offlanding_time')
+
+                ->orWhere('billing_date', 'like', $formattedDateTime)
+                //->orWhereNull('billing_date')
+
+                ->orWhere('billing_id','like',"%$search%")
+                //->orWhereNull('billing_id')
+                ->orWhere('device_number','like',"%$search%");
+                //->orWhereNull('device_number');
+            });
+        }
+        
+
+        //Filtros específicos de parámetros (inputs de filtros aplicados)
+        if ($request->has('stm_id') && $request->input('stm_id') != '') {
+            $query->where('stm_id', 'like', "%{$request->input('stm_id')}%");
+        }
+        if ($request->has('gnct_id_shipment_type') && $request->input('gnct_id_shipment_type') != '') {
+            $query->whereHas('shipmenttype', function($q) use ($request) {
+                $q->where('gnct_id', $request->input('gnct_id_shipment_type'));
+            });
+        }
+        if ($request->has('secondary_shipment_id') && $request->input('secondary_shipment_id') != '') {
+            $query->where('secondary_shipment_id', 'like', "%{$request->input('secondary_shipment_id')}%");
+        }
+        if ($request->has('id_trailer') && $request->input('id_trailer') != '') {
+            $query->where('id_trailer', 'like', "%{$request->input('id_trailer')}%");
+        }
+        if ($request->has('etd_start') && $request->has('etd_end') &&
+            $request->input('etd_start') != '' && $request->input('etd_end') != '') {
+
+                $startDate = Carbon::createFromFormat('m/d/Y H:i:s',$request->input('etd_start'));
+                $endDate = Carbon::createFromFormat('m/d/Y H:i:s',$request->input('etd_end'));
+            $query->whereBetween('etd', [
+                $startDate,
+                $endDate
+            ]);
+        }
+        if ($request->has('units') && $request->input('units') != '') {
+            $query->where('units', 'like', "%{$request->input('units')}%");
+        }
+        if ($request->has('pallets') && $request->input('pallets') != '') {
+            $query->where('pallets', 'like', "%{$request->input('pallets')}%");
+        }
+        if ($request->has('driver_assigned_date_start') && $request->has('driver_assigned_date_end') &&
+            $request->input('driver_assigned_date_start') != '' && $request->input('driver_assigned_date_end') != '') {
+
+                $startDate = Carbon::createFromFormat('m/d/Y H:i:s',$request->input('driver_assigned_date_start'));
+                $endDate = Carbon::createFromFormat('m/d/Y H:i:s',$request->input('driver_assigned_date_end'));
+            $query->whereBetween('driver_assigned_date', [
+                $startDate,
+                $endDate
+            ]);
+        }
+        if ($request->has('pick_up_date_start') && $request->has('pick_up_date_end') &&
+            $request->input('pick_up_date_start') != '' && $request->input('pick_up_date_end') != '') {
+
+                $startDate = Carbon::createFromFormat('m/d/Y H:i:s',$request->input('pick_up_date_start'));
+                $endDate = Carbon::createFromFormat('m/d/Y H:i:s',$request->input('pick_up_date_end'));
+            $query->whereBetween('pick_up_date', [
+                $startDate,
+                $endDate
+            ]);
+        }
+        if ($request->has('intransit_date_start') && $request->has('intransit_date_end') &&
+            $request->input('intransit_date_start') != '' && $request->input('intransit_date_end') != '') {
+
+                $startDate = Carbon::createFromFormat('m/d/Y H:i:s',$request->input('intransit_date_start'));
+                $endDate = Carbon::createFromFormat('m/d/Y H:i:s',$request->input('intransit_date_end'));
+            $query->whereBetween('intransit_date', [
+                $startDate,
+                $endDate
+            ]);
+        }
+        if ($request->has('delivered_date_start') && $request->has('delivered_date_end') &&
+            $request->input('delivered_date_start') != '' && $request->input('delivered_date_end') != '') {
+
+                $startDate = Carbon::createFromFormat('m/d/Y H:i:s',$request->input('delivered_date_start'));
+                $endDate = Carbon::createFromFormat('m/d/Y H:i:s',$request->input('delivered_date_end'));
+            $query->whereBetween('delivered_date', [
+                $startDate,
+                $endDate
+            ]);
+        }
+        if ($request->has('secured_yarddate_start') && $request->has('secured_yarddate_end') &&
+            $request->input('secured_yarddate_start') != '' && $request->input('secured_yarddate_end') != '') {
+
+                $startDate = Carbon::createFromFormat('m/d/Y H:i:s',$request->input('secured_yarddate_start'));
+                $endDate = Carbon::createFromFormat('m/d/Y H:i:s',$request->input('secured_yarddate_end'));
+            $query->whereBetween('secured_yarddate', [
+                $startDate,
+                $endDate
+            ]);
+        }
+        if ($request->has('wh_auth_date_start') && $request->has('wh_auth_date_end') &&
+            $request->input('wh_auth_date_start') != '' && $request->input('wh_auth_date_end') != '') {
+
+                $startDate = Carbon::createFromFormat('m/d/Y H:i:s',$request->input('wh_auth_date_start'));
+                $endDate = Carbon::createFromFormat('m/d/Y H:i:s',$request->input('wh_auth_date_end'));
+            $query->whereBetween('wh_auth_date', [
+                $startDate,
+                $endDate
+            ]);
+        }
+
+        if ($request->has('offlanding_time_start') && $request->has('offlanding_time_end') &&
+            $request->input('offlanding_time_start') != '' && $request->input('offlanding_time_end') != '') {
+
+                //$startDate = Carbon::createFromFormat('m/d/Y H:i:s',$request->input('offlanding_time_start'));
+                //$endDate = Carbon::createFromFormat('m/d/Y H:i:s',$request->input('offlanding_time_end'));
+            $query->whereBetween('offlanding_time', [
+                $request->input('offlanding_time_start'),
+                $request->input('offlanding_time_end')
+                
+            ]);
+        }
+
+        if ($request->has('billing_date_start') && $request->has('billing_date_end') &&
+            $request->input('billing_date_start') != '' && $request->input('billing_date_end') != '') {
+
+                $startDate = Carbon::createFromFormat('m/d/Y H:i:s',$request->input('billing_date_start'));
+                $endDate = Carbon::createFromFormat('m/d/Y H:i:s',$request->input('billing_date_end'));
+            $query->whereBetween('billing_date', [
+                $startDate,
+                $endDate
+            ]);
+        }
+        
+        if ($request->has('billing_id') && $request->input('billing_id') != '') {
+            $query->where('billing_id', 'like', "%{$request->input('billing_id')}%");
+        }
+        if ($request->has('device_number') && $request->input('device_number') != '') {
+            $query->where('device_number', 'like', "%{$request->input('device_number')}%");
+        }
+        
+
+        // Obtener los trailers con los filtros aplicados
+        $shipments = $query->get();
+
+        // Devolver los datos en formato JSON
+        return response()->json($shipments);
     }
 
 }

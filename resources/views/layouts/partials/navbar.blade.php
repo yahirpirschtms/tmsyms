@@ -57,7 +57,7 @@
                       Appoinment Viewer
                     </a>
                     <ul class="ms-4 dropdown-menu dropdown-menu-start" style="background-color: #1e4877; border:none">
-                      <li><a class="dropdown-item text-light" href="#">WH Appointment Approval</a></li>
+                      <li><a class="dropdown-item text-light" href="{{ route('whapptapproval') }}">WH Appointment Approval</a></li>
                       <li><a class="dropdown-item text-light" href="#">WH Appointment Viewer</a></li>
                       <li><a class="dropdown-item text-light" href="#">Historical Calendar Viewer</a></li>
                     </ul>
