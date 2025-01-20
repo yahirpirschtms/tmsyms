@@ -41,9 +41,15 @@ class GenericCatalog extends Model
         }
 
         // Relación inversa con Shipments
-        public function shipments()
+        public function currentstatus()
         {
             return $this->hasMany(Shipments::class, 'gnct_id_avaibility_indicator', 'gnct_id');
         }
+
+         // Relación inversa con Shipments
+         public function shipmenttype()
+         {
+             return $this->hasMany(Shipments::class, 'gnct_id_avaibility_indicator', 'gnct_id');
+         }
     
 }

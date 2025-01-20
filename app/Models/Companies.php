@@ -46,7 +46,12 @@ class Companies extends Model
     }
 
     // Relación inversa con Shipments
-    public function shipments()
+    public function carrier()
+    {
+        return $this->hasMany(Shipments::class, 'gnct_id_avaibility_indicator', 'gnct_id');
+    }
+
+    public function origin()
     {
         return $this->hasMany(Shipments::class, 'gnct_id_avaibility_indicator', 'gnct_id');
     }
