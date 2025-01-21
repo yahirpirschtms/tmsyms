@@ -22,14 +22,16 @@
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="cardsContainer">
                 @foreach ($shipments as $shipment)
                     <div class="col shipment-card"
-                        data-search="{{ $shipment->stm_id }} {{ $shipment->shipment_type }} {{ $shipment->status }} {{ $shipment->originCatalog->gntc_value ?? '' }} {{ $shipment->currentStatus->gntc_description ?? '' }} {{ $shipment->driver->drivername ?? '' }}">
+                        data-search="{{ $shipment->stm_id }} {{ $shipment->shipment_type }} {{ $shipment->status }} {{ $shipment->company->CoName ?? '' }} {{ $shipment->currentStatus->gntc_description ?? '' }} {{ $shipment->driver->drivername ?? '' }}">
                         <div class="card">
                             <div class="card-body text-white bg-dark">
-                                <h5 class="card-title">{{ $shipment->stm_id }}</h5>
+                                <h5 class="card-title">{{ $shipment->service->id_service }}</h5>
                                 <p class="card-subtitle mb-2">{{ $shipment->shipment_type }}</p>
                                 <h6 class="card-text">{{ $shipment->status }}</h6>
-                                <p>{{ $shipment->originCatalog->gntc_value ?? 'Origen no disponible' }}</p>
-                                <p>{{ $shipment->currentStatus->gntc_description ?? 'Estado no disponible' }}</p>
+                                <p>{{ $shipment->company->CoName ?? 'Origen no disponible' }}</p>
+
+                                {{ $shipment->currentStatus->gntc_description ?? 'Estado no disponible' }}</p>
+                                <p>{{ $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y') : 'Approved ETA date no disponible' }}</p>
                                 <p>{{ $shipment->driver->drivername ?? 'Conductor no asignado' }}</p>
                                 <div class="d-flex justify-content-between">
                                     <button class="btn btn-primary btn-sm" data-bs-toggle="offcanvas"
@@ -68,7 +70,7 @@
                     <form>
                         <div class="mb-3">
                             <label for="stm_id" class="form-label">STM ID</label>
-                            <input type="text" class="form-control" id="stm_id" value="{{ $shipment->stm_id }}" readonly>
+                            <input type="text" class="form-control" id="stm_id" value="{{ $shipment->service->id_service ?? 'STM ID no disponible' }}" readonly>
                         </div>
 
                         <div class="mb-3">
@@ -83,7 +85,7 @@
 
                         <div class="mb-3">
                             <label for="origin" class="form-label">Origin</label>
-                            <input type="text" class="form-control" id="origin" value="{{ $shipment->originCatalog->gntc_value ?? 'Origen no disponible' }}" readonly>
+                            <input type="text" class="form-control" id="origin" value="{{ $shipment->company->CoName ?? 'Origen no disponible' }}" readonly>
                         </div>
 
                         <div class="mb-3">
@@ -335,6 +337,11 @@
                     <div class="mb-3">
                         <label class="form-label">At Door Date</label>
                         <p>{{ \Carbon\Carbon::parse($shipment->at_door_date)->format('m/d/Y H:i:s') }}</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Approved ETA date & Time</label>
+                        <p>{{ $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y H:i:s') : 'Approved ETA date no disponible' }}</p>
                     </div>
                 </div>
 

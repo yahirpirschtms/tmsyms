@@ -167,11 +167,12 @@ class CalendarController extends Controller
             // Buscar el envío por pk_shipment
             $shipment = Shipment::findOrFail($pk_shipment);
 
+
             // Validar los datos recibidos
             $validatedData = $request->validate([
                 'trailer_id' => 'nullable|string|max:255', // ID del remolque
                 'stm_id' => 'nullable|integer', // ID del STM
-                'current_status' => 'nullable|integer', // Estado actual
+                'gnct_id_current_status' => 'nullable|integer', // Estado actual
                 'delivered_date' => 'nullable|date', // Fecha de entrega
                 'at_door_date' => 'nullable|date', // Fecha de llegada
                 'offload_date' => 'nullable|date', // Fecha de descarga
@@ -180,6 +181,7 @@ class CalendarController extends Controller
 
             // Actualizar el envío con los nuevos datos
             $shipment->update($validatedData);
+
 
             // Devolver respuesta con el estado de la actualización
             return response()->json(['message' => 'Shipment updated successfully'], 200);

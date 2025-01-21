@@ -190,15 +190,46 @@
 
 
 
-            .table {
-    table-layout: auto;
+      table {
     width: 100%;
-}
+    border-collapse: collapse;
+  }
 
-.table-responsive {
-    overflow-x: auto;
-}
+  td {
+    padding: 10px;
+    text-align: left;
+    border: none;
+  }
 
+  th {
+    padding: 10px;
+    text-align: left;
+    font-size: 15px;
+    background-color: #f8f9fa;
+    font-weight: bold;
+    white-space: nowrap; /* Evita que el texto se envuelva */
+    border-bottom: 2px solid #000;
+
+    /* Fija el encabezado al desplazarse verticalmente */
+    position: sticky;
+    top: 0; /* Fija el encabezado en la parte superior */
+    z-index: 1; /* Asegura que el encabezado esté sobre las celdas */
+  }
+
+  td {
+    font-size: 14px;
+    white-space: nowrap; /* Evita que el texto se envuelva */
+  }
+  /* Estilo para pantallas menores o iguales a 768px */
+  @media screen and (max-width: 768px) {
+    th {
+      font-size: 14px; /* Encabezados más pequeños */
+    }
+
+    td {
+      font-size: 13px; /* Celdas más pequeñas */
+    }
+  }
 
 
 </style>

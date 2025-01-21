@@ -87,6 +87,11 @@ class Shipment extends Model
         return $this->belongsTo(GenericCatalog::class, 'gnct_id_shipment_type', 'gnct_id');
     }
 
+    public function service()
+    {
+        return $this->belongsTo('App\Models\Service', 'stm_id', 'pk_service');
+    }
+
     // Método para obtener el estatus actual
     public function getCurrentStatusValueAttribute()
     {
@@ -104,9 +109,9 @@ class Shipment extends Model
         return $this->belongsTo(Driver::class, 'id_driver', 'pk_driver'); // Ajustado a id_driver
     }
 
-    public function originCatalog()
+    public function company()
     {
-        return $this->belongsTo(GenericCatalog::class, 'origin', 'gnct_id'); // Relación con la tabla generic_catalogs
+        return $this->belongsTo(Company::class, 'origin', 'pk_company'); // Relación con la tabla companies
     }
 
     // Formateo de la fecha de entrega

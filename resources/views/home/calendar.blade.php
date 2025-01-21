@@ -116,8 +116,8 @@
                         <input type="datetime-local" class="form-control" id="atDoorDate{{ $shipment->stm_id }}" name="at_door_date" value="{{ old('at_door_date', $shipment->at_door_date ? \Carbon\Carbon::parse($shipment->at_door_date)->format('Y-m-d\TH:i') : '') }}">
                         </div>
                         <div class="mb-3">
-                        <label for="offloadDate{{ $shipment->stm_id }}" class="form-label">Offload Date</label>
-                        <input type="datetime-local" class="form-control" id="offloadDate{{ $shipment->stm_id }}" name="offload_date" value="{{ old('offload_date', $shipment->offload_date ? \Carbon\Carbon::parse($shipment->offload_date)->format('Y-m-d\TH:i') : '') }}">
+                            <label for="offloadTime{{ $shipment->stm_id }}" class="form-label">Offload Time</label>
+                            <input type="time" class="form-control" id="offloadTime{{ $shipment->stm_id }}" name="offloading_time" value="{{ old('offloading_time', $shipment->offloading_time ? \Carbon\Carbon::parse($shipment->offloading_time)->format('H:i') : '') }}">
                         </div>
                         <div class="mb-3">
                             <label for="approvedETADateTime{{ $shipment->stm_id }}" class="form-label">Approved ETA Date & Time</label>
