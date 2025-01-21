@@ -254,7 +254,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Pre-Alerted Date & Time</label>
-                        <p>{{ $shipment->pre_alerted_datetime }}</p>
+                        <p>{{ \Carbon\Carbon::parse($shipment->pre_alerted_datetime)->format('m/d/Y H:i:s') }}</p>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Trailer ID</label>
@@ -278,7 +278,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">ETD (Estimated Time of Departure)</label>
-                        <p>{{ $shipment->etd }}</p>
+                        <p>{{ \Carbon\Carbon::parse($shipment->etd)->format('m/d/Y H:i:s') }}</p>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Units</label>
@@ -306,19 +306,19 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Driver Assigned Date</label>
-                        <p>{{ $shipment->driver_assigned_date }}</p>
+                        <p>{{ \Carbon\Carbon::parse($shipment->driver_assigned_date)->format('m/d/Y H:i:s') }}</p>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Pick-Up Date</label>
-                        <p>{{ $shipment->pick_up_date }}</p>
+                        <p>{{ \Carbon\Carbon::parse($shipment->pick_up_date)->format('m/d/Y H:i:s') }}</p>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">In Transit Date</label>
-                        <p>{{ $shipment->intransit_date }}</p>
+                        <p>{{ \Carbon\Carbon::parse($shipment->intransit_date)->format('m/d/Y H:i:s') }}</p>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Secured Yard Date</label>
-                        <p>{{ $shipment->secured_yarddate }}</p>
+                        <p>{{ \Carbon\Carbon::parse($shipment->secured_yarddate)->format('m/d/Y H:i:s') }}</p>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Current Status</label>
@@ -330,11 +330,11 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Delivered Date</label>
-                        <p>{{ $shipment->delivered_date }}</p>
+                        <p>{{ \Carbon\Carbon::parse($shipment->delivered_date)->format('m/d/Y H:i:s') }}</p>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">At Door Date</label>
-                        <p>{{ $shipment->at_door_date }}</p>
+                        <p>{{ \Carbon\Carbon::parse($shipment->at_door_date)->format('m/d/Y H:i:s') }}</p>
                     </div>
                 </div>
 
