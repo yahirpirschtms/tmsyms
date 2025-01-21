@@ -209,7 +209,7 @@
 
             <!--Tabla mostrar los Shipments existentes-->
             <div class="table_style">
-                <table class="table">
+                <table class="table" id="table_wh_eta_approval_shipments">
                     <thead>
                         <tr>
                             <th scope="col">Shipment Type</th>
