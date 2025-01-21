@@ -1,3 +1,11 @@
+// Inicializar los tooltips solo para los elementos con la clase memingo
+document.addEventListener('DOMContentLoaded', function () {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+});
+    
     function updateShipmentWHETATable() {
         // Obtener los valores de los filtros
         const searchwh = document.getElementById('searchemptytrailergeneralwh').value;

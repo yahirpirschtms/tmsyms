@@ -33,10 +33,10 @@
                         aria-label="Search" 
                         style="padding-left: 30px;">
                 </div>
-                <button type="button" style="color: white;" class="btn me-2 btn-success" id="exportexcel">
+                <button type="button" style="color: white;" class="btn me-2 btn-success" id="exportfile" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Export File">
                     <i class="fa-solid fa-file-export"></i>
                 </button>
-                <button type="button" style="color: white;" class="btn me-2 btn-primary" id="refreshemptytrailertable" data-url="{{ route('emptytrailer.data') }}">
+                <button type="button" style="color: white;" class="btn me-2 btn-primary" id="refreshemptytrailertable" data-url="{{ route('emptytrailer.data') }}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Refresh Table">
                     <i class="fa-solid fa-arrows-rotate"></i>
                 </button>
                 <button class="btn me-2" style="color: white;;background-color:rgb(13, 82, 200);" id="addnewemptytrailer" type="button" data-bs-toggle="offcanvas" data-bs-target="#newtrailerempty" aria-controls="offcanvasWithBothOptions">
@@ -246,7 +246,7 @@
             
             <!--Tabla mostrar los emptytrailers existentes-->
             <div class="table_style">
-                <table class="table">
+                <table class="table" id="table_emptytrailers_actual">
                     <thead>
                         <tr>
                             <th scope="col">ID Trailer</th>
@@ -443,9 +443,9 @@
                         <button type="button" id="closeoffcanvastrailersdetails" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                     </div>
                         <div class=" d-flex justify-content-end m-4">
-                            <button type="button" style="color: white;" class="btn btn-success me-2" id="createshipmentwithemptytrailer" data-url="{{ route('createworkflowstartwithemptytrailer') }}"><i class="fa-solid fa-truck"></i></button>
-                            <button type="button" style="color: white;" class="btn btn-danger me-2" id="deleteemptytrailercanvas" data-url="{{ url('trailers') }}"><i class="fa-solid fa-trash"></i></button>
-                            <button type="button" style="color: white;" class="btn btn-primary" id="updateemptytrailer"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button type="button" style="color: white;" class="btn btn-success me-2" id="createshipmentwithemptytrailer" data-url="{{ route('createworkflowstartwithemptytrailer') }}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Create Shipment"><i class="fa-solid fa-truck"></i></button>
+                            <button type="button" style="color: white;" class="btn btn-danger me-2" id="deleteemptytrailercanvas" data-url="{{ url('trailers') }}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Delete"><i class="fa-solid fa-trash"></i></button>
+                            <button type="button" style="color: white;" class="btn btn-primary" id="updateemptytrailer" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
                         </div>
                     <div class="offcanvas-body">
                         <p id="pk_trailer" style="display:none;"></p>

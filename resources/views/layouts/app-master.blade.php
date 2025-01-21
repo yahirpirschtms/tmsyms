@@ -229,6 +229,28 @@
       font-size: 13px; /* Celdas más pequeñas */
     }
   }
+  /* Cambiar fondo y texto */
+  
+.tooltip-inner {
+    background-color: rgb(13, 82, 200);;  /* Fondo azul */
+    color: #fff;  /* Texto blanco */
+    font-size: 14px;  /* Tamaño de fuente */
+    border-radius: 5px;  /* Bordes redondeados */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+/* Cambiar el color de la flecha */
+.tooltip-arrow::before {
+    border-top-color:rgb(13, 82, 200) !important;  /* Cambiar color de la flecha */
+    border-right-color: transparent;
+    border-bottom-color: transparent;
+    border-left-color: transparent;
+}
+/* Animación de aparición */
+.tooltip.bs-tooltip-top .tooltip-inner {
+    transition: opacity 0.4s ease;
+}
+
+
     </style>
 </head>
 <body>
