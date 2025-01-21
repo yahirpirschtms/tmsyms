@@ -1313,7 +1313,7 @@ document.addEventListener('DOMContentLoaded', function () {
         toggleDateRangeButtons('#inputapplyoltstfilter', '#inputapplyoltenfilter', '#closeapplyoltfilter', '#applyoltfilter');
         toggleDateRangeButtons('#inputapplydobstfilter', '#inputapplydobenfilter', '#closeapplydobfilter', '#applydobfilter');
     });
-
+    /*
     //Guardar los valores de los filtros para recargas de la pagina
     // Lista de IDs de los inputs
     const inputIds = [
@@ -1879,4 +1879,4 @@ document.addEventListener('DOMContentLoaded', function () {
         closeButton.disabled = true;
         }
     }
-    
+    */

@@ -133,9 +133,9 @@
                 </div>
 
 
-            <button type="submit" class="btn btn-primary" id="saveButtonShipment" data-url="{{ route('shipment.store') }}">Submit</button>
+            <button type="submit" class="btn btn-primary" id="saveButtonShipment" data-url="{{ route('shipment.store') }}">Save</button>
 
-            <a href="{{ route('all-shipments') }}" class="btn btn-primary">All Shipments</a>
+            <!--<a href="{{ route('all-shipments') }}" class="btn btn-primary">All Shipments</a>-->
 
             </form>
         </div>

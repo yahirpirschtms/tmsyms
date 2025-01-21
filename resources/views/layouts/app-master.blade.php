@@ -130,6 +130,13 @@
           visibility: hidden;
           transition: 0.3s ease-in-out;
         }
+        li{
+          text-align: center; /* Centra el texto horizontalmente */
+          /*width: 100%; /* Asegura que ocupen todo el ancho disponible */
+          display: flex; /* Utiliza flexbox para centrado */
+          justify-content: center; /* Centra horizontalmente el contenido */
+          align-items: center; /* Centra verticalmente el contenido */
+        }
         .offcanvas-body{
           background-color: transparent;
         }
