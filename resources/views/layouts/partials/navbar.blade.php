@@ -102,7 +102,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn text-white" style="background: rgb(13, 82, 200)" onclick="document.getElementById('logout-form').submit();">Logout</button>
+                <button type="button" class="btn text-white btn-danger" style="" onclick="document.getElementById('logout-form').submit();">Logout</button>
 
                 <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                     @csrf

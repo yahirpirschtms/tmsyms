@@ -32,10 +32,13 @@
                         aria-label="Search" 
                         style="padding-left: 30px;">
                 </div>
-                <button type="button" style="color: white;;background-color:rgb(13, 82, 200);" class="btn me-2" id="refreshwhetapprovaltable" data-url="{{ route('shipmentwh.data') }}">
+                <button type="button" style="color: white;" class="btn me-2 btn-success" id="exportfile" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Export File">
+                    <i class="fa-solid fa-file-export"></i>
+                </button>
+                <button type="button" style="color: white;" class="btn me-2 btn-primary" id="refreshwhetapprovaltable" data-url="{{ route('shipmentwh.data') }}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Refresh Table">
                     <i class="fa-solid fa-arrows-rotate"></i>
                 </button>
-                <button class="btn" id="addmorefiltersemptytrailer" style="color: white;background-color:rgb(13, 82, 200);" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasaddmorefilters" aria-controls="offcanvasaddmorefilters">
+                <button class="btn" id="addmorefiltersemptytrailer" style="color: white;background-color:orange;" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasaddmorefilters" aria-controls="offcanvasaddmorefilters">
                     <i class="fa-solid fa-filter"></i>
                 </button>
             </div>
@@ -503,7 +506,7 @@
                         <div class=" d-flex justify-content-end m-4">
                             <!--<button type="button" style="color: white;" class="btn btn-success me-2" id="createshipmentwithemptytrailer" data-url="{{ route('createworkflowstartwithemptytrailer') }}"><i class="fa-solid fa-truck"></i></button>
                             <button type="button" style="color: white;" class="btn btn-danger me-2" id="deleteemptytrailercanvas" data-url="{{ url('trailers') }}"><i class="fa-solid fa-trash"></i></button>-->
-                            <button type="button" style="color: white;" class="btn btn-primary" id="whetaapprovalbutton">WH ETA Approval <i class="fa-solid fa-thumbs-up"></i></button>
+                            <button type="button" style="color: white;" class="btn btn-success" id="whetaapprovalbutton">WH ETA Approval <i class="fa-solid fa-thumbs-up"></i></button>
                         </div>
                     <div class="offcanvas-body">
                         <p id="offcanvasdetails-pk_shipment" style="display:none;"></p>
