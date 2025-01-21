@@ -92,8 +92,8 @@
                             <td>{{ \Carbon\Carbon::parse($shipment->incident_date)->format('m/d/Y') }}</td>
                             <td>{{ $shipment->incident_notes }}</td>
                             <td>{{ $shipment->wh_status }}</td>
-                            <td>{{ \Carbon\Carbon::parse($shipment->at_door_time)->format('H:i') }}</td>
-                            <td>{{ \Carbon\Carbon::parse($shipment->offload_time)->format('H:i') }}</td>
+                            <td>{{ \Carbon\Carbon::parse($shipment->at_door_date)->format('H:i') }}</td>
+                            <td>{{ \Carbon\Carbon::parse($shipment->offload_date)->format('H:i') }}</td>
                             <td>{{ \Carbon\Carbon::parse($shipment->billing_date)->format('m/d/Y') }}</td>
                             <td>{{ $shipment->billing_id }}</td>
                             <td>{{ $shipment->device_number }}</td>
@@ -131,7 +131,7 @@
                         </ul>
                         <div class="tab-content" id="pills-tabContent{{ $shipment->stm_id }}">
                             <!-- Shipment Details -->
-                            <div class="tab-pane fade show active" id="pills-shipment-details{{ $shipment->stm_id }}" role="tabpanel" aria-labelledby="pills-shipment-details-tab{{ $shipment->stm_id }}">
+                            <div class="tab-pane fade show active" id="pills-shipment-details" role="tabpanel" aria-labelledby="pills-shipment-details-tab">
                                 <div class="mb-3">
                                     <label class="form-label">STM ID</label>
                                     <p>{{ $shipment->stm_id }}</p>
@@ -154,7 +154,7 @@
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Pre-Alerted Date & Time</label>
-                                    <p>{{ $shipment->pre_alerted_datetime }}</p>
+                                    <p>{{ \Carbon\Carbon::parse($shipment->pre_alerted_datetime)->format('m/d/Y H:i:s') }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Trailer ID</label>
@@ -178,7 +178,7 @@
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">ETD (Estimated Time of Departure)</label>
-                                    <p>{{ $shipment->etd }}</p>
+                                    <p>{{ \Carbon\Carbon::parse($shipment->etd)->format('m/d/Y H:i:s') }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Units</label>
@@ -206,19 +206,19 @@
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Driver Assigned Date</label>
-                                    <p>{{ $shipment->driver_assigned_date }}</p>
+                                    <p>{{ \Carbon\Carbon::parse($shipment->driver_assigned_date)->format('m/d/Y H:i:s') }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Pick-Up Date</label>
-                                    <p>{{ $shipment->pick_up_date }}</p>
+                                    <p>{{ \Carbon\Carbon::parse($shipment->pick_up_date)->format('m/d/Y H:i:s') }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">In Transit Date</label>
-                                    <p>{{ $shipment->intransit_date }}</p>
+                                    <p>{{ \Carbon\Carbon::parse($shipment->intransit_date)->format('m/d/Y H:i:s') }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Secured Yard Date</label>
-                                    <p>{{ $shipment->secured_yarddate }}</p>
+                                    <p>{{ \Carbon\Carbon::parse($shipment->secured_yarddate)->format('m/d/Y H:i:s') }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Current Status</label>
@@ -230,11 +230,11 @@
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Delivered Date</label>
-                                    <p>{{ $shipment->delivered_date }}</p>
+                                    <p>{{ \Carbon\Carbon::parse($shipment->delivered_date)->format('m/d/Y H:i:s') }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">At Door Date</label>
-                                    <p>{{ $shipment->at_door_date }}</p>
+                                    <p>{{ \Carbon\Carbon::parse($shipment->at_door_date)->format('m/d/Y H:i:s') }}</p>
                                 </div>
                             </div>
                             <!-- Update Shipment Status -->
@@ -479,14 +479,47 @@
 
 @section('custom-css')
 <style>
-.table {
-    font-size: 0.75rem; /* Tamaño de texto más pequeño */
-}
+table {
+    width: 100%;
+    border-collapse: collapse;
+  }
 
-.table th,
-.table td {
-    padding: 0.15rem; /* Menor espaciado interno */
-}
+  td {
+    padding: 10px;
+    text-align: left;
+    border: none;
+  }
+
+  th {
+    padding: 10px;
+    text-align: left;
+    font-size: 15px;
+    background-color: #f8f9fa;
+    font-weight: bold;
+    white-space: nowrap; /* Evita que el texto se envuelva */
+    border-bottom: 2px solid #000;
+
+    /* Fija el encabezado al desplazarse verticalmente */
+    position: sticky;
+    top: 0; /* Fija el encabezado en la parte superior */
+    z-index: 1; /* Asegura que el encabezado esté sobre las celdas */
+  }
+
+  td {
+    font-size: 14px;
+    white-space: nowrap; /* Evita que el texto se envuelva */
+  }
+  /* Estilo para pantallas menores o iguales a 768px */
+  @media screen and (max-width: 768px) {
+    th {
+      font-size: 14px; /* Encabezados más pequeños */
+    }
+
+    td {
+      font-size: 13px; /* Celdas más pequeñas */
+    }
+  }
+  /* Cambiar fondo y texto */
 
 /* Estilo para las pestañas */
  /* Estilo para las pestañas nav-pills */
