@@ -246,7 +246,7 @@
             
             <!--Tabla mostrar los emptytrailers existentes-->
             <div class="table_style">
-                <table class="table" id="table_emptytrailers_actual">
+                <table class="table" id="table_empty_trailers">
                     <thead>
                         <tr>
                             <th scope="col">ID Trailer</th>

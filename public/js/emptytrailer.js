@@ -1,3 +1,57 @@
+document.getElementById('exportfile').addEventListener('click', function () {
+    // Obtén la tabla con el id "table_empty_trailers"
+    var table = document.getElementById('table_empty_trailers');
+    
+    // Convierte la tabla HTML en una hoja de cálculo de Excel
+    var wb = XLSX.utils.table_to_book(table, { sheet: "EmptyTrailers" });
+
+    // Aplica formato a las columnas 8, 9, 10 (índices 7, 8, 9)
+    var ws = wb.Sheets["EmptyTrailers"];
+    
+    // Recorre todas las filas y aplica formato a las columnas 8, 9, 10
+    var range = XLSX.utils.decode_range(ws['!ref']); // Obtiene el rango de la hoja
+    for (var row = range.s.r + 1; row <= range.e.r; row++) {
+        // Para la columna 8 (índice 7)
+        var cellAddress8 = { r: row, c: 7 };
+        var cell8 = ws[XLSX.utils.encode_cell(cellAddress8)];
+        if (cell8) {
+            cell8.z = "yyyy-mm-dd hh:mm:ss"; // El formato de fecha y hora
+        }
+        
+        // Para la columna 9 (índice 8)
+        var cellAddress9 = { r: row, c: 8 };
+        var cell9 = ws[XLSX.utils.encode_cell(cellAddress9)];
+        if (cell9) {
+            cell9.z = "yyyy-mm-dd hh:mm:ss"; // El formato de fecha y hora
+        }
+
+        // Para la columna 10 (índice 9)
+        var cellAddress10 = { r: row, c: 9 };
+        var cell10 = ws[XLSX.utils.encode_cell(cellAddress10)];
+        if (cell10) {
+            cell10.z = "yyyy-mm-dd hh:mm:ss"; // El formato de fecha y hora
+        }
+    }
+
+    // Obtén la fecha y hora actuales
+    var now = new Date();
+    var year = now.getFullYear();
+    var month = String(now.getMonth() + 1).padStart(2, '0'); // Mes con 2 dígitos
+    var day = String(now.getDate()).padStart(2, '0');       // Día con 2 dígitos
+    var hours = String(now.getHours()).padStart(2, '0');    // Horas con 2 dígitos
+    var minutes = String(now.getMinutes()).padStart(2, '0');// Minutos con 2 dígitos
+    var seconds = String(now.getSeconds()).padStart(2, '0');// Segundos con 2 dígitos
+
+    // Formato: MM-DD-YYYY_HH-MM-SS
+    var formattedDateTime = `${month}${day}${year}_${hours}-${minutes}-${seconds}`;
+
+    // Define el nombre del archivo con fecha y hora
+    var filename = `EmptyTrailers_${formattedDateTime}.xlsx`;
+
+    // Exporta el archivo Excel
+    XLSX.writeFile(wb, filename);
+});
+
 // Inicializar los tooltips solo para los elementos con la clase memingo
 document.addEventListener('DOMContentLoaded', function () {
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))

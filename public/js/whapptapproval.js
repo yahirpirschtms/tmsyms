@@ -1,3 +1,30 @@
+document.getElementById('exportfile').addEventListener('click', function () {
+    // Obtén la tabla con el id "table_wh_eta_approval_shipments"
+    var table = document.getElementById('table_wh_eta_approval_shipments');
+    
+    // Convierte la tabla HTML en una hoja de cálculo de Excel
+    var wb = XLSX.utils.table_to_book(table, { sheet: "WHApptApprovalShipments" });
+
+    // Aplica formato a la tercera columna (suponiendo que la columna de fecha y hora es la tercera)
+    var ws = wb.Sheets["WHApptApprovalShipments"];
+    
+    // Recorre todas las filas y aplica formato a la tercera columna (index 2)
+    var range = XLSX.utils.decode_range(ws['!ref']); // Obtiene el rango de la hoja
+    for (var row = range.s.r + 1; row <= range.e.r; row++) {
+        var cellAddress = { r: row, c: 2 }; // Columna 3, índice 2
+        var cell = ws[XLSX.utils.encode_cell(cellAddress)];
+
+        if (cell) {
+            // Establecer el formato de la fecha y hora
+            cell.z = "yyyy-mm-dd hh:mm:ss"; // El formato que deseas
+        }
+    }
+
+    // Exporta el archivo Excel con el nombre apropiado
+    var filename = 'WHApptApprovalShipments.xlsx';
+    XLSX.writeFile(wb, filename);
+});
+
 // Inicializar los tooltips solo para los elementos con la clase memingo
 document.addEventListener('DOMContentLoaded', function () {
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
