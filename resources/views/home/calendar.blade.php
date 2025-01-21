@@ -70,15 +70,11 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Suggested Delivery Date</label>
-                                <p>{{ $shipment->suggested_delivery_date }}</p>
+                                <p>{{ \Carbon\Carbon::parse($shipment->etd)->format('m/d/Y H:i') }}</p>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Approved ETA Date</label>
-                                <p>{{ $shipment->approved_eta_date }}</p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Approved ETA Time</label>
-                                <p>{{ $shipment->approved_eta_time }}</p>
+                                <label class="form-label">Approved ETA Date & Time</label>
+                                <p>{{ $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y H:i') : 'N/A' }}</p>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Units</label>
@@ -124,12 +120,8 @@
                         <input type="datetime-local" class="form-control" id="offloadDate{{ $shipment->stm_id }}" name="offload_date" value="{{ old('offload_date', $shipment->offload_date ? \Carbon\Carbon::parse($shipment->offload_date)->format('Y-m-d\TH:i') : '') }}">
                         </div>
                         <div class="mb-3">
-                        <label for="approvedETADate{{ $shipment->stm_id }}" class="form-label">Approved ETA Date</label>
-                        <input type="date" class="form-control" id="approvedETADate{{ $shipment->stm_id }}" name="approved_eta_date" value="{{ old('approved_eta_date', $shipment->approved_eta_date ? \Carbon\Carbon::parse($shipment->approved_eta_date)->format('Y-m-d') : '') }}">
-                        </div>
-                        <div class="mb-3">
-                        <label for="approvedETATime{{ $shipment->stm_id }}" class="form-label">Approved ETA Time</label>
-                        <input type="time" class="form-control" id="approvedETATime{{ $shipment->stm_id }}" name="approved_eta_time" value="{{ old('approved_eta_time', $shipment->approved_eta_time ? \Carbon\Carbon::parse($shipment->approved_eta_time)->format('H:i') : '') }}">
+                            <label for="approvedETADateTime{{ $shipment->stm_id }}" class="form-label">Approved ETA Date & Time</label>
+                            <input type="datetime-local" class="form-control" id="approvedETADateTime{{ $shipment->stm_id }}" name="wh_auth_date" value="{{ old('wh_auth_date', $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('Y-m-d\TH:i') : '') }}">
                         </div>
                         <div class="d-flex justify-content-end">
                             <button type="submit" class="btn btn-primary" id="saveButton{{ $shipment->stm_id }}">Save</button>
@@ -172,11 +164,18 @@
                 },
                 events: events,
 
+                // Eliminar la hora
                 eventTimeFormat: {
                     hour: '2-digit',
                     minute: '2-digit',
                     meridiem: 'short',
                     hour12: true
+                },
+
+                // Modificar cómo se muestra el evento
+                eventContent: function(info) {
+                    // Suponiendo que el evento tiene una propiedad llamada 'shipmentInfo' que contiene la información del envío
+                    return { html: '<strong>' + info.event.title + '</strong><br>'};
                 },
 
                 eventClick: function(info) {
@@ -256,9 +255,21 @@
 @section('custom-css')
 <style>
 #calendar {
-    max-width: 80%;
+    width: 100%; /* Ocupa todo el ancho de la pantalla */
+    height: 100vh; /* Ocupa toda la altura de la ventana del navegador */
     margin: 0 auto;
-    height: 700px;
+}
+
+.fc-daygrid-day {
+    height: 120px; /* Ajusta la altura de las celdas de las fechas */
+}
+
+.fc-daygrid-day-number {
+    line-height: 30px; /* Ajusta la alineación del número en cada celda */
+}
+
+.fc-daygrid-day-frame {
+    padding: 5px; /* Puedes añadir un poco de espacio dentro de las celdas */
 }
 
 .fc-event {

@@ -46,8 +46,7 @@
                             <th>In Transit Date</th>
                             <th>Delivered/Received Date</th>
                             <th>Secured Yard Date</th>
-                            <th>Approved ETA Date</th>
-                            <th>Approved ETA Time</th>
+                            <th>Approved ETA Date & Time</th>
                             <th>Sec Incident</th>
                             <th>Incident Type</th>
                             <th>Incident Date</th>
@@ -71,31 +70,31 @@
                             <td>{{ $shipment->originCatalog->gntc_value ?? 'Origen no disponible' }}</td>
                             <td>{{ $shipment->id_trailer }}</td>
                             <td>{{ $shipment->destination }}</td>
-                            <td>{{ \Carbon\Carbon::parse($shipment->pre_alerted_datetime)->format('d/m/Y H:i') ?? 'No disponible' }}</td>
+                            <td>{{ \Carbon\Carbon::parse($shipment->pre_alerted_datetime)->format('m/d/Y H:i') ?? 'No disponible' }}</td>
                             <td>{{ $shipment->carrier_dropping_trailer }}</td>
                             <td>{{ $shipment->trailer_owner }}</td>
                             <td>{{ $shipment->driver_truck }}</td>
-                            <td>{{ \Carbon\Carbon::parse($shipment->suggested_delivery_date)->format('d/m/Y') }}</td>
+                            <td>{{ \Carbon\Carbon::parse($shipment->etd)->format('m/d/Y') }}</td>
                             <td>{{ $shipment->units }}</td>
                             <td>{{ $shipment->pallets }}</td>
                             <td>{{ $shipment->security_seals }}</td>
                             <td>{{ $shipment->notes }}</td>
                             <td>{{ $shipment->currentStatus->gntc_value ?? 'Estado no disponible' }}</td>
-                            <td>{{ \Carbon\Carbon::parse($shipment->driver_assigned_date)->format('d/m/Y H:i') }}</td>
-                            <td>{{ \Carbon\Carbon::parse($shipment->pick_up_date)->format('d/m/Y') }}</td>
-                            <td>{{ \Carbon\Carbon::parse($shipment->intransit_date)->format('d/m/Y') }}</td>
-                            <td>{{ \Carbon\Carbon::parse($shipment->delivered_date)->format('d/m/Y') }}</td>
-                            <td>{{ $shipment->secured_yarddate ? \Carbon\Carbon::parse($shipment->secured_yarddate)->format('d/m/Y H:i') : 'No disponible' }}</td>
-                            <td>{{ \Carbon\Carbon::parse($shipment->approved_eta_date)->format('d/m/Y') }}</td>
-                            <td>{{ $shipment->approved_eta_time }}</td>
+                            <td>{{ \Carbon\Carbon::parse($shipment->driver_assigned_date)->format('m/d/Y H:i') }}</td>
+                            <td>{{ \Carbon\Carbon::parse($shipment->pick_up_date)->format('m/d/Y') }}</td>
+                            <td>{{ \Carbon\Carbon::parse($shipment->intransit_date)->format('m/d/Y') }}</td>
+                            <td>{{ \Carbon\Carbon::parse($shipment->delivered_date)->format('m/d/Y') }}</td>
+                            <td>{{ $shipment->secured_yarddate ? \Carbon\Carbon::parse($shipment->secured_yarddate)->format('m/d/Y H:i') : 'No disponible' }}</td>
+                            <td>{{ \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y H:i:s') }}</td>
+
                             <td>{{ $shipment->sec_incident }}</td>
                             <td>{{ $shipment->incident_type }}</td>
-                            <td>{{ \Carbon\Carbon::parse($shipment->incident_date)->format('d/m/Y') }}</td>
+                            <td>{{ \Carbon\Carbon::parse($shipment->incident_date)->format('m/d/Y') }}</td>
                             <td>{{ $shipment->incident_notes }}</td>
                             <td>{{ $shipment->wh_status }}</td>
                             <td>{{ \Carbon\Carbon::parse($shipment->at_door_time)->format('H:i') }}</td>
                             <td>{{ \Carbon\Carbon::parse($shipment->offload_time)->format('H:i') }}</td>
-                            <td>{{ \Carbon\Carbon::parse($shipment->billing_date)->format('d/m/Y') }}</td>
+                            <td>{{ \Carbon\Carbon::parse($shipment->billing_date)->format('m/d/Y') }}</td>
                             <td>{{ $shipment->billing_id }}</td>
                             <td>{{ $shipment->device_number }}</td>
                             <td>{{ $shipment->overhaul_id }}</td>

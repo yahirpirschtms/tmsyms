@@ -15,35 +15,25 @@ class CalendarController extends Controller
         if (Auth::check()) {
             // Obtener el ID del estado 'Finalized' desde el catálogo
             $finalizedStatus = GenericCatalog::where('gntc_value', 'Finalized')
-                ->where('gntc_group', 'STATUS_E_REPORT') // Ajustar si hay más grupos
+                ->where('gntc_group', 'STATUS_E_REPORT')
                 ->first();
 
             // Filtrar los envíos que no tienen el estado 'Finalized'
             $shipments = Shipment::where('gnct_id_current_status', '!=', $finalizedStatus->gnct_id)->get();
             $currentStatus = GenericCatalog::where('gntc_group', 'STATUS_E_REPORT')->get();
+
             // Obtener los catálogos para 'MWD_LOCATION' (origen) y 'STATUS_E_REPORT' (estado actual)
             $originCatalog = GenericCatalog::where('gntc_group', 'MWD_LOCATION')->get()->keyBy('gnct_id');
             $statusCatalog = GenericCatalog::where('gntc_group', 'STATUS_E_REPORT')->get()->keyBy('gnct_id');
 
-            // Obtener el primer envío
             // Obtener el primer envío, o dejar $shipment como null si no hay envíos
-             $shipment = $shipments->first() ?? null;
-
-
-
-            if (empty($shipment->approved_eta_date)) {
-                $shipment->approved_eta_date = null;
-            }
-            if (empty($shipment->approved_eta_time)) {
-                $shipment->approved_eta_time = null;
-            }
+            $shipment = $shipments->first() ?? null;
 
             // Mapear los datos al formato esperado por FullCalendar
             $events = $shipments->map(function ($shipment) use ($originCatalog, $statusCatalog) {
                 // Parsear fechas relevantes con Carbon
-                $suggestedDeliveryDate = Carbon::parse($shipment->suggesteddeliverydate);
-                $approvedETADate = $shipment->approved_eta_date ? Carbon::parse($shipment->approved_eta_date) : null;
-                $approvedETATime = $shipment->approved_eta_time ? Carbon::parse($shipment->approved_eta_time) : null;
+                $etd = Carbon::parse($shipment->etd);  // Cambiado de suggestedDeliveryDate a etd
+                $whAuthDate = $shipment->wh_auth_date ? Carbon::parse($shipment->wh_auth_date) : null;
 
                 // Obtener las descripciones para 'origin' y 'gnct_id_current_status'
                 $originDescription = isset($originCatalog[$shipment->origin])
@@ -56,17 +46,16 @@ class CalendarController extends Controller
 
                 return [
                     'title' => 'STM ID: ' . $shipment->stm_id,
-                    'start' => $suggestedDeliveryDate->format('Y-m-d\TH:i:s'),
-                    'end' => $suggestedDeliveryDate->addHours(1)->format('Y-m-d\TH:i:s'),
+                    'start' => $etd->format('Y-m-d\TH:i:s'),
+                    'end' => $etd->addHours(1)->format('Y-m-d\TH:i:s'),
                     'extendedProps' => [
                         'stm_id' => $shipment->stm_id,
                         'reference' => $shipment->reference,
                         'origin' => $originDescription,
                         'destination' => $shipment->destination,
                         'current_status' => $statusDescription,
-                        'suggested_delivery_date' => $suggestedDeliveryDate->format('m/d/Y H:i'),
-                        'approved_eta_date' => $approvedETADate ? $approvedETADate->format('m/d/Y') : 'N/A',
-                        'approved_eta_time' => $approvedETATime ? $approvedETATime->format('H:i') : 'N/A',
+                        'etd' => $etd->format('m/d/Y H:i'),  // Cambiado de suggested_delivery_date a etd
+                        'wh_auth_date' => $whAuthDate ? $whAuthDate->format('m/d/Y H:i') : 'N/A',
                         'units' => $shipment->units,
                         'pallets' => $shipment->pallets,
                         'id_trailer' => $shipment->id_trailer,
@@ -81,7 +70,7 @@ class CalendarController extends Controller
                 'originCatalog' => $originCatalog,
                 'statusCatalog' => $statusCatalog,
                 'shipment' => $shipment,
-                'currentStatus'=> $currentStatus, // Se conserva la variable $shipment
+                'currentStatus'=> $currentStatus,
             ]);
         }
 
@@ -93,35 +82,25 @@ class CalendarController extends Controller
         if (Auth::check()) {
             // Obtener el ID del estado 'Finalized' desde el catálogo
             $finalizedStatus = GenericCatalog::where('gntc_value', 'Finalized')
-                ->where('gntc_group', 'STATUS_E_REPORT') // Ajustar si hay más grupos
+                ->where('gntc_group', 'STATUS_E_REPORT')
                 ->first();
 
             // Filtrar los envíos que no tienen el estado 'Finalized'
             $shipments = Shipment::where('gnct_id_current_status', '!=', $finalizedStatus->gnct_id)->get();
             $currentStatus = GenericCatalog::where('gntc_group', 'STATUS_E_REPORT')->get();
+
             // Obtener los catálogos para 'MWD_LOCATION' (origen) y 'STATUS_E_REPORT' (estado actual)
             $originCatalog = GenericCatalog::where('gntc_group', 'MWD_LOCATION')->get()->keyBy('gnct_id');
             $statusCatalog = GenericCatalog::where('gntc_group', 'STATUS_E_REPORT')->get()->keyBy('gnct_id');
 
-            // Obtener el primer envío
             // Obtener el primer envío, o dejar $shipment como null si no hay envíos
-             $shipment = $shipments->first() ?? null;
-
-
-
-            if (empty($shipment->approved_eta_date)) {
-                $shipment->approved_eta_date = null;
-            }
-            if (empty($shipment->approved_eta_time)) {
-                $shipment->approved_eta_time = null;
-            }
+            $shipment = $shipments->first() ?? null;
 
             // Mapear los datos al formato esperado por FullCalendar
             $events = $shipments->map(function ($shipment) use ($originCatalog, $statusCatalog) {
                 // Parsear fechas relevantes con Carbon
-                $suggestedDeliveryDate = Carbon::parse($shipment->suggesteddeliverydate);
-                $approvedETADate = $shipment->approved_eta_date ? Carbon::parse($shipment->approved_eta_date) : null;
-                $approvedETATime = $shipment->approved_eta_time ? Carbon::parse($shipment->approved_eta_time) : null;
+                $etd = Carbon::parse($shipment->etd);  // Cambiado de suggestedDeliveryDate a etd
+                $whAuthDate = $shipment->wh_auth_date ? Carbon::parse($shipment->wh_auth_date) : null;
 
                 // Obtener las descripciones para 'origin' y 'gnct_id_current_status'
                 $originDescription = isset($originCatalog[$shipment->origin])
@@ -134,17 +113,16 @@ class CalendarController extends Controller
 
                 return [
                     'title' => 'STM ID: ' . $shipment->stm_id,
-                    'start' => $suggestedDeliveryDate->format('Y-m-d\TH:i:s'),
-                    'end' => $suggestedDeliveryDate->addHours(1)->format('Y-m-d\TH:i:s'),
+                    'start' => $etd->format('Y-m-d\TH:i:s'),
+                    'end' => $etd->addHours(1)->format('Y-m-d\TH:i:s'),
                     'extendedProps' => [
                         'stm_id' => $shipment->stm_id,
                         'reference' => $shipment->reference,
                         'origin' => $originDescription,
                         'destination' => $shipment->destination,
                         'current_status' => $statusDescription,
-                        'suggested_delivery_date' => $suggestedDeliveryDate->format('m/d/Y H:i'),
-                        'approved_eta_date' => $approvedETADate ? $approvedETADate->format('m/d/Y') : 'N/A',
-                        'approved_eta_time' => $approvedETATime ? $approvedETATime->format('H:i') : 'N/A',
+                        'etd' => $etd->format('m/d/Y H:i'),  // Cambiado de suggested_delivery_date a etd
+                        'wh_auth_date' => $whAuthDate ? $whAuthDate->format('m/d/Y H:i') : 'N/A',
                         'units' => $shipment->units,
                         'pallets' => $shipment->pallets,
                         'id_trailer' => $shipment->id_trailer,
@@ -159,14 +137,12 @@ class CalendarController extends Controller
                 'originCatalog' => $originCatalog,
                 'statusCatalog' => $statusCatalog,
                 'shipment' => $shipment,
-                'currentStatus'=> $currentStatus, // Se conserva la variable $shipment
+                'currentStatus'=> $currentStatus,
             ]);
         }
 
         return redirect('/login');
     }
-
-
 
     public function getShipmentDetails($pk_shipment)
     {
@@ -181,15 +157,12 @@ class CalendarController extends Controller
             'delivered_date' => $shipment->formatted_delivered_date,
             'at_door_date' => $shipment->at_door_date ? $shipment->at_door_date->format('m/d/Y H:i') : 'N/A',
             'offload_date' => $shipment->offload_date ? $shipment->offload_date->format('m/d/Y H:i') : 'N/A',
-            'approved_eta_date' => $shipment->approved_eta_date ? $shipment->approved_eta_date->format('m/d/Y') : 'N/A',
-            'approved_eta_time' => $shipment->approved_eta_time ? $shipment->approved_eta_time->format('H:i') : 'N/A',
+            'wh_auth_date' => $shipment->wh_auth_date ? $shipment->wh_auth_date->format('m/d/Y H:i') : 'N/A',
         ]);
     }
 
     public function updateOffloadingStatus(Request $request, $pk_shipment)
     {
-
-
         try {
             // Buscar el envío por pk_shipment
             $shipment = Shipment::findOrFail($pk_shipment);
@@ -200,29 +173,18 @@ class CalendarController extends Controller
                 'stm_id' => 'nullable|integer', // ID del STM
                 'current_status' => 'nullable|integer', // Estado actual
                 'delivered_date' => 'nullable|date', // Fecha de entrega
-                'at_door_date' => 'nullable|date', // Fecha en puerta
+                'at_door_date' => 'nullable|date', // Fecha de llegada
                 'offload_date' => 'nullable|date', // Fecha de descarga
-                'approved_eta_date' => 'nullable|date', // Fecha ETA aprobada
-                'approved_eta_time' => 'nullable|date_format:H:i', // Hora ETA aprobada en formato HH:mm
+                'wh_auth_date' => 'nullable|date', // Fecha de autorización
             ]);
 
-            $shipment->update([
-                'trailer_id' => $request->trailer_id ?? $shipment->trailer_id, // Solo actualizar si está presente
-                'stm_id' => $request->stm_id ?? $shipment->stm_id, // Solo actualizar si está presente
-                'gnct_id_current_status' => $request->gnct_id_current_status ?? $shipment->gnct_id_current_status, // Solo actualizar si está presente
-                'delivered_date' => $request->delivered_date ?? $shipment->delivered_date, // Solo actualizar si está presente
-                'at_door_date' => $request->at_door_date ?? $shipment->at_door_date, // Solo actualizar si está presente
-                'offload_date' => $request->offload_date ?? $shipment->offload_date, // Solo actualizar si está presente
-                'approved_eta_date' => $request->approved_eta_date ?? $shipment->approved_eta_date, // Solo actualizar si está presente
-                'approved_eta_time' => $request->approved_eta_time ?? $shipment->approved_eta_time, // Solo actualizar si está presente
-            ]);
+            // Actualizar el envío con los nuevos datos
+            $shipment->update($validatedData);
 
-            // Responder con un mensaje de éxito
+            // Devolver respuesta con el estado de la actualización
             return response()->json(['message' => 'Shipment updated successfully'], 200);
-
         } catch (\Exception $e) {
-            // Manejar errores y responder con el mensaje de error
-            return response()->json(['message' => 'Failed to update shipment', 'error' => $e->getMessage()], 500);
+            return response()->json(['message' => 'Error updating shipment: ' . $e->getMessage()], 500);
         }
     }
 }
