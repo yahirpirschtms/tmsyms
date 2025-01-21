@@ -2190,7 +2190,7 @@ $(document).ready(function() {
         });
     });
     
-    
+    /*
     //Guardar los valores de los filtros para recargas de la pagina
     // Lista de IDs de los inputs
     const inputIds = [
@@ -2688,4 +2688,4 @@ $(document).ready(function() {
         // Deshabilitar el botón "Close"
         closeButton.disabled = true;
         }
-    }
+    }*/

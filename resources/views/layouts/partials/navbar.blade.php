@@ -22,21 +22,20 @@
                   </li>
 
                   <!--Trailer Status-->
-                  <li class="nav-item ">
+                  <!--<li class="nav-item ">
                     <a class="nav-link mx-lg-2 text-light" aria-current="page" href="{{ route('workflowtrafficstart') }}"> Shipments</a>
-                  </li>
+                  </li>-->
 
                   <!--options shipments-->
-                  <!--<li class="nav-item dropdown ">
+                  <li class="nav-item dropdown ">
                     <a class="nav-link mx-lg-2 text-light" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                       Shipments
                     </a>
                     <ul class="ms-4 dropdown-menu dropdown-menu-start" style="background-color: #1e4877; border:none">
-                      <li><a class="dropdown-item" href="#">Traffic Workflow Start</a></li>
-                      <li><a class="dropdown-item" href="#">Live Shipments</a></li>
-                      <li><a class="dropdown-item" href="#">All Shipments</a></li>
+                      <li><a class="dropdown-item" href="{{ route('workflowtrafficstart') }}">Traffic Workflow Start</a></li>
+                      <li><a class="dropdown-item" href="#">Shipments</a></li>
                     </ul>
-                  </li>-->
+                  </li>
 
                   <!--options catalog-->
                   <li class="nav-item mx-lg-2 dropdown ">
@@ -57,7 +56,7 @@
                       Appoinment Viewer
                     </a>
                     <ul class="ms-4 dropdown-menu dropdown-menu-start" style="background-color: #1e4877; border:none">
-                      <li><a class="dropdown-item text-light" href="{{ route('whapptapproval') }}">WH Appointment Approval</a></li>
+                      <li><a class="dropdown-item text-light" href="{{ route('whapptapproval') }}">WH Appot Approval</a></li>
                       <li><a class="dropdown-item text-light" href="#">WH Appointment Viewer</a></li>
                       <li><a class="dropdown-item text-light" href="#">Historical Calendar Viewer</a></li>
                     </ul>
