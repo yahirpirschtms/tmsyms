@@ -12,8 +12,8 @@ class CompaniesController extends Controller
     {
         // Filtrar por el código "CBMX"
         //$locations = Companies::where('code', 'CBMX')->pluck('CoName', 'pk_company');
-        $locations = Companies::where('code', 'CBMX')
-        ->select('id_company', 'CoName')
+        $locations = Companies::where('Notes', 'yms')
+        ->select('pk_company', 'CoName')
         ->get();
 
         // Retornar los datos en formato JSON

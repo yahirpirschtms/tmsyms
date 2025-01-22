@@ -40,9 +40,14 @@ class Companies extends Model
     protected $guarded = [];
 
     // Relación inversa con EmptyTrailer
-    public function trailers()
+    public function locations()
     {
-        return $this->hasMany(EmptyTrailer::class, 'location', 'id_company');
+        return $this->hasMany(EmptyTrailer::class, 'location', 'pk_company');
+    }
+
+    public function carriers()
+    {
+        return $this->hasMany(EmptyTrailer::class, 'carrier', 'pk_company');
     }
 
     // Relación inversa con Shipments

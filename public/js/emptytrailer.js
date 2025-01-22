@@ -95,7 +95,7 @@ $(document).ready(function() {
                     select.append('<option disabled>No options available</option>');
                 } else {
                     data.forEach(item => {
-                        select.append(`<option value="${item.id_company}">${item.CoName}</option>`);
+                        select.append(`<option value="${item.pk_company}">${item.CoName}</option>`);
                     });
                 }
 
@@ -124,13 +124,13 @@ $(document).ready(function() {
                 let selectedValue = select.val();
                 //let selectedValue = "{{ old('inputcarrier') }}"; // Recupera el valor previo
                 select.empty();
-                select.append('<option selected disabled hidden></option>');
+                //select.append('<option selected disabled hidden></option>');
 
                 if (data.length === 0) {
                     select.append('<option disabled>No options available</option>');
                 } else {
                     data.forEach(item => {
-                        select.append(`<option value="${item.id_company}">${item.CoName}</option>`);
+                        select.append(`<option value="${item.pk_company}">${item.CoName}</option>`);
                     });
                 }
 
@@ -168,7 +168,7 @@ $(document).ready(function() {
                     select.append('<option disabled>No options available</option>');
                 } else {
                     data.forEach(item => {
-                        select.append(`<option value="${item.id_company}">${item.CoName}</option>`);
+                        select.append(`<option value="${item.pk_company}">${item.CoName}</option>`);
                     });
                 }
 
@@ -197,13 +197,13 @@ $(document).ready(function() {
                 let selectedValue = select.val();
                 //let selectedValue = "{{ old('inputlocation') }}"; // Recupera el valor previo
                 select.empty();
-                select.append('<option selected disabled hidden></option>');
+                //select.append('<option selected disabled hidden></option>');
 
                 if (data.length === 0) {
                     select.append('<option disabled>No options available</option>');
                 } else {
                     data.forEach(item => {
-                        select.append(`<option value="${item.id_company}">${item.CoName}</option>`);
+                        select.append(`<option value="${item.pk_company}">${item.CoName}</option>`);
                     });
                 }
 
@@ -235,14 +235,15 @@ $(document).ready(function() {
                   let selectedValue = select.val();
                   //let selectedValue = "{{ old('inputavailabilityindicator') }}"; // Recupera el valor previo
                   select.empty(); // Limpia el select eliminando todas las opciones
-                  select.append('<option selected disabled hidden></option>'); // Opción inicial
+                  //select.append('<option selected disabled hidden></option>'); // Opción inicial
 
                   if (data.length === 0) {
                       select.append('<option disabled>No options available</option>');
                   } else {
-                      data.forEach(item => {
-                          select.append(`<option value="${item.gnct_id}">${item.gntc_description}</option>`);
-                      });
+                        select.append('<option value="">Choose an option</option>');
+                        data.forEach(item => {
+                            select.append(`<option value="${item.gnct_id}">${item.gntc_description}</option>`);
+                        });
                   }
 
                   if (selectedValue) {
@@ -270,14 +271,15 @@ $(document).ready(function() {
                   let selectedValue = select.val();
                   //let selectedValue = "{{ old('inputavailabilityindicator') }}"; // Recupera el valor previo
                   select.empty(); // Limpia el select eliminando todas las opciones
-                  select.append('<option selected disabled hidden></option>'); // Opción inicial
+                  //select.append('<option selected disabled hidden></option>'); // Opción inicial
 
                   if (data.length === 0) {
                       select.append('<option disabled>No options available</option>');
                   } else {
-                      data.forEach(item => {
-                          select.append(`<option value="${item.gnct_id}">${item.gntc_description}</option>`);
-                      });
+                        select.append('<option value="">Choose an option</option>');
+                        data.forEach(item => {
+                            select.append(`<option value="${item.gnct_id}">${item.gntc_description}</option>`);
+                        });
                   }
 
                   if (selectedValue) {
@@ -318,33 +320,27 @@ $(document).ready(function() {
                 errorContainer.text('Date of Status is required.');
             }
     
-            /*if (fieldName === 'inputpalletsontrailer' && field.val().trim().length > 50) {
-                field.addClass('is-invalid');
-                errorContainer.text('The Pallets On Trailer field must not exceed 50 characters.');
-            }*/
-            if (fieldName === 'inputpalletsontrailer' && field.val().trim().length === 0) {
+
+            /*if (fieldName === 'inputpalletsontrailer' && field.val().trim().length === 0) {
                 field.addClass('is-invalid');
                 errorContainer.text('The Pallets On Trailer is required.');
-            }
-    
-            /*if (fieldName === 'inputpalletsonfloor' && field.val().trim().length > 50) {
-                field.addClass('is-invalid');
-                errorContainer.text('The Pallets On Floor field must not exceed 50 characters.');
             }*/
-                if (fieldName === 'inputpalletsonfloor' && field.val().trim().length === 0) {
-                    field.addClass('is-invalid');
-                    errorContainer.text('The Pallets On Floor is required.');
-                }
+    
+
+            /*if (fieldName === 'inputpalletsonfloor' && field.val().trim().length === 0) {
+                field.addClass('is-invalid');
+                errorContainer.text('The Pallets On Floor is required.');
+            }*/
     
             if (fieldName === 'inputcarrier' && field.val().trim().length === 0) {
                 field.addClass('is-invalid');
                 errorContainer.text('Carrier is required.');
             }
     
-            if (fieldName === 'inputavailabilityindicator' && field.val().trim().length === 0) {
+            /*if (fieldName === 'inputavailabilityindicator' && field.val().trim().length === 0) {
                 field.addClass('is-invalid');
                 errorContainer.text('Availability Indicator is required.');
-            }
+            }*/
     
             if (fieldName === 'inputlocation' && field.val().trim().length === 0) {
                 field.addClass('is-invalid');
@@ -357,24 +353,19 @@ $(document).ready(function() {
                 errorContainer.text('Date In is required.');
             }
     
-            if (fieldName === 'inputdateout' && field.val().trim().length === 0) {
+            /*if (fieldName === 'inputdateout' && field.val().trim().length === 0) {
                 field.addClass('is-invalid');
                 errorContainer.text('Date out is required.');
-            }
+            }*/
     
-            if (fieldName === 'inputtransactiondate' && field.val().trim().length === 0) {
+            /*if (fieldName === 'inputtransactiondate' && field.val().trim().length === 0) {
                 field.addClass('is-invalid');
                 errorContainer.text('Transaction Date is required.');
-            }
-    
-            /*if (fieldName === 'inputusername' && field.val().trim().length > 50) {
-                field.addClass('is-invalid');
-                errorContainer.text('The Username is mandatory and must not exceed 50 characters.');
             }*/
-            if (fieldName === 'inputusername' && field.val().trim().length === 0) {
+            /*if (fieldName === 'inputusername' && field.val().trim().length === 0) {
                 field.addClass('is-invalid');
                 errorContainer.text('The Username is required.');
-            }
+            }*/
         });
     
         // Cuando el formulario se envía (al hacer clic en Save)
@@ -429,85 +420,6 @@ $(document).ready(function() {
         });
     });
     
-    //Funcion para actualizar los datos de la tabla empty trailer al picarle al boton refresh
-    // Función para actualizar la tabla y trailersData
-    /*function updateTrailerTable() {
-        const url = document.getElementById('refreshemptytrailertable').getAttribute('data-url'); // Obtén la URL desde el atributo data-url
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                // Aquí va el código para actualizar trailersData
-                trailersData = data.reduce((acc, trailer) => {
-                    acc[trailer.pk_trailer] = trailer;
-                    return acc;
-                }, {});
-
-                // Actualiza la tabla
-                const tbody = document.getElementById('emptyTrailerTableBody');
-                tbody.innerHTML = ''; // Limpiar tabla antes de agregar nuevas filas
-                data.forEach(trailer => {
-                    const row = `
-                        <tr id="trailer-${trailer.pk_trailer}" class="clickable-row" 
-                            data-bs-toggle="offcanvas" 
-                            data-bs-target="#emptytrailer" 
-                            aria-controls="emptytrailer" 
-                            data-id="${trailer.pk_trailer}">                              
-                            <td>${trailer.trailer_num}</td>
-                            <td>${trailer.status}</td>
-                            <td>${trailer.pallets_on_trailer}</td>
-                            <td>${trailer.pallets_on_floor}</td>
-                            <td>${trailer.carrier}</td>
-                            <td>${trailer.availability_indicator?.gntc_description ?? 'N/A'}</td>
-                            <td>${trailer.locations?.CoName ?? 'N/A'}</td>
-                            <td>${trailer.date_in}</td>
-                            <td>${trailer.date_out}</td>
-                            <td>${trailer.transaction_date}</td>
-                            <td>${trailer.username}</td>
-                        </tr>
-                    `;
-                    tbody.innerHTML += row;
-                });
-                
-                // Vuelve a agregar los listeners de clic después de actualizar la tabla
-                const rows = document.querySelectorAll(".clickable-row");
-                rows.forEach(row => {
-                    row.addEventListener("click", function () {
-                        const id = this.getAttribute("data-id");
-                        const trailer = trailersData[id]; // Busca los datos del tráiler
-                        //console.log(trailer);
-                        if (trailer) {
-                            // Asigna los datos al offcanvas
-                            document.getElementById("pk_trailer").textContent = trailer.pk_trailer;
-                            document.getElementById("offcanvas-id").textContent = trailer.trailer_num;
-                            document.getElementById("offcanvas-status").textContent = trailer.status;
-                            document.getElementById("offcanvas-pallets-on-trailer").textContent = trailer.pallets_on_trailer;
-                            document.getElementById("offcanvas-pallets-on-floor").textContent = trailer.pallets_on_floor;
-                            document.getElementById("offcanvas-carrier").textContent = trailer.carrier;
-                            document.getElementById("offcanvas-availability").textContent = trailer.availability_indicator && trailer.availability_indicator.gntc_description ? trailer.availability_indicator.gntc_description : 'N/A';
-                            document.getElementById("offcanvas-location").textContent = trailer.locations && trailer.locations.CoName ? trailer.locations.CoName : 'N/A';
-                            document.getElementById("offcanvas-date-in").textContent = trailer.date_in;
-                            document.getElementById("offcanvas-date-out").textContent = trailer.date_out;
-                            document.getElementById("offcanvas-transaction-date").textContent = trailer.transaction_date;
-                            document.getElementById("offcanvas-username").textContent = trailer.username;
-                            document.getElementById("pk_availability").textContent = trailer.availability_indicator && trailer.availability_indicator.gnct_id ? trailer.availability_indicator.gnct_id : 'N/A';
-                            document.getElementById("pk_location").textContent = trailer.location;
-                            document.getElementById("pk_carrier").textContent = trailer.carrier;
-                        } else {
-                            console.error(`No data found for trailer ID ${id}`);
-                        }
-                    });
-                });
-
-            })
-            .catch(error => console.error('Error:', error));
-    }
-
-    // Llama a la función cuando se hace clic en el botón de "Refresh"
-    document.getElementById('refreshemptytrailertable').addEventListener('click', updateTrailerTable);
-
-    // Configura la actualización automática cada 5 minutos (300,000 ms)
-    setInterval(updateTrailerTable, 300000); // 300,000 ms = 5 minutos*/
-
     function updateTrailerTable() {
         // Obtener los valores de los filtros
         const search = document.getElementById('searchemptytrailergeneral').value;
@@ -522,10 +434,10 @@ $(document).ready(function() {
         const username = document.getElementById('emptytrailerfilterinputusername').value;
         const dateInStart = document.getElementById('emptytrailerfilterinputstartdatein').value;
         const dateInEnd = document.getElementById('emptytrailerfilterinputenddatein').value;
-        const dateOutStart = document.getElementById('emptytrailerfilterinputstartdateout').value;
-        const dateOutEnd = document.getElementById('emptytrailerfilterinputenddateout').value;
-        const transactionDateStart = document.getElementById('emptytrailerfilterinputstarttransactiondate').value;
-        const transactionDateEnd = document.getElementById('emptytrailerfilterinputendtransactiondate').value;
+        //const dateOutStart = document.getElementById('emptytrailerfilterinputstartdateout').value;
+        //const dateOutEnd = document.getElementById('emptytrailerfilterinputenddateout').value;
+        //const transactionDateStart = document.getElementById('emptytrailerfilterinputstarttransactiondate').value;
+        //const transactionDateEnd = document.getElementById('emptytrailerfilterinputendtransactiondate').value;
         
         // Construir la URL con los parámetros de filtro
         const url = new URL(document.getElementById('refreshemptytrailertable').getAttribute('data-url'));
@@ -544,10 +456,10 @@ $(document).ready(function() {
         params.set('username', username);
         params.set('date_in_start', dateInStart);
         params.set('date_in_end', dateInEnd);
-        params.set('date_out_start', dateOutStart);
-        params.set('date_out_end', dateOutEnd);
-        params.set('transaction_date_start', transactionDateStart);
-        params.set('transaction_date_end', transactionDateEnd);
+        //params.set('date_out_start', dateOutStart);
+        //params.set('date_out_end', dateOutEnd);
+        //params.set('transaction_date_start', transactionDateStart);
+        //params.set('transaction_date_end', transactionDateEnd);
     
         url.search = params.toString();
         //console.log(url);
@@ -570,18 +482,18 @@ $(document).ready(function() {
                             data-bs-toggle="offcanvas" 
                             data-bs-target="#emptytrailer" 
                             aria-controls="emptytrailer" 
-                            data-id="${trailer.pk_trailer}">
-                            <td>${trailer.trailer_num}</td>
-                            <td>${trailer.status}</td>
-                            <td>${trailer.pallets_on_trailer}</td>
-                            <td>${trailer.pallets_on_floor}</td>
-                            <td>${trailer.carrier}</td>
-                            <td>${trailer.availability_indicator?.gntc_description ?? 'N/A'}</td>
-                            <td>${trailer.locations?.CoName ?? 'N/A'}</td>
-                            <td>${trailer.date_in}</td>
-                            <td>${trailer.date_out}</td>
-                            <td>${trailer.transaction_date}</td>
-                            <td>${trailer.username}</td>
+                            data-id="${trailer.pk_trailer ?? '' }">
+                            <td>${trailer.trailer_num ?? '' }</td>
+                            <td>${trailer.status ?? '' }</td>
+                            <td>${trailer.pallets_on_trailer ?? ''}</td>
+                            <td>${trailer.pallets_on_floor ?? ''}</td>
+                            <td>${trailer.carriers?.CoName ?? ''}</td>
+                            <td>${trailer.availability_indicator?.gntc_description ?? ''}</td>
+                            <td>${trailer.locations?.CoName ?? ''}</td>
+                            <td>${trailer.date_in ?? '' }</td>
+                            <!-- <td>${trailer.date_out ?? '' }</td> -->
+                            <!-- <td>${trailer.transaction_date ?? '' }</td> -->
+                            <td>${trailer.username ?? '' }</td>
                         </tr>
                     `;
                     tbody.innerHTML += row;
@@ -601,16 +513,16 @@ $(document).ready(function() {
                             document.getElementById("offcanvas-status").textContent = trailer.status;
                             document.getElementById("offcanvas-pallets-on-trailer").textContent = trailer.pallets_on_trailer;
                             document.getElementById("offcanvas-pallets-on-floor").textContent = trailer.pallets_on_floor;
-                            document.getElementById("offcanvas-carrier").textContent = trailer.carrier;
-                            document.getElementById("offcanvas-availability").textContent = trailer.availability_indicator && trailer.availability_indicator.gntc_description ? trailer.availability_indicator.gntc_description : 'N/A';
-                            document.getElementById("offcanvas-location").textContent = trailer.locations && trailer.locations.CoName ? trailer.locations.CoName : 'N/A';
+                            document.getElementById("offcanvas-carrier").textContent = trailer.carriers && trailer.carriers.CoName ? trailer.carriers.CoName : '';
+                            document.getElementById("offcanvas-availability").textContent = trailer.availability_indicator && trailer.availability_indicator.gntc_description ? trailer.availability_indicator.gntc_description : '';
+                            document.getElementById("offcanvas-location").textContent = trailer.locations && trailer.locations.CoName ? trailer.locations.CoName : '';
                             document.getElementById("offcanvas-date-in").textContent = trailer.date_in;
-                            document.getElementById("offcanvas-date-out").textContent = trailer.date_out;
-                            document.getElementById("offcanvas-transaction-date").textContent = trailer.transaction_date;
+                            //document.getElementById("offcanvas-date-out").textContent = trailer.date_out;
+                            //document.getElementById("offcanvas-transaction-date").textContent = trailer.transaction_date;
                             document.getElementById("offcanvas-username").textContent = trailer.username;
-                            document.getElementById("pk_availability").textContent = trailer.availability_indicator && trailer.availability_indicator.gnct_id ? trailer.availability_indicator.gnct_id : 'N/A';
-                            document.getElementById("pk_location").textContent = trailer.location;
-                            document.getElementById("pk_carrier").textContent = trailer.carrier;
+                            document.getElementById("pk_availability").textContent = trailer.availability_indicator && trailer.availability_indicator.gnct_id ? trailer.availability_indicator.gnct_id : '';
+                            document.getElementById("pk_location").textContent = trailer.locations && trailer.locations.pk_company ? trailer.locations.pk_company : '';
+                            document.getElementById("pk_carrier").textContent = trailer.carriers && trailer.carriers.pk_company ? trailer.carriers.pk_company : '';
                         } else {
                             console.error(`No data found for trailer ID ${id}`);
                         }
@@ -623,11 +535,6 @@ $(document).ready(function() {
     
     // Llamar la función cuando se hace clic en el botón de "Refresh" o cuando cambian los filtros
     document.getElementById('refreshemptytrailertable').addEventListener('click', updateTrailerTable);
-
-    //Refresh de la tabla al aplicar un filtro
-    //document.querySelectorAll('.filterapply').addEventListener('click', updateTrailerTable);
-
-    //document.getElementById('applytraileridfilter').addEventListener('click', updateTrailerTable);
     
     // Configurar los eventos de cambio de los inputs
     const filterInputs = document.querySelectorAll('#filtersapplied input');
@@ -697,19 +604,19 @@ $(document).ready(function() {
                     //console.log(trailer.availabilityIndicator); // Verifica que availabilityIndicator esté cargado
                       // Asigna los datos al offcanvas
                       document.getElementById("pk_trailer").textContent = trailer.pk_trailer;
-                      document.getElementById("pk_availability").textContent = trailer.availability_indicator && trailer.availability_indicator.gnct_id ? trailer.availability_indicator.gnct_id : 'N/A' ;
-                      document.getElementById("pk_location").textContent = trailer.location;
-                      document.getElementById("pk_carrier").textContent = trailer.carrier;
+                      document.getElementById("pk_availability").textContent = trailer.availability_indicator && trailer.availability_indicator.gnct_id ? trailer.availability_indicator.gnct_id : '' ;
+                      document.getElementById("pk_location").textContent = trailer.locations && trailer.locations.pk_company ? trailer.locations.pk_company : '';
+                      document.getElementById("pk_carrier").textContent = trailer.carriers && trailer.carriers.pk_company ? trailer.carriers.pk_company : '';
                       document.getElementById("offcanvas-id").textContent = trailer.trailer_num;
                       document.getElementById("offcanvas-status").textContent = trailer.status;
                       document.getElementById("offcanvas-pallets-on-trailer").textContent = trailer.pallets_on_trailer;
                       document.getElementById("offcanvas-pallets-on-floor").textContent = trailer.pallets_on_floor;
-                      document.getElementById("offcanvas-carrier").textContent = trailer.carrier;
-                      document.getElementById("offcanvas-availability").textContent = trailer.availability_indicator && trailer.availability_indicator.gntc_description ? trailer.availability_indicator.gntc_description : 'N/A';
-                      document.getElementById("offcanvas-location").textContent = trailer.locations && trailer.locations.CoName ? trailer.locations.CoName : 'N/A';
+                      document.getElementById("offcanvas-carrier").textContent = trailer.carriers && trailer.carriers.CoName ? trailer.carriers.CoName : '';
+                      document.getElementById("offcanvas-availability").textContent = trailer.availability_indicator && trailer.availability_indicator.gntc_description ? trailer.availability_indicator.gntc_description : '';
+                      document.getElementById("offcanvas-location").textContent = trailer.locations && trailer.locations.CoName ? trailer.locations.CoName : '';
                       document.getElementById("offcanvas-date-in").textContent = trailer.date_in;
-                      document.getElementById("offcanvas-date-out").textContent = trailer.date_out;
-                      document.getElementById("offcanvas-transaction-date").textContent = trailer.transaction_date;
+                      //document.getElementById("offcanvas-date-out").textContent = trailer.date_out;
+                      //document.getElementById("offcanvas-transaction-date").textContent = trailer.transaction_date;
                       document.getElementById("offcanvas-username").textContent = trailer.username;
                   } else {
                       console.error(`No data found for trailer ID ${id}`);
@@ -728,8 +635,6 @@ $(document).ready(function() {
         const trailerId = document.getElementById('pk_trailer').innerText.trim(); // ID del tráiler
         const baseUrl = deleteButton.getAttribute('data-url'); // Base URL
 
-          /*const deleteUrl = deleteButton.getAttribute('data-url'); // URL de eliminación
-        console.log(deleteUrl)*/
           if (trailerId) {
             // Construir la URL completa
             const deleteUrl = `${baseUrl}/${trailerId}`;
@@ -823,12 +728,12 @@ $(document).ready(function() {
           document.getElementById('updateinputpalletsontrailer').value = trailer.pallets_on_trailer || '';
           document.getElementById('updateinputpalletsonfloor').value = trailer.pallets_on_floor || '';
           document.getElementById('updateinputcarrier').value = trailer.carrier || '';
-          document.getElementById('updateinputavailabilityindicator').value = trailer.gnct_id_avaibility_indicator || '';
+          document.getElementById('updateinputavailabilityindicator').value = trailer.gnct_id_availability_indicator || '';
           document.getElementById('updateinputlocation').value = trailer.location || '';
           document.getElementById('updateinputdatein').value = trailer.date_in || '';
-          document.getElementById('updateinputdateout').value = trailer.date_out || '';
-          document.getElementById('updateinputtransactiondate').value = trailer.transaction_date || '';
-          document.getElementById('updateinputusername').value = trailer.username || '';
+          //document.getElementById('updateinputdateout').value = trailer.date_out || '';
+          //document.getElementById('updateinputtransactiondate').value = trailer.transaction_date || '';
+          //document.getElementById('updateinputusername').value = trailer.username || '';
 
           // Mostrar el canvas de actualización
           const updateCanvas = new bootstrap.Offcanvas(document.getElementById('updatenewtrailerempty'));
@@ -918,15 +823,15 @@ $(document).ready(function() {
     const formFields = [
         'updateinputidtrailer',
         'updateinputdateofstatus',
-        'updateinputpalletsontrailer',
-        'updateinputpalletsonfloor',
+        //'updateinputpalletsontrailer',
+        //'updateinputpalletsonfloor',
         'updateinputcarrier',
-        'updateinputavailabilityindicator',
+        //'updateinputavailabilityindicator',
         'updateinputlocation',
         'updateinputdatein',
-        'updateinputdateout',
-        'updateinputtransactiondate',
-        'updateinputusername'
+        //'updateinputdateout',
+        //'updateinputtransactiondate',
+        //'updateinputusername'
     ];
 
     // Validación de cada campo
@@ -952,10 +857,10 @@ $(document).ready(function() {
             errorElement.textContent = 'This field is required'; // Mensaje de error
         }
         // Validar si el campo excede los 50 caracteres
-        else if ((field.id === 'updateinputusername' || field.id === 'updateinputpalletsonfloor' || field.id === 'updateinputpalletsontrailer') && field.value.length > 50) {
+        /*else if ((field.id === 'updateinputusername' || field.id === 'updateinputpalletsonfloor' || field.id === 'updateinputpalletsontrailer') && field.value.length > 50) {
             field.classList.add('is-invalid');
             errorElement.textContent = 'This field cannot exceed 50 characters'; // Mensaje de error
-        } else {
+        }*/ else {
             field.classList.remove('is-invalid');
             errorElement.textContent = ''; // Limpiar el mensaje de error
         }
@@ -977,11 +882,11 @@ $(document).ready(function() {
                 errorElement.textContent = 'This field is required';
             }
             // Validar si el campo excede los 50 caracteres (solo para los campos específicos)
-            else if ((fieldId === 'updateinputusername' || fieldId === 'updateinputpalletsonfloor' || fieldId === 'updateinputpalletsontrailer') && field.value.length > 50) {
+            /*else if ((fieldId === 'updateinputusername' || fieldId === 'updateinputpalletsonfloor' || fieldId === 'updateinputpalletsontrailer') && field.value.length > 50) {
                 valid = false;
                 field.classList.add('is-invalid');
                 errorElement.textContent = 'This field cannot exceed 50 characters';
-            } else {
+            }*/ else {
                 field.classList.remove('is-invalid');
                 errorElement.textContent = '';
             }
@@ -1020,11 +925,11 @@ $(document).ready(function() {
                     pallets_on_trailer: document.getElementById("updateinputpalletsontrailer").value,
                     pallets_on_floor: document.getElementById("updateinputpalletsonfloor").value,
                     carrier: document.getElementById("updateinputcarrier").value,
-                    gnct_id_avaibility_indicator: document.getElementById("updateinputavailabilityindicator").value,
+                    gnct_id_availability_indicator: document.getElementById("updateinputavailabilityindicator").value,
                     location: document.getElementById("updateinputlocation").value,
                     date_in: document.getElementById("updateinputdatein").value,
-                    date_out: document.getElementById("updateinputdateout").value,
-                    transaction_date: document.getElementById("updateinputtransactiondate").value,
+                    //date_out: document.getElementById("updateinputdateout").value,
+                    //transaction_date: document.getElementById("updateinputtransactiondate").value,
                     username: document.getElementById("updateinputusername").value,
                 };
 
@@ -1128,8 +1033,8 @@ $(document).ready(function() {
         const availability = document.getElementById("pk_availability").textContent;
         const location = document.getElementById("pk_location").textContent;
         const datein = document.getElementById("offcanvas-date-in").textContent;
-        const dateout = document.getElementById("offcanvas-date-out").textContent;
-        const transaction = document.getElementById("offcanvas-transaction-date").textContent;
+        //const dateout = document.getElementById("offcanvas-date-out").textContent;
+        //const transaction = document.getElementById("offcanvas-transaction-date").textContent;
         const username = document.getElementById("offcanvas-username").textContent;
     
         // Construir la URL con los parámetros necesarios
@@ -1142,9 +1047,13 @@ $(document).ready(function() {
         &availability=${encodeURIComponent(availability)}
         &location=${encodeURIComponent(location)}
         &datein=${encodeURIComponent(datein)}
+        &username=${encodeURIComponent(username)}`;
+
+        /*
         &dateout=${encodeURIComponent(dateout)}
         &transaction=${encodeURIComponent(transaction)}
         &username=${encodeURIComponent(username)}`;
+        */
 
         console.log(redirectUrl);
 
@@ -1371,116 +1280,6 @@ $(document).ready(function() {
         });
     });
 
-    //Manejo de inputs de Date Of Status
-    /*$(document).ready(function () {
-        // Función para manejar el estado de los botones (habilitar/deshabilitar)
-        function toggleDateRangeButtons(startInputSelector, endInputSelector, closeButtonSelector) {
-            if ($(startInputSelector).val() || $(endInputSelector).val()) {
-                $(closeButtonSelector).prop('disabled', true); // Deshabilita el botón Collapse
-            } else {
-                $(closeButtonSelector).prop('disabled', false); // Habilita el botón Collapse
-            }
-        }
-    
-        // Función para manejar el filtro de rango de fechas (Start Date y End Date)
-        function handleDateRangeFilter(startInputSelector, endInputSelector, divSelector, startFilterInputSelector, endFilterInputSelector, closeButtonSelector) {
-            var startDate = $(startInputSelector).val(); // Obtiene el valor del Start Date
-            var endDate = $(endInputSelector).val(); // Obtiene el valor del End Date
-    
-            if (startDate && endDate) {
-                if ($(divSelector).is(':visible')) {
-                    $(startFilterInputSelector).val(startDate); // Actualiza el input del filtro con el Start Date
-                    $(endFilterInputSelector).val(endDate); // Actualiza el input del filtro con el End Date
-                } else {
-                    $(startFilterInputSelector).val(startDate);
-                    $(endFilterInputSelector).val(endDate);
-                    $(divSelector).show(); // Muestra el div del filtro
-                }
-            } else {
-                $(startFilterInputSelector).val(''); // Limpia el input del Start Date asociado al filtro
-                $(endFilterInputSelector).val(''); // Limpia el input del End Date asociado al filtro
-                $(divSelector).hide(); // Oculta el div del filtro
-                $(closeButtonSelector).click(); // Simula un clic en Collapse
-            }
-            toggleDateRangeButtons(startInputSelector, endInputSelector, closeButtonSelector);
-        }
-    
-        // Función para limpiar el filtro (botón X)
-        function clearDateRangeFilter(divSelector, startInputSelector, endInputSelector, applyButtonSelector, closeButtonSelector) {
-            $(startInputSelector).val(''); // Limpia el input del Start Date
-            $(endInputSelector).val(''); // Limpia el input del End Date
-            $(divSelector).hide(); // Oculta el div del filtro
-            $(closeButtonSelector).prop('disabled', false); // Habilita el botón
-            $(applyButtonSelector).click(); // Simula clic en Apply
-        }
-    
-        // Función para manejar clics en botones de cerrar Collapse
-        function handleCloseDateRangeCollapse(startInputSelector, endInputSelector, divSelector, startFilterInputSelector, endFilterInputSelector) {
-            if (!$(startInputSelector).val() && !$(endInputSelector).val()) {
-                $(startFilterInputSelector).val(''); // Limpia el Start Date del filtro
-                $(endFilterInputSelector).val(''); // Limpia el End Date del filtro
-                $(divSelector).hide(); // Oculta el div del filtro
-            }
-        }
-    
-        // Función para abrir el canvas y enfocar el input correspondiente
-        function openCanvasAndFocus(inputSelector) {
-            var offcanvas = new bootstrap.Offcanvas(document.getElementById('offcanvasaddmorefilters'));
-            offcanvas.show();
-            $(inputSelector).focus(); // Enfocar el input específico
-        }
-    
-        // ------------------ Date Of Status ------------------
-        $('#applystatusfilter').on('click', function () {
-            handleDateRangeFilter(
-                '#inputapplystatusstfilter', // Start Date input en el offcanvas
-                '#inputapplystatusedfilter', // End Date input en el offcanvas
-                '#emptytrailerfilterdivdateofstatus', // Div del filtro
-                '#emptytrailerfilterinputdateofstartstatus', // Start Date input en el filtro
-                '#emptytrailerfilterinputdateofendstatus', // End Date input en el filtro
-                '#closeapplystatusfilter' // Botón Collapse
-            );
-        });
-    
-        $('#emptytrailerfilterbuttondateofstatus').on('click', function () {
-            clearDateRangeFilter(
-                '#emptytrailerfilterdivdateofstatus', // Div del filtro
-                '#inputapplystatusstfilter', // Start Date input en el offcanvas
-                '#inputapplystatusedfilter', // End Date input en el offcanvas
-                '#applystatusfilter', // Botón Apply
-                '#closeapplystatusfilter' // Botón Collapse
-            );
-        });
-    
-        $('#emptytrailerfilterbtndateofstatus, #emptytrailerfilterinputdateofstartstatus').on('click', function () {
-            openCanvasAndFocus('#inputapplystatusstfilter'); // Enfoca el Start Date en el offcanvas
-        });
-    
-        $('#emptytrailerfilterinputdateofendstatus').on('click', function () {
-            openCanvasAndFocus('#inputapplystatusedfilter'); // Enfoca el End Date en el offcanvas
-        });
-    
-        $('#closeapplystatusfilter').on('click', function () {
-            handleCloseDateRangeCollapse(
-                '#inputapplystatusstfilter', // Start Date input en el offcanvas
-                '#inputapplystatusedfilter', // End Date input en el offcanvas
-                '#emptytrailerfilterdivdateofstatus', // Div del filtro
-                '#emptytrailerfilterinputdateofstartstatus', // Start Date input en el filtro
-                '#emptytrailerfilterinputdateofendstatus' // End Date input en el filtro
-            );
-        });
-    
-        // Llamada inicial para verificar los botones
-        toggleDateRangeButtons('#inputapplystatusstfilter', '#inputapplystatusedfilter', '#closeapplystatusfilter');
-
-        // ------------------ Verificación de los inputs ------------------
-    // Detecta cambios en los inputs del Offcanvas para habilitar o deshabilitar el botón de Collapse
-    $('#inputapplystatusstfilter, #inputapplystatusedfilter').on('input', function () {
-        toggleDateRangeButtons('#inputapplystatusstfilter', '#inputapplystatusedfilter', '#closeapplystatusfilter');
-    });
-    });*/
-    
-    
     //Manejo mejorado de Date of Status
     $(document).ready(function () {
         const updatetab = document.getElementById("refreshemptytrailertable");
@@ -1722,7 +1521,7 @@ $(document).ready(function() {
         });
     
         // ------------------ Date Out ------------------
-        $('#applydofilter').on('click', function () {
+        /*$('#applydofilter').on('click', function () {
             handleDateRangeFilter(
                 '#inputapplydostfilter', // Start Date input en el offcanvas
                 '#inputapplydoedfilter', // End Date input en el offcanvas
@@ -1760,10 +1559,10 @@ $(document).ready(function() {
                 '#emptytrailerfilterinputstartdateout', // Start Date input en el filtro
                 '#emptytrailerfilterinputenddateout' // End Date input en el filtro
             );
-        });
+        });*/
     
         // ------------------ Transaction Date ------------------
-        $('#applytdfilter').on('click', function () {
+        /*$('#applytdfilter').on('click', function () {
             handleDateRangeFilter(
                 '#inputapplytdstfilter', // Start Date input en el offcanvas
                 '#inputapplytdedfilter', // End Date input en el offcanvas
@@ -1801,25 +1600,25 @@ $(document).ready(function() {
                 '#emptytrailerfilterinputstarttransactiondate', // Start Date input en el filtro
                 '#emptytrailerfilterinputendtransactiondate' // End Date input en el filtro
             );
-        });
+        });*/
     
         // Detectar cambios en los inputs de las fechas para habilitar o deshabilitar botones
         $('#inputapplydistfilter, #inputapplydienfilter').on('input', function () {
             toggleDateRangeButtons('#inputapplydistfilter', '#inputapplydienfilter', '#closeapplydifilter', '#applydifilter');
         });
     
-        $('#inputapplydostfilter, #inputapplydoedfilter').on('input', function () {
+        /*$('#inputapplydostfilter, #inputapplydoedfilter').on('input', function () {
             toggleDateRangeButtons('#inputapplydostfilter', '#inputapplydoedfilter', '#closeapplydofilter', '#applydofilter');
-        });
+        });*/
     
-        $('#inputapplytdstfilter, #inputapplytdedfilter').on('input', function () {
+        /*$('#inputapplytdstfilter, #inputapplytdedfilter').on('input', function () {
             toggleDateRangeButtons('#inputapplytdstfilter', '#inputapplytdedfilter', '#closeapplytdfilter', '#applytdfilter');
-        });
+        });*/
     
         // Llamada inicial para verificar los botones
         toggleDateRangeButtons('#inputapplydistfilter', '#inputapplydienfilter', '#closeapplydifilter', '#applydifilter');
-        toggleDateRangeButtons('#inputapplydostfilter', '#inputapplydoedfilter', '#closeapplydofilter', '#applydofilter');
-        toggleDateRangeButtons('#inputapplytdstfilter', '#inputapplytdedfilter', '#closeapplytdfilter', '#applytdfilter');
+        //toggleDateRangeButtons('#inputapplydostfilter', '#inputapplydoedfilter', '#closeapplydofilter', '#applydofilter');
+        //toggleDateRangeButtons('#inputapplytdstfilter', '#inputapplytdedfilter', '#closeapplytdfilter', '#applytdfilter');
     });
     
 
@@ -1842,7 +1641,7 @@ $(document).ready(function() {
                     select.append('<option value="">Choose a filter</option>');
                     //select.append('<option value="">Remove filter</option>');
                     data.forEach(item => {
-                        select.append(`<option value="${item.id_company}">${item.CoName}</option>`);
+                        select.append(`<option value="${item.pk_company}">${item.CoName}</option>`);
                     });
                 }
 
@@ -1878,7 +1677,7 @@ $(document).ready(function() {
                 } else {
                     select.append('<option value="">Choose a filter</option>');
                     data.forEach(item => {
-                        select.append(`<option value="${item.id_company}">${item.CoName}</option>`);
+                        select.append(`<option value="${item.pk_company}">${item.CoName}</option>`);
                     });
                 }
 

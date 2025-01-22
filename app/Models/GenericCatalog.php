@@ -35,21 +35,21 @@ class GenericCatalog extends Model
     protected $guarded = [];
 
         // Relación inversa con EmptyTrailer
-        public function trailers()
+        public function availabilityIndicator()
         {
-            return $this->hasMany(EmptyTrailer::class, 'gnct_id_avaibility_indicator', 'gnct_id');
+            return $this->hasMany(EmptyTrailer::class, 'gnct_id_availability_indicator', 'gnct_id');
         }
 
         // Relación inversa con Shipments
         public function currentstatus()
         {
-            return $this->hasMany(Shipments::class, 'gnct_id_avaibility_indicator', 'gnct_id');
+            return $this->hasMany(Shipments::class, 'gnct_id_current_status', 'gnct_id');
         }
 
          // Relación inversa con Shipments
          public function shipmenttype()
          {
-             return $this->hasMany(Shipments::class, 'gnct_id_avaibility_indicator', 'gnct_id');
+             return $this->hasMany(Shipments::class, 'gnct_id_shipment_type', 'gnct_id');
          }
     
 }

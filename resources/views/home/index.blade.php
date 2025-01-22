@@ -56,12 +56,6 @@
                         <button id="emptytrailerfilterbuttonidtrailer" style="border:unset; background-color:rgb(13, 82, 200); color:white; font-size: small;" class="btn">X</button>
                     </div>
                 </div>
-                
-                    <!--<div id="emptytrailerfilterdividtrailer" style="background-color:white;display:none" class="input-group mb-3 me-2">
-                        <btn id="emptytrailerfilterbtnidtrailer" style="background-color: unset; color:black" class="ms-2 me-2">ID Trailer:</btn>
-                        <input id="emptytrailerfilterinputidtrailer" name="emptytrailerfilterinputidtrailer" value="" style="border:unset; color:black; max-width:150px" type="text" class="form-control me-2" aria-label="">
-                        <button id="emptytrailerfilterbuttonidtrailer" style="border-radius:0.5rem; background-color:rgb(13, 82, 200); color:white" class="btn me-2">X</button>
-                    </div>-->
 
                 <div class="col-auto" id="emptytrailerfilterdivdateofstatus" style="display:none">
                     <div style="background-color:rgb(13, 82, 200); border-radius:0.5rem; width:fit-content; display:flex; flex-wrap:nowrap; align-items:center" class="mb-3 me-2">
@@ -73,14 +67,6 @@
                     </div>
                 </div>
 
-                    <!--<div id="emptytrailerfilterdivdateofstatus" style="background-color:white;display:none" class="input-group mb-3 me-2">
-                        <btn id="emptytrailerfilterbtndateofstatus" style="background-color: unset; color:black" class="ms-2 me-2">Date Of Status:</btn>
-                        <input id="emptytrailerfilterinputdateofstartstatus" name="emptytrailerfilterinputdateofstartstatus" value="" style="border:unset; color:black; max-width:150px" type="text" class="form-control me-2" aria-label=""> 
-                        <p>-</p>
-                        <input id="emptytrailerfilterinputdateofendstatus" name="emptytrailerfilterinputdateofendstatus" value="" style="border:unset; color:black; max-width:150px" type="text" class="form-control mx-2" aria-label="">
-                        <button id="emptytrailerfilterbuttondateofstatus" style="border-radius:0.5rem; background-color:rgb(13, 82, 200); color:white" class="btn me-2">X</button>
-                    </div>-->
-                    
                 <div class="col-auto" id="emptytrailerfilterdivpalletsontrailer" style="display:none">
                     <div style="background-color:rgb(13, 82, 200); border-radius:0.5rem; width:fit-content; display:flex; flex-wrap:nowrap" class="input-group mb-3 me-2">
                         <btn id="emptytrailerfilterbtnpalletsontrailer" style="background-color: unset; color:white; white-space:nowrap; align-content:center; font-size: small;" class="ms-2 me-2">Pallets On Trailer:</btn>
@@ -88,11 +74,6 @@
                         <button id="emptytrailerfilterbuttonpalletsontrailer" style="border:unset; background-color:rgb(13, 82, 200); color:white; font-size: small;" class="btn">X</button>
                     </div>
                 </div>
-                    <!--<div id="emptytrailerfilterdivpalletsontrailer" style="background-color:white;display:none" class="input-group mb-3 me-2">
-                        <btn id="emptytrailerfilterbtnpalletsontrailer" style="background-color: unset; color:black" class="ms-2 me-2">Pallets On Trailer:</btn>
-                        <input id="emptytrailerfilterinputpalletsontrailer" name="emptytrailerfilterinputpalletsontrailer" value="" style="border:unset; color:black; max-width:150px" type="text" class="form-control me-2" aria-label="">
-                        <button id="emptytrailerfilterbuttonpalletsontrailer" style="border-radius:0.5rem; background-color:rgb(13, 82, 200); color:white" class="btn me-2">X</button>
-                    </div>-->
 
                 <div class="col-auto" id="emptytrailerfilterdivpalletsonfloor" style="display:none">
                     <div style="background-color:rgb(13, 82, 200); border-radius:0.5rem; width:fit-content; display:flex; flex-wrap:nowrap" class="input-group mb-3 me-2">
@@ -101,12 +82,6 @@
                         <button id="emptytrailerfilterbuttonpalletsonfloor" style="border:unset; background-color:rgb(13, 82, 200); color:white; font-size: small;" class="btn">X</button>
                     </div>
                 </div>
-
-                    <!--<div id="emptytrailerfilterdivpalletsonfloor" style="background-color:white;display:none" class="input-group mb-3 me-2">
-                        <btn id="emptytrailerfilterbtnpalletsonfloor" style="background-color: unset; color:black" class="ms-2 me-2">Pallets On Floor</btn>
-                        <input id="emptytrailerfilterinputpalletsonfloor" name="emptytrailerfilterinputpalletsonfloor" value="" style="border:unset; color:black; max-width:150px" type="text" class="form-control me-2" aria-label="">
-                        <button id="emptytrailerfilterbuttonpalletsonfloor" style="border-radius:0.5rem; background-color:rgb(13, 82, 200); color:white" class="btn me-2">X</button>
-                    </div>-->
 
                 <div class="col-auto" id="emptytrailerfilterdivcarrier" style="display:none">
                     <div style="background-color:rgb(13, 82, 200); border-radius:0.5rem; width:fit-content; display:flex; flex-wrap:nowrap" class="input-group mb-3 me-2">
@@ -117,13 +92,6 @@
                     </div>
                 </div>
 
-                    <!--<div id="emptytrailerfilterdivcarrier" style="background-color:white;display:none" class="input-group mb-3 me-2">
-                        <btn id="emptytrailerfilterbtncarrier" style="background-color: unset; color:black" class="ms-2 me-2">Carrier:</btn>
-                        <input id="emptytrailerfilterinputcarrier" name="" value="" style="border:unset; color:black; max-width:150px" type="text" class="form-control me-2" aria-label="">
-                        <input type="text" name="emptytrailerfilterinputcarrierpk" id="emptytrailerfilterinputcarrierpk" value="">
-                        <button id="emptytrailerfilterbuttoncarrier" style="border-radius:0.5rem; background-color:rgb(13, 82, 200); color:white" class="btn me-2">X</button>
-                    </div>-->
-
                 <div class="col-auto" id="emptytrailerfilterdivavailabilityindicator" style="display: none;">
                     <div style="background-color:rgb(13, 82, 200); border-radius:0.5rem; width:fit-content; display:flex; flex-wrap:nowrap" class="input-group mb-3 me-2">
                         <btn id="emptytrailerfilterbtnavailabilityindicator" style="background-color: unset; color:white; white-space:nowrap; align-content:center; font-size: small;" class="ms-2 me-2">Availability Indicator:</btn>
@@ -133,13 +101,6 @@
                     </div>
                 </div>
 
-                    <!--<div id="emptytrailerfilterdivavailabilityindicator" style="background-color:white;display:none" class="input-group mb-3 me-2">
-                        <btn id="emptytrailerfilterbtnavailabilityindicator" style="background-color: unset; color:black" class="ms-2 me-2">Availability Indicator:</btn>
-                        <input id="emptytrailerfilterinputavailabilityindicator" value="" style="border:unset; color:black; max-width:150px" type="text" class="form-control me-2" aria-label="">
-                        <input type="text" name="emptytrailerfilterinputavailabilityindicatorpk" id="emptytrailerfilterinputavailabilityindicatorpk" value="">
-                        <button id="emptytrailerfilterbuttonavailabilityindicator" style="border-radius:0.5rem; background-color:rgb(13, 82, 200); color:white" class="btn me-2">X</button>
-                    </div>-->
-
                 <div class="col-auto" id="emptytrailerfilterdivlocation" style="display: none;">
                     <div style="background-color:rgb(13, 82, 200); border-radius:0.5rem; width:fit-content; display:flex; flex-wrap:nowrap" class="input-group mb-3 me-2">
                         <btn id="emptytrailerfilterbtnlocation" style="background-color: unset; color:white; white-space:nowrap; align-content:center; font-size: small;" class="ms-2 me-2">Location:</btn>
@@ -148,13 +109,6 @@
                         <button id="emptytrailerfilterbuttonlocation" style="border:unset; width:fit-content;  color:white; background-color:rgb(13, 82, 200); font-size: small;" class="btn">X</button>
                     </div>
                 </div>
-
-                    <!--<div id="emptytrailerfilterdivlocation" style="background-color:white;display:none" class="input-group mb-3 me-2">
-                        <btn id="emptytrailerfilterbtnlocation" style="background-color: unset; color:black" class="ms-2 me-2">Location:</btn>
-                        <input id="emptytrailerfilterinputlocation" value="" style="border:unset; color:black; max-width:150px" type="text" class="form-control me-2" aria-label="">
-                        <input type="text" name="emptytrailerfilterinputlocationpk" id="emptytrailerfilterinputlocationpk" value="">
-                        <button id="emptytrailerfilterbuttonlocation" style="border-radius:0.5rem; background-color:rgb(13, 82, 200); color:white" class="btn me-2">X</button>
-                    </div>-->
 
                 <div class="col-auto" id="emptytrailerfilterdivdatein" style="display: none;">
                     <div style="background-color:rgb(13, 82, 200); border-radius:0.5rem; width:fit-content; display:flex; flex-wrap:nowrap; align-items:center" class="input-group mb-3 me-2">
@@ -166,15 +120,7 @@
                     </div>
                 </div>
 
-                    <!--<div id="emptytrailerfilterdivdatein" style="background-color:white;display:none" class="input-group mb-3 me-2">
-                        <btn id="emptytrailerfilterbtndatein" style="background-color: unset; color:black" class="ms-2 me-2">Date In:</btn>
-                        <input id="emptytrailerfilterinputstartdatein" name="emptytrailerfilterinputstartdatein" value="" style="border:unset; color:black; max-width:150px" type="text" class="form-control me-2" aria-label="">
-                        <p>-</p>
-                        <input id="emptytrailerfilterinputenddatein" name="emptytrailerfilterinputenddatein" value="" style="border:unset; color:black; max-width:150px" type="text" class="form-control me-2" aria-label="">
-                        <button id="emptytrailerfilterbuttondatein" style="border-radius:0.5rem; background-color:rgb(13, 82, 200); color:white" class="btn mx-2">X</button>
-                    </div>-->
-
-                <div class="col-auto" id="emptytrailerfilterdivdateout" style="display:none">
+                <!--<div class="col-auto" id="emptytrailerfilterdivdateout" style="display:none">
                     <div style="background-color:rgb(13, 82, 200); border-radius:0.5rem; width:fit-content; display:flex; flex-wrap:nowrap; align-items:center" class="input-group mb-3 me-2">
                         <btn id="emptytrailerfilterbtndateout" style="background-color: unset; color:white; white-space:nowrap; align-content:center; font-size: small;" class="ms-2 me-2">Date Out:</btn>
                         <input id="emptytrailerfilterinputstartdateout" name="emptytrailerfilterinputstartdateout" value="" style="border:unset; width:fit-content;  color:white; background-color:rgb(13, 82, 200); font-size: small; text-align:center" type="text" class="">
@@ -184,14 +130,6 @@
                     </div>
                 </div>
 
-                    <!--<div id="emptytrailerfilterdivdateout" style="background-color:white;display:none" class="input-group mb-3 me-2">
-                        <btn id="emptytrailerfilterbtndateout" style="background-color: unset; color:black" class="ms-2 me-2">Date Out:</btn>
-                        <input id="emptytrailerfilterinputstartdateout" name="emptytrailerfilterinputstartdateout" value="" style="border:unset; color:black; max-width:150px; text-align:center" type="text" class="">
-                        <p>-</p>
-                        <input id="emptytrailerfilterinputenddateout" name="emptytrailerfilterinputenddateout" value="" style="border:unset; color:black; max-width:150px; text-align:center" type="text" class="">
-                        <button id="emptytrailerfilterbuttondateout" style="border-radius:0.5rem; background-color:rgb(13, 82, 200); color:white" class="btn mx-2">X</button>
-                    </div>-->
-
                 <div class="col-auto" id="emptytrailerfilterdivtransactiondate" style="display: none;">
                     <div style="background-color:rgb(13, 82, 200); border-radius:0.5rem; width:fit-content; display:flex; flex-wrap:nowrap; align-items:center" class="input-group mb-3 me-2">
                         <btn id="emptytrailerfilterbtntransactiondate" style="background-color: unset; color:white; white-space:nowrap; align-content:center; font-size: small;" class="ms-2 me-2">Transaction Date:</btn>
@@ -200,15 +138,7 @@
                         <input id="emptytrailerfilterinputendtransactiondate" name="emptytrailerfilterinputendtransactiondate" value="" style="border:unset; width:fit-content;  color:white; background-color:rgb(13, 82, 200); font-size: small; text-align:center" type="text" class="">
                         <button id="emptytrailerfilterbuttontransactiondate" style="border:unset; width:fit-content;  color:white; background-color:rgb(13, 82, 200); font-size: small;" class="btn">X</button>
                     </div>
-                </div>
-
-                    <!--<div id="emptytrailerfilterdivtransactiondate" style="background-color:white;display:none" class="input-group mb-3 me-2">
-                        <btn id="emptytrailerfilterbtntransactiondate" style="background-color: unset; color:black" class="ms-2 me-2">Transaction Date:</btn>
-                        <input id="emptytrailerfilterinputstarttransactiondate" name="emptytrailerfilterinputstarttransactiondate" value="" style="border:unset; color:black; max-width:150px; text-align:center" type="text" class="">
-                        <p>-</p>
-                        <input id="emptytrailerfilterinputendtransactiondate" name="emptytrailerfilterinputendtransactiondate" value="" style="border:unset; color:black; max-width:150px; text-align:center" type="text" class="">
-                        <button id="emptytrailerfilterbuttontransactiondate" style="border-radius:0.5rem; background-color:rgb(13, 82, 200); color:white" class="btn mx-2">X</button>
-                    </div>-->
+                </div>-->
 
                 <div class="col-auto" id="emptytrailerfilterdivusername" style="display:none">
                     <div style="background-color:rgb(13, 82, 200); border-radius:0.5rem; width:fit-content; display:flex; flex-wrap:nowrap" class="input-group mb-3 me-2">
@@ -218,11 +148,6 @@
                     </div>
                 </div>
 
-                    <!--<div id="emptytrailerfilterdivusername" style="background-color:white;display:none" class="input-group mb-3 me-2">
-                        <btn id="emptytrailerfilterbtnusername" style="background-color: unset; color:black" class="ms-2 me-2">Username:</btn>
-                        <input id="emptytrailerfilterinputusername" name="emptytrailerfilterinputusername" value="" style="border:unset; color:black; max-width:150px" type="text" class="">
-                        <button id="emptytrailerfilterbuttonusername" style="border-radius:0.5rem; background-color:rgb(13, 82, 200); color:white" class="btn me-2">X</button>
-                    </div>-->
             </div>
 
         </div>
@@ -257,8 +182,8 @@
                             <th scope="col">Availability Indicator</th>
                             <th scope="col">Location</th>
                             <th scope="col">Date In</th>
-                            <th scope="col">Date Out</th>
-                            <th scope="col">Transaction Date</th>
+                            <!--<th scope="col">Date Out</th>-->
+                            <!--<th scope="col">Transaction Date</th>-->
                             <th scope="col">Username</th>
                         </tr>
                     </thead>
@@ -269,17 +194,17 @@
                             data-bs-target="#emptytrailer" 
                             aria-controls="emptytrailer" 
                             data-id="{{ $trailer->pk_trailer }}">
-                            <td>{{ $trailer->trailer_num }}</td>
-                            <td>{{ $trailer->status }}</td>
-                            <td>{{ $trailer->pallets_on_trailer }}</td>
-                            <td>{{ $trailer->pallets_on_floor }}</td>
-                            <td>{{ $trailer->carrier }}</td>
-                            <td>{{ $trailer->availabilityIndicator->gntc_description ?? 'N/A' }}</td>
-                            <td>{{ $trailer->locations->CoName ?? 'N/A' }}</td>
-                            <td>{{ $trailer->date_in }}</td>
-                            <td>{{ $trailer->date_out }}</td>
-                            <td>{{ $trailer->transaction_date }}</td>
-                            <td>{{ $trailer->username }}</td>
+                            <td>{{ $trailer->trailer_num ?? ''  }}</td>
+                            <td>{{ $trailer->status ?? ''  }}</td>
+                            <td>{{ $trailer->pallets_on_trailer ?? ''  }}</td>
+                            <td>{{ $trailer->pallets_on_floor ?? ''  }}</td>
+                            <td>{{ $trailer->carriers->CoName ?? '' }}</td>
+                            <td>{{ $trailer->availabilityIndicator->gntc_description ?? '' }}</td>
+                            <td>{{ $trailer->locations->CoName ?? '' }}</td>
+                            <td>{{ $trailer->date_in ?? ''  }}</td>
+                            <!--<td>{{ $trailer->date_out ?? ''  }}</td>-->
+                            <!--<td>{{ $trailer->transaction_date ?? ''  }}</td>-->
+                            <td>{{ $trailer->username ?? ''  }}</td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -393,7 +318,7 @@
                             </div>
                         </div>
                     </div>
-                    <div>
+                    <!--<div>
                         <button class="btn btn-primary w-100 mb-2" id="closeapplydofilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapseapplydofilter" aria-expanded="false" aria-controls="multiCollapseapplydofilter">Date Out</button>
                         <div class="row mb-2">
                             <div class="col">
@@ -406,8 +331,8 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div>
+                    </div>-->
+                    <!--<div>
                         <button class="btn btn-primary w-100 mb-2" id="closeapplytdfilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapseapplytdfilter" aria-expanded="false" aria-controls="multiCollapseapplytdfilter">Transaction Date</button>
                         <div class="row mb-2">
                             <div class="col">
@@ -420,7 +345,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div>-->
                     <div>
                         <button class="btn btn-primary w-100 mb-2" id="closeapplyusernamefilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapseapplyusernamefilter" aria-expanded="false" aria-controls="multiCollapseapplyusernamefilter">Username</button>
                         <div class="row mb-2">
@@ -460,8 +385,8 @@
                         <p><strong>Availability:</strong> <span id="offcanvas-availability"></span></p>
                         <p><strong>Location:</strong> <span id="offcanvas-location"></span></p>
                         <p><strong>Date In:</strong> <span id="offcanvas-date-in"></span></p>
-                        <p><strong>Date Out:</strong> <span id="offcanvas-date-out"></span></p>
-                        <p><strong>Transaction Date:</strong> <span id="offcanvas-transaction-date"></span></p>
+                        <!--<p><strong>Date Out:</strong> <span id="offcanvas-date-out"></span></p>-->
+                        <!--<p><strong>Transaction Date:</strong> <span id="offcanvas-transaction-date"></span></p>-->
                         <p><strong>Username:</strong> <span id="offcanvas-username"></span></p>
                     </div>
                 </div>
@@ -526,6 +451,7 @@
                                             <div class="mb-3 ">
                                                 <label for="inputcarrier" class="form-label ">Carrier</label>
                                                 <select class="form-select searchcarrier" aria-label="Default select example"  id="inputcarrier" name="inputcarrier" value="{{ old('inputcarrier') }}" data-url="{{ route('carrier-emptytrailer') }}">
+                                                    <option selected disabled hidden></option>
                                                 </select>
                                                 <div class="invalid-feedback"></div>
                                             </div>
@@ -537,7 +463,7 @@
                                             <div class="mb-3 ">
                                                 <label for="inputavailabilityindicator" class="form-label ">Availability Indicator</label>
                                                 <select class="form-select searchavailabilityindicator" aria-label="Default select example"  id="inputavailabilityindicator" name="inputavailabilityindicator" value="{{ old('inputavailabilityindicator') }}" data-url="{{ route('availabilityindicators-emptytrailer') }}">
-                                                    <option selected disabled hidden></option>
+                                                    <option value="">Choose an option</option>
                                                 </select>
                                                 <div class="invalid-feedback"></div>
                                             </div>
@@ -549,6 +475,7 @@
                                             <div class="mb-3 ">
                                                 <label for="inputlocation" class="form-label ">Location</label>
                                                 <select class="form-select searchlocation" aria-label="Default select example"  id="inputlocation" name="inputlocation" value="{{ old('inputlocation') }}" data-url="{{ route('locations-emptytrailer') }}">
+                                                    <option selected disabled hidden></option>
                                                 </select>
                                                 <div class="invalid-feedback"></div>
                                             </div>
@@ -567,7 +494,7 @@
                                                     <h6 class="alert alert-danger">{{  $message  }}</h6>
                                                 @enderror
                                             </div>
-                                            <div class="mb-3 ">
+                                            <div class="mb-3 " style="display: none;">
                                                 <label for="inputdateout" class="form-label ">Date Out</label>
                                                 <input type="text" class="form-control datetimepicker" id="inputdateout" name="inputdateout" placeholder="MM/DD/YYYY - H/M/S">
                                                 <div class="invalid-feedback"></div>
@@ -577,7 +504,7 @@
                                                     <h6 class="alert alert-danger">{{  $message  }}</h6>
                                                 @enderror
                                             </div>
-                                            <div class="mb-3 ">
+                                            <div class="mb-3 " style="display: none;">
                                                 <label for="inputtransactiondate" class="form-label ">Transaction Date</label>
                                                 <input type="text" class="form-control datetimepicker" id="inputtransactiondate" name="inputtransactiondate" placeholder="MM/DD/YYYY - H/M/S">
                                                 <div class="invalid-feedback"></div>
@@ -587,9 +514,9 @@
                                                     <h6 class="alert alert-danger">{{  $message  }}</h6>
                                                 @enderror
                                             </div>
-                                            <div class="mb-3 ">
+                                            <div class="mb-3 " style="display: none;">
                                                 <label for="inputusername" class="form-label ">Username</label>
-                                                <input type="text" class="form-control" id="inputusername" name="inputusername" value="{{ old('inputusername') }}">
+                                                <input type="text" class="form-control" id="inputusername" name="inputusername" value="{{auth()->user()->username ?? auth()->user()->username}}">
                                                 <div class="invalid-feedback"></div>
                                             </div>        
                                 <button type="submit" class="btn btn-primary" id="saveButton" data-url="{{ route('emptytrailer.store') }}">Save</button >
@@ -600,7 +527,8 @@
             </div>
 
             <!--OffCanvas para Actualizar un Trailer-->
-            <div>
+            <div68
+            .>
                 <div class="offcanvas offcanvas-end offcanvas-size" data-bs-scroll="true" tabindex="-1" id="updatenewtrailerempty" aria-labelledby="updateoffcanvasWithBothOptionsLabel">
                     <div class="offcanvas-header">
                         <h5 class="offcanvas-title" id="updateoffcanvasWithBothOptionsLabel">Update Trailer Empty</h5>
@@ -646,7 +574,7 @@
                                             <div class="mb-3 ">
                                                 <label for="updateinputavailabilityindicator" class="form-label ">Availability Indicator</label>
                                                 <select class="form-select searchavailabilityindicator" aria-label="Default select example"  id="updateinputavailabilityindicator" name="updateinputavailabilityindicator" value="{{ old('updateinputavailabilityindicator') }}" data-url="{{ route('availabilityindicators-emptytrailer') }}">
-                                                    <option selected disabled hidden></option>
+                                                    <option value="">Choose an option</option>
                                                 </select>
                                                 <div class="invalid-feedback" id="error-updateinputavailabilityindicator"></div>
                                             </div>
@@ -664,21 +592,21 @@
                                                 <div class="invalid-feedback" id="error-updateinputdatein"></div>
                                             </div>
 
-                                            <div class="mb-3 ">
+                                            <div class="mb-3 " style="display: none;">
                                                 <label for="updateinputdateout" class="form-label ">Date Out</label>
-                                                <input type="text" class="form-control datetimepicker" id="updateinputdateout" name="updateinputdateout" value="{{ old('updateinputdateout') }}">
+                                                <input type="text" class="form-control datetimepicker" id="updateinputdateout" name="updateinputdateout" value="">
                                                 <div class="invalid-feedback" id="error-updateinputdateout"></div>
                                             </div>
 
-                                            <div class="mb-3 ">
+                                            <div class="mb-3 " style="display: none;">
                                                 <label for="updateinputtransactiondate" class="form-label ">Transaction Date</label>
-                                                <input type="text" class="form-control datetimepicker" id="updateinputtransactiondate" name="updateinputtransactiondate" value="{{ old('updateinputtransactiondate') }}">
+                                                <input type="text" class="form-control datetimepicker" id="updateinputtransactiondate" name="updateinputtransactiondate" value="">
                                                 <div class="invalid-feedback" id="error-updateinputtransactiondate"></div>
                                             </div>
 
-                                            <div class="mb-3 ">
+                                            <div class="mb-3 " style="display: none;">
                                                 <label for="updateinputusername" class="form-label ">Username</label>
-                                                <input type="text" class="form-control" id="updateinputusername" name="updateinputusername" value="{{ old('updateinputusername') }}">
+                                                <input type="text" class="form-control" id="updateinputusername" name="updateinputusername" value="{{auth()->user()->username ?? auth()->user()->username}}">
                                                 <div class="invalid-feedback" id="error-updateinputusername"></div>
                                             </div>        
                                 <button type="button" class="btn btn-primary" id="updatesaveButton" data-url="{{ route('emptytrailer.update') }}">Update</button>

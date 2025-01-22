@@ -40,7 +40,7 @@ $(document).ready(function() {
                     } else {
                         select.append('<option value="">Choose an option</option>');
                         data.forEach(item => {
-                            select.append(`<option value="${item.id_company}">${item.CoName}</option>`);
+                            select.append(`<option value="${item.pk_company}">${item.CoName}</option>`);
                         });
                     }
         
@@ -84,7 +84,7 @@ $(document).ready(function() {
                         select.append('<option disabled>No options available</option>');
                     } else {
                         data.forEach(item => {
-                            select.append(`<option value="${item.id_company}">${item.CoName}</option>`);
+                            select.append(`<option value="${item.pk_company}">${item.CoName}</option>`);
                         });
                     }
         

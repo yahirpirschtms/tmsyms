@@ -33,12 +33,13 @@ class EmptyTrailer extends Model
         'pallets_on_trailer',
         'pallets_on_floor',
         'carrier',
-        'gnct_id_avaibility_indicator',
+        'gnct_id_availability_indicator',
         'location',
         'date_in',
         'date_out',
         'transaction_date',
         'username',
+        'availability'
     ];
 
         protected static function boot(){
@@ -59,19 +60,24 @@ class EmptyTrailer extends Model
         // Relaciones si las hay
         public function availabilityIndicator()
         {
-            return $this->belongsTo(GenericCatalog::class, 'gnct_id_avaibility_indicator', 'gnct_id');
+            return $this->belongsTo(GenericCatalog::class, 'gnct_id_availability_indicator', 'gnct_id');
         }
     
         public function locations()
         {
-            return $this->belongsTo(Companies::class, 'location', 'id_company');
+            return $this->belongsTo(Companies::class, 'location', 'pk_company');
+        }
+
+        public function carriers()
+        {
+            return $this->belongsTo(Companies::class, 'carrier', 'pk_company');
         }
 
         // Relación inversa con Shipments
-        public function emptytrailer()
+        /*public function emptytrailer()
         {
             return $this->hasMany(Shipments::class, 'id_trailer', 'trailer_num');
-        }
+        }*/
 
 
         //Convertir Fechas
@@ -87,11 +93,12 @@ class EmptyTrailer extends Model
 
         public function getDateOutAttribute($value)
         {
-            return Carbon::parse($value)->format('m/d/Y H:i:s');
+            return $value ? Carbon::parse($value)->format('m/d/Y H:i:s') : null;
         }
 
         public function getTransactionDateAttribute($value)
         {
-            return Carbon::parse($value)->format('m/d/Y H:i:s');
+            return $value ? Carbon::parse($value)->format('m/d/Y H:i:s') : null;
         }
+
 }

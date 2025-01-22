@@ -1,3 +1,4 @@
+
 document.getElementById('exportfile').addEventListener('click', function () {
     // Obtén la tabla con el id "table_wh_eta_approval_shipments"
     var table = document.getElementById('table_wh_eta_approval_shipments');
