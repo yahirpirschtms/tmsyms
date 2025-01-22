@@ -50,7 +50,7 @@
                         <div class="tab-pane fade show active" id="pills-shipment-details{{ $shipment->stm_id }}" role="tabpanel" aria-labelledby="pills-shipment-details-tab{{ $shipment->stm_id }}">
                             <div class="mb-3">
                                 <label class="form-label">STM ID</label>
-                                <p>{{ $shipment->stm_id }}</p>
+                                <p>{{ $shipment->service->id_service }}</p>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Landstar Reference</label>
@@ -58,11 +58,11 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Origin</label>
-                                <p>{{ $shipment->originCatalog->gntc_value ?? 'Origen no disponible' }}</p>
+                                <p>{{ $shipment->company->CoName ?? 'Origen no disponible' }}</p>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Destination</label>
-                                <p>{{ $shipment->destination }}</p>
+                                <p>{{ $shipment->destinationFacility->fac_name }}</p>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Current Status</label>
@@ -228,20 +228,35 @@
                 method: 'PUT', // Asegúrate de que coincida con el método de tu ruta
                 data: formData,
                 beforeSend: function () {
-                    console.log('Enviando datos...');
+                    Swal.fire({
+                        title: 'Enviando datos...',
+                        text: 'Por favor espera mientras procesamos la información.',
+                        icon: 'info',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading(); // Muestra un indicador de carga
+                        }
+                    });
                 },
                 success: function (response) {
-                    // Manejar la respuesta exitosa
-                    alert(response.message);
+                    Swal.fire({
+                        title: '¡Éxito!',
+                        text: response.message || 'El formulario se actualizó correctamente.',
+                        icon: 'success',
+                        confirmButtonText: 'Aceptar'
+                    }).then(() => {
+                        location.reload(); // Recargar la página para ver los cambios
+                    });
                     console.log(response);
-
-                    // Opcional: Actualizar algo sin recargar
-                    location.reload(); // Recargar la página para ver los cambios
                 },
                 error: function (xhr) {
-                    // Manejar errores
                     let errorMessage = xhr.responseJSON?.message || 'Ocurrió un error al actualizar el envío.';
-                    alert(errorMessage);
+                    Swal.fire({
+                        title: 'Error',
+                        text: errorMessage,
+                        icon: 'error',
+                        confirmButtonText: 'Aceptar'
+                    });
                     console.error(xhr.responseJSON?.error || xhr.responseText);
                 },
             });

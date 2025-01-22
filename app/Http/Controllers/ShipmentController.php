@@ -14,35 +14,38 @@ class ShipmentController extends Controller
     //
       public function allshipmentsshow()
     {
-    if (Auth::check()) {
+     if (Auth::check()) {
         $shipments = Shipment::all();  // Obtén los envíos desde la base de datos
           // Esto te ayudará a verificar si los envíos se están obteniendo correctamente
 
           // Obtener los estados actuales desde la base de datos (usando un modelo genérico como ejemplo)
         $currentStatus = GenericCatalog::where('gntc_group', 'STATUS_E_REPORT')->get();
         return view('home.all-shipments', compact('shipments', 'currentStatus'));  // Cambia aquí el nombre de la vista
-    }
-    return redirect('/login');
+        }
+     return redirect('/login');
     }
 
 
     public function liveshipmentsshow()
-{
-    if (Auth::check()) {
-        // Obtener los envíos
-        $shipments = Shipment::all();
+    {
+        if (Auth::check()) {
+            // Obtener el ID del estado 'Finalized' desde el catálogo
+            $finalizedStatus = GenericCatalog::where('gntc_value', 'Finalized')
+                ->where('gntc_group', 'STATUS_E_REPORT')
+                ->first();
 
-        // Obtener los estados actuales desde la base de datos (usando un modelo genérico como ejemplo)
-        $currentStatus = GenericCatalog::where('gntc_group', 'STATUS_E_REPORT')->get();
+            // Filtrar los envíos que no tienen el estado 'Finalized'
+            $shipments = Shipment::where('gnct_id_current_status', '!=', $finalizedStatus->gnct_id)->get();
 
-        // Depurar el contenido de $currentStatus
+            // Obtener los estados actuales desde la base de datos
+            $currentStatus = GenericCatalog::where('gntc_group', 'STATUS_E_REPORT')->get();
 
-        // Pasar los envíos y los estados a la vista
-        return view('home.liveshipments', compact('shipments', 'currentStatus'));
+            // Pasar los envíos y los estados a la vista
+            return view('home.liveshipments', compact('shipments', 'currentStatus'));
+        }
+
+        return redirect('/login');
     }
-
-    return redirect('/login');
-}
 
     // Listar envíos
     public function index()
@@ -70,9 +73,9 @@ class ShipmentController extends Controller
         return redirect()->back()->with('success', 'Envío creado exitosamente.');
     }
 
-    // Mostrar los detalles de un envío
-        public function details($pk_shipment)
-        {
+
+    public function details($pk_shipment)
+    {
         // Obtener el envío con las relaciones de currentStatus, driver y originCatalog
         $shipment = Shipment::with(['currentStatus', 'driver', 'originCatalog'])->findOrFail($pk_shipment);
 
@@ -86,45 +89,46 @@ class ShipmentController extends Controller
 
     public function update(Request $request, $pk_shipment)
     {
-    // Depurar los datos recibidos
 
 
-    try {
-        // Buscar el envío por su ID
-        $shipment = Shipment::findOrFail($pk_shipment);
 
-        // Validar los datos recibidos
-        $validated = $request->validate([
-            'gnct_id_current_status' => 'nullable|integer', // El campo de estado actual (deshabilitado en el formulario)
-            'driver_assigned_date' => 'nullable|date', // Fecha de asignación del conductor
-            'pick_up_date' => 'nullable|date', // Fecha de recogida
-            'intransit_date' => 'nullable|date', // Fecha de tránsito
-            'secured_yarddate' => 'nullable|date', // Fecha de depósito asegurado
-            'sec_incident' => 'nullable|integer', // Incidente (si aplica)
-            'incident_type' => 'nullable|string', // Tipo de incidente (si aplica)
-            'incident_date' => 'nullable|date', // Fecha del incidente (si aplica)
-        ]);
+        try {
+            // Buscar el envío por su ID
+            $shipment = Shipment::findOrFail($pk_shipment);
 
-        // Actualizar los datos del envío
-        $shipment->update([
-            'gnct_id_current_status' => $request->gnct_id_current_status ?? $shipment->gnct_id_current_status, // Solo actualizar si el campo no está vacío
-            'driver_assigned_date' => $request->driver_assigned_date,
-            'pick_up_date' => $request->pick_up_date,
-            'intransit_date' => $request->intransit_date,
-            'secured_yarddate' => $request->secured_yarddate,
-            'sec_incident' => $request->sec_incident,
-            'incident_type' => $request->incident_type,
-            'incident_date' => $request->incident_date,
-        ]);
+            // Validar los datos recibidos
+            $validated = $request->validate([
+                'gnct_id_current_status' => 'nullable|integer', // El campo de estado actual (deshabilitado en el formulario)
+                'driver_assigned_date' => 'nullable|date', // Fecha de asignación del conductor
+                'pick_up_date' => 'nullable|date', // Fecha de recogida
+                'intransit_date' => 'nullable|date', // Fecha de tránsito
+                'secured_yarddate' => 'nullable|date', // Fecha de depósito asegurado
+                'sec_incident' => 'nullable|integer', // Incidente (si aplica)
+                'incident_type' => 'nullable|string', // Tipo de incidente (si aplica)
+                'incident_date' => 'nullable|date', // Fecha del incidente (si aplica)
+            ]);
 
-        // Redirigir a la lista de envíos con un mensaje de éxito
-        return response()->json(['message' => 'Shipment updated successfully'], 200);
-    } catch (\Exception $e) {
-        // Si ocurre un error, redirigir con un mensaje de error
+            // Actualizar los datos del envío
+            $shipment->update([
+                'gnct_id_current_status' => $request->gnct_id_current_status ?? $shipment->gnct_id_current_status, // Solo actualizar si el campo no está vacío
+                'driver_assigned_date' => $request->driver_assigned_date,
+                'pick_up_date' => $request->pick_up_date,
+                'intransit_date' => $request->intransit_date,
+                'secured_yarddate' => $request->secured_yarddate,
+                'sec_incident' => $request->sec_incident,
+                'incident_type' => $request->incident_type,
+                'incident_date' => $request->incident_date,
+            ]);
 
-        return response()->json(['message' => 'Failed to update shipment', 'error' => $e->getMessage()], 500);
+            // Redirigir a la lista de envíos con un mensaje de éxito
+            return response()->json(['message' => 'Shipment updated successfully'], 200);
+        } catch (\Exception $e) {
+            // Si ocurre un error, redirigir con un mensaje de error
+
+            return response()->json(['message' => 'Failed to update shipment', 'error' => $e->getMessage()], 500);
+        }
     }
-    }
+
     // Método para actualizar las notas del envío
     public function updateNotes(Request $request, Shipment $shipment)
     {

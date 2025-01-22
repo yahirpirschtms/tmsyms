@@ -114,6 +114,11 @@ class Shipment extends Model
         return $this->belongsTo(Company::class, 'origin', 'pk_company'); // Relación con la tabla companies
     }
 
+    public function destinationFacility()
+    {
+        return $this->belongsTo(Facility::class, 'destination', 'fac_id');
+    }
+
     // Formateo de la fecha de entrega
     public function getFormattedDeliveredDateAttribute()
     {

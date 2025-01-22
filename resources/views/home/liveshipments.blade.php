@@ -90,7 +90,8 @@
 
                         <div class="mb-3">
                             <label for="destination" class="form-label">Destination</label>
-                            <input type="text" class="form-control" id="destination" value="{{ $shipment->destination }}" readonly>
+                            <input type="text" class="form-control" id="destination"
+                                   value="{{ $shipment->destinationFacility->fac_name ?? 'Destination not available' }}" readonly>
                         </div>
 
                         <div class="mb-3">
@@ -105,7 +106,7 @@
 
                         <div class="mb-3">
                             <label for="id_company" class="form-label">Company ID</label>
-                            <input type="text" class="form-control" id="id_company" value="{{ $shipment->id_company }}" readonly>
+                            <input type="text" class="form-control" id="id_company" value="{{ $shipment->company->id_company }}" readonly>
                         </div>
 
                         <div class="mb-3">
@@ -236,7 +237,7 @@
                 <div class="tab-pane fade show active" id="pills-shipment-details" role="tabpanel" aria-labelledby="pills-shipment-details-tab">
                     <div class="mb-3">
                         <label class="form-label">STM ID</label>
-                        <p>{{ $shipment->stm_id }}</p>
+                        <p>{{ $shipment->service->id_service }}</p>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Reference</label>
@@ -248,11 +249,11 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Origin</label>
-                        <p>{{ $shipment->originCatalog->gntc_value ?? 'Origen no disponible' }}</p>
+                        <p>{{ $shipment->company->CoName ?? 'Origen no disponible' }}</p>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Destination</label>
-                        <p>{{ $shipment->destination }}</p>
+                        <p>{{ $shipment->destinationFacility->fac_name }}</p>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Pre-Alerted Date & Time</label>
@@ -264,7 +265,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Company ID</label>
-                        <p>{{ $shipment->id_company }}</p>
+                        <p>{{ $shipment->company->id_company }}</p>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Trailer</label>
@@ -357,45 +358,64 @@
 @endsection
 
 @section('scripts')
-    <script>
-        $(document).ready(function () {
-            // Interceptar el envío del formulario
-            $('#shipmentForm').on('submit', function (event) {
-                event.preventDefault(); // Evitar el envío estándar del formulario
+<script>
+    $(document).ready(function () {
+        // Interceptar el envío del formulario
+        $('#shipmentForm').on('submit', function (event) {
+            event.preventDefault(); // Evitar el envío estándar del formulario
 
-                // Obtener la URL del formulario
-                let formAction = $(this).attr('action');
+            // Obtener la URL del formulario
+            let formAction = $(this).attr('action');
 
-                // Serializar los datos del formulario
-                let formData = $(this).serialize();
+            // Serializar los datos del formulario
+            let formData = $(this).serialize();
 
-                // Enviar los datos mediante AJAX
-                $.ajax({
-                    url: formAction,
-                    method: 'PUT',
-                    data: formData,
-                    beforeSend: function () {
-                        // Puedes agregar un indicador de carga aquí si lo necesitas
-                        console.log('Enviando datos...');
-                    },
-                    success: function (response) {
-                        // Manejar la respuesta exitosa
-                        alert(response.message);
-                        console.log(response);
-
-                        // Actualizar la página o realizar alguna acción adicional
+            // Enviar los datos mediante AJAX
+            $.ajax({
+                url: formAction,
+                method: 'PUT',
+                data: formData,
+                beforeSend: function () {
+                    // Mostrar un indicador de carga con SweetAlert2
+                    Swal.fire({
+                        title: 'Enviando datos...',
+                        text: 'Por favor espera mientras procesamos tu solicitud.',
+                        icon: 'info',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading(); // Mostrar cargando
+                        }
+                    });
+                },
+                success: function (response) {
+                    // Manejar la respuesta exitosa
+                    Swal.fire({
+                        title: '¡Éxito!',
+                        text: response.message || 'El formulario fue actualizado correctamente.',
+                        icon: 'success',
+                        confirmButtonText: 'Aceptar'
+                    }).then(() => {
                         location.reload(); // Recargar la página para ver los cambios
-                    },
-                    error: function (xhr) {
-                        // Manejar errores
-                        let errorMessage = xhr.responseJSON?.message || 'Ocurrió un error al actualizar el envío.';
-                        alert(errorMessage);
-                        console.error(xhr.responseJSON?.error || xhr.responseText);
-                    },
-                });
+                    });
+
+                    console.log(response);
+                },
+                error: function (xhr) {
+                    // Manejar errores
+                    let errorMessage = xhr.responseJSON?.message || 'Ocurrió un error al actualizar el envío.';
+                    Swal.fire({
+                        title: 'Error',
+                        text: errorMessage,
+                        icon: 'error',
+                        confirmButtonText: 'Aceptar'
+                    });
+
+                    console.error(xhr.responseJSON?.error || xhr.responseText);
+                },
             });
         });
-    </script>
+    });
+</script>
 
 
     <script>

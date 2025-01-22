@@ -45,7 +45,7 @@ class CalendarController extends Controller
                     : 'Unknown';
 
                 return [
-                    'title' => 'STM ID: ' . $shipment->stm_id,
+                    'title' => 'STM ID: ' . $shipment->service->id_service,
                     'start' => $etd->format('Y-m-d\TH:i:s'),
                     'end' => $etd->addHours(1)->format('Y-m-d\TH:i:s'),
                     'extendedProps' => [
@@ -80,13 +80,8 @@ class CalendarController extends Controller
     public function historicalcalendarshow()
     {
         if (Auth::check()) {
-            // Obtener el ID del estado 'Finalized' desde el catálogo
-            $finalizedStatus = GenericCatalog::where('gntc_value', 'Finalized')
-                ->where('gntc_group', 'STATUS_E_REPORT')
-                ->first();
-
-            // Filtrar los envíos que no tienen el estado 'Finalized'
-            $shipments = Shipment::where('gnct_id_current_status', '!=', $finalizedStatus->gnct_id)->get();
+            // Obtener todos los envíos
+            $shipments = Shipment::all();
             $currentStatus = GenericCatalog::where('gntc_group', 'STATUS_E_REPORT')->get();
 
             // Obtener los catálogos para 'MWD_LOCATION' (origen) y 'STATUS_E_REPORT' (estado actual)
@@ -99,20 +94,15 @@ class CalendarController extends Controller
             // Mapear los datos al formato esperado por FullCalendar
             $events = $shipments->map(function ($shipment) use ($originCatalog, $statusCatalog) {
                 // Parsear fechas relevantes con Carbon
-                $etd = Carbon::parse($shipment->etd);  // Cambiado de suggestedDeliveryDate a etd
+                $etd = Carbon::parse($shipment->etd); // Cambiado de suggestedDeliveryDate a etd
                 $whAuthDate = $shipment->wh_auth_date ? Carbon::parse($shipment->wh_auth_date) : null;
 
                 // Obtener las descripciones para 'origin' y 'gnct_id_current_status'
-                $originDescription = isset($originCatalog[$shipment->origin])
-                    ? $originCatalog[$shipment->origin]->gntc_value
-                    : 'Unknown';
-
-                $statusDescription = isset($statusCatalog[$shipment->gnct_id_current_status])
-                    ? $statusCatalog[$shipment->gnct_id_current_status]->gntc_value
-                    : 'Unknown';
+                $originDescription = $originCatalog[$shipment->origin]->gntc_value ?? 'Unknown';
+                $statusDescription = $statusCatalog[$shipment->gnct_id_current_status]->gntc_value ?? 'Unknown';
 
                 return [
-                    'title' => 'STM ID: ' . $shipment->stm_id,
+                    'title' => 'STM ID: ' . $shipment->service->id_service,
                     'start' => $etd->format('Y-m-d\TH:i:s'),
                     'end' => $etd->addHours(1)->format('Y-m-d\TH:i:s'),
                     'extendedProps' => [
@@ -121,7 +111,7 @@ class CalendarController extends Controller
                         'origin' => $originDescription,
                         'destination' => $shipment->destination,
                         'current_status' => $statusDescription,
-                        'etd' => $etd->format('m/d/Y H:i'),  // Cambiado de suggested_delivery_date a etd
+                        'etd' => $etd->format('m/d/Y H:i'), // Cambiado de suggested_delivery_date a etd
                         'wh_auth_date' => $whAuthDate ? $whAuthDate->format('m/d/Y H:i') : 'N/A',
                         'units' => $shipment->units,
                         'pallets' => $shipment->pallets,
@@ -137,7 +127,7 @@ class CalendarController extends Controller
                 'originCatalog' => $originCatalog,
                 'statusCatalog' => $statusCatalog,
                 'shipment' => $shipment,
-                'currentStatus'=> $currentStatus,
+                'currentStatus' => $currentStatus,
             ]);
         }
 
