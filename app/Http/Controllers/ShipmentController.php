@@ -11,8 +11,8 @@ use Illuminate\Support\Facades\Log;
 class ShipmentController extends Controller
 {
 
-    //
-      public function allshipmentsshow()
+
+    public function allshipmentsshow()
     {
      if (Auth::check()) {
         $shipments = Shipment::all();  // Obtén los envíos desde la base de datos
@@ -39,9 +39,11 @@ class ShipmentController extends Controller
 
             // Obtener los estados actuales desde la base de datos
             $currentStatus = GenericCatalog::where('gntc_group', 'STATUS_E_REPORT')->get();
+            // Obtener los estados actuales desde la base de datos
+            $shipmentType = GenericCatalog::where('gntc_group', 'TYPE')->get();
 
             // Pasar los envíos y los estados a la vista
-            return view('home.liveshipments', compact('shipments', 'currentStatus'));
+            return view('home.liveshipments', compact('shipments', 'currentStatus', 'shipmentType'));
         }
 
         return redirect('/login');

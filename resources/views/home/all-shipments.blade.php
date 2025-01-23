@@ -237,7 +237,7 @@
                     <tbody>
                         @foreach ($shipments as $shipment)
                         <tr data-bs-toggle="modal" data-bs-target="#shipmentModal{{ $shipment->stm_id }}" class="clickable-row" data-shipment-id="{{ $shipment->stm_id }}">
-                            <td>{{ $shipment->gnct_id_shipment_type }}</td>
+                            <td>{{ $shipment->shipmentType->gntc_description}}</td>
                             <td>{{ $shipment->stm_id }}</td>
                             <td>{{ $shipment->secondary_shipment_id }}</td>
                             <td>{{ $shipment->reference }}</td>
@@ -247,7 +247,7 @@
                             <td>{{ \Carbon\Carbon::parse($shipment->pre_alerted_datetime)->format('m/d/Y H:i') ?? 'No disponible' }}</td>
                             <td>{{ $shipment->carrier_dropping_trailer }}</td>
                             <td>{{ $shipment->trailer_owner }}</td>
-                            <td>{{ $shipment->driver_truck }}</td>
+                            <td>{{ $shipment->driver->drivername }} - {{ $shipment->truck }}</td>
                             <td>{{ \Carbon\Carbon::parse($shipment->etd)->format('m/d/Y') }}</td>
                             <td>{{ $shipment->units }}</td>
                             <td>{{ $shipment->pallets }}</td>
