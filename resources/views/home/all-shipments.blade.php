@@ -183,23 +183,17 @@
                         </div>
                     </div>
 
-                    <!-- Filtro por Pick-up Location -->
-                    <div>
-                        <button class="btn btn-primary w-100 mb-2" id="closeapplypickupfilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapspickupfilter" aria-expanded="false" aria-controls="multiCollapspickupfilter">Pick-up Location</button>
-                        <div class="row mb-2">
-                            <div class="col">
-                                <div class="collapse multi-collapse" id="multiCollapspickupfilter">
-                                    <input type="text" class="form-control" id="inputapplypickupfilter">
-                                    <button class="btn btn-primary mt-2 filterapply" type="button" id="applypickupfilter">Apply</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+
 
 
                 </div>
             </div>
-
+            <div class="col-auto mt-2" id="activeFilterDiv" style="display:none;">
+                <div style="background-color:rgb(13, 82, 200); border-radius:0.5rem; width:fit-content; display:flex; flex-wrap:nowrap; align-items:center" class="input-group mb-3 me-2">
+                    <span id="activeFilterText" style="color:white; font-size: small;" class="ms-2 me-2"></span>
+                    <button id="closeActiveFilter" style="background-color:unset; color:white; font-size: small;" class="ms-2 me-2">X</button>
+                </div>
+            </div>
                 <div class="table-responsive">
                 <table class="table" id="shipmentsTable">
                     <thead class="thead-dark">
@@ -665,50 +659,91 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-    // Lista de todos los botones de filtro
-    const filterButtons = document.querySelectorAll(".filterapply");
+      const tableRows = document.querySelectorAll("#shipmentsTable tbody tr");  // Filas de la tabla
 
-    filterButtons.forEach(button => {
-        button.addEventListener("click", function () {
-            // Obtener el ID del botón y el campo de texto correspondiente
-            const filterId = this.id.replace("apply", "input");
-            const filterInput = document.getElementById(filterId);
+      // Función común para aplicar filtros
+      function applyFilter(inputId, buttonId, columnIndex) {
+          const inputFilter = document.getElementById(inputId);  // Campo de filtro
+          const applyButton = document.getElementById(buttonId);  // Botón "Apply"
 
-            if (!filterInput) {
-                alert(`No se encontró el campo de entrada asociado al filtro con ID: ${filterId}`);
-                return;
-            }
+          const $activeFilterDiv = $('#activeFilterDiv');
+          const $activeFilterText = $('#activeFilterText');
+          const $closeActiveFilterButton = $('#closeActiveFilter');
 
-            const filterValue = filterInput.value.trim();
+          // Lógica para aplicar el filtro
+          if (applyButton) {
+              applyButton.addEventListener("click", function () {
+                  const filterValue = inputFilter.value.trim().toLowerCase();  // Obtener el valor y convertirlo a minúsculas
 
-            if (filterValue) {
-                // Aplica el filtro
-                applyFilter(filterId, filterValue);
-            } else {
-                // Muestra un mensaje si no se ingresó valor
-                alert("Por favor, ingresa un valor antes de aplicar el filtro.");
-            }
-        });
-    });
+                  if (filterValue) {
+                      console.log("Filtro aplicado: " + filterValue);
 
-    // Función para aplicar el filtro
-    function applyFilter(filterId, filterValue) {
-        console.log(`Filtro aplicado: ${filterId} con valor: ${filterValue}`);
+                      // Mostrar el filtro aplicado con el texto "Filtro: "
+                      $activeFilterText.text("Filtro: " + inputFilter.placeholder + ": " + filterValue);
+                      $activeFilterDiv.show();
 
-        // Selecciona las filas de la tabla o los elementos a filtrar
-        const rows = document.querySelectorAll(".table-row"); // Cambiar a tu selector real
+                      // Filtrar las filas de la tabla
+                      tableRows.forEach(row => {
+                          const cell = row.cells[columnIndex];  // Columna correspondiente
 
-        rows.forEach(row => {
-            const cell = row.querySelector(`[data-filter="${filterId}"]`);
-            if (cell) {
-                const text = (cell.textContent || cell.innerText).toLowerCase();
-                // Compara el texto del filtro (ignorando mayúsculas)
-                row.style.display = text.includes(filterValue.toLowerCase()) ? "" : "none";
-            }
+                          if (cell) {
+                              const cellText = cell.textContent || cell.innerText;  // Obtener texto de la celda
+                              if (cellText.toLowerCase().includes(filterValue)) {
+                                  row.style.display = "";  // Mostrar la fila si coincide con el filtro
+                              } else {
+                                  row.style.display = "none";  // Ocultar la fila si no coincide
+                              }
+                          }
+                      });
+                  } else {
+                      // Si no hay valor en el filtro, mostrar todas las filas
+                      tableRows.forEach(row => row.style.display = "");
+                      $activeFilterDiv.hide();  // Ocultar la sección de filtro aplicado si no hay filtro
+                  }
+              });
+          }
+
+          // Lógica para cerrar el filtro y resetear la tabla al hacer clic en la "X"
+          if ($closeActiveFilterButton) {
+              $closeActiveFilterButton.on('click', function () {
+                  // Limpiar el campo de filtro y mostrar todas las filas
+                  inputFilter.value = "";
+                  tableRows.forEach(row => row.style.display = "");
+
+                  // Ocultar la sección de filtro aplicado
+                  $activeFilterDiv.hide();
+              });
+          }
+      }
+
+      // Llamar a la función de filtro para cada uno de los filtros
+      applyFilter('inputapplyshipmenttypefilter', 'applyshipmenttypefilter', 0);  // Filtro por Shipment Type
+      applyFilter('inputapplystmfilter', 'applystmfilter', 1);  // Filtro por STM ID
+      applyFilter('inputapplysecondaryshipmentidfilter', 'applysecondaryshipmentidfilter', 2);  // Filtro por Secondary Shipment ID
+      applyFilter('inputapplylandstarreferencefilter', 'applylandstarreferencefilter', 3);  // Filtro por Landstar Reference
+      applyFilter('inputapplyoriginfilter', 'applyoriginfilter', 4);  // Filtro por Origin
+      applyFilter('inputapplytraileridfilter', 'applytraileridfilter', 5);  // Filtro por Trailer ID
+      applyFilter('inputdestinationfilter', 'applydestinationfilter', 6);  // Filtro por Destination
+      applyFilter('inputapplyprealertfilter', 'applyprealertfilter', 7);  // Filtro por Pre-Alert Date & Time
+      applyFilter('inputapplycarrierfilter', 'applycarrierfilter', 8);  // Filtro por Carrier Dropping Trailer
+      applyFilter('inputapplytrailerownerfilter', 'applytrailerownerfilter', 9);  // Filtro por Trailer Owner
+      applyFilter('inputapplydrivertruckfilter', 'applydrivertruckfilter', 10);  // Filtro por Driver & Truck
+      applyFilter('inputapplypickupfilter', 'applypickupfilter', 11);  // Filtro por Pick-up Location
+
+      // Evento para el botón de refresh
+    const refreshButton = document.getElementById("refreshshipmentstable");
+    if (refreshButton) {
+        refreshButton.addEventListener("click", function () {
+            // Recargar la tabla, por ejemplo, mostrando todas las filas y limpiando los filtros
+            tableRows.forEach(row => row.style.display = "");  // Mostrar todas las filas
+            const inputs = document.querySelectorAll('input');  // Obtener todos los campos de filtro
+            inputs.forEach(input => input.value = "");  // Limpiar los filtros
+            $('#activeFilterDiv').hide();  // Ocultar la sección del filtro activo
+            console.log("Tabla recargada");
         });
     }
-});
-</script>
+  });
+  </script>
 @endsection
 
 @section('custom-css')
