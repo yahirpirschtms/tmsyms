@@ -12,8 +12,11 @@
                 <!-- Centrar contenido horizontalmente -->
                 <div class="row justify-content-center">
                     <div class="col-md-6">
-                        <!-- Barra de búsqueda -->
-                        <input type="text" id="searchByStmId" class="form-control" placeholder="Search WH appt viewer">
+                        <!-- Barra de búsqueda modificada -->
+                        <div style="position: relative; display: inline-block; width: 100%;" class="me-4">
+                            <i class="fa-solid fa-magnifying-glass" style="position: absolute; top: 50%; left: 10px; transform: translateY(-50%); color: #6c757d; cursor: pointer;" onclick="document.getElementById('searchByStmId').focus()"></i>
+                            <input type="text" id="searchByStmId" class="form-control" placeholder="Search WH appt viewer" style="padding-left: 30px;">
+                        </div>
                     </div>
                 </div>
             </div>

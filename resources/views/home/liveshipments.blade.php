@@ -8,15 +8,73 @@
             <div class="my-4 d-flex justify-content-center align-items-center">
                 <h2 class="gradient-text text-capitalize fw-bolder" >Live Shipments</h2>
             </div>
-            <div class="container my-4">
-                <!-- Centrar contenido horizontalmente -->
-                <div class="row justify-content-center">
-                    <div class="col-md-6">
-                        <!-- Barra de búsqueda -->
-                        <input type="text" id="searchByShipment" class="form-control" placeholder="Search live shipments">
+            <div class="d-flex justify-content-end mt-4 mb-2">
+                <!-- Search Input for All Shipments -->
+                <div style="position: relative; display: inline-block; width: 100%;" class="me-4">
+                    <i class="fa-solid fa-magnifying-glass" style="position: absolute; top: 50%; left: 10px; transform: translateY(-50%); color: #6c757d; cursor: pointer;" onclick="document.getElementById('searchByShipment').focus()"></i>
+                    <input class="form-control" type="search" placeholder="Search Live Shipments" name="searchByShipment" id="searchByShipment" aria-label="Search" style="padding-left: 30px;">
+                </div>
+
+                <!-- Refresh Table Button -->
+                <button type="button" class="btn me-2 btn-primary" id="refreshshipmentstable" data-bs-toggle="tooltip" data-bs-placement="top" title="Refresh Table">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                </button>
+
+                <!-- Add More Filters Button -->
+                <button class="btn" id="addmorefiltersallshipments" style="color: white;background-color:orange;" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasaddmorefilters" aria-controls="offcanvasaddmorefilters">
+                    <i class="fa-solid fa-filter"></i>
+                </button>
+            </div>
+
+             <!--OffCanvas añadir más filtros-->
+             <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasaddmorefilters" aria-labelledby="offcanvasaddmorefiltersLabel">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title" id="offcanvasaddmorefiltersLabel">Add More Filters</h5>
+                    <button type="button" id="offcanvasaddmorefiltersclosebutton" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body">
+
+                    <!-- Filtro por Origin -->
+                    <div>
+                        <button class="btn btn-primary w-100 mb-2" id="closeapplystmfilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapsstmfilter" aria-expanded="false" aria-controls="multiCollapsstmfilter">Origin</button>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="collapse multi-collapse" id="multiCollapsstmfilter">
+                                    <input type="text" class="form-control" id="inputapplyoriginfilter">
+                                    <button class="btn btn-primary mt-2 filterapply" type="button" id="applyoriginfilter">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtro por Status-->
+                    <div>
+                        <button class="btn btn-primary w-100 mb-2" id="closeapplysecondaryshipmentidfilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapssecondaryshipmentidfilter" aria-expanded="false" aria-controls="multiCollapssecondaryshipmentidfilter">Status</button>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="collapse multi-collapse" id="multiCollapssecondaryshipmentidfilter">
+                                    <input type="text" class="form-control" id="inputapplystatusidfilter">
+                                    <button class="btn btn-primary mt-2 filterapply" type="button" id="applystatusidfilter">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtro por Driver -->
+                    <div>
+                        <button class="btn btn-primary w-100 mb-2" id="closeapplylandstarreferencefilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapslandstarreferencefilter" aria-expanded="false" aria-controls="multiCollapslandstarreferencefilter">Driver</button>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="collapse multi-collapse" id="multiCollapslandstarreferencefilter">
+                                    <input type="text" class="form-control" id="inputapplydriverfilter">
+                                    <button class="btn btn-primary mt-2 filterapply" type="button" id="applydriverfilter">Apply</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
+
 
            <!-- Contenedor de tarjetas -->
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="cardsContainer">
@@ -26,13 +84,11 @@
                         <div class="card">
                             <div class="card-body text-white bg-dark">
                                 <h5 class="card-title">{{ $shipment->stm_id }}</h5>
-                                <p class="card-subtitle mb-2">{{ $shipment->shipment_type }}</p>
-                                <h6 class="card-text">{{ $shipment->status }}</h6>
-                                <p>{{ $shipment->company->CoName ?? 'Origen no disponible' }}</p>
+                                <p class="origin">{{ $shipment->company->CoName ?? 'Origen no disponible' }}</p>
 
-                                {{ $shipment->currentStatus->gntc_description ?? 'Estado no disponible' }}</p>
+                                <p class="status">{{ $shipment->currentStatus->gntc_description ?? 'Estado no disponible' }}</p>
                                 <p>{{ $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y') : 'Approved ETA date no disponible' }}</p>
-                                <p>{{ $shipment->driver->drivername ?? 'Conductor no asignado' }}</p>
+                                <p class="driver">{{ $shipment->driver->drivername ?? 'Conductor no asignado' }}</p>
                                 <div class="d-flex justify-content-between">
                                     <button class="btn btn-primary btn-sm" data-bs-toggle="offcanvas"
                                         data-bs-target="#offcanvasUpdateStatus"
@@ -45,7 +101,11 @@
             </div>
         </div>
 
-
+        <div class="col-auto mt-2" id="activeFilterDiv" style="display:none;">
+            <div style="background-color:rgb(13, 82, 200); border-radius:0.5rem; width:fit-content; display:flex; flex-wrap:nowrap; align-items:center" class="input-group mb-3 me-2">
+                <span id="activeFilterText" style="color:white; font-size: small;" class="ms-2 me-2"></span>
+                <button id="closeActiveFilter" style="background-color:unset; color:white; font-size: small;" class="ms-2 me-2">X</button>
+        </div>
         <!-- Offcanvas para Update Status -->
         <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasUpdateStatus" aria-labelledby="offcanvasUpdateStatusLabel">
             <div class="offcanvas-header">
@@ -437,6 +497,86 @@
             });
         });
     </script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const cardsContainer = document.getElementById("cardsContainer");  // Contenedor de las tarjetas
+        const cardElements = cardsContainer.querySelectorAll(".card");  // Todas las tarjetas dentro del contenedor
+
+        // Función común para aplicar filtros
+        function applyFilter(inputId, buttonId, filterClass) {
+            const inputFilter = document.getElementById(inputId);  // Campo de filtro
+            const applyButton = document.getElementById(buttonId);  // Botón "Apply"
+            const $activeFilterDiv = $('#activeFilterDiv');
+            const $activeFilterText = $('#activeFilterText');
+            const $closeActiveFilterButton = $('#closeActiveFilter');
+
+            // Lógica para aplicar el filtro
+            if (applyButton) {
+                applyButton.addEventListener("click", function () {
+                    const filterValue = inputFilter.value.trim().toLowerCase();  // Obtener el valor y convertirlo a minúsculas
+
+                    if (filterValue) {
+                        console.log("Filtro aplicado: " + filterValue);
+
+                        // Mostrar el filtro aplicado con el texto "Filtro: "
+                        $activeFilterText.text("Filtro" + inputFilter.placeholder + ": " + filterValue);
+                        $activeFilterDiv.show();
+
+                        // Filtrar las tarjetas
+                        cardElements.forEach(card => {
+                            const cardText = card.querySelector(filterClass) ? card.querySelector(filterClass).textContent : "";  // Obtener el texto de la clase de filtro
+
+                            if (cardText.toLowerCase().includes(filterValue)) {
+                                card.style.display = "";  // Mostrar la tarjeta si coincide con el filtro
+                            } else {
+                                card.style.display = "none";  // Ocultar la tarjeta si no coincide
+                            }
+                        });
+                    } else {
+                        // Si no hay valor en el filtro, mostrar todas las tarjetas
+                        cardElements.forEach(card => card.style.display = "");
+                        $activeFilterDiv.hide();  // Ocultar la sección de filtro aplicado si no hay filtro
+                    }
+                });
+            }
+
+            // Lógica para cerrar el filtro y resetear las tarjetas al hacer clic en la "X"
+            if ($closeActiveFilterButton) {
+                $closeActiveFilterButton.on('click', function () {
+                    // Limpiar el campo de filtro y mostrar todas las tarjetas
+                    inputFilter.value = "";
+                    cardElements.forEach(card => card.style.display = "");
+
+                    // Ocultar la sección de filtro aplicado
+                    $activeFilterDiv.hide();
+                });
+            }
+        }
+
+        // Filtro por Origin (Filtro basado en la clase .origin dentro de cada tarjeta)
+        applyFilter('inputapplyoriginfilter', 'applyoriginfilter', '.origin');  // Filtro por Origin
+
+        // Filtro por Status (Filtro basado en la clase .status dentro de cada tarjeta)
+        applyFilter('inputapplystatusidfilter', 'applystatusidfilter', '.status');  // Filtro por Status
+
+        // Filtro por Driver (Filtro basado en la clase .driver dentro de cada tarjeta)
+        applyFilter('inputapplydriverfilter', 'applydriverfilter', '.driver');  // Filtro por Driver
+
+        // Evento para el botón de refresh
+        const refreshButton = document.getElementById("refreshshipmentstable");
+        if (refreshButton) {
+            refreshButton.addEventListener("click", function () {
+                // Recargar las tarjetas, por ejemplo, mostrando todas las tarjetas y limpiando los filtros
+                cardElements.forEach(card => card.style.display = "");  // Mostrar todas las tarjetas
+                const inputs = document.querySelectorAll('input');  // Obtener todos los campos de filtro
+                inputs.forEach(input => input.value = "");  // Limpiar los filtros
+                $('#activeFilterDiv').hide();  // Ocultar la sección del filtro activo
+                console.log("Tarjetas recargadas");
+            });
+        }
+    });
+</script>
 @endsection
 
 @section('custom-css')

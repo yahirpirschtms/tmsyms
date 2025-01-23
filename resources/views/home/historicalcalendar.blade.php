@@ -12,8 +12,11 @@
             <!-- Centrar contenido horizontalmente -->
             <div class="row justify-content-center">
                 <div class="col-md-6">
-                    <!-- Barra de búsqueda -->
-                    <input type="text" id="searchByStmId" class="form-control" placeholder="Search Historical Calendar">
+                    <!-- Barra de búsqueda modificada -->
+                    <div style="position: relative; display: inline-block; width: 100%;" class="me-4">
+                        <i class="fa-solid fa-magnifying-glass" style="position: absolute; top: 50%; left: 10px; transform: translateY(-50%); color: #6c757d; cursor: pointer;" onclick="document.getElementById('searchByStmId').focus()"></i>
+                        <input type="text" id="searchByStmId" class="form-control" placeholder=" Search Historical Calendar" style="padding-left: 30px;">
+                    </div>
                 </div>
             </div>
         </div>
@@ -50,7 +53,7 @@
                     <div class="tab-pane fade show active" id="pills-shipment-details{{ $shipment->stm_id }}" role="tabpanel" aria-labelledby="pills-shipment-details-tab{{ $shipment->stm_id }}">
                         <div class="mb-3">
                             <label class="form-label">STM ID</label>
-                            <p>{{ $shipment->service->id_service }}</p>
+                            <p>{{ $shipment->stm_id }}</p>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Landstar Reference</label>

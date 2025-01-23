@@ -14,7 +14,7 @@
             <!-- Search Input for All Shipments -->
             <div style="position: relative; display: inline-block; width: 100%;" class="me-4">
                 <i class="fa-solid fa-magnifying-glass" style="position: absolute; top: 50%; left: 10px; transform: translateY(-50%); color: #6c757d; cursor: pointer;" onclick="document.getElementById('searchByShipment').focus()"></i>
-                <input class="form-control" type="search" placeholder="    Search By Filters" name="searchByShipment" id="searchByShipment" aria-label="Search" style="padding-left: 30px;">
+                <input class="form-control" type="search" placeholder="    Search WH Appoinment Viewer" name="searchByShipment" id="searchByShipment" aria-label="Search" style="padding-left: 30px;">
             </div>
 
             <!-- Export Button -->
@@ -743,7 +743,55 @@
         });
     }
   });
-  </script>
+</script>
+
+<script>
+    document.getElementById('exportfile').addEventListener('click', function () {
+        // Obtén la tabla con el id "shipmentsTable"
+        var table = document.getElementById('shipmentsTable');
+
+        // Convierte la tabla HTML en una hoja de cálculo de Excel
+        var wb = XLSX.utils.table_to_book(table, { sheet: "Shipments" });
+
+        // Aplica formato a las columnas de fechas
+        var ws = wb.Sheets["Shipments"];
+
+        // Recorre todas las filas y aplica formato a las columnas de fechas
+        var range = XLSX.utils.decode_range(ws['!ref']); // Obtiene el rango de la hoja
+        for (var row = range.s.r + 1; row <= range.e.r; row++) {
+            // Lista de columnas que contienen fechas (índices)
+            var dateColumns = [7, 11, 16, 17, 18, 19, 20, 21, 24, 26, 27];
+
+            // Recorre cada columna de fechas y aplica el formato
+            dateColumns.forEach(function(colIndex) {
+                var cellAddress = { r: row, c: colIndex };
+                var cell = ws[XLSX.utils.encode_cell(cellAddress)];
+                if (cell) {
+                    cell.z = "yyyy-mm-dd hh:mm:ss"; // El formato de fecha y hora
+                }
+            });
+        }
+
+        // Obtén la fecha y hora actuales
+        var now = new Date();
+        var year = now.getFullYear();
+        var month = String(now.getMonth() + 1).padStart(2, '0'); // Mes con 2 dígitos
+        var day = String(now.getDate()).padStart(2, '0');       // Día con 2 dígitos
+        var hours = String(now.getHours()).padStart(2, '0');    // Horas con 2 dígitos
+        var minutes = String(now.getMinutes()).padStart(2, '0');// Minutos con 2 dígitos
+        var seconds = String(now.getSeconds()).padStart(2, '0');// Segundos con 2 dígitos
+
+        // Formato: MM-DD-YYYY_HH-MM-SS
+        var formattedDateTime = `${month}${day}${year}_${hours}-${minutes}-${seconds}`;
+
+        // Define el nombre del archivo con fecha y hora
+        var filename = `Shipments_${formattedDateTime}.xlsx`;
+
+        // Exporta el archivo Excel
+        XLSX.writeFile(wb, filename);
+    });
+</script>
+
 @endsection
 
 @section('custom-css')
