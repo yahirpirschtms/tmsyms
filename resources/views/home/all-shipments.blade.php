@@ -9,18 +9,209 @@
         <div class="d-flex justify-content-center my-4">
             <h2 class="gradient-text text-capitalize fw-bolder">All Shipments</h2>
         </div>
-        <div class="container my-4">
-            <!-- Centrar contenido horizontalmente -->
-            <div class="row justify-content-center">
-                <div class="col-md-6">
-                    <!-- Barra de búsqueda -->
-                    <input type="text" id="searchByShipment" class="form-control" placeholder="Search all shipments">
-                </div>
+         <!-- Botones Añadir y Refresh -->
+         <div class="d-flex justify-content-end mt-4 mb-2">
+            <!-- Search Input for All Shipments -->
+            <div style="position: relative; display: inline-block; width: 100%;" class="me-4">
+                <i class="fa-solid fa-magnifying-glass" style="position: absolute; top: 50%; left: 10px; transform: translateY(-50%); color: #6c757d; cursor: pointer;" onclick="document.getElementById('searchByShipment').focus()"></i>
+                <input class="form-control" type="search" placeholder="    Search By Filters" name="searchByShipment" id="searchByShipment" aria-label="Search" style="padding-left: 30px;">
             </div>
+
+            <!-- Export Button -->
+            <button type="button" class="btn me-2 btn-success" id="exportfile" data-bs-toggle="tooltip" data-bs-placement="top" title="Export File">
+                <i class="fa-solid fa-file-export"></i>
+            </button>
+
+            <!-- Refresh Table Button -->
+            <button type="button" class="btn me-2 btn-primary" id="refreshshipmentstable" data-bs-toggle="tooltip" data-bs-placement="top" title="Refresh Table">
+                <i class="fa-solid fa-arrows-rotate"></i>
+            </button>
+
+            <!-- Add More Filters Button -->
+            <button class="btn" id="addmorefiltersallshipments" style="color: white;background-color:orange;" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasaddmorefilters" aria-controls="offcanvasaddmorefilters">
+                <i class="fa-solid fa-filter"></i>
+            </button>
         </div>
 
+            <!--OffCanvas añadir más filtros-->
+            <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasaddmorefilters" aria-labelledby="offcanvasaddmorefiltersLabel">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title" id="offcanvasaddmorefiltersLabel">Add More Filters</h5>
+                    <button type="button" id="offcanvasaddmorefiltersclosebutton" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <!-- Filtro por Shipment Type -->
+                    <div>
+                        <button class="btn btn-primary w-100 mb-2" id="closeapplyshipmenttypefilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapsshipmenttypefilter" aria-expanded="false" aria-controls="multiCollapsshipmenttypefilter">Shipment Type</button>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="collapse multi-collapse" id="multiCollapsshipmenttypefilter">
+                                    <input type="text" class="form-control" id="inputapplyshipmenttypefilter">
+                                    <button class="btn btn-primary mt-2 filterapply" type="button" id="applyshipmenttypefilter">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-            <div class="table-responsive">
+                    <!-- Filtro por STM ID -->
+                    <div>
+                        <button class="btn btn-primary w-100 mb-2" id="closeapplystmfilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapsstmfilter" aria-expanded="false" aria-controls="multiCollapsstmfilter">STM ID</button>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="collapse multi-collapse" id="multiCollapsstmfilter">
+                                    <input type="text" class="form-control" id="inputapplystmfilter">
+                                    <button class="btn btn-primary mt-2 filterapply" type="button" id="applystmfilter">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtro por Secondary Shipment ID -->
+                    <div>
+                        <button class="btn btn-primary w-100 mb-2" id="closeapplysecondaryshipmentidfilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapssecondaryshipmentidfilter" aria-expanded="false" aria-controls="multiCollapssecondaryshipmentidfilter">Secondary Shipment ID</button>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="collapse multi-collapse" id="multiCollapssecondaryshipmentidfilter">
+                                    <input type="text" class="form-control" id="inputapplysecondaryshipmentidfilter">
+                                    <button class="btn btn-primary mt-2 filterapply" type="button" id="applysecondaryshipmentidfilter">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtro por Landstar Reference -->
+                    <div>
+                        <button class="btn btn-primary w-100 mb-2" id="closeapplylandstarreferencefilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapslandstarreferencefilter" aria-expanded="false" aria-controls="multiCollapslandstarreferencefilter">Landstar Reference</button>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="collapse multi-collapse" id="multiCollapslandstarreferencefilter">
+                                    <input type="text" class="form-control" id="inputapplylandstarreferencefilter">
+                                    <button class="btn btn-primary mt-2 filterapply" type="button" id="applylandstarreferencefilter">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtro por Origin -->
+                    <div>
+                        <button class="btn btn-primary w-100 mb-2" id="closeapplyoriginfilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapsoriginfilter" aria-expanded="false" aria-controls="multiCollapsoriginfilter">Origin</button>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="collapse multi-collapse" id="multiCollapsoriginfilter">
+                                    <input type="text" class="form-control" id="inputapplyoriginfilter">
+                                    <button class="btn btn-primary mt-2 filterapply" type="button" id="applyoriginfilter">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtro por Trailer ID -->
+                    <div>
+                        <button class="btn btn-primary w-100 mb-2" id="closeapplytraileridfilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapstraileridfilter" aria-expanded="false" aria-controls="multiCollapstraileridfilter">Trailer ID</button>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="collapse multi-collapse" id="multiCollapstraileridfilter">
+                                    <input type="text" class="form-control" id="inputapplytraileridfilter">
+                                    <button class="btn btn-primary mt-2 filterapply" type="button" id="applytraileridfilter">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtro por Destination -->
+                    <div>
+                        <button class="btn btn-primary w-100 mb-2" id="closeapplydestinationfilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapsdestinationfilter" aria-expanded="false" aria-controls="multiCollapsdestinationfilter">Destination</button>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="collapse multi-collapse" id="multiCollapsdestinationfilter">
+                                    <input type="text" class="form-control" id="inputapplydestinationfilter">
+                                    <button class="btn btn-primary mt-2 filterapply" type="button" id="applydestinationfilter">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtro por Pre-Alert Date & Time -->
+                    <div>
+                        <button class="btn btn-primary w-100 mb-2" id="closeapplyprealertfilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapsprealertfilter" aria-expanded="false" aria-controls="multiCollapsprealertfilter">Pre-Alert Date & Time</button>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="collapse multi-collapse" id="multiCollapsprealertfilter">
+                                    <input type="text" class="form-control datetimepicker" id="inputapplyprealertfilter" placeholder="Select Date">
+                                    <button class="btn btn-primary mt-2 filterapply" type="button" id="applyprealertfilter">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtro por Carrier Dropping Trailer -->
+                    <div>
+                        <button class="btn btn-primary w-100 mb-2" id="closeapplycarrierfilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapscarrierfilter" aria-expanded="false" aria-controls="multiCollapscarrierfilter">Carrier Dropping Trailer</button>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="collapse multi-collapse" id="multiCollapscarrierfilter">
+                                    <input type="text" class="form-control" id="inputapplycarrierfilter">
+                                    <button class="btn btn-primary mt-2 filterapply" type="button" id="applycarrierfilter">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtro por Trailer Owner -->
+                    <div>
+                        <button class="btn btn-primary w-100 mb-2" id="closeapplytrailerownerfilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapstrailerownerfilter" aria-expanded="false" aria-controls="multiCollapstrailerownerfilter">Trailer Owner</button>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="collapse multi-collapse" id="multiCollapstrailerownerfilter">
+                                    <input type="text" class="form-control" id="inputapplytrailerownerfilter">
+                                    <button class="btn btn-primary mt-2 filterapply" type="button" id="applytrailerownerfilter">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtro por Driver & Truck -->
+                    <div>
+                        <button class="btn btn-primary w-100 mb-2" id="closeapplydrivertruckfilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapsdrivertruckfilter" aria-expanded="false" aria-controls="multiCollapsdrivertruckfilter">Driver & Truck</button>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="collapse multi-collapse" id="multiCollapsdrivertruckfilter">
+                                    <input type="text" class="form-control" id="inputapplydrivertruckfilter">
+                                    <button class="btn btn-primary mt-2 filterapply" type="button" id="applydrivertruckfilter">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtro por Pick-up Location -->
+                    <div>
+                        <button class="btn btn-primary w-100 mb-2" id="closeapplypickupfilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapspickupfilter" aria-expanded="false" aria-controls="multiCollapspickupfilter">Pick-up Location</button>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="collapse multi-collapse" id="multiCollapspickupfilter">
+                                    <input type="text" class="form-control" id="inputapplypickupfilter">
+                                    <button class="btn btn-primary mt-2 filterapply" type="button" id="applypickupfilter">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtro por Empty Pickup -->
+                    <div>
+                        <button class="btn btn-primary w-100 mb-2" id="closeapplyemptypickupfilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapseemptypickupfilter" aria-expanded="false" aria-controls="multiCollapseemptypickupfilter">Empty Pickup</button>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="collapse multi-collapse" id="multiCollapseemptypickupfilter">
+                                    <input type="text" class="form-control" id="inputapplyemptypickupfilter">
+                                    <button class="btn btn-primary mt-2 filterapply" type="button" id="applyemptypickupfilter">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+                       <div class="table-responsive">
                 <table class="table" id="shipmentsTable">
                     <thead class="thead-dark">
                         <tr>
@@ -64,12 +255,12 @@
                         @foreach ($shipments as $shipment)
                         <tr data-bs-toggle="modal" data-bs-target="#shipmentModal{{ $shipment->stm_id }}" class="clickable-row" data-shipment-id="{{ $shipment->stm_id }}">
                             <td>{{ $shipment->gnct_id_shipment_type }}</td>
-                            <td>{{ $shipment->service->id_service }}</td>
+                            <td>{{ $shipment->stm_id }}</td>
                             <td>{{ $shipment->secondary_shipment_id }}</td>
                             <td>{{ $shipment->reference }}</td>
                             <td>{{ $shipment->company->CoName ?? 'Origen no disponible' }}</td>
                             <td>{{ $shipment->id_trailer }}</td>
-                            <td>{{ $shipment->destination }}</td>
+                            <td>{{ $shipment->destinationFacility->fac_name }}</td>
                             <td>{{ \Carbon\Carbon::parse($shipment->pre_alerted_datetime)->format('m/d/Y H:i') ?? 'No disponible' }}</td>
                             <td>{{ $shipment->carrier_dropping_trailer }}</td>
                             <td>{{ $shipment->trailer_owner }}</td>
@@ -93,9 +284,8 @@
                             <td>{{ $shipment->incident_notes }}</td>
                             <td>{{ $shipment->wh_status }}</td>
                             <td>{{ \Carbon\Carbon::parse($shipment->at_door_date)->format('H:i') }}</td>
-                            <td>{{ \Carbon\Carbon::parse($shipment->offload_date)->format('H:i') }}</td>
-                            <td>{{ \Carbon\Carbon::parse($shipment->billing_date)->format('m/d/Y') }}</td>
-
+                            <td>{{ \Carbon\Carbon::parse($shipment->offloading_time)->format('H:i') }}</td>
+                            <td>{{ $shipment->device_number }}</td>
                             <td>{{ $shipment->overhaul_id }}</td>
                         </tr>
                         @endforeach
@@ -133,7 +323,7 @@
                             <div class="tab-pane fade show active" id="pills-shipment-details" role="tabpanel" aria-labelledby="pills-shipment-details-tab">
                                 <div class="mb-3">
                                     <label class="form-label">STM ID</label>
-                                    <p>{{ $shipment->service->id_service }}</p>
+                                    <p>{{ $shipment->stm_id }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Reference</label>
@@ -241,7 +431,7 @@
                                 <form>
                                     <div class="mb-3">
                                         <label for="stm_id" class="form-label">STM ID</label>
-                                        <input type="text" class="form-control" id="stm_id" value="{{ $shipment->service->id_service }}" readonly>
+                                        <input type="text" class="form-control" id="stm_id" value="{{ $shipment->stm_id }}" readonly>
                                     </div>
 
                                     <div class="mb-3">
@@ -413,28 +603,28 @@
 
 @section('scripts')
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const searchInput = document.getElementById('searchByShipment');
-            const table = document.getElementById('shipmentsTable');
-            const rows = table.querySelectorAll('tbody tr');
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('searchByShipment');
+        const table = document.getElementById('shipmentsTable');
+        const rows = table.querySelectorAll('tbody tr');
 
-            searchInput.addEventListener('input', function () {
-                const searchText = this.value.toLowerCase();
+        searchInput.addEventListener('input', function () {
+            const searchText = this.value.toLowerCase();
 
-                rows.forEach(row => {
-                    // Verificar si alguna celda contiene el texto buscado
-                    const cells = row.querySelectorAll('td');
-                    const match = Array.from(cells).some(cell =>
-                        cell.textContent.toLowerCase().includes(searchText)
-                    );
+            rows.forEach(row => {
+                // Verificar si alguna celda contiene el texto buscado
+                const cells = row.querySelectorAll('td');
+                const match = Array.from(cells).some(cell =>
+                    cell.textContent.toLowerCase().includes(searchText)
+                );
 
-                    // Mostrar u ocultar la fila dependiendo de si coincide
-                    row.style.display = match ? '' : 'none';
-                });
+                // Mostrar u ocultar la fila dependiendo de si coincide
+                row.style.display = match ? '' : 'none';
             });
         });
-    </script>
+    });
+</script>
 
 <script>
     $(document).on('submit', '#shipmentForm', function (event) {

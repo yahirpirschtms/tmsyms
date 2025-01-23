@@ -50,7 +50,7 @@
                         <div class="tab-pane fade show active" id="pills-shipment-details{{ $shipment->stm_id }}" role="tabpanel" aria-labelledby="pills-shipment-details-tab{{ $shipment->stm_id }}">
                             <div class="mb-3">
                                 <label class="form-label">STM ID</label>
-                                <p>{{ $shipment->service->id_service }}</p>
+                                <p>{{ $shipment->stm_id }}</p>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Landstar Reference</label>

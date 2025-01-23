@@ -25,7 +25,7 @@
                         data-search="{{ $shipment->stm_id }} {{ $shipment->shipment_type }} {{ $shipment->status }} {{ $shipment->company->CoName ?? '' }} {{ $shipment->currentStatus->gntc_description ?? '' }} {{ $shipment->driver->drivername ?? '' }}">
                         <div class="card">
                             <div class="card-body text-white bg-dark">
-                                <h5 class="card-title">{{ $shipment->service->id_service }}</h5>
+                                <h5 class="card-title">{{ $shipment->stm_id }}</h5>
                                 <p class="card-subtitle mb-2">{{ $shipment->shipment_type }}</p>
                                 <h6 class="card-text">{{ $shipment->status }}</h6>
                                 <p>{{ $shipment->company->CoName ?? 'Origen no disponible' }}</p>
@@ -70,7 +70,7 @@
                     <form>
                         <div class="mb-3">
                             <label for="stm_id" class="form-label">STM ID</label>
-                            <input type="text" class="form-control" id="stm_id" value="{{ $shipment->service->id_service ?? 'STM ID no disponible' }}" readonly>
+                            <input type="text" class="form-control" id="stm_id" value="{{ $shipment->stm_id ?? 'STM ID no disponible' }}" readonly>
                         </div>
 
                         <div class="mb-3">
@@ -237,7 +237,7 @@
                 <div class="tab-pane fade show active" id="pills-shipment-details" role="tabpanel" aria-labelledby="pills-shipment-details-tab">
                     <div class="mb-3">
                         <label class="form-label">STM ID</label>
-                        <p>{{ $shipment->service->id_service }}</p>
+                        <p>{{ $shipment->stm_id }}</p>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Reference</label>

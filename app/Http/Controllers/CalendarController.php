@@ -45,7 +45,7 @@ class CalendarController extends Controller
                     : 'Unknown';
 
                 return [
-                    'title' => 'STM ID: ' . $shipment->service->id_service,
+                    'title' => 'STM ID: ' . $shipment->stm_id,
                     'start' => $etd->format('Y-m-d\TH:i:s'),
                     'end' => $etd->addHours(1)->format('Y-m-d\TH:i:s'),
                     'extendedProps' => [
@@ -102,7 +102,7 @@ class CalendarController extends Controller
                 $statusDescription = $statusCatalog[$shipment->gnct_id_current_status]->gntc_value ?? 'Unknown';
 
                 return [
-                    'title' => 'STM ID: ' . $shipment->service->id_service,
+                    'title' => 'STM ID: ' . $shipment->stm_id,
                     'start' => $etd->format('Y-m-d\TH:i:s'),
                     'end' => $etd->addHours(1)->format('Y-m-d\TH:i:s'),
                     'extendedProps' => [
