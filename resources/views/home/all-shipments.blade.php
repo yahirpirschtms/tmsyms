@@ -124,7 +124,7 @@
                         <div class="row mb-2">
                             <div class="col">
                                 <div class="collapse multi-collapse" id="multiCollapsdestinationfilter">
-                                    <input type="text" class="form-control" id="inputapplydestinationfilter">
+                                    <input type="text" class="form-control" id="inputdestinationfilter">
                                     <button class="btn btn-primary mt-2 filterapply" type="button" id="applydestinationfilter">Apply</button>
                                 </div>
                             </div>
@@ -196,22 +196,11 @@
                         </div>
                     </div>
 
-                    <!-- Filtro por Empty Pickup -->
-                    <div>
-                        <button class="btn btn-primary w-100 mb-2" id="closeapplyemptypickupfilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapseemptypickupfilter" aria-expanded="false" aria-controls="multiCollapseemptypickupfilter">Empty Pickup</button>
-                        <div class="row mb-2">
-                            <div class="col">
-                                <div class="collapse multi-collapse" id="multiCollapseemptypickupfilter">
-                                    <input type="text" class="form-control" id="inputapplyemptypickupfilter">
-                                    <button class="btn btn-primary mt-2 filterapply" type="button" id="applyemptypickupfilter">Apply</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+
                 </div>
             </div>
 
-                       <div class="table-responsive">
+                <div class="table-responsive">
                 <table class="table" id="shipmentsTable">
                     <thead class="thead-dark">
                         <tr>
@@ -672,6 +661,53 @@
             },
         });
     });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+    // Lista de todos los botones de filtro
+    const filterButtons = document.querySelectorAll(".filterapply");
+
+    filterButtons.forEach(button => {
+        button.addEventListener("click", function () {
+            // Obtener el ID del botón y el campo de texto correspondiente
+            const filterId = this.id.replace("apply", "input");
+            const filterInput = document.getElementById(filterId);
+
+            if (!filterInput) {
+                alert(`No se encontró el campo de entrada asociado al filtro con ID: ${filterId}`);
+                return;
+            }
+
+            const filterValue = filterInput.value.trim();
+
+            if (filterValue) {
+                // Aplica el filtro
+                applyFilter(filterId, filterValue);
+            } else {
+                // Muestra un mensaje si no se ingresó valor
+                alert("Por favor, ingresa un valor antes de aplicar el filtro.");
+            }
+        });
+    });
+
+    // Función para aplicar el filtro
+    function applyFilter(filterId, filterValue) {
+        console.log(`Filtro aplicado: ${filterId} con valor: ${filterValue}`);
+
+        // Selecciona las filas de la tabla o los elementos a filtrar
+        const rows = document.querySelectorAll(".table-row"); // Cambiar a tu selector real
+
+        rows.forEach(row => {
+            const cell = row.querySelector(`[data-filter="${filterId}"]`);
+            if (cell) {
+                const text = (cell.textContent || cell.innerText).toLowerCase();
+                // Compara el texto del filtro (ignorando mayúsculas)
+                row.style.display = text.includes(filterValue.toLowerCase()) ? "" : "none";
+            }
+        });
+    }
+});
 </script>
 @endsection
 
