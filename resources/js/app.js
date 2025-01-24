@@ -10,8 +10,11 @@ window.bootstrap = bootstrap; // Esto hace que Bootstrap sea accesible desde win
 window.Popper = createPopper;  // Hace que Popper esté disponible globalmente
 window.XLSX = XLSX; // Hace que XLSX esté disponible globalmente
 
+
 import '@fortawesome/fontawesome-free/scss/fontawesome.scss';
 import '@fortawesome/fontawesome-free/scss/brands.scss';
 import '@fortawesome/fontawesome-free/scss/regular.scss';
 import '@fortawesome/fontawesome-free/scss/solid.scss';
 import '@fortawesome/fontawesome-free/scss/v4-shims.scss';
+
+

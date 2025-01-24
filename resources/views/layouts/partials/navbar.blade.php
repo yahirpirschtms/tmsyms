@@ -21,21 +21,18 @@
                     <a class="nav-link mx-lg-2 text-light" aria-current="page" href="{{ route('emptytrailer') }}">Empty Trailer</a>
                   </li>
 
-                  <!--Trailer Status-->
-                  <!--<li class="nav-item ">
-                    <a class="nav-link mx-lg-2 text-light" aria-current="page" href="{{ route('workflowtrafficstart') }}"> Shipments</a>
-                  </li>-->
 
                   <!--options shipments-->
-                  <li class="nav-item dropdown ">
+                  <li class="nav-item dropdown">
                     <a class="nav-link mx-lg-2 text-light" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                      Shipments
+                        Shipments
                     </a>
                     <ul class="ms-4 dropdown-menu dropdown-menu-start" style="background-color: #1e4877; border:none">
-                      <li><a class="dropdown-item" href="{{ route('workflowtrafficstart') }}">Traffic Workflow Start</a></li>
-                      <li><a class="dropdown-item" href="#">Shipments</a></li>
+                        <li><a class="dropdown-item" href="#">Traffic Workflow Start</a></li>
+                        <li><a class="dropdown-item" href="{{ route('liveshipments') }}">Live Shipments</a></li>
+                        <li><a class="dropdown-item" href="{{ route('all-shipments') }}">All Shipments</a></li>
                     </ul>
-                  </li>
+                </li>
 
                   <!--options catalog-->
                   <li class="nav-item mx-lg-2 dropdown ">
@@ -56,9 +53,9 @@
                       Appoinment Viewer
                     </a>
                     <ul class="ms-4 dropdown-menu dropdown-menu-start" style="background-color: #1e4877; border:none">
-                      <li><a class="dropdown-item text-light" href="{{ route('whapptapproval') }}">WH Appot Approval</a></li>
-                      <li><a class="dropdown-item text-light" href="#">WH Appointment Viewer</a></li>
-                      <li><a class="dropdown-item text-light" href="#">Historical Calendar Viewer</a></li>
+                      <li><a class="dropdown-item text-light" href="#">WH Appointment Approval</a></li>
+                      <li><a class="dropdown-item text-light" href="{{ route('calendar.view') }}">WH Appointment Viewer</a></li>
+                      <li><a class="dropdown-item text-light" href="{{ route('historicalcalendar.view') }}">Historical Calendar Viewer</a></li>
                     </ul>
                   </li>
 
@@ -97,7 +94,7 @@
             </div>
             <div class="modal-body">
             <p>Bienvenido {{auth()->user()->username ?? auth()->user()->username}}</p>
-                
+
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

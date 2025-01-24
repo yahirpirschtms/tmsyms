@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'App')</title>
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -15,6 +16,14 @@
         'resources/sass/app.scss',
         'resources/js/app.js'
         ])
+    <!-- Cargar FullCalendar 5.x con los plugins necesarios -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/interaction@5.11.0/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@5.11.0/main.min.js"></script>
+    <!-- SweetAlert2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
       .gradient-text {
@@ -77,6 +86,26 @@
         color: white;
         position: relative;
       }
+
+
+      .offcanvasUpdateStatus {
+            background-color: #212529;
+            color: white;
+            width: 300px;
+        }
+
+        .offcanvasUpdateStatus .form-label {
+            color: #f8f9fa;
+        }
+        .offcanvasDetails {
+            background-color: #212529;
+            color: white;
+            width: 300px;
+        }
+
+        .ooffcanvasDetails .form-label {
+            color: #f8f9fa;
+        }
       .nav-link:hover, .nav-link:active, .dropdown-item:hover, .dropdown-item:active{
         /*color: #000;*/
         color: white;
@@ -115,7 +144,7 @@
           width: 85%;
         }
       }
-      
+
       @media (min-width: 991px) {
         .nav-link::before, .dropdown-item::before{
           content: "";
@@ -231,13 +260,13 @@
     th {
       font-size: 14px; /* Encabezados más pequeños */
     }
-    
+
     td {
       font-size: 13px; /* Celdas más pequeñas */
     }
   }
   /* Cambiar fondo y texto */
-  
+
 .tooltip-inner {
     background-color: rgb(13, 82, 200);;  /* Fondo azul */
     color: #fff;  /* Texto blanco */
@@ -262,18 +291,73 @@
     padding: 20px; /* Añade un poco de espacio interno */
 }
 
-    </style>
+
+
+
+
+      table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  td {
+    padding: 10px;
+    text-align: left;
+    border: none;
+  }
+
+  th {
+    padding: 10px;
+    text-align: left;
+    font-size: 15px;
+    background-color: #f8f9fa;
+    font-weight: bold;
+    white-space: nowrap; /* Evita que el texto se envuelva */
+    border-bottom: 2px solid #000;
+
+    /* Fija el encabezado al desplazarse verticalmente */
+    position: sticky;
+    top: 0; /* Fija el encabezado en la parte superior */
+    z-index: 1; /* Asegura que el encabezado esté sobre las celdas */
+  }
+
+  td {
+    font-size: 14px;
+    white-space: nowrap; /* Evita que el texto se envuelva */
+  }
+  /* Estilo para pantallas menores o iguales a 768px */
+  @media screen and (max-width: 768px) {
+    th {
+      font-size: 14px; /* Encabezados más pequeños */
+    }
+
+    td {
+      font-size: 13px; /* Celdas más pequeñas */
+    }
+  }
+
+
+</style>
 </head>
 <body>
 
       @include('layouts.partials.navbar')
       <div style="margin-top: 120px;">
         @yield('content')
+
       </div>
-      
+
       <!-- Aquí se cargarán los scripts específicos de cada página -->
       @yield('scripts')
 
 </body>
+
+
 </html>
+
+
+
+
+
+
 
