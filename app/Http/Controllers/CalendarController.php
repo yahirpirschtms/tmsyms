@@ -13,12 +13,12 @@ class CalendarController extends Controller
     public function calendarshow()
     {
         if (Auth::check()) {
-            // Obtener el ID del estado 'Finalized' desde el catálogo
-            $finalizedStatus = GenericCatalog::where('gntc_value', 'Finalized')
+            // Obtener el ID del estado 'Delivered' desde el catálogo
+            $finalizedStatus = GenericCatalog::where('gntc_value', 'Delivered')
                 ->where('gntc_group', 'STATUS_E_REPORT')
                 ->first();
 
-            // Filtrar los envíos que no tienen el estado 'Finalized'
+            // Filtrar los envíos que no tienen el estado 'Delivered'
             $shipments = Shipment::where('gnct_id_current_status', '!=', $finalizedStatus->gnct_id)->get();
             $currentStatus = GenericCatalog::where('gntc_group', 'STATUS_E_REPORT')->get();
 

@@ -279,15 +279,15 @@
 
         <!-- Modal para ver los detalles del envío -->
         @foreach ($shipments as $shipment)
-        <div class="modal fade" id="shipmentModal{{ $shipment->stm_id }}" tabindex="-1" aria-labelledby="shipmentModalLabel{{ $shipment->stm_id }}" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
+            <div class="modal fade" id="shipmentModal{{ $shipment->stm_id }}" tabindex="-1" aria-labelledby="shipmentModalLabel{{ $shipment->stm_id }}" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
                         <h5 class="modal-title" id="shipmentModalLabel{{ $shipment->stm_id }}">Shipment Details - {{ $shipment->stm_id }}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
+                        </div>
 
-                    <div class="modal-body">
+                        <div class="modal-body">
                         <!-- Pestañas de detalle -->
                         <ul class="nav nav-pills mb-3" id="pills-tab{{ $shipment->stm_id }}" role="tablist">
                             <li class="nav-item" role="presentation">
@@ -574,7 +574,7 @@
                 </div>
             </div>
         </div>
-        @endforeach
+      @endforeach
 
 
     @endauth
