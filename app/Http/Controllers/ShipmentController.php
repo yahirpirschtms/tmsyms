@@ -28,6 +28,8 @@ class ShipmentController extends Controller
         return redirect('/login');
 
     }
+
+    //Cambiar a la pantalla de creacion empty trailes
     public function emptytrailershow()
     {
         if(Auth::check()){
@@ -36,21 +38,8 @@ class ShipmentController extends Controller
         return redirect('/login');
 
     }
-    /*public function createWorkflowStartWithEmptyTrailer(Request $request)
-    {
-        if (Auth::check()) {
-            // Recuperar los datos enviados por la URL o sessionStorage
-            $origin = $request->query('origin', session('shipment_origin'));
-            $trailerId = $request->query('trailerId', session('trailer_id'));
 
-            // Pasar los datos a la vista
-            return view('home.trafficworkflowstart', compact('origin', 'trailerId'));
-        }
-
-        return redirect('/login');
-    }*/
-
-    //Funcione rellenar campos con el empty trailer
+    //Funcione rellenar campos del shipment con el empty trailer
     public function createWorkflowStartWithEmptyTrailer(Request $request){
         if (Auth::check()) {
             // Recuperar los datos de la URL o de la sesión
@@ -62,8 +51,8 @@ class ShipmentController extends Controller
             $availability = $request->query('availability', session(''));
             $location = $request->query('location', session('shipment_origin'));
             $datein = $request->query('datein', session(''));
-            $dateout = $request->query('dateout', session(''));
-            $transaction = $request->query('transaction', session(''));
+            //$dateout = $request->query('dateout', session(''));
+            //$transaction = $request->query('transaction', session(''));
             $username = $request->query('username', session(''));
             
             // Verificar si la solicitud proviene del botón (usamos una bandera)
@@ -71,7 +60,7 @@ class ShipmentController extends Controller
 
             // Pasar los datos a la vista
             return view('home.trafficworkflowstart', compact('trailerId', 'status', 'palletsontrailer', 
-            'palletsonfloor', 'carrier', 'availability', 'location', 'datein', 'dateout', 'transaction', 'username',  'from_button'));
+            'palletsonfloor', 'carrier', 'availability', 'location', 'datein',/* 'dateout', 'transaction',*/ 'username',  'from_button'));
         }
 
         return redirect('/login');
@@ -96,18 +85,18 @@ class ShipmentController extends Controller
     {
         // Validación de los datos
         $validatedData = $request->validate([
-            'inputshipmentstmid' => 'nullable',
-            'inputshipmentshipmenttype' => 'nullable',
+            'inputshipmentstmid' => 'required|unique:shipments,stm_id|exists:services,id_service',
+            'inputshipmentshipmenttype' => 'required|exists:generic_catalogs,gnct_id',
             'inputshipmentreference' => 'nullable',
             'inputshipmentcheckbonded' => 'nullable',
-            'inputorigin' => 'required',
-            'inputshipmentdestination' => 'nullable',
+            'inputorigin' => 'required|exists:companies,pk_company',
+            'inputshipmentdestination' => 'required|exists:facilities,fac_id',
             'inputshipmentprealertdatetime' => 'required|date',
-            'inputidtrailer' => 'required|exists:empty_trailer,trailer_num',
-            'inputshipmentcarrier' => 'nullable',
-            'inputshipmenttrailer' => 'nullable',
+            'inputidtrailer' => 'required|unique:shipments,id_trailer|exists:empty_trailer,trailer_num',
+            'inputshipmentcarrier' => 'required|exists:companies,pk_company',
+            'inputshipmenttrailer' => 'required',
             'inputshipmenttruck' => 'nullable',
-            'inputshipmentdriver' => 'nullable',
+            'inputshipmentdriver' => 'nullable|exists:driver,pk_driver',
             'inputshipmentetd' => 'required|date',
             'inputshipmentsunits' => 'nullable',
             'inputpallets' => 'nullable',
@@ -115,16 +104,30 @@ class ShipmentController extends Controller
             'inputshipmentnotes' => 'nullable',
             'inputshipmentoverhaulid' => 'nullable',
             'inputshipmentdevicenumber' => 'nullable',
+            'inputshipmentcurrentstatus' => 'required|exists:generic_catalogs,gnct_id'
         ], [
             'inputidtrailer.required'=>'ID Trailer is required',
             'inputidtrailer.exists' =>'ID Trailer doesnt exists',
-            'inputshipmentshipmenttype' => 'Shipment Type is requiered',
-            'inputorigin' => 'Origin is required',
-            //'inputshipmentdestination' => 'Destination is required',
-            'inputshipmentprealertdatetime' => 'PreAlert Date is required',
-            //'inputshipmentstmid' => 'STM ID is required',
-            'inputshipmentetd' => 'Estimated date of departure is required',
-
+            'inputidtrailer.unique' =>'ID Trailer has already been taken',
+            'inputshipmentstmid.required'=>'ID STM is required',
+            'inputshipmentstmid.exists'=>'ID STM doesnt exists',
+            'inputshipmentstmid.unique'=>'ID STM has already been taken',
+            'inputshipmentshipmenttype.required' => 'Shipment Type is requiered',
+            'inputshipmentshipmenttype.exists' => 'Shipment Type doesnt exists',
+            'inputorigin.required' => 'Origin is required',
+            'inputorigin.exists' => 'Origin doesnt exists',
+            'inputshipmentdestination.required' => 'Destination is required',
+            'inputshipmentdestination.exists' => 'Destination doesnt exists',
+            'inputshipmentcarrier.required' => 'Carrier is required',
+            'inputshipmentcarrier.exists' => 'Carrier doesnt exists',
+            'inputshipmenttrailer.required' => 'Trailer Owner is required',
+            'inputshipmentdriver.exists' => 'Driver doesnt exists',
+            'inputshipmentprealertdatetime.required' => 'PreAlert Date is required',
+            'inputshipmentprealertdatetime.date' => 'Format no valid',
+            'inputshipmentetd.required' => 'Estimated date of departure is required',
+            'inputshipmentetd.date' => 'Estimated date of departure format is invalid',
+            'inputshipmentcurrentstatus.required' => 'Current Status is required',
+            'inputshipmentcurrentstatus.exists' => 'Current Status doesnt exists',
         ]);
 
         // Convertir las fechas al formato 'm/d/Y'
@@ -156,13 +159,17 @@ class ShipmentController extends Controller
             'notes' => $request->inputshipmentnotes,
             'overhaul_id' => $request->inputshipmentoverhaulid,
             'device_number' => $request->inputshipmentdevicenumber,
+            'gnct_id_current_status' => $request->inputshipmentcurrentstatus,
             
         ]);
 
         // Actualizar la tabla `empty_trailer` para el trailer correspondiente
-        // EmptyTrailer::where('trailer_num', $request->inputidtrailer)
-        // ->update(['availability' => 'NO']);
-
+        EmptyTrailer::where('trailer_num', $request->inputidtrailer)
+        ->update([
+            'availability' => 'Used',
+            'date_out' => now(), // Establece la fecha y hora actual
+            'transaction_date' => now() // También aquí
+        ]);
     
         // Redirigir con mensaje de éxito
         return redirect()->route('workflowtrafficstart')->with('success', 'Shipment successfully added!');
@@ -170,14 +177,11 @@ class ShipmentController extends Controller
 
     public function indexwhapptapproval(){
         if (Auth::check()) {
-            $shipments = Shipments::with(['shipmenttype', 'currentstatus', 'origin', 'carrier', 'emptytrailer', 'services'])
-            /*->whereHas('shipmenttype', function ($query) {
-                $query->where('shipment_type', 'Shipping');
+            $shipments = Shipments::with(['shipmenttype', 'currentstatus', 'origin', 'destinations', 'carrier', 'emptytrailer', 'services', 'driverowner', 'drivers'])
+            ->whereHas('destinations', function ($query) {
+                $query->where('fac_auth', 1); // Filtrar las relaciones destinations con fac_auth = 1
             })
-            ->whereNull('wu_auth_date') // Agregar la condición para wu_auth_date vacío
-            ->get();*/
-            //->where('shipment_type', 'Shipping') // Filtrar por shipment_type
-            //->whereNull('wh_auth_date') // Filtrar registros donde wu_auth_date esté vacío
+            ->whereNull('wh_auth_date')
             ->get();
             
             return view('home.whapptapproval', compact('shipments'));
@@ -191,14 +195,14 @@ class ShipmentController extends Controller
         // Validar los datos
         $validated = $request->validate([
             'pk_shipment' => 'required',
-            'id_trailer' => 'required',
-            'stm_id' =>  'nullable',
+            //'id_trailer' => 'required',
+            //'stm_id' =>  'nullable',
             'pallets' => 'required',
             'units' => 'required',
-            'etd' => 'required',
+            //'etd' => 'required',
             'wh_auth_date' => 'required',
         ], [
-            'id_trailer.required' => 'ID Trailer is required.',
+            //'id_trailer.required' => 'ID Trailer is required.',
             //'trailer_num.string' => 'El campo ID Trailer debe ser una cadena de texto.',
             //'trailer_num.max' => 'El campo ID Trailer no puede exceder los 50 caracteres.',
             //'stm_id.required' => 'La fecha de estatus es obligatoria.',
@@ -212,7 +216,7 @@ class ShipmentController extends Controller
             'units.required' => 'Units are rquired.',
             //'carrier.string' => 'El campo Carrier debe ser una cadena de texto.',
             //'carrier.max' => 'El campo Carrier no puede exceder los 50 caracteres.',
-            'etd.required' => 'ETD is required.',
+            //'etd.required' => 'ETD is required.',
             
             'wh_auth_date.required' => 'WH Auth Date is required.',
         ]);
@@ -224,9 +228,9 @@ class ShipmentController extends Controller
         /*$validated['status'] = $validated['status']
             ? Carbon::createFromFormat('m/d/Y', $validated['status'])->format('Y-m-d') 
             : null;*/
-        $validated['etd'] = $validated['etd'] 
+        /*$validated['etd'] = $validated['etd'] 
             ? Carbon::createFromFormat('m/d/Y H:i:s', $validated['etd'])->format('Y-m-d H:i:s') 
-            : null;
+            : null;*/
         $validated['wh_auth_date'] = $validated['wh_auth_date'] 
             ? Carbon::createFromFormat('m/d/Y H:i:s', $validated['wh_auth_date'])->format('Y-m-d H:i:s') 
             : null;
@@ -244,10 +248,13 @@ class ShipmentController extends Controller
     }
 
     public function getShipmentswh(Request $request){
-        $query = Shipments::with(['shipmenttype', 'currentstatus', 'origin', 'carrier', 'emptytrailer', 'services']);
-        //->where('shipment_type', 'Shipping') // Filtrar por shipment_type
-        //->whereNull('wh_auth_date') // Filtrar registros donde wu_auth_date esté vacío
-        
+        $query = Shipments::with(['shipmenttype', 'currentstatus', 'origin', 'destinations', 'carrier', 'emptytrailer', 'services', 'driverowner', 'drivers'])
+            // Aplicar filtro de 'fac_auth' directamente
+            ->whereHas('destinations', function ($query) {
+                    $query->where('fac_auth', 1); // Filtrar las relaciones destinations con fac_auth = 1
+            })
+            ->whereNull('wh_auth_date');
+
         // Filtros generales (searchemptytrailergeneral)
         if ($request->has('search')) {
             $search = $request->input('search');
@@ -290,7 +297,7 @@ class ShipmentController extends Controller
                 ->orWhere('wh_auth_date', 'like', $formattedDateTime)
                 //->orWhereNull('wh_auth_date')
 
-                ->orWhere('offlanding_time', 'like', "%$search%")
+                ->orWhere('offloading_time', 'like', "%$search%")
                 //->orWhereNull('offlanding_time')
 
                 ->orWhere('billing_date', 'like', $formattedDateTime)
@@ -401,7 +408,7 @@ class ShipmentController extends Controller
 
                 //$startDate = Carbon::createFromFormat('m/d/Y H:i:s',$request->input('offlanding_time_start'));
                 //$endDate = Carbon::createFromFormat('m/d/Y H:i:s',$request->input('offlanding_time_end'));
-            $query->whereBetween('offlanding_time', [
+            $query->whereBetween('offloading_time', [
                 $request->input('offlanding_time_start'),
                 $request->input('offlanding_time_end')
                 

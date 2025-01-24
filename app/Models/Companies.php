@@ -53,12 +53,17 @@ class Companies extends Model
     // Relación inversa con Shipments
     public function carrier()
     {
-        return $this->hasMany(Shipments::class, 'gnct_id_avaibility_indicator', 'gnct_id');
+        return $this->hasMany(Shipments::class, 'id_company', 'pk_company');
     }
 
     public function origin()
     {
-        return $this->hasMany(Shipments::class, 'gnct_id_avaibility_indicator', 'gnct_id');
+        return $this->hasMany(Shipments::class, 'origin', 'pk_company');
+    }
+
+    public function driverowner()
+    {
+        return $this->hasMany(Shipments::class, 'trailer', 'pk_company');
     }
 
 

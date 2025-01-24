@@ -541,13 +541,13 @@
                                             <input type="hidden" id="whetainputpkshipment">
                                             <div class="mb-3">
                                                 <label for="whaetainputidtrailer" class="form-label">ID Trailer</label>
-                                                <input type="text" class="form-control" id="whaetainputidtrailer" name="whaetainputidtrailer" value="{{ old('whaetainputidtrailer') }}">
+                                                <input type="text" class="form-control" disabled id="whaetainputidtrailer" name="whaetainputidtrailer" value="{{ old('whaetainputidtrailer') }}">
                                                 <div class="invalid-feedback" id="error-whaetainputidtrailer"></div>
                                             </div>
 
                                             <div class="mb-3 ">
                                                 <label for="whetainputidstm" class="form-label ">ID STM</label>
-                                                <input type="text" class="form-control" id="whetainputidstm" name="whetainputidstm" readonly value="{{ old('whetainputidstm') }}">
+                                                <input type="text" class="form-control" disabled id="whetainputidstm" name="whetainputidstm" readonly value="{{ old('whetainputidstm') }}">
                                                 <div class="invalid-feedback" id="error-whetainputidstm"></div>
                                             </div>   
 
@@ -564,8 +564,8 @@
                                             </div>
 
                                             <div class="mb-3 ">
-                                                <label for="whetainputedt" class="form-label ">Suggestes Delivery Date</label>
-                                                <input type="text" class="form-control datetimepicker" id="whetainputedt" name="whetainputedt" value="{{ old('whetainputedt') }}" placeholder="MM/DD/YYYY - H/M/S">
+                                                <label for="whetainputedt" class="form-label ">Suggested Delivery Date</label>
+                                                <input type="text" disabled class="form-control datetimepicker" id="whetainputedt" name="whetainputedt" value="{{ old('whetainputedt') }}" placeholder="MM/DD/YYYY - H/M/S">
                                                 <div class="invalid-feedback" id="error-whetainputedt"></div>
                                             </div>
 

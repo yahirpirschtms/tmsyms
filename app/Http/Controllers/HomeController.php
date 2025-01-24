@@ -12,45 +12,45 @@ use Illuminate\Support\Facades\Log;
 class HomeController extends Controller
 {
     //Funcion actualizar EmptyTrailers
-    public function update(Request $request){
+    /*public function update(Request $request){
         // Validar los datos
         $validated = $request->validate([
             'pk_trailer' => 'required',
-            'trailer_num' => 'required|string',
+            'trailer_num' => 'required|unique:empty_trailer,trailer_num',
             'status' =>  'required|date',
-            'pallets_on_trailer' => 'nullable|string',
-            'pallets_on_floor' => 'nullable|string',
-            'carrier' => 'required|string',
-            'gnct_id_availability_indicator' => 'nullable|integer',
-            'location' => 'required|string',
+            'pallets_on_trailer' => 'nullable',
+            'pallets_on_floor' => 'nullable',
+            'carrier' => 'required|exists:companies,pk_company',
+            'gnct_id_availability_indicator' => 'nullable|exists:generic_catalogs,gnct_id',
+            'location' => 'required|exists:companies,pk_company',
             'date_in' => 'required|date',
             //'date_out' => 'required|date',
             //'transaction_date' => 'required|date',
-            'username' => 'nullable|string',
+            'username' => 'nullable',
         ], [
-            'trailer_num.required' => 'El ID Trailer es obligatorio.',
-            'trailer_num.string' => 'El campo ID Trailer debe ser una cadena de texto.',
+            'trailer_num.required' => 'ID Trailer is required.',
+            'trailer_num.unique' => 'The trailer number has already been taken.',
             //'trailer_num.max' => 'El campo ID Trailer no puede exceder los 50 caracteres.',
-            'status.required' => 'La fecha de estatus es obligatoria.',
-            'status.date' => 'El campo de fecha de estatus debe ser una fecha válida.',
+            'status.required' => 'Status date is required.',
+            'status.date' => 'The status date field must be a valid date.',
             //'pallets_on_trailer.required' => 'El campo Pallets on Trailer es obligatorio.',
-            'pallets_on_trailer.string' => 'El campo Pallets on Trailer debe ser una cadena de texto.',
+            //'pallets_on_trailer.string' => 'El campo Pallets on Trailer debe ser una cadena de texto.',
             //'pallets_on_trailer.max' => 'El campo Pallets on Trailer no puede exceder los 50 caracteres.',
             //'pallets_on_floor.required' => 'El campo Pallets on Floor es obligatorio.',
-            'pallets_on_floor.string' => 'El campo Pallets on Floor debe ser una cadena de texto.',
+            //'pallets_on_floor.string' => 'El campo Pallets on Floor debe ser una cadena de texto.',
             //'pallets_on_floor.max' => 'El campo Pallets on Floor no puede exceder los 50 caracteres.',
-            'carrier.required' => 'El campo Carrier es obligatorio.',
-            'carrier.string' => 'El campo Carrier debe ser una cadena de texto.',
+            'carrier.required' => 'Carrier is required.',
+            'carrier.exists' => 'Carrier selected is not valid.',
             //'carrier.max' => 'El campo Carrier no puede exceder los 50 caracteres.',
             //'gnct_id_avaibility_indicator.required' => 'El campo Availability Indicator es obligatorio.',
-            'gnct_id_avaibility_indicator.integer' => 'El campo Availability Indicator debe ser un número entero.',
-            'location.required' => 'El campo Location es obligatorio.',
-            'location.string' => 'El campo Location debe ser una cadena de texto.',
-            'date_in.required' => 'El campo Date In es obligatorio.',
+            'gnct_id_availability_indicator.exists' => 'Availability Indicator selected is not valid.',
+            'location.required' => 'Location is required.',
+            'location.exists' => 'Location selected is not valid.',
+            'date_in.required' => 'Date In is required.',
             //'date_out.required' => 'El campo Date Out es obligatorio.',
             //'transaction_date.required' => 'El campo Transaction Date es obligatorio.',
             //'username.required' => 'El campo Username es obligatorio.',
-            'username.string' => 'El campo Username debe ser una cadena de texto.',
+            //'username.string' => 'El campo Username debe ser una cadena de texto.',
             //'username.max' => 'El campo Username no puede exceder los 50 caracteres.',
         ]);
     
@@ -64,12 +64,12 @@ class HomeController extends Controller
         $validated['date_in'] = $validated['date_in'] 
             ? Carbon::createFromFormat('m/d/Y H:i:s', $validated['date_in'])->format('Y-m-d H:i:s') 
             : null;
-        /*$validated['date_out'] = $validated['date_out'] 
-            ? Carbon::createFromFormat('m/d/Y H:i:s', $validated['date_out'])->format('Y-m-d H:i:s') 
-            : null;
-        $validated['transaction_date'] = $validated['transaction_date'] 
-            ? Carbon::createFromFormat('m/d/Y H:i:s', $validated['transaction_date'])->format('Y-m-d H:i:s') 
-            : null;*/
+        //$validated['date_out'] = $validated['date_out'] 
+        //    ? Carbon::createFromFormat('m/d/Y H:i:s', $validated['date_out'])->format('Y-m-d H:i:s') 
+        //    : null;
+        //$validated['transaction_date'] = $validated['transaction_date'] 
+        //    ? Carbon::createFromFormat('m/d/Y H:i:s', $validated['transaction_date'])->format('Y-m-d H:i:s') 
+        //    : null;
 
             // Log para depuración
         Log::info('Received data:', $validated);
@@ -78,7 +78,107 @@ class HomeController extends Controller
         $trailer->update($validated);
 
         return response()->json(['message' => 'Successfully updated trailer'], 200);
+    }*/
+    /*public function update(Request $request)
+{
+    try {
+        // Validar los datos
+        $validated = $request->validate([
+            'pk_trailer' => 'required',
+            'trailer_num' => 'required|unique:empty_trailer,trailer_num',
+            'status' => 'required|date',
+            'pallets_on_trailer' => 'nullable',
+            'pallets_on_floor' => 'nullable',
+            'carrier' => 'required|exists:companies,pk_company',
+            'gnct_id_availability_indicator' => 'nullable|exists:generic_catalogs,gnct_id',
+            'location' => 'required|exists:companies,pk_company',
+            'date_in' => 'required|date',
+        ], [
+            'trailer_num.required' => 'ID Trailer is required.',
+            'trailer_num.unique' => 'The trailer number has already been taken.',
+            'status.required' => 'Status date is required.',
+            'status.date' => 'The status date field must be a valid date.',
+            'carrier.required' => 'Carrier is required.',
+            'carrier.exists' => 'Carrier selected is not valid.',
+            'location.required' => 'Location is required.',
+            'location.exists' => 'Location selected is not valid.',
+            'date_in.required' => 'Date In is required.',
+        ]);
+
+        // Buscar el trailer
+        $trailer = EmptyTrailer::findOrFail($validated['pk_trailer']);
+
+        // Convertir las fechas al formato adecuado
+        $validated['status'] = Carbon::createFromFormat('m/d/Y', $validated['status'])->format('Y-m-d');
+        $validated['date_in'] = Carbon::createFromFormat('m/d/Y H:i:s', $validated['date_in'])->format('Y-m-d H:i:s');
+
+        // Actualizar los campos
+        $trailer->update($validated);
+
+        return response()->json(['message' => 'Successfully updated trailer'], 200);
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        // Devolver errores de validación como JSON
+        return response()->json(['errors' => $e->errors()], 422);
+    } catch (\Exception $e) {
+        return response()->json(['message' => 'An unexpected error occurred.'], 500);
     }
+}*/
+public function update(Request $request)
+{
+    try {
+        // Validar los datos enviados
+        $validated = $request->validate([
+            'updateinputpktrailer' => 'required', // pk_trailer
+            'updateinputidtrailer' => 'required|unique:empty_trailer,trailer_num',
+            'updateinputdateofstatus' => 'required|date', // status
+            'updateinputpalletsontrailer' => 'nullable|numeric', // pallets_on_trailer
+            'updateinputpalletsonfloor' => 'nullable|numeric', // pallets_on_floor
+            'updateinputcarrier' => 'required|exists:companies,pk_company', // carrier
+            'updateinputavailabilityindicator' => 'nullable|exists:generic_catalogs,gnct_id', // gnct_id_availability_indicator
+            'updateinputlocation' => 'required|exists:companies,pk_company', // location
+            'updateinputdatein' => 'required|date', // date_in
+        ], [
+            'updateinputidtrailer.required' => 'ID Trailer is required.',
+            'updateinputidtrailer.unique' => 'The trailer number has already been taken.',
+            'updateinputdateofstatus.required' => 'Status date is required.',
+            'updateinputdateofstatus.date' => 'The status date field must be a valid date.',
+            'updateinputcarrier.required' => 'Carrier is required.',
+            'updateinputcarrier.exists' => 'Carrier selected is not valid.',
+            'updateinputlocation.required' => 'Location is required.',
+            'updateinputlocation.exists' => 'Location selected is not valid.',
+            'updateinputdatein.required' => 'Date In is required.',
+        ]);
+
+        // Buscar el trailer
+        $trailer = EmptyTrailer::findOrFail($validated['updateinputpktrailer']);
+
+        // Mapear los datos del formulario a los nombres de las columnas
+        $dataToUpdate = [
+            'trailer_num' => $validated['updateinputidtrailer'],
+            'status' => Carbon::createFromFormat('m/d/Y', $validated['updateinputdateofstatus'])->format('Y-m-d'),
+            'pallets_on_trailer' => $validated['updateinputpalletsontrailer'],
+            'pallets_on_floor' => $validated['updateinputpalletsonfloor'],
+            'carrier' => $validated['updateinputcarrier'],
+            'gnct_id_availability_indicator' => $validated['updateinputavailabilityindicator'],
+            'location' => $validated['updateinputlocation'],
+            'date_in' => Carbon::createFromFormat('m/d/Y H:i:s', $validated['updateinputdatein'])->format('Y-m-d H:i:s'),
+        ];
+
+        // Actualizar el trailer
+        $trailer->update($dataToUpdate);
+
+        return response()->json(['message' => 'Successfully updated trailer'], 200);
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        // Devolver errores de validación como JSON
+        return response()->json(['errors' => $e->errors()], 422);
+    } catch (\Exception $e) {
+        return response()->json(['message' => 'An unexpected error occurred.'], 500);
+    }
+}
+
+
 
     //Funcion eliminar trailers
     public function destroy($id){
@@ -111,19 +211,8 @@ class HomeController extends Controller
     {
         // Validaciones
         $validated = $request->validate([
-            /*'inputidtrailer' => 'required|string|max:50',
-            'inputdateofstatus' => 'required|date',
-            'inputpalletsontrailer' => 'required|string|max:50',
-            'inputpalletsonfloor' => 'required|string|max:50',
-            'inputcarrier' => 'required|string|max:50',
-            'inputavailabilityindicator' => 'required|integer|exists:generic_catalogs,gnct_id',
-            'inputlocation' => 'required|string|exists:companies,id_company',
-            'inputdatein' => 'required|date',
-            'inputdateout' => 'required|date',
-            'inputtransactiondate' => 'required|date',
-            'inputusername' => 'required|string|max:50',*/
 
-            'inputidtrailer' => 'required',
+            'inputidtrailer' => 'required|unique:empty_trailer,trailer_num',
             'inputdateofstatus' => 'required|date',
             'inputpalletsontrailer' => 'nullable',
             'inputpalletsonfloor' => 'nullable',
@@ -136,6 +225,7 @@ class HomeController extends Controller
             'inputusername' => 'nullable',
         ], [
             'inputidtrailer.required' => 'ID Trailer is required.',
+            'inputidtrailer.unique' => 'The trailer number has already been taken.',
             //'inputidtrailer.string' => 'The Trailer ID field must be a text string.',
             //'inputidtrailer.max' => 'The Trailer ID field cannot exceed 50 characters.',
             'inputdateofstatus.required' => 'Status date is required.',
@@ -147,7 +237,7 @@ class HomeController extends Controller
             //'inputpalletsonfloor.string' => 'The Pallets on Floor field must be a text string.',
             //'inputpalletsonfloor.max' => 'The Pallets on Floor field cannot exceed 50 characters.',
             'inputcarrier.required' => 'Carrier is required.',
-            'inputcarrier.exists' => 'Carrier selected is not valid..',
+            'inputcarrier.exists' => 'Carrier selected is not valid.',
             //'inputcarrier.max' => 'The Carrier field cannot exceed 50 characters.',
             //'inputavailabilityindicator.required' => 'Availability Indicator is required.',
             //'inputavailabilityindicator.integer' => 'Availability Indicator must be an integer.',

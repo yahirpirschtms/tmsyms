@@ -8,17 +8,26 @@
             <div class="my-4 d-flex justify-content-center align-items-center">
                 <h2 class="gradient-text text-capitalize fw-bolder" >Traffic Workflow Start</h2>
             </div>
-            <form id="createnewshipmentform">
+            <form id="createnewshipmentform"  class="centered-form">
             @csrf
                 <div class="mb-3">
                     <label for="inputshipmentstmid" class="form-label ">STM ID</label>
                     <input type="text" class="form-control" id="inputshipmentstmid" name="inputshipmentstmid">
+                    <!--<select class="form-select" aria-label="Default select example"  id="inputshipmentstmid" name="inputshipmentstmid" data-url="{{ route('services-shipment') }}">
+                    </select>*-->
                     <div class="invalid-feedback"></div>
                 </div>
 
                 <div class="mb-3">
                     <label for="inputshipmentshipmenttype" class="form-label ">Shipment Type</label>
                     <select class="form-select" aria-label="Default select example"  id="inputshipmentshipmenttype" name="inputshipmentshipmenttype" data-url="{{ route('shipmenttypes-shipment') }}">
+                    </select>
+                    <div class="invalid-feedback"></div>
+                </div>
+
+                <div class="mb-3" style="display: none;">
+                    <label for="inputshipmentcurrentstatus" class="form-label ">Current Status</label>
+                    <select class="form-select" aria-label="Default select example"  id="inputshipmentcurrentstatus" name="inputshipmentcurrentstatus" data-url="{{ route('currentstatus-shipment') }}">
                     </select>
                     <div class="invalid-feedback"></div>
                 </div>
@@ -45,54 +54,58 @@
 
                 <div class="mb-3">
                     <label for="inputshipmentdestination" class="form-label ">Destination</label>
-                    <select class="form-select" aria-label="Default select example"  id="inputshipmentdestination" name="inputshipmentdestination">
+                    <select class="form-select" aria-label="Default select example"  id="inputshipmentdestination" name="inputshipmentdestination" data-url="{{ route('destinations-shipments') }}">
                     </select>
                     <div class="invalid-feedback"></div>
                 </div>
 
                 <div class="mb-3">
                     <label for="inputshipmentprealertdatetime" class="form-label ">PreAlert DateTime</label>
-                    <input type="text" class="form-control datetimepicker" id="inputshipmentprealertdatetime" name="inputshipmentprealertdatetime">
+                    <input type="text" class="form-control datetimepicker" id="inputshipmentprealertdatetime" name="inputshipmentprealertdatetime" placeholder="MM/DD/YYYY - H/M/S">
                     <div class="invalid-feedback"></div>
                 </div>
 
                 <div class="mb-3">
                     <label for="inputidtrailer" class="form-label ">Trailer ID</label>
-                    <input type="text" class="form-control" id="inputidtrailer" name="inputidtrailer" value="{{ old('inputidtrailer', $from_button == 1 ? $trailerId : '') }}">
+                    <input type="text" class="form-control" id="inputidtrailer" name="inputidtrailer" disabled value="{{ old('inputidtrailer', $from_button == 1 ? $trailerId : '') }}">
                     <div class="invalid-feedback"></div>
+                    <input type="hidden" name="inputidtrailer" value="{{ old('inputidtrailer', $from_button == 1 ? $trailerId : '') }}">
                 </div>
 
                 <div class="mb-3">
                     <label for="inputshipmentcarrier" class="form-label ">Carrier Dropping Trailer</label>
-                    <select class="form-select" aria-label="Default select example"  id="inputshipmentcarrier" name="inputshipmentcarrier" value="{{ old('inputshipmentcarrier', $from_button == 1 ? $carrier : '') }}" data-url="{{ route('locations-emptytrailer') }}">
+                    <select class="form-select" aria-label="Default select example" disabled  id="inputshipmentcarrier" name="inputshipmentcarrier" value="{{ old('inputshipmentcarrier', $from_button == 1 ? $carrier : '') }}" data-url="{{ route('locations-emptytrailer') }}">
                     <option value="">Choose an option</option>
                     </select>
                     <div class="invalid-feedback"></div>
+                    <input type="hidden" name="inputshipmentcarrier" value="{{ old('inputshipmentcarrier', $from_button == 1 ? $carrier : '') }}">
                 </div>
 
                 <div class="mb-3">
                     <label for="inputshipmentdriver" class="form-label ">Driver</label>
-                    <select class="form-select" aria-label="Default select example"  id="inputshipmentdriver" name="inputshipmentdriver">
+                    <select class="form-select" aria-label="Default select example"  id="inputshipmentdriver" name="inputshipmentdriver" data-url="{{ url('drivers-shipments') }}">
                     </select>
                 </div>
 
                 <div class="mb-3">
-                    <label for="inputshipmenttrailer" class="form-label ">Trailer</label>
-                    <select class="form-select" aria-label="Default select example"  id="inputshipmenttrailer" name="inputshipmenttrailer">
+                    <label for="inputshipmenttrailer" class="form-label ">Trailer Owner</label>
+                    <select class="form-select" aria-label="Default select example" disabled id="inputshipmenttrailer" name="inputshipmenttrailer" value="{{ old('inputshipmenttrailer', $from_button == 1 ? $carrier : '') }}" data-url="{{ route('locations-emptytrailer') }}">
                     </select>
                     <div class="invalid-feedback"></div>
+                    <input type="hidden" name="inputshipmenttrailer" value="{{ old('inputshipmenttrailer', $from_button == 1 ? $carrier : '') }}">
                 </div>
 
                 <div class="mb-3">
                     <label for="inputshipmenttruck" class="form-label ">Truck</label>
-                    <select class="form-select" aria-label="Default select example"  id="inputshipmenttruck" name="inputshipmenttruck">
-                    </select>
+                    <!--<select class="form-select" aria-label="Default select example"  id="inputshipmenttruck" name="inputshipmenttruck">
+                    </select>-->
+                    <input type="text" class="form-control" id="inputshipmenttruck" name="inputshipmenttruck">
                     <div class="invalid-feedback"></div>
                </div>
 
                 <div class="mb-3">
                     <label for="inputshipmentetd" class="form-label ">Estimated date of departure</label>
-                    <input type="text" class="form-control datetimepicker" id="inputshipmentetd" name="inputshipmentetd">
+                    <input type="text" class="form-control datetimepicker" id="inputshipmentetd" name="inputshipmentetd" placeholder="MM/DD/YYYY - H/M/S">
                     <div class="invalid-feedback"></div>
                 </div>
 

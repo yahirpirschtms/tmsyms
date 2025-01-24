@@ -124,7 +124,7 @@ $(document).ready(function() {
                 let selectedValue = select.val();
                 //let selectedValue = "{{ old('inputcarrier') }}"; // Recupera el valor previo
                 select.empty();
-                //select.append('<option selected disabled hidden></option>');
+                select.append('<option selected disabled hidden></option>');
 
                 if (data.length === 0) {
                     select.append('<option disabled>No options available</option>');
@@ -197,7 +197,7 @@ $(document).ready(function() {
                 let selectedValue = select.val();
                 //let selectedValue = "{{ old('inputlocation') }}"; // Recupera el valor previo
                 select.empty();
-                //select.append('<option selected disabled hidden></option>');
+                select.append('<option selected disabled hidden></option>');
 
                 if (data.length === 0) {
                     select.append('<option disabled>No options available</option>');
@@ -371,11 +371,11 @@ $(document).ready(function() {
         // Cuando el formulario se envía (al hacer clic en Save)
         $('#emptytrailerformm').submit(function(e) {
             e.preventDefault(); // Evita el envío del formulario
-    
+        
             const saveButton = $('#saveButton');
             const url = saveButton.data('url'); // URL para la petición AJAX
             let formData = new FormData(this);
-    
+        
             $.ajax({
                 url: url,
                 type: 'POST',
@@ -386,7 +386,7 @@ $(document).ready(function() {
                     // Si la respuesta es exitosa, mostrar el mensaje de éxito
                     Swal.fire({
                         icon: 'success',
-                        title: '¡Succes!',
+                        title: '¡Success!',
                         text: 'Trailer successfully added.',
                         confirmButtonText: 'Ok'
                     });
@@ -396,19 +396,28 @@ $(document).ready(function() {
                 error: function(xhr, status, error) {
                     // Limpia los errores anteriores
                     $('input, select').removeClass('is-invalid');
-                    $('.invalid-feedback').text('');
-                    
-                    // Manejo de errores con SweetAlert2
+                    $('.invalid-feedback').text(''); // Vaciar mensajes de error
+        
                     let errors = xhr.responseJSON.errors;
-                    for (let field in errors) {
-                        const inputField = $('#' + field);
-                        const errorContainer = inputField.next('.invalid-feedback');
-                        
-                        inputField.addClass('is-invalid');  // Marca el campo con error
-                        errorContainer.text(errors[field][0]); // Muestra el error correspondiente
+        
+                    // Verifica si hay errores
+                    if (errors) {
+                        for (let field in errors) {
+                            const inputField = $('#' + field);
+        
+                            // Verifica que exista el div de error; si no, lo crea
+                            let errorContainer = inputField.next('.invalid-feedback');
+                            if (!errorContainer.length) {
+                                errorContainer = $('<div>').addClass('invalid-feedback').insertAfter(inputField);
+                            }
+        
+                            // Marca el input y muestra el error
+                            inputField.addClass('is-invalid');
+                            errorContainer.text(errors[field][0]);
+                        }
                     }
-    
-                    // Si hubo un error en el servidor, muestra una alerta
+        
+                    // Luego muestra el mensaje de error general
                     Swal.fire({
                         icon: 'error',
                         title: '¡Error!',
@@ -418,6 +427,7 @@ $(document).ready(function() {
                 }
             });
         });
+        
     });
     
     function updateTrailerTable() {
@@ -564,6 +574,22 @@ $(document).ready(function() {
             form.reset();
 
             inputs.forEach((input) => {
+                // Eliminar clases de validación
+                input.classList.remove("is-invalid", "is-valid");
+            
+                // Reiniciar mensajes de error
+                let errorDiv = input.nextElementSibling;
+                if (errorDiv && errorDiv.classList.contains("invalid-feedback")) {
+                    errorDiv.textContent = ''; // Vaciar el contenido en lugar de eliminar el div
+                } else if (!errorDiv) {
+                    // Si no existe, crea uno
+                    errorDiv = document.createElement('div');
+                    errorDiv.className = 'invalid-feedback';
+                    input.parentNode.appendChild(errorDiv);
+                }
+            });
+
+            /*inputs.forEach((input) => {
             // Eliminar clases de validación
             input.classList.remove("is-invalid", "is-valid");
 
@@ -576,7 +602,7 @@ $(document).ready(function() {
             // Eliminar atributos añadidos (como required o disabled)
             input.removeAttribute('required');
             input.removeAttribute('disabled');
-            });
+            });*/
 
             // Opcional: Si necesitas reiniciar select dinámicos o resetear errores manualmente
             const selects = form.querySelectorAll("select");
@@ -754,71 +780,6 @@ $(document).ready(function() {
       }
   });
 
- // Guardar los cambios al hacer clic en el botón de guardar
-    /*document.getElementById("updatesaveButton").addEventListener("click", function () {
-        const closeButtonUpdate = document.getElementById('closeupdatemptytrailerbutton'); // Botón de cerrar
-        const refreshButtonUpdate = document.getElementById('refreshemptytrailertable'); // Botón de cerrar
-        const closeButtonDetailsUpdate = document.getElementById('closeoffcanvastrailersdetails'); // Botón de cerrar
-
-
-        const updatesaveButton = $('#updatesaveButton');
-        const urlupdatetrailer = updatesaveButton.data('url'); // URL para la petición AJAX
-
-        Swal.fire({
-            title: "¿Estás seguro?",
-            text: "¿Quieres guardar los cambios realizados?",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Sí, guardar",
-            cancelButtonText: "Cancelar",
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Crear datos para enviar
-                const data = {
-                    pk_trailer: document.getElementById("updateinputpktrailer").value,
-                    trailer_num: document.getElementById("updateinputidtrailer").value,
-                    status: document.getElementById("updateinputdateofstatus").value,
-                    pallets_on_trailer: document.getElementById("updateinputpalletsontrailer").value,
-                    pallets_on_floor: document.getElementById("updateinputpalletsonfloor").value,
-                    carrier: document.getElementById("updateinputcarrier").value,
-                    gnct_id_avaibility_indicator: document.getElementById("updateinputavailabilityindicator").value,
-                    location: document.getElementById("updateinputlocation").value,
-                    date_in: document.getElementById("updateinputdatein").value,
-                    date_out: document.getElementById("updateinputdateout").value,
-                    transaction_date: document.getElementById("updateinputtransactiondate").value,
-                    username: document.getElementById("updateinputusername").value,
-                    //_token: "{{ csrf_token() }}" // Agregar el token CSRF
-                };
-                console.log(data);
-
-                // Enviar la solicitud PUT (cambiar de POST a PUT)
-                fetch(urlupdatetrailer, {
-                    method: "PUT", // Cambié de POST a PUT
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content'), // CSRF token correctamente
-                    },
-                    body: JSON.stringify(data),
-                })
-                    .then((response) => {
-                        if (response.ok) {
-                            Swal.fire("¡Guardado!", "Los cambios se guardaron correctamente.", "success");
-                            closeButtonUpdate.click();
-                            closeButtonDetailsUpdate.click();
-                            refreshButtonUpdate.click();
-                        } else {
-                            return response.json().then((data) => {
-                                throw new Error(data.message || "Error al guardar los cambios.");
-                            });
-                        }
-                    })
-                    .catch((error) => {
-                        Swal.fire("Error", error.message, "error");
-                    });
-            }
-        });
-    });*/
-
     // Función de validación en tiempo real
     const formFields = [
         'updateinputidtrailer',
@@ -856,18 +817,14 @@ $(document).ready(function() {
             field.classList.add('is-invalid');
             errorElement.textContent = 'This field is required'; // Mensaje de error
         }
-        // Validar si el campo excede los 50 caracteres
-        /*else if ((field.id === 'updateinputusername' || field.id === 'updateinputpalletsonfloor' || field.id === 'updateinputpalletsontrailer') && field.value.length > 50) {
-            field.classList.add('is-invalid');
-            errorElement.textContent = 'This field cannot exceed 50 characters'; // Mensaje de error
-        }*/ else {
+        else {
             field.classList.remove('is-invalid');
             errorElement.textContent = ''; // Limpiar el mensaje de error
         }
     }
 
     // Ejecutar la validación al hacer clic en el botón de "guardar"
-    document.getElementById("updatesaveButton").addEventListener("click", function () {
+    /*document.getElementById("updatesaveButton").addEventListener("click", function () {
         let valid = true;
 
         // Validar cada campo antes de enviar
@@ -881,12 +838,7 @@ $(document).ready(function() {
                 field.classList.add('is-invalid');
                 errorElement.textContent = 'This field is required';
             }
-            // Validar si el campo excede los 50 caracteres (solo para los campos específicos)
-            /*else if ((fieldId === 'updateinputusername' || fieldId === 'updateinputpalletsonfloor' || fieldId === 'updateinputpalletsontrailer') && field.value.length > 50) {
-                valid = false;
-                field.classList.add('is-invalid');
-                errorElement.textContent = 'This field cannot exceed 50 characters';
-            }*/ else {
+            else {
                 field.classList.remove('is-invalid');
                 errorElement.textContent = '';
             }
@@ -958,7 +910,112 @@ $(document).ready(function() {
                     });
             }
         });
+    });*/
+
+    // Ejecutar la validación al hacer clic en el botón de "guardar"
+// Ejecutar la validación al hacer clic en el botón de "guardar"
+document.getElementById("updatesaveButton").addEventListener("click", function () {
+    let valid = true;
+
+    // Validar cada campo antes de enviar
+    formFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        const errorElement = document.getElementById(`error-${fieldId}`);
+
+        // Validar el campo
+        if (field.value.trim() === '') {
+            valid = false;
+            field.classList.add('is-invalid');
+            errorElement.textContent = 'This field is required';
+        } else {
+            field.classList.remove('is-invalid');
+            errorElement.textContent = '';
+        }
     });
+
+    // Si hay errores, no enviar el formulario
+    if (!valid) {
+        const firstInvalidField = document.querySelector('.is-invalid');
+        if (firstInvalidField) {
+            firstInvalidField.focus();
+        }
+        return;
+    }
+
+    // Si todos los campos son válidos, proceder con la solicitud de actualización
+    const closeButtonUpdate = document.getElementById('closeupdatemptytrailerbutton');
+    const refreshButtonUpdate = document.getElementById('refreshemptytrailertable');
+    const closeButtonDetailsUpdate = document.getElementById('closeoffcanvastrailersdetails');
+    const updatesaveButton = $('#updatesaveButton');
+    const urlupdatetrailer = updatesaveButton.data('url');
+
+    Swal.fire({
+        title: "Are you sure?",
+        text: "Do you want to save the changes made?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, save",
+        cancelButtonText: "Cancel",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const data = {
+                updateinputpktrailer: document.getElementById("updateinputpktrailer").value,
+                updateinputidtrailer: document.getElementById("updateinputidtrailer").value,
+                updateinputdateofstatus: document.getElementById("updateinputdateofstatus").value,
+                updateinputpalletsontrailer: document.getElementById("updateinputpalletsontrailer").value,
+                updateinputpalletsonfloor: document.getElementById("updateinputpalletsonfloor").value,
+                updateinputcarrier: document.getElementById("updateinputcarrier").value,
+                updateinputavailabilityindicator: document.getElementById("updateinputavailabilityindicator").value,
+                updateinputlocation: document.getElementById("updateinputlocation").value,
+                updateinputdatein: document.getElementById("updateinputdatein").value,
+                updateinputusername: document.getElementById("updateinputusername").value,
+            };
+
+            fetch(urlupdatetrailer, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json",
+                    "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                },
+                body: JSON.stringify(data),
+            })
+                .then((response) => {
+                    if (!response.ok) {
+                        return response.json().then((errorData) => {
+                            throw errorData;
+                        });
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    Swal.fire("Saved!", data.message, "success");
+                    document.getElementById('closeupdatemptytrailerbutton').click();
+                    document.getElementById('refreshemptytrailertable').click();
+                    document.getElementById('closeoffcanvastrailersdetails').click();
+                })
+                .catch((error) => {
+                    console.log(error); // Muestra el error
+                    if (error.errors) {
+                        Object.keys(error.errors).forEach(field => {
+                            const fieldId = field; 
+                            const errorMessages = error.errors[field]; // Los mensajes de error
+                            const errorElement = document.getElementById(`error-${fieldId}`);
+                            const fieldElement = document.getElementById(fieldId);
+                
+                            if (fieldElement) {
+                                fieldElement.classList.add('is-invalid'); // Marca el campo como inválido
+                                errorElement.textContent = errorMessages.join(', '); // Muestra el error en el campo
+                            }
+                        });
+                    } else {
+                        Swal.fire("Error", error.message || "An unknown error occurred", "error");
+                    }
+                });
+        }
+    });
+});
+
 
     // Limpiar los mensajes de error al cerrar el modal (tanto al hacer clic en el botón de cerrar como al hacer clic fuera del modal)
     $(document).ready(function() {

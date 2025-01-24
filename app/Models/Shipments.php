@@ -56,7 +56,7 @@ class Shipments extends Model
         'delivered_date',
         'at_door_date',
         'wh_auth_date',
-        'offlanding_time',
+        'offloading_time',
         'billing_id',
         'billing_date'
     ];
@@ -114,20 +114,26 @@ class Shipments extends Model
     // Relación con la tabla `companies`
     public function origin()
     {
-        return $this->belongsTo(Companies::class, 'id_company', 'id_company');
+        return $this->belongsTo(Companies::class, 'origin', 'pk_company');
     }
 
     // Relación con la tabla `companies`
     public function carrier()
     {
-        return $this->belongsTo(Companies::class, 'id_company', 'id_company');
+        return $this->belongsTo(Companies::class, 'id_company', 'pk_company');
+    }
+
+    // Relación con la tabla `companies`
+    public function driverowner()
+    {
+        return $this->belongsTo(Companies::class, 'trailer', 'pk_company');
     }
 
     // Relación con la tabla `driver`
-    /*public function driver()
+    public function drivers()
     {
-        return $this->belongsTo(Driver::class, 'id_driver', 'id_driver');
-    }*/
+        return $this->belongsTo(Driver::class, 'id_driver', 'pk_driver');
+    }
 
     // Relación con la tabla `generic_catalogs` para el estado actual
     public function currentstatus()
@@ -139,5 +145,11 @@ class Shipments extends Model
     public function shipmenttype()
     {
         return $this->belongsTo(GenericCatalog::class, 'gnct_id_shipment_type', 'gnct_id');
+    }
+
+    // Relación con la tabla `facilities` para el tipo de envío
+    public function destinations()
+    {
+        return $this->belongsTo(Facilities::class, 'destination', 'fac_id');
     }
 }

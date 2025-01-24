@@ -256,7 +256,11 @@
 .tooltip.bs-tooltip-top .tooltip-inner {
     transition: opacity 0.4s ease;
 }
-
+.centered-form {
+    max-width: 750px; /* Limita el ancho máximo a 600px */
+    margin: 0 auto; /* Centra el formulario horizontalmente */
+    padding: 20px; /* Añade un poco de espacio interno */
+}
 
     </style>
 </head>

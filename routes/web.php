@@ -1,16 +1,22 @@
 <?php
 
 use App\Http\Controllers\CompaniesController;
+use App\Http\Controllers\DriversController;
 use App\Http\Controllers\EmptyTrailerController;
+use App\Http\Controllers\FacilitiesController;
 use App\Http\Controllers\GenericCatalogController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LogoutController;
+use App\Http\Controllers\ServicesController;
 use App\Http\Controllers\ShipmentController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
+/*Route::get('/', function () {
     return view('welcome');
+});*/
+Route::get('/', function () {
+    return redirect('/login');
 });
 
 Route::get('/login', [LoginController::class, 'show']);
@@ -60,6 +66,18 @@ Route::get('/createworkflowstartwithemptytrailer', [ShipmentController::class, '
 
 //Rutas nutrir selects para la pantalla de Shipments
 Route::get('/shipment-types', [GenericCatalogController::class, 'getShipmentTypes'])->name('shipmenttypes-shipment');
+
+//Rutas nutrir selects para la pantalla de Shipments con CurrentStatus
+Route::get('/current-status', [GenericCatalogController::class, 'getCurrentStatus'])->name('currentstatus-shipment');
+
+//Rutas nutrir selects para la pantalla de Shipments con STM ID
+Route::get('/services', [ServicesController::class, 'getServices'])->name('services-shipment');
+
+//Rutas nutrir selects para la pantalla de Shipments con los destinations
+Route::get('/destinations-shipments', [FacilitiesController::class, 'getFacilities'])->name('destinations-shipments');
+
+//Rutas nutrir selects para la pantalla de Shipments con los Drivers
+Route::get('/drivers-shipments/{id_company}', [DriversController::class, 'getDriversByCompany'])->name('drivers-shipments');
 
 //Ruta ir a WH ETA Approval sin filtros
 Route::get('/whapptapproval', [ShipmentController::class, 'indexwhapptapproval'])->name('whapptapproval');

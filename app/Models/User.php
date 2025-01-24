@@ -18,11 +18,11 @@ class User extends Authenticatable
      * @var list<string>
      */
 
-    protected $table = "users";
+    protected $table = "users_yms";
     public $timestamps = false; // Deshabilitar timestamps
  
     // Definir la clave primaria
-    protected $primaryKey = 'user_id';
+    protected $primaryKey = 'pk_users';
  
      // Si la clave primaria no es un entero, indica que es de tipo string
      //public $incrementing = false;
@@ -30,7 +30,6 @@ class User extends Authenticatable
 
     // Campos permitidos para asignación masiva
     protected $fillable = [
-        'user_id',
         'username',
         'privilege',
         'password',

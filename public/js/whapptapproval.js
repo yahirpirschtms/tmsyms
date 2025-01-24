@@ -21,8 +21,23 @@ document.getElementById('exportfile').addEventListener('click', function () {
         }
     }
 
+    // Obtener la fecha y hora actual
+    var now = new Date();
+    var day = ('0' + now.getDate()).slice(-2);
+    var month = ('0' + (now.getMonth() + 1)).slice(-2);
+    var year = now.getFullYear();
+    var hours = ('0' + now.getHours()).slice(-2);
+    var minutes = ('0' + now.getMinutes()).slice(-2);
+    var seconds = ('0' + now.getSeconds()).slice(-2);
+
+    
+    // Formato: MM-DD-YYYY_HH-MM-SS
+    var formattedDateTime = `${month}${day}${year}_${hours}-${minutes}-${seconds}`;
+
+    // Define el nombre del archivo con fecha y hora
+    var filename = `WHApptApprovalShipments_${formattedDateTime}.xlsx`;
+
     // Exporta el archivo Excel con el nombre apropiado
-    var filename = 'WHApptApprovalShipments.xlsx';
     XLSX.writeFile(wb, filename);
 });
 
@@ -311,11 +326,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Función de validación en tiempo real
     const formFields = [
-        'whaetainputidtrailer',
-        'whetainputidstm',
+        //'whaetainputidtrailer',
+        //'whetainputidstm',
         'whetainputpallets',
         'whetainputunits',
-        'whetainputedt',
+        //'whetainputedt',
         'whetainputapprovedeta',
     ];
 
@@ -405,11 +420,11 @@ document.addEventListener('DOMContentLoaded', function () {
             if (result.isConfirmed) {
                 const data = {
                     pk_shipment: document.getElementById("whetainputpkshipment").value,
-                    id_trailer: document.getElementById("whaetainputidtrailer").value,
-                    stm_id: document.getElementById("whetainputidstm").value,
+                    //id_trailer: document.getElementById("whaetainputidtrailer").value,
+                    //stm_id: document.getElementById("whetainputidstm").value,
                     pallets: document.getElementById("whetainputpallets").value,
                     units: document.getElementById("whetainputunits").value,
-                    etd: document.getElementById("whetainputedt").value,
+                    //etd: document.getElementById("whetainputedt").value,
                     wh_auth_date: document.getElementById("whetainputapprovedeta").value,
                 };
 
@@ -426,7 +441,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             Swal.fire("Saved!", "The changes were saved successfully.", "success");
                             closewhetaapprovalbutton.click();
                             closeoffcanvaswhetaapprovaldetails.click();
-                            //refreshButtonUpdate.click();
+                            refreshButtonUpdate.click();
                         } else {
                             return response.json().then((data) => {
                                 throw new Error(data.message || "Error saving changes.");

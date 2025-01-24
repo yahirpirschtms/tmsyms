@@ -527,8 +527,7 @@
             </div>
 
             <!--OffCanvas para Actualizar un Trailer-->
-            <div68
-            .>
+            <div>
                 <div class="offcanvas offcanvas-end offcanvas-size" data-bs-scroll="true" tabindex="-1" id="updatenewtrailerempty" aria-labelledby="updateoffcanvasWithBothOptionsLabel">
                     <div class="offcanvas-header">
                         <h5 class="offcanvas-title" id="updateoffcanvasWithBothOptionsLabel">Update Trailer Empty</h5>
