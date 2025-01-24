@@ -75,7 +75,12 @@
                 </div>
             </div>
 
-
+            <div class="col-auto mt-2" id="activeFilterDiv" style="display:none;">
+                <div style="background-color:rgb(13, 82, 200); border-radius:0.5rem; width:fit-content; display:flex; flex-wrap:nowrap; align-items:center" class="input-group mb-3 me-2">
+                    <span id="activeFilterText" style="color:white; font-size: small;" class="ms-2 me-2"></span>
+                    <button id="closeActiveFilter" style="background-color:unset; color:white; font-size: small;" class="ms-2 me-2">X</button>
+                </div>
+            </div>
            <!-- Contenedor de tarjetas -->
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="cardsContainer">
                 @foreach ($shipments as $shipment)
@@ -101,11 +106,7 @@
             </div>
         </div>
 
-        <div class="col-auto mt-2" id="activeFilterDiv" style="display:none;">
-            <div style="background-color:rgb(13, 82, 200); border-radius:0.5rem; width:fit-content; display:flex; flex-wrap:nowrap; align-items:center" class="input-group mb-3 me-2">
-                <span id="activeFilterText" style="color:white; font-size: small;" class="ms-2 me-2"></span>
-                <button id="closeActiveFilter" style="background-color:unset; color:white; font-size: small;" class="ms-2 me-2">X</button>
-        </div>
+
         <!-- Offcanvas para Update Status -->
         <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasUpdateStatus" aria-labelledby="offcanvasUpdateStatusLabel">
             <div class="offcanvas-header">
