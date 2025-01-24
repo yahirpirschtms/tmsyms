@@ -84,6 +84,3 @@ Route::get('/whapptapproval', [ShipmentController::class, 'indexwhapptapproval']
 
 //Ruta Asignar WH ETA Approval a Shipments
 Route::put('/shipment/whetaapproval', [ShipmentController::class, 'whetaapproval'])->name('shipment.whetaapproval');
-
-
-
