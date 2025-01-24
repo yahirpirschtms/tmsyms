@@ -34,7 +34,7 @@ class GenericCatalogController extends Controller
     }
 
     public function getOrigin()
-{
+    {
     // Obtener el origen de la tabla 'generic_catalogs' donde el grupo sea 'MWD_LOCATION' y el valor '3PA'
     $origin = GenericCatalog::where('gntc_group', 'MWD_LOCATION')
         ->select('gntc_value') // Seleccionamos solo el valor necesario
@@ -42,5 +42,5 @@ class GenericCatalogController extends Controller
 
     // Si se encuentra un origen, retornamos el valor, de lo contrario, retornamos null
     return response()->json($origin);
-}
+    }
 }

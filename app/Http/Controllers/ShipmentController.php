@@ -10,13 +10,13 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Shipment;
 use App\Models\GenericCatalog;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Log;
+
 
 class ShipmentController extends Controller
 {
 
 
-    /*public function allshipmentsshow()
+    public function allshipmentsshow()
     {
      if (Auth::check()) {
         $shipments = Shipment::all();  // Obtén los envíos desde la base de datos
@@ -27,7 +27,7 @@ class ShipmentController extends Controller
         return view('home.all-shipments', compact('shipments', 'currentStatus'));  // Cambia aquí el nombre de la vista
         }
      return redirect('/login');
-    }*/
+    }
 
 
     public function liveshipmentsshow()
@@ -62,22 +62,7 @@ class ShipmentController extends Controller
         return view('shipments', compact('shipments', 'origins'));
     }
 
-    // Crear un nuevo envío
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'stm_id' => 'required|string|max:50',
-            'reference' => 'required|string|max:50',
-            'origin' => 'required|string|max:50',
-            'destination' => 'required|string|max:50',
-            'etd' => 'nullable|date',
-            'units' => 'nullable|string|max:50',
-        ]);
 
-        Shipment::create($validated);
-
-        return redirect()->back()->with('success', 'Envío creado exitosamente.');
-    }
 
 
     public function details($pk_shipment)
