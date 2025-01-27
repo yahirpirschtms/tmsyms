@@ -152,4 +152,78 @@ class Shipments extends Model
     {
         return $this->belongsTo(Facilities::class, 'destination', 'fac_id');
     }
+
+
+    //Formatos de Fecha de Christian y Relaciones
+    // Configuración de timestamps personalizados
+    const CREATED_AT = 'dateCreated';
+    const UPDATED_AT = 'dateUpdated';
+
+    // Atributos que son fechas y deben ser manejados como instancias de Carbon
+    protected $dates = [
+        'pre_alerted_datetime',
+        'driver_assigned_date',
+        'pick_up_date',
+        'intransit_date',
+        'secured_yarddate',
+        'delivered_date',
+        'at_door_date',
+        'offload_date',
+        'dateCreated',
+        'dateUpdated',
+        'wh_auth_date',
+    ];
+
+    // Formateo de la fecha de entrega
+    public function getFormattedDeliveredDateAttribute()
+    {
+        return $this->delivered_date
+            ? $this->delivered_date->format('m/d/Y H:i')
+            : null;
+    }
+
+    //Relaciones
+    // Relación con GenericCatalog (estatus actual)
+    /*public function currentStatus()
+    {
+        return $this->belongsTo(GenericCatalog::class, 'gnct_id_current_status', 'gnct_id');
+    }*/
+
+    // Relación con GenericCatalog (tipo de envío)
+    /*public function shipmentType()
+    {
+        return $this->belongsTo(GenericCatalog::class, 'gnct_id_shipment_type', 'gnct_id');
+    }*/
+
+    public function service()
+    {
+        return $this->belongsTo('App\Models\Service', 'stm_id', 'pk_service');
+    }
+
+    // Método para obtener el estatus actual
+    public function getCurrentStatusValueAttribute()
+    {
+        return $this->currentStatus ? $this->currentStatus->gntc_value : null;
+    }
+
+    // Método para obtener el tipo de envío
+    public function getShipmentTypeValueAttribute()
+    {
+        return $this->shipmentType ? $this->shipmentType->gntc_value : null;
+    }
+
+    public function driver()
+    {
+        return $this->belongsTo(Driver::class, 'id_driver', 'pk_driver'); // Ajustado a id_driver
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Companies::class, 'origin', 'pk_company'); // Relación con la tabla companies
+    }
+
+    public function destinationFacility()
+    {
+        return $this->belongsTo(Facilities::class, 'destination', 'fac_id');
+    }
 }

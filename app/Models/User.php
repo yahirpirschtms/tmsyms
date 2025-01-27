@@ -30,6 +30,7 @@ class User extends Authenticatable
 
     // Campos permitidos para asignación masiva
     protected $fillable = [
+        'pk_users',
         'username',
         'privilege',
         'password',

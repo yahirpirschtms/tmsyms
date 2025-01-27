@@ -148,6 +148,8 @@ public function update(Request $request)
             'updateinputlocation.required' => 'Location is required.',
             'updateinputlocation.exists' => 'Location selected is not valid.',
             'updateinputdatein.required' => 'Date In is required.',
+            'updateinputpalletsontrailer.numeric' => 'Pallets on trailer must be an integer',
+            'updateinputpalletsonfloor.numeric' => 'Pallets on floor must be an integer',
         ]);
 
         // Buscar el trailer

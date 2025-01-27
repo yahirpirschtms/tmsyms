@@ -5,9 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'App')</title>
+    <!-- SweetAlert2 -->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Cargar FullCalendar 5.x con los plugins necesarios -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/interaction@5.11.0/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@5.11.0/main.min.js"></script>
+    <!--JQuery-->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!--Flatpickr para fechas en inputs-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <link rel="icon" type="image/png" href="{!! asset('/icons/tms_logo.png')!!}">
@@ -262,6 +270,24 @@
     padding: 20px; /* Añade un poco de espacio interno */
 }
 
+
+/*Estilos de Christian*/
+.offcanvasUpdateStatus {
+  background-color: #212529;
+  color: white;
+  width: 300px;
+}
+.offcanvasUpdateStatus .form-label {
+  color: #f8f9fa;
+}
+.offcanvasDetails {
+  background-color: #212529;
+  color: white;
+  width: 300px;
+}
+.ooffcanvasDetails .form-label {
+  color: #f8f9fa;
+}
     </style>
 </head>
 <body>
