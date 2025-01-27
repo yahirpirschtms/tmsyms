@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Shipment;
 use App\Models\GenericCatalog;
+use App\Models\Shipments;
 use Illuminate\Support\Facades\Log;
 
 class ShipmentController extends Controller
@@ -15,7 +16,7 @@ class ShipmentController extends Controller
     public function allshipmentsshow()
     {
      if (Auth::check()) {
-        $shipments = Shipment::all();  // Obtén los envíos desde la base de datos
+        $shipments = Shipments::all();  // Obtén los envíos desde la base de datos
           // Esto te ayudará a verificar si los envíos se están obteniendo correctamente
 
           // Obtener los estados actuales desde la base de datos (usando un modelo genérico como ejemplo)
@@ -35,7 +36,7 @@ class ShipmentController extends Controller
                 ->first();
 
             // Filtrar los envíos que no tienen el estado 'Finalized'
-            $shipments = Shipment::where('gnct_id_current_status', '!=', $finalizedStatus->gnct_id)->get();
+            $shipments = Shipments::where('gnct_id_current_status', '!=', $finalizedStatus->gnct_id)->get();
 
             // Obtener los estados actuales desde la base de datos
             $currentStatus = GenericCatalog::where('gntc_group', 'STATUS_E_REPORT')->get();
@@ -52,8 +53,8 @@ class ShipmentController extends Controller
     // Listar envíos
     public function index()
     {
-        $origins = Shipment::select('origin')->distinct()->get();
-        $shipments = Shipment::all();
+        $origins = Shipments::select('origin')->distinct()->get();
+        $shipments = Shipments::all();
 
         return view('shipments', compact('shipments', 'origins'));
     }
@@ -70,7 +71,7 @@ class ShipmentController extends Controller
             'units' => 'nullable|string|max:50',
         ]);
 
-        Shipment::create($validated);
+        Shipments::create($validated);
 
         return redirect()->back()->with('success', 'Envío creado exitosamente.');
     }
@@ -79,7 +80,7 @@ class ShipmentController extends Controller
     public function details($pk_shipment)
     {
         // Obtener el envío con las relaciones de currentStatus, driver y originCatalog
-        $shipment = Shipment::with(['currentStatus', 'driver', 'originCatalog'])->findOrFail($pk_shipment);
+        $shipment = Shipments::with(['currentStatus', 'driver', 'originCatalog'])->findOrFail($pk_shipment);
 
         // Obtener los estatus disponibles bajo el grupo 'STATUS_E_REPORT'
         $currentStatus = GenericCatalog::where('gntc_group', 'STATUS_E_REPORT')->get();
@@ -96,7 +97,7 @@ class ShipmentController extends Controller
 
         try {
             // Buscar el envío por su ID
-            $shipment = Shipment::findOrFail($pk_shipment);
+            $shipment = Shipments::findOrFail($pk_shipment);
 
             // Validar los datos recibidos
             $validated = $request->validate([
@@ -132,7 +133,7 @@ class ShipmentController extends Controller
     }
 
     // Método para actualizar las notas del envío
-    public function updateNotes(Request $request, Shipment $shipment)
+    public function updateNotes(Request $request, Shipments $shipment)
     {
         // Validar y actualizar las notas
         $request->validate([
@@ -150,7 +151,7 @@ class ShipmentController extends Controller
     // Eliminar un envío
     public function destroy($id)
     {
-        Shipment::findOrFail($id)->delete();
+        Shipments::findOrFail($id)->delete();
         return redirect()->back()->with('success', 'Envío eliminado exitosamente.');
     }
 }

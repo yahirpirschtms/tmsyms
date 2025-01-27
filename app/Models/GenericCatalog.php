@@ -30,4 +30,25 @@ class GenericCatalog extends Model
         'gntc_update_user',
         'gntc_label',
     ];
+
+    //Esto desactiva la protección contra asignación masiva, pero se debe usar con precaución.
+    protected $guarded = [];
+
+        // Relación inversa con EmptyTrailer
+        public function availabilityIndicator()
+        {
+            return $this->hasMany(EmptyTrailer::class, 'gnct_id_availability_indicator', 'gnct_id');
+        }
+
+        // Relación inversa con Shipments
+        public function currentstatus()
+        {
+            return $this->hasMany(Shipments::class, 'gnct_id_current_status', 'gnct_id');
+        }
+
+         // Relación inversa con Shipments
+         public function shipmenttype()
+         {
+             return $this->hasMany(Shipments::class, 'gnct_id_shipment_type', 'gnct_id');
+         }
 }

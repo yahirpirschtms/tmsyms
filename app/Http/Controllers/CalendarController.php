@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Shipment;
 use Illuminate\Support\Facades\Auth;
 use App\Models\GenericCatalog;
+use App\Models\Shipments;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -19,7 +20,7 @@ class CalendarController extends Controller
                 ->first();
 
             // Filtrar los envíos que no tienen el estado 'Finalized'
-            $shipments = Shipment::where('gnct_id_current_status', '!=', $finalizedStatus->gnct_id)->get();
+            $shipments = Shipments::where('gnct_id_current_status', '!=', $finalizedStatus->gnct_id)->get();
             $currentStatus = GenericCatalog::where('gntc_group', 'STATUS_E_REPORT')->get();
 
             // Obtener los catálogos para 'MWD_LOCATION' (origen) y 'STATUS_E_REPORT' (estado actual)
@@ -81,7 +82,7 @@ class CalendarController extends Controller
     {
         if (Auth::check()) {
             // Obtener todos los envíos
-            $shipments = Shipment::all();
+            $shipments = Shipments::all();
             $currentStatus = GenericCatalog::where('gntc_group', 'STATUS_E_REPORT')->get();
 
             // Obtener los catálogos para 'MWD_LOCATION' (origen) y 'STATUS_E_REPORT' (estado actual)
@@ -137,7 +138,7 @@ class CalendarController extends Controller
     public function getShipmentDetails($pk_shipment)
     {
         // Buscar el envío por la clave primaria
-        $shipment = Shipment::with(['currentStatus', 'originCatalog'])->findOrFail($pk_shipment);
+        $shipment = Shipments::with(['currentStatus', 'originCatalog'])->findOrFail($pk_shipment);
 
         // Formatear los datos para enviarlos al frontend
         return response()->json([
@@ -155,7 +156,7 @@ class CalendarController extends Controller
     {
         try {
             // Buscar el envío por pk_shipment
-            $shipment = Shipment::findOrFail($pk_shipment);
+            $shipment = Shipments::findOrFail($pk_shipment);
 
 
             // Validar los datos recibidos

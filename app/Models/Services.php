@@ -14,20 +14,22 @@ class Service extends Model
 
     // Especificar las columnas que se pueden llenar masivamente (mass assignable)
     protected $fillable = [
-        'pk_service',
         'id_service',
         'type',
         'status',
         'transport',
-        'delivery_appoinment',
+        'delivery_appointment',
         'waiting_time',
-        'appoinment',
+        'appointment',
         'departure_date',
         'arrival_date',
         'from',
         'to',
         'date',
         'hbl',
+        'containers',
+        'booking',
+        'bol',
         'mbl',
         'vesselname',
         'awb',
@@ -38,11 +40,15 @@ class Service extends Model
         'flight',
         'name',
         'class',
-        'spin',
+        'spIn',
         'pedimentoR',
         'icv',
         'exchanger',
         'commissions1',
+        'icvfc',
+        'nicvfc',
+        'dat',
+        'commissions2',
         'crn',
         'trnu',
         'ST_Date_in_Transit',
@@ -60,11 +66,17 @@ class Service extends Model
         'wh_doc',
         'ci_doc',
         'other_doc',
-        'ST_Date_released',
+        'ST_Date_Released',
         'dateCreated',
         'dateUpdated',
     ];
 
     // Si no estás usando los timestamps (created_at y updated_at), puedes desactivar con:
     public $timestamps = false;
+
+    // Relación inversa con Sgipments
+    public function services()
+    {
+        return $this->hasMany(Shipments::class, 'stm_id', 'id_service');
+    }
 }
