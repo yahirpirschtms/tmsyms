@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -149,7 +150,7 @@ class Shipments extends Model
     {
         return Carbon::parse($value)->format('m/d/Y');
     }*/
-     /*public function getPickUpDateAttribute($value)
+    public function getPickUpDateAttribute($value)
     {
             return Carbon::parse($value)->format('m/d/Y H:i:s');
     }
@@ -164,7 +165,7 @@ class Shipments extends Model
     public function getetdAttribute($value)
     {
             return Carbon::parse($value)->format('m/d/Y H:i:s');
-    }*/
+    }
 
 
     // Relación con la tabla `services`
