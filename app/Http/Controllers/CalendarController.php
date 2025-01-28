@@ -147,7 +147,7 @@ class CalendarController extends Controller
             'current_status' => $shipment->currentStatus ? $shipment->currentStatus->gntc_value : 'Unknown',
             'delivered_date' => $shipment->formatted_delivered_date,
             'at_door_date' => $shipment->at_door_date ? $shipment->at_door_date->format('m/d/Y H:i') : 'N/A',
-            'offload_date' => $shipment->offload_date ? $shipment->offload_date->format('m/d/Y H:i') : 'N/A',
+            'offloading_time' => $shipment->offloading_time ?? 'N/A', // Cambio aquí para tipo Time
             'wh_auth_date' => $shipment->wh_auth_date ? $shipment->wh_auth_date->format('m/d/Y H:i') : 'N/A',
         ]);
     }
@@ -160,15 +160,15 @@ class CalendarController extends Controller
 
 
             // Validar los datos recibidos
-            $validatedData = $request->validate([
-                'trailer_id' => 'nullable|string|max:255', // ID del remolque
-                'stm_id' => 'nullable|integer', // ID del STM
-                'gnct_id_current_status' => 'nullable|integer', // Estado actual
-                'delivered_date' => 'nullable|date', // Fecha de entrega
-                'at_door_date' => 'nullable|date', // Fecha de llegada
-                'offload_date' => 'nullable|date', // Fecha de descarga
-                'wh_auth_date' => 'nullable|date', // Fecha de autorización
-            ]);
+                $validatedData = $request->validate([
+                    'trailer_id' => 'nullable|string|max:255', // ID del remolque
+                    'stm_id' => 'nullable|integer', // ID del STM
+                    'gnct_id_current_status' => 'nullable|integer', // Estado actual
+                    'delivered_date' => 'nullable|date', // Fecha de entrega
+                    'at_door_date' => 'nullable|date', // Fecha de llegada
+                    'offloading_time' => 'nullable|date_format:H:i', // Hora de descarga
+                    'wh_auth_date' => 'nullable|date', // Fecha de autorización
+                ]);
 
             // Actualizar el envío con los nuevos datos
             $shipment->update($validatedData);
