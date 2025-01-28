@@ -312,28 +312,55 @@
 }
 
  /* Estilo para las pestañas nav-pills */
- .nav-pills .nav-link {
-        font-weight: 600;
-        background-color: #f8f9fa;
-        color: #007bff;
-        border: 1px solid #ddd;
-        border-radius: 50px;
-        transition: background-color 0.3s, color 0.3s;
+
+ .nav-tabs {
+    font-weight: 600;
+    background-color: #f8f9fa;
+    color: #007bff;
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    transition: background-color 0.3s, color 0.3s;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap; /* Esto permite que las pestañas se ajusten en pantallas más pequeñas */
+}
+
+/* Pestañas inactivas con texto oscuro */
+.nav-pills .nav-link {
+    font-weight: 600;
+    background-color: #f8f9fa;
+    color: #007bff;
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    margin: 0 10px 10px 10px; /* Separación horizontal y vertical */
+    padding: 10px 15px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Estilo para la pestaña activa */
+.nav-pills .nav-link.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+/* Estilo para la pestaña cuando se pasa el cursor */
+.nav-pills .nav-link:hover {
+    background-color: #e2e6ea;
+    color: #0056b3;
+}
+
+/* Media query para pantallas móviles */
+@media (max-width: 576px) {
+    .nav-tabs {
+        flex-direction: column; /* Hace que las pestañas se alineen verticalmente */
+        align-items: center; /* Centra las pestañas en la pantalla */
     }
 
-    /* Estilo para la pestaña activa */
-    .nav-pills .nav-link.active {
-        background-color: #007bff;
-        color: white;
-        border-color: #007bff;
+    .nav-pills .nav-link {
+        margin: 5px 0; /* Espaciado vertical en pantallas pequeñas */
     }
-
-    /* Estilo para la pestaña cuando se pasa el cursor */
-    .nav-pills .nav-link:hover {
-        background-color: #e2e6ea;
-        color: #0056b3;
-    }
-
+}
     /* Estilo para el modal */
     .modal-header {
         background-color: #007bff;
