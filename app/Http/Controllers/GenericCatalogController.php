@@ -10,7 +10,7 @@ class GenericCatalogController extends Controller
     public function getCurrentStatus()
     {
         // Obtener los registros del grupo 'STATUS_E_REPORT'
-        $currentStatus = GenericCatalog::where('gntc_group', 'STATUS_E_REPORT')
+        $data = GenericCatalog::where('gntc_group', 'STATUS_E_REPORT')
             ->select('gnct_id', 'gnct_description') // Seleccionamos los campos necesarios
             ->get();
 
@@ -18,7 +18,7 @@ class GenericCatalogController extends Controller
         // dd($currentStatus);
 
         // Devolver los datos en formato JSON (opcional si quieres consumirlos vía AJAX)
-        return response()->json($currentStatus);
+        return response()->json($data);
     }
 
     // Método para obtener indicadores de disponibilidad (como lo tenías originalmente)
