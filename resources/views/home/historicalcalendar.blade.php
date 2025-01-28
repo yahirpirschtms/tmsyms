@@ -34,7 +34,7 @@
 <div id="shipmentModal{{ $shipment->stm_id }}" class="modal fade" tabindex="-1" aria-labelledby="shipmentModalLabel{{ $shipment->stm_id }}" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header" style="background-color: #0056b3;" >
                 <h5 class="modal-title" id="shipmentModalLabel{{ $shipment->stm_id }}">Shipment Details</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -273,6 +273,52 @@
     margin: 0 auto;
 }
 
+.fc-toolbar-title{
+    color: #0056b3;
+    font-weight: bolder;
+}
+/* Día actual en la vista de cuadrícula (mes) */
+.fc-daygrid-day.fc-day-today {
+    background-color: #dde5f4 !important;
+}
+
+/* Estilo base para todos los botones */
+.fc-button {
+    background-color: #0056b3 !important; /* Color de fondo (ejemplo: verde) */
+    color: white !important; /* Color del texto */
+    border: none !important; /* Eliminar el borde */
+    border-radius: 5px; /* Bordes redondeados */
+}
+
+/* Cambiar el color cuando el botón está activo */
+.fc-button-primary {
+    background-color: #0056b3 !important; /* Un verde más oscuro */
+}
+/* Estilo para botones activos (sin borde negro) */
+.fc-button.fc-button-active,
+.fc-button:active {
+    outline: none !important; /* Elimina el borde por defecto */
+    box-shadow: none !important; /* Elimina la sombra */
+}
+
+/* Cambiar el color al pasar el mouse */
+.fc-button:hover {
+    background-color: #3372bf !important; /* Un verde más claro */
+    color: #fff !important;
+}
+
+/* Eliminar la opacidad de los eventos en la vista de semana */
+.fc-timegrid-event {
+    opacity: 1 !important; /* Elimina la opacidad */
+    background-color: darkorange !important; /* Un fondo verde brillante */
+    border: none !important;
+}
+
+/* Día actual en las vistas de semana y día */
+.fc-timegrid-col.fc-day-today {
+    background-color: #dde5f4 !important;
+}
+
 .fc-daygrid-day {
     height: 120px; /* Ajusta la altura de las celdas de las fechas */
 }
@@ -284,26 +330,36 @@
 .fc-daygrid-day-frame {
     padding: 5px; /* Puedes añadir un poco de espacio dentro de las celdas */
 }
-
+/*.fc-timegrid-slot .fc-timegrid-slot-lane {
+    background-color: white;
+}*/
+.fc-col-header-cell-cushion{
+    text-decoration: none;
+    color: #0056b3;
+}
+.fc-daygrid-day-number{
+    text-decoration: none;
+    color: #0056b3;
+}
 .fc-event {
-background-color: #4CAF50;
-color: white;
-border-radius: 5px;
-padding: 10px;
-font-size: 12px;
+    background-color: darkorange;
+    color: white;
+    border-radius: .375rem;
+    padding: 10px;
+    font-size: 12px;
 }
 
 .fc-event-title {
-font-weight: bold;
-margin-bottom: 5px;
+    font-weight: bold;
+    margin-bottom: 5px;
 }
 
 .fc-event-description {
-font-size: 10px;
+    font-size: 10px;
 }
 
 .fc-event:hover {
-background-color: #45a049;
+    background-color: #3372bf;
 }
 
 /* Estilo para las pestañas nav-pills */
@@ -352,6 +408,9 @@ background-color: #45a049;
 .tab-content p {
     font-size: 14px;
     line-height: 1.6;
+}
+.fc-button{
+    background-color: #0056b3;
 }
 </style>
 
