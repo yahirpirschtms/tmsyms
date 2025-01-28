@@ -117,17 +117,45 @@
                 <div class="offcanvas-body">
                     <ul class="nav nav-pills mb-3" id="pills-tab-{{ $shipment->stm_id }}" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <a class="nav-link active" id="pills-initial-status-tab-{{ $shipment->stm_id }}" data-bs-toggle="pill" href="#pills-initial-status-{{ $shipment->stm_id }}" role="tab" aria-controls="pills-initial-status" aria-selected="true">Initial Shipment Status</a>
+                            <a class="nav-link active"
+                               id="pills-initial-status-tab-{{ $shipment->stm_id }}"
+                               data-bs-toggle="pill"
+                               href="#pills-initial-status-{{ $shipment->stm_id }}"
+                               role="tab"
+                               aria-controls="pills-initial-status-{{ $shipment->stm_id }}"
+                               aria-selected="true">
+                                Initial Shipment Status
+                            </a>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <a class="nav-link" id="pills-update-status-tab-{{ $shipment->stm_id }}" data-bs-toggle="pill" href="#pills-update-status-{{ $shipment->stm_id }}" role="tab" aria-controls="pills-update-status-{{ $shipment->stm_id }}" aria-selected="false">Update Shipment Status</a>
+                            <a class="nav-link"
+                               id="pills-update-status-tab-{{ $shipment->stm_id }}"
+                               data-bs-toggle="pill"
+                               href="#pills-update-status-{{ $shipment->stm_id }}"
+                               role="tab"
+                               aria-controls="pills-update-status-{{ $shipment->stm_id }}"
+                               aria-selected="false">
+                                Update Shipment Status
+                            </a>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <a class="nav-link" id="pills-shipment-details-tab-{{ $shipment->stm_id }}" data-bs-toggle="pill" href="#pills-shipment-details-{{ $shipment->stm_id }}" role="tab" aria-controls="pills-shipment-details-{{ $shipment->stm_id }}" aria-selected="false">Shipment Details</a>
+                            <a class="nav-link"
+                               id="pills-shipment-details-tab-{{ $shipment->stm_id }}"
+                               data-bs-toggle="pill"
+                               href="#pills-shipment-details-{{ $shipment->stm_id }}"
+                               role="tab"
+                               aria-controls="pills-shipment-details-{{ $shipment->stm_id }}"
+                               aria-selected="false">
+                                Shipment Details
+                            </a>
                         </li>
                     </ul>
+                    <!-- Contenido de las pestañas -->
                     <div class="tab-content" id="pills-tabContent-{{ $shipment->stm_id }}">
-                        <div class="tab-pane fade show active" id="pills-initial-status-{{ $shipment->stm_id }}" role="tabpanel" aria-labelledby="pills-initial-status-tab">
+                        <div class="tab-pane fade show active"
+                            id="pills-initial-status-{{ $shipment->stm_id }}"
+                            role="tabpanel"
+                            aria-labelledby="pills-initial-status-tab-{{ $shipment->stm_id }}">
                             <form>
                                 <div class="mb-3">
                                     <label for="stm_id" class="form-label">STM ID</label>
@@ -229,183 +257,187 @@
                             </form>
 
                         </div>
+                        <div class="tab-pane fade"
+                            id="pills-update-status-{{ $shipment->stm_id }}"
+                            role="tabpanel"
+                            aria-labelledby="pills-update-status-tab-{{ $shipment->stm_id }}">
+                            <form id="shipmentForm-{{ $shipment->stm_id }}" method="POST" action="/update-status-endpoint/{{ $shipment->pk_shipment }}">
+                                @method('PUT')
+                                @csrf
+                                <input type="hidden" name="_method" value="PUT">
 
-                    </div>
-                    <!-- Update Shipment Status -->
-                    <div class="tab-pane fade" id="pills-update-status-{{ $shipment->stm_id }}" role="tabpanel" aria-labelledby="pills-update-status-tab-{{ $shipment->stm_id }}">
-                        <form id="shipmentForm-{{ $shipment->stm_id }}" method="POST" action="/update-status-endpoint/{{ $shipment->pk_shipment }}">
-                            @method('PUT')
-                            @csrf
-                            <input type="hidden" name="_method" value="PUT">
-
-                            <select class="form-select" id="currentStatus-{{ $shipment->stm_id }}" name="gnct_id_current_status">
-                                @foreach ($currentStatus as $status)
-                                    <label for="currentStatus-{{ $shipment->stm_id }}" class="form-label">Current Status</label>
-                                    <option value="{{ $status->gnct_id }}" {{ old('gnct_id_current_status', $shipment->gnct_id_current_status) == $status->gnct_id ? 'selected' : '' }}>
-                                        {{ $status->gntc_description }}
-                                    </option>
-                                @endforeach
-                            </select>
-
-                            <div class="mb-3">
-                                <label for="driverAssignmentDate-{{ $shipment->stm_id }}" class="form-label">Driver Assignment Date</label>
-                                <input type="datetime-local" class="form-control" id="driverAssignmentDate-{{ $shipment->stm_id }}" name="driver_assigned_date"
-                                    value="{{ $shipment->driver_assigned_date ? \Carbon\Carbon::parse($shipment->driver_assigned_date)->format('Y-m-d\TH:i') : '' }}">
-                            </div>
-                            <div class="mb-3">
-                                <label for="pickUpDate-{{ $shipment->stm_id }}" class="form-label">Pick Up Date</label>
-                                <input type="datetime-local" class="form-control" id="pickUpDate-{{ $shipment->stm_id }}" name="pick_up_date"
-                                    value="{{ $shipment->pick_up_date ? \Carbon\Carbon::parse($shipment->pick_up_date)->format('Y-m-d\TH:i') : '' }}">
-                            </div>
-                            <div class="mb-3">
-                                <label for="inTransitDate-{{ $shipment->stm_id }}" class="form-label">In Transit Date</label>
-                                <input type="datetime-local" class="form-control" id="inTransitDate-{{ $shipment->stm_id }}" name="intransit_date"
-                                    value="{{ $shipment->intransit_date ? \Carbon\Carbon::parse($shipment->intransit_date)->format('Y-m-d\TH:i') : '' }}">
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="securedYardDate-{{ $shipment->stm_id }}" class="form-label">Secured Yard Date</label>
-                                <input type="datetime-local" class="form-control" id="securedYardDate-{{ $shipment->stm_id }}" name="secured_yarddate"
-                                    value="{{ $shipment->secured_yarddate ? \Carbon\Carbon::parse($shipment->secured_yarddate)->format('Y-m-d\TH:i') : '' }}">
-                            </div>
-
-                            <!-- Campos de Incidentes desactivados para pruebas -->
-                            <div class="mb-3">
-                                <label for="secIncident-{{ $shipment->stm_id }}" class="form-label">Sec Incident</label>
-                                <select class="form-select" id="secIncident-{{ $shipment->stm_id }}" name="sec_incident" disabled>
-                                    <option value="null" selected>No Incident</option>
+                                <label for="currentStatus" class="form-label">Current Status</label>
+                                <select class="form-select" id="currentStatus" name="gnct_id_current_status">
+                                    @foreach ($currentStatus as $status)
+                                        <option value="{{ $status->gnct_id }}"
+                                            {{ old('gnct_id_current_status', $shipment->gnct_id_current_status) == $status->gnct_id ? 'selected' : '' }}>
+                                            {{ $status->gntc_description }}
+                                        </option>
+                                    @endforeach
                                 </select>
-                            </div>
-                            <div class="mb-3">
-                                <label for="incidentType-{{ $shipment->stm_id }}" class="form-label">Incident Type</label>
-                                <input type="text" class="form-control" id="incidentType-{{ $shipment->stm_id }}" name="incident_type" disabled placeholder="Type of incident (if any)">
-                            </div>
-                            <div class="mb-3">
-                                <label for="incidentDate-{{ $shipment->stm_id }}" class="form-label">Incident Date</label>
-                                <input type="datetime-local" class="form-control" id="incidentDate-{{ $shipment->stm_id }}" name="incident_date" disabled>
-                            </div>
 
-                            <div class="d-flex justify-content-end">
-                                <button type="submit" class="btn btn-primary">Save</button>
-                            </div>
-                        </form>
+                                <div class="mb-3">
+                                    <label for="driverAssignmentDate-{{ $shipment->stm_id }}" class="form-label">Driver Assignment Date</label>
+                                    <input type="datetime-local" class="form-control" id="driverAssignmentDate-{{ $shipment->stm_id }}" name="driver_assigned_date"
+                                        value="{{ $shipment->driver_assigned_date ? \Carbon\Carbon::parse($shipment->driver_assigned_date)->format('Y-m-d\TH:i') : '' }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="pickUpDate-{{ $shipment->stm_id }}" class="form-label">Pick Up Date</label>
+                                    <input type="datetime-local" class="form-control" id="pickUpDate-{{ $shipment->stm_id }}" name="pick_up_date"
+                                        value="{{ $shipment->pick_up_date ? \Carbon\Carbon::parse($shipment->pick_up_date)->format('Y-m-d\TH:i') : '' }}">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="inTransitDate-{{ $shipment->stm_id }}" class="form-label">In Transit Date</label>
+                                    <input type="datetime-local" class="form-control" id="inTransitDate-{{ $shipment->stm_id }}" name="intransit_date"
+                                        value="{{ $shipment->intransit_date ? \Carbon\Carbon::parse($shipment->intransit_date)->format('Y-m-d\TH:i') : '' }}">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="securedYardDate-{{ $shipment->stm_id }}" class="form-label">Secured Yard Date</label>
+                                    <input type="datetime-local" class="form-control" id="securedYardDate-{{ $shipment->stm_id }}" name="secured_yarddate"
+                                        value="{{ $shipment->secured_yarddate ? \Carbon\Carbon::parse($shipment->secured_yarddate)->format('Y-m-d\TH:i') : '' }}">
+                                </div>
+
+                                <!-- Campos de Incidentes desactivados para pruebas -->
+                                <div class="mb-3">
+                                    <label for="secIncident-{{ $shipment->stm_id }}" class="form-label">Sec Incident</label>
+                                    <select class="form-select" id="secIncident-{{ $shipment->stm_id }}" name="sec_incident" disabled>
+                                        <option value="null" selected>No Incident</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="incidentType-{{ $shipment->stm_id }}" class="form-label">Incident Type</label>
+                                    <input type="text" class="form-control" id="incidentType-{{ $shipment->stm_id }}" name="incident_type" disabled placeholder="Type of incident (if any)">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="incidentDate-{{ $shipment->stm_id }}" class="form-label">Incident Date</label>
+                                    <input type="datetime-local" class="form-control" id="incidentDate-{{ $shipment->stm_id }}" name="incident_date" disabled>
+                                </div>
+
+                                <div class="d-flex justify-content-end">
+                                    <button type="submit" class="btn btn-primary">Save</button>
+                                </div>
+                            </form>
+
+                        </div>
+                        <div class="tab-pane fade"
+                            id="pills-shipment-details-{{ $shipment->stm_id }}"
+                            role="tabpanel"
+                            aria-labelledby="pills-shipment-details-tab-{{ $shipment->stm_id }}">
+                            <form id="shipmentDetailsForm">
+                                @csrf
+                                <div class="mb-3">
+                                    <label class="form-label">STM ID</label>
+                                    <p>{{ $shipment->stm_id }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Reference</label>
+                                    <p>{{ $shipment->reference }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Bonded</label>
+                                    <p>{{ $shipment->bonded }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Origin</label>
+                                    <p>{{ $shipment->company->CoName ?? 'Origen no disponible' }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Destination</label>
+                                    <p>{{ $shipment->destinationFacility->fac_name }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Pre-Alerted Date & Time</label>
+                                    <p>{{ \Carbon\Carbon::parse($shipment->pre_alerted_datetime)->format('m/d/Y H:i:s') }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Trailer ID</label>
+                                    <p>{{ $shipment->id_trailer }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Company ID</label>
+                                    <p>{{ $shipment->company->id_company }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Trailer</label>
+                                    <p>{{ $shipment->trailer }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Truck</label>
+                                    <p>{{ $shipment->truck }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Driver ID</label>
+                                    <p>{{ $shipment->id_driver }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">ETD (Estimated Time of Departure)</label>
+                                    <p>{{ \Carbon\Carbon::parse($shipment->etd)->format('m/d/Y H:i:s') }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Units</label>
+                                    <p>{{ $shipment->units }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Pallets</label>
+                                    <p>{{ $shipment->pallets }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Security Seals</label>
+                                    <p>{{ $shipment->security_seals }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Overhaul ID</label>
+                                    <p>{{ $shipment->overhaul_id }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Device Number</label>
+                                    <p>{{ $shipment->device_number }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Secondary Shipment ID</label>
+                                    <p>{{ $shipment->secondary_shipment_id }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Driver Assigned Date</label>
+                                    <p>{{ \Carbon\Carbon::parse($shipment->driver_assigned_date)->format('m/d/Y H:i:s') }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Pick-Up Date</label>
+                                    <p>{{ \Carbon\Carbon::parse($shipment->pick_up_date)->format('m/d/Y H:i:s') }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">In Transit Date</label>
+                                    <p>{{ \Carbon\Carbon::parse($shipment->intransit_date)->format('m/d/Y H:i:s') }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Secured Yard Date</label>
+                                    <p>{{ \Carbon\Carbon::parse($shipment->secured_yarddate)->format('m/d/Y H:i:s') }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Current Status</label>
+                                    <p>{{ $shipment->currentStatus->gntc_description ?? 'Unknown' }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Shipment Type (GNCT ID)</label>
+                                    <p>{{ $shipment->gnct_id_shipment_type }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Delivered Date</label>
+                                    <p>{{ \Carbon\Carbon::parse($shipment->delivered_date)->format('m/d/Y H:i:s') }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">At Door Date</label>
+                                    <p>{{ \Carbon\Carbon::parse($shipment->at_door_date)->format('m/d/Y H:i:s') }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Approved ETA date & Time</label>
+                                    <p>{{ $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y H:i:s') : 'Approved ETA date no disponible' }}</p>
+                                </div>
+                            </form>
+
+                        </div>
                     </div>
-
-                    <!--Pestaña detalles generales-->
-                    <div class="tab-pane fade show active" id="pills-shipment-details" role="tabpanel" aria-labelledby="pills-shipment-details-tab">
-                        <form id="shipmentDetailsForm">
-                            @csrf
-                            <div class="mb-3">
-                                <label class="form-label">STM ID</label>
-                                <p>{{ $shipment->stm_id }}</p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Reference</label>
-                                <p>{{ $shipment->reference }}</p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Bonded</label>
-                                <p>{{ $shipment->bonded }}</p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Origin</label>
-                                <p>{{ $shipment->company->CoName ?? 'Origen no disponible' }}</p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Destination</label>
-                                <p>{{ $shipment->destinationFacility->fac_name }}</p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Pre-Alerted Date & Time</label>
-                                <p>{{ \Carbon\Carbon::parse($shipment->pre_alerted_datetime)->format('m/d/Y H:i:s') }}</p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Trailer ID</label>
-                                <p>{{ $shipment->id_trailer }}</p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Company ID</label>
-                                <p>{{ $shipment->company->id_company }}</p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Trailer</label>
-                                <p>{{ $shipment->trailer }}</p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Truck</label>
-                                <p>{{ $shipment->truck }}</p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Driver ID</label>
-                                <p>{{ $shipment->id_driver }}</p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">ETD (Estimated Time of Departure)</label>
-                                <p>{{ \Carbon\Carbon::parse($shipment->etd)->format('m/d/Y H:i:s') }}</p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Units</label>
-                                <p>{{ $shipment->units }}</p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Pallets</label>
-                                <p>{{ $shipment->pallets }}</p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Security Seals</label>
-                                <p>{{ $shipment->security_seals }}</p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Overhaul ID</label>
-                                <p>{{ $shipment->overhaul_id }}</p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Device Number</label>
-                                <p>{{ $shipment->device_number }}</p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Secondary Shipment ID</label>
-                                <p>{{ $shipment->secondary_shipment_id }}</p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Driver Assigned Date</label>
-                                <p>{{ \Carbon\Carbon::parse($shipment->driver_assigned_date)->format('m/d/Y H:i:s') }}</p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Pick-Up Date</label>
-                                <p>{{ \Carbon\Carbon::parse($shipment->pick_up_date)->format('m/d/Y H:i:s') }}</p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">In Transit Date</label>
-                                <p>{{ \Carbon\Carbon::parse($shipment->intransit_date)->format('m/d/Y H:i:s') }}</p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Secured Yard Date</label>
-                                <p>{{ \Carbon\Carbon::parse($shipment->secured_yarddate)->format('m/d/Y H:i:s') }}</p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Current Status</label>
-                                <p>{{ $shipment->currentStatus->gntc_description ?? 'Unknown' }}</p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Shipment Type (GNCT ID)</label>
-                                <p>{{ $shipment->gnct_id_shipment_type }}</p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Delivered Date</label>
-                                <p>{{ \Carbon\Carbon::parse($shipment->delivered_date)->format('m/d/Y H:i:s') }}</p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">At Door Date</label>
-                                <p>{{ \Carbon\Carbon::parse($shipment->at_door_date)->format('m/d/Y H:i:s') }}</p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Approved ETA date & Time</label>
-                                <p>{{ $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y H:i:s') : 'Approved ETA date no disponible' }}</p>
-                            </div>
-                        </form>
-                    </div>
-
 
                 </div>
             </div>
@@ -572,65 +604,88 @@
 
 @section('custom-css')
 <style>
-    /* Estilo general del offcanvas */
-    .offcanvas-header {
-        background-color: #343a40;
-        color: #fff;
-        border-bottom: 2px solid #495057;
-    }
+/* Estilo general del offcanvas */
+.offcanvas-header {
+    background-color: #343a40; /* Fondo oscuro */
+    color: #fff; /* Texto blanco */
+    border-bottom: 2px solid #495057; /* Borde gris */
+}
 
-    .offcanvas-title {
-        font-size: 1.25rem;
-        font-weight: bold;
-    }
+.offcanvas-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
 
-    .btn-close {
-        color: #fff;
-        opacity: 0.8;
-    }
+.btn-close {
+    color: #fff;
+    opacity: 0.8;
+}
 
-    .btn-close:hover {
-        opacity: 1;
-    }
+.btn-close:hover {
+    opacity: 1;
+}
 
-    /* Estilo de las pestañas */
+/* Estilo de las pestañas en el offcanvas */
+/* Estilo de las pestañas en el offcanvas */
+.nav-tabs {
+    font-weight: 600;
+    background-color: #f8f9fa;
+    color: #007bff;
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    transition: background-color 0.3s, color 0.3s;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap; /* Esto permite que las pestañas se ajusten en pantallas más pequeñas */
+}
+
+/* Pestañas inactivas con texto oscuro */
+.nav-pills .nav-link {
+    font-weight: 600;
+    background-color: #f8f9fa;
+    color: #007bff;
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    margin: 0 10px 10px 10px; /* Separación horizontal y vertical */
+    padding: 10px 15px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Estilo para la pestaña activa */
+.nav-pills .nav-link.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+/* Estilo para la pestaña cuando se pasa el cursor */
+.nav-pills .nav-link:hover {
+    background-color: #e2e6ea;
+    color: #0056b3;
+}
+
+/* Media query para pantallas móviles */
+@media (max-width: 576px) {
     .nav-tabs {
-        border-bottom: 2px solid #dee2e6;
-        justify-content: center;
-        padding: 10px 0;
-        background-color: #f8f9fa;
-        border-radius: 5px;
+        flex-direction: column; /* Hace que las pestañas se alineen verticalmente */
+        align-items: center; /* Centra las pestañas en la pantalla */
     }
 
-    .nav-tabs .nav-link {
-        font-size: 1rem;
-        font-weight: bold;
-        color: #495057; /* Color visible para pestañas inactivas */
-        background-color: #e9ecef; /* Fondo gris claro para pestañas inactivas */
-        border: 1px solid #dee2e6;
-        border-radius: 5px;
-        margin: 0 5px;
-        padding: 10px 15px;
-        transition: all 0.3s ease-in-out;
+    .nav-pills .nav-link {
+        margin: 5px 0; /* Espaciado vertical en pantallas pequeñas */
     }
+}
 
-    .nav-tabs .nav-link.active {
-        color: #fff; /* Texto blanco para pestaña activa */
-        background-color: #0d6efd; /* Fondo azul Bootstrap para pestaña activa */
-        border-color: #0d6efd; /* Bordes azules */
-    }
+/* Estilo para el contenido del offcanvas */
+.offcanvas-body {
+    padding: 20px;
+    background-color: #f8f9fa; /* Fondo claro */
+}
 
-    .nav-tabs .nav-link:hover {
-        background-color: #d6d8db; /* Fondo más claro al pasar el mouse */
-        color: #212529; /* Texto más oscuro */
-    }
-
-    /* Contenido de las pestañas */
-    .tab-content {
-        background-color: #fff;
-        border: 1px solid #dee2e6;
-        border-radius: 5px;
-        padding: 15px;
-        margin-top: 10px;
-    }
+/* Estilo para el footer del offcanvas */
+.offcanvas-footer {
+    padding: 10px;
+    background-color: #e9ecef; /* Fondo gris claro */
+    border-top: 1px solid #dee2e6;
+}
 </style>

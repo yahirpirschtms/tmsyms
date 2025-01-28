@@ -237,39 +237,38 @@
                     <tbody>
                         @foreach ($shipments as $shipment)
                         <tr data-bs-toggle="modal" data-bs-target="#shipmentModal{{ $shipment->stm_id }}" class="clickable-row" data-shipment-id="{{ $shipment->stm_id }}">
-                            <td>{{ $shipment->shipmentType->gntc_description ?? 'No disponible' }}</td>
-                            <td>{{ $shipment->stm_id ?? 'No disponible' }}</td>
-                            <td>{{ $shipment->secondary_shipment_id ?? 'No disponible' }}</td>
-                            <td>{{ $shipment->reference ?? 'No disponible' }}</td>
-                            <td>{{ $shipment->company->CoName ?? 'Origen no disponible' }}</td>
-                            <td>{{ $shipment->id_trailer ?? 'No disponible' }}</td>
-                            <td>{{ $shipment->destinationFacility->fac_name ?? 'No disponible' }}</td>
-                            <td>{{ $shipment->pre_alerted_datetime ? \Carbon\Carbon::parse($shipment->pre_alerted_datetime)->format('m/d/Y H:i') : 'No disponible' }}</td>
-                            <td>{{ $shipment->carrier_dropping_trailer ?? 'No disponible' }}</td>
-                            <td>{{ $shipment->trailer_owner ?? 'No disponible' }}</td>
-                            <td>{{ $shipment->driver->drivername ? $shipment->driver->drivername . ' - ' . $shipment->truck : 'No disponible' }}</td>
-                            <td>{{ $shipment->etd ? \Carbon\Carbon::parse($shipment->etd)->format('m/d/Y') : 'No disponible' }}</td>
-                            <td>{{ $shipment->units ?? 'No disponible' }}</td>
-                            <td>{{ $shipment->pallets ?? 'No disponible' }}</td>
-                            <td>{{ $shipment->security_seals ?? 'No disponible' }}</td>
-                            <td>{{ $shipment->notes ?? 'No disponible' }}</td>
-                            <td>{{ $shipment->currentStatus->gntc_value ?? 'Estado no disponible' }}</td>
-                            <td>{{ $shipment->driver_assigned_date ? \Carbon\Carbon::parse($shipment->driver_assigned_date)->format('m/d/Y H:i') : 'No disponible' }}</td>
-                            <td>{{ $shipment->pick_up_date ? \Carbon\Carbon::parse($shipment->pick_up_date)->format('m/d/Y') : 'No disponible' }}</td>
-                            <td>{{ $shipment->intransit_date ? \Carbon\Carbon::parse($shipment->intransit_date)->format('m/d/Y') : 'No disponible' }}</td>
-                            <td>{{ $shipment->delivered_date ? \Carbon\Carbon::parse($shipment->delivered_date)->format('m/d/Y') : 'No disponible' }}</td>
-                            <td>{{ $shipment->secured_yarddate ? \Carbon\Carbon::parse($shipment->secured_yarddate)->format('m/d/Y H:i') : 'No disponible' }}</td>
-                            <td>{{ $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y H:i:s') : 'No disponible' }}</td>
-                            <td>{{ $shipment->sec_incident ?? 'No disponible' }}</td>
-                            <td>{{ $shipment->incident_type ?? 'No disponible' }}</td>
-                            <td>{{ $shipment->incident_date ? \Carbon\Carbon::parse($shipment->incident_date)->format('m/d/Y') : 'No disponible' }}</td>
-                            <td>{{ $shipment->incident_notes ?? 'No disponible' }}</td>
-                            <td>{{ $shipment->wh_status ?? 'No disponible' }}</td>
-                            <td>{{ $shipment->at_door_date ? \Carbon\Carbon::parse($shipment->at_door_date)->format('H:i') : 'No disponible' }}</td>
-                            <td>{{ $shipment->offloading_time ? \Carbon\Carbon::parse($shipment->offloading_time)->format('H:i') : 'No disponible' }}</td>
-                            <td>{{ $shipment->device_number ?? 'No disponible' }}</td>
-                            <td>{{ $shipment->overhaul_id ?? 'No disponible' }}</td>
-                        </tr>
+                            <td>{{ $shipment->shipmentType->gntc_description ?? 'Not available' }}</td>
+                            <td>{{ $shipment->stm_id ?? 'Not available' }}</td>
+                            <td>{{ $shipment->secondary_shipment_id ?? 'Not available' }}</td>
+                            <td>{{ $shipment->reference ?? 'Not available' }}</td>
+                            <td>{{ $shipment->company->CoName ?? 'Origin not available' }}</td>
+                            <td>{{ $shipment->id_trailer ?? 'Not available' }}</td>
+                            <td>{{ $shipment->destinationFacility->fac_name ?? 'Not available' }}</td>
+                            <td>{{ $shipment->pre_alerted_datetime ? \Carbon\Carbon::parse($shipment->pre_alerted_datetime)->format('m/d/Y H:i') : 'Not available' }}</td>
+                            <td>{{ $shipment->carrier_dropping_trailer ?? 'Not available' }}</td>
+                            <td>{{ $shipment->trailer_owner ?? 'Not available' }}</td>
+                            <td>{{ $shipment->driver->drivername ? $shipment->driver->drivername . ' - ' . $shipment->truck : 'Not available' }}</td>
+                            <td>{{ $shipment->etd ? \Carbon\Carbon::parse($shipment->etd)->format('m/d/Y') : 'Not available' }}</td>
+                            <td>{{ $shipment->units ?? 'Not available' }}</td>
+                            <td>{{ $shipment->pallets ?? 'Not available' }}</td>
+                            <td>{{ $shipment->security_seals ?? 'Not available' }}</td>
+                            <td>{{ $shipment->notes ?? 'Not available' }}</td>
+                            <td>{{ $shipment->currentStatus->gntc_value ?? 'Status not available' }}</td>
+                            <td>{{ $shipment->driver_assigned_date ? \Carbon\Carbon::parse($shipment->driver_assigned_date)->format('m/d/Y H:i') : 'Not available' }}</td>
+                            <td>{{ $shipment->pick_up_date ? \Carbon\Carbon::parse($shipment->pick_up_date)->format('m/d/Y') : 'Not available' }}</td>
+                            <td>{{ $shipment->intransit_date ? \Carbon\Carbon::parse($shipment->intransit_date)->format('m/d/Y') : 'Not available' }}</td>
+                            <td>{{ $shipment->delivered_date ? \Carbon\Carbon::parse($shipment->delivered_date)->format('m/d/Y') : 'Not available' }}</td>
+                            <td>{{ $shipment->secured_yarddate ? \Carbon\Carbon::parse($shipment->secured_yarddate)->format('m/d/Y H:i') : 'Not available' }}</td>
+                            <td>{{ $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y H:i:s') : 'Not available' }}</td>
+                            <td>{{ $shipment->sec_incident ?? 'Not available' }}</td>
+                            <td>{{ $shipment->incident_type ?? 'Not available' }}</td>
+                            <td>{{ $shipment->incident_date ? \Carbon\Carbon::parse($shipment->incident_date)->format('m/d/Y') : 'Not available' }}</td>
+                            <td>{{ $shipment->incident_notes ?? 'Not available' }}</td>
+                            <td>{{ $shipment->wh_status ?? 'Not available' }}</td>
+                            <td>{{ $shipment->at_door_date ? \Carbon\Carbon::parse($shipment->at_door_date)->format('H:i') : 'Not available' }}</td>
+                            <td>{{ $shipment->offloading_time ? \Carbon\Carbon::parse($shipment->offloading_time)->format('H:i') : 'Not available' }}</td>
+                            <td>{{ $shipment->device_number ?? 'Not available' }}</td>
+                            <td>{{ $shipment->overhaul_id ?? 'Not available' }}</td>
                         @endforeach
                     </tbody>
                 </table>
@@ -290,19 +289,29 @@
                         <!-- Pestañas de detalle -->
                         <ul class="nav nav-pills mb-3" id="pills-tab{{ $shipment->stm_id }}" role="tablist">
                             <li class="nav-item" role="presentation">
-                                <a class="nav-link active" id="pills-shipment-details-tab{{ $shipment->stm_id }}" data-bs-toggle="pill" href="#pills-shipment-details{{ $shipment->stm_id }}" role="tab" aria-controls="pills-shipment-details{{ $shipment->stm_id }}" aria-selected="true">Shipment Details</a>
+                                <a class="nav-link active" id="pills-shipment-details-tab{{ $shipment->stm_id }}"
+                                   data-bs-toggle="pill" href="#pills-shipment-details{{ $shipment->stm_id }}"
+                                   role="tab" aria-controls="pills-shipment-details{{ $shipment->stm_id }}"
+                                   aria-selected="true">Shipment Details</a>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <a class="nav-link" id="pills-update-status-tab{{ $shipment->stm_id }}" data-bs-toggle="pill" href="#pills-update-status{{ $shipment->stm_id }}" role="tab" aria-controls="pills-update-status{{ $shipment->stm_id }}" aria-selected="false">Initial Shipment Info</a>
+                                <a class="nav-link" id="pills-update-status-tab{{ $shipment->stm_id }}"
+                                   data-bs-toggle="pill" href="#pills-update-status{{ $shipment->stm_id }}"
+                                   role="tab" aria-controls="pills-update-status{{ $shipment->stm_id }}"
+                                   aria-selected="false">Initial Shipment Info</a>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <a class="nav-link" id="notes-tab{{ $shipment->stm_id }}" data-bs-toggle="pill" href="#notes{{ $shipment->stm_id }}" role="tab" aria-controls="notes{{ $shipment->stm_id }}" aria-selected="false">Update Shipment Status</a>
+                                <a class="nav-link" id="notes-tab{{ $shipment->stm_id }}"
+                                   data-bs-toggle="pill" href="#notes{{ $shipment->stm_id }}"
+                                   role="tab" aria-controls="notes{{ $shipment->stm_id }}"
+                                   aria-selected="false">Update Shipment Status</a>
                             </li>
                         </ul>
-                        </ul>
+
+                        <!-- Contenedor de contenido -->
                         <div class="tab-content" id="pills-tabContent{{ $shipment->stm_id }}">
-                            <!-- Shipment Details -->
-                            <div class="tab-pane fade show active" id="pills-shipment-details" role="tabpanel" aria-labelledby="pills-shipment-details-tab">
+                            <div class="tab-pane fade show active" id="pills-shipment-details{{ $shipment->stm_id }}"
+                                role="tabpanel" aria-labelledby="pills-shipment-details-tab{{ $shipment->stm_id }}">
                                 <div class="mb-3">
                                     <label class="form-label">STM ID</label>
                                     <p>{{ $shipment->stm_id }}</p>
@@ -408,8 +417,8 @@
                                     <p>{{ \Carbon\Carbon::parse($shipment->at_door_date)->format('m/d/Y H:i:s') }}</p>
                                 </div>
                             </div>
-                            <!-- Update Shipment Status -->
-                            <div class="tab-pane fade" id="pills-update-status{{ $shipment->stm_id }}" role="tabpanel" aria-labelledby="pills-update-status-tab{{ $shipment->stm_id }}">
+                            <div class="tab-pane fade" id="pills-update-status{{ $shipment->stm_id }}"
+                                role="tabpanel" aria-labelledby="pills-update-status-tab{{ $shipment->stm_id }}">
                                 <form>
                                     <div class="mb-3">
                                         <label for="stm_id" class="form-label">STM ID</label>
@@ -509,19 +518,19 @@
                                     <!-- Agrega más campos si es necesario -->
                                 </form>
                             </div>
-                            <!-- Notes -->
-                            <div class="tab-pane fade" id="notes{{ $shipment->stm_id }}" role="tabpanel" aria-labelledby="notes-tab{{ $shipment->stm_id }}">
+                            <div class="tab-pane fade" id="notes{{ $shipment->stm_id }}"
+                                role="tabpanel" aria-labelledby="notes-tab{{ $shipment->stm_id }}">
                                 <form id="shipmentForm" method="POST" action="/update-status-endpoint/{{ $shipment->pk_shipment }}">
                                     @method('PUT')
 
                                        @csrf
                                        <input type="hidden" name="_method" value="PUT">
 
+                                       <label for="currentStatus" class="form-label">Current Status</label>
                                        <select class="form-select" id="currentStatus" name="gnct_id_current_status">
-
                                            @foreach ($currentStatus as $status)
-                                               <label for="currentStatus" class="form-label">Current Status</label>
-                                               <option value="{{ $status->gnct_id }}" {{ old('gnct_id_current_status', $shipment->gnct_id_current_status) == $status->gnct_id ? 'selected' : '' }}>
+                                               <option value="{{ $status->gnct_id }}"
+                                                   {{ old('gnct_id_current_status', $shipment->gnct_id_current_status) == $status->gnct_id ? 'selected' : '' }}>
                                                    {{ $status->gntc_description }}
                                                </option>
                                            @endforeach
@@ -567,6 +576,7 @@
                                            <button type="submit" class="btn btn-primary">Save</button>
                                        </div>
                                    </form>
+
                             </div>
                         </div>
                     </div>
@@ -800,27 +810,54 @@
 
 /* Estilo para las pestañas */
  /* Estilo para las pestañas nav-pills */
- .nav-pills .nav-link {
-        font-weight: 600;
-        background-color: #f8f9fa;
-        color: #007bff;
-        border: 1px solid #ddd;
-        border-radius: 50px;
-        transition: background-color 0.3s, color 0.3s;
+ .nav-tabs {
+    font-weight: 600;
+    background-color: #f8f9fa;
+    color: #007bff;
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    transition: background-color 0.3s, color 0.3s;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap; /* Esto permite que las pestañas se ajusten en pantallas más pequeñas */
+}
+
+/* Pestañas inactivas con texto oscuro */
+.nav-pills .nav-link {
+    font-weight: 600;
+    background-color: #f8f9fa;
+    color: #007bff;
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    margin: 0 10px 10px 10px; /* Separación horizontal y vertical */
+    padding: 10px 15px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Estilo para la pestaña activa */
+.nav-pills .nav-link.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+/* Estilo para la pestaña cuando se pasa el cursor */
+.nav-pills .nav-link:hover {
+    background-color: #e2e6ea;
+    color: #0056b3;
+}
+
+/* Media query para pantallas móviles */
+@media (max-width: 576px) {
+    .nav-tabs {
+        flex-direction: column; /* Hace que las pestañas se alineen verticalmente */
+        align-items: center; /* Centra las pestañas en la pantalla */
     }
 
-    /* Estilo para la pestaña activa */
-    .nav-pills .nav-link.active {
-        background-color: #007bff;
-        color: white;
-        border-color: #007bff;
+    .nav-pills .nav-link {
+        margin: 5px 0; /* Espaciado vertical en pantallas pequeñas */
     }
-
-    /* Estilo para la pestaña cuando se pasa el cursor */
-    .nav-pills .nav-link:hover {
-        background-color: #e2e6ea;
-        color: #0056b3;
-    }
+}
 
     /* Estilo para el modal */
     .modal-header {
