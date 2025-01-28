@@ -237,39 +237,38 @@
                     <tbody>
                         @foreach ($shipments as $shipment)
                         <tr data-bs-toggle="modal" data-bs-target="#shipmentModal{{ $shipment->stm_id }}" class="clickable-row" data-shipment-id="{{ $shipment->stm_id }}">
-                            <td>{{ $shipment->shipmentType->gntc_description}}</td>
-                            <td>{{ $shipment->stm_id }}</td>
-                            <td>{{ $shipment->secondary_shipment_id }}</td>
-                            <td>{{ $shipment->reference }}</td>
+                            <td>{{ $shipment->shipmentType->gntc_description ?? 'No disponible' }}</td>
+                            <td>{{ $shipment->stm_id ?? 'No disponible' }}</td>
+                            <td>{{ $shipment->secondary_shipment_id ?? 'No disponible' }}</td>
+                            <td>{{ $shipment->reference ?? 'No disponible' }}</td>
                             <td>{{ $shipment->company->CoName ?? 'Origen no disponible' }}</td>
-                            <td>{{ $shipment->id_trailer }}</td>
-                            <td>{{ $shipment->destinationFacility->fac_name }}</td>
-                            <td>{{ \Carbon\Carbon::parse($shipment->pre_alerted_datetime)->format('m/d/Y H:i') ?? 'No disponible' }}</td>
-                            <td>{{ $shipment->carrier_dropping_trailer }}</td>
-                            <td>{{ $shipment->trailer_owner }}</td>
-                            <td>{{ $shipment->driver->drivername }} - {{ $shipment->truck }}</td>
-                            <td>{{ \Carbon\Carbon::parse($shipment->etd)->format('m/d/Y') }}</td>
-                            <td>{{ $shipment->units }}</td>
-                            <td>{{ $shipment->pallets }}</td>
-                            <td>{{ $shipment->security_seals }}</td>
-                            <td>{{ $shipment->notes }}</td>
+                            <td>{{ $shipment->id_trailer ?? 'No disponible' }}</td>
+                            <td>{{ $shipment->destinationFacility->fac_name ?? 'No disponible' }}</td>
+                            <td>{{ $shipment->pre_alerted_datetime ? \Carbon\Carbon::parse($shipment->pre_alerted_datetime)->format('m/d/Y H:i') : 'No disponible' }}</td>
+                            <td>{{ $shipment->carrier_dropping_trailer ?? 'No disponible' }}</td>
+                            <td>{{ $shipment->trailer_owner ?? 'No disponible' }}</td>
+                            <td>{{ $shipment->driver->drivername ? $shipment->driver->drivername . ' - ' . $shipment->truck : 'No disponible' }}</td>
+                            <td>{{ $shipment->etd ? \Carbon\Carbon::parse($shipment->etd)->format('m/d/Y') : 'No disponible' }}</td>
+                            <td>{{ $shipment->units ?? 'No disponible' }}</td>
+                            <td>{{ $shipment->pallets ?? 'No disponible' }}</td>
+                            <td>{{ $shipment->security_seals ?? 'No disponible' }}</td>
+                            <td>{{ $shipment->notes ?? 'No disponible' }}</td>
                             <td>{{ $shipment->currentStatus->gntc_value ?? 'Estado no disponible' }}</td>
-                            <td>{{ \Carbon\Carbon::parse($shipment->driver_assigned_date)->format('m/d/Y H:i') }}</td>
-                            <td>{{ \Carbon\Carbon::parse($shipment->pick_up_date)->format('m/d/Y') }}</td>
-                            <td>{{ \Carbon\Carbon::parse($shipment->intransit_date)->format('m/d/Y') }}</td>
-                            <td>{{ \Carbon\Carbon::parse($shipment->delivered_date)->format('m/d/Y') }}</td>
+                            <td>{{ $shipment->driver_assigned_date ? \Carbon\Carbon::parse($shipment->driver_assigned_date)->format('m/d/Y H:i') : 'No disponible' }}</td>
+                            <td>{{ $shipment->pick_up_date ? \Carbon\Carbon::parse($shipment->pick_up_date)->format('m/d/Y') : 'No disponible' }}</td>
+                            <td>{{ $shipment->intransit_date ? \Carbon\Carbon::parse($shipment->intransit_date)->format('m/d/Y') : 'No disponible' }}</td>
+                            <td>{{ $shipment->delivered_date ? \Carbon\Carbon::parse($shipment->delivered_date)->format('m/d/Y') : 'No disponible' }}</td>
                             <td>{{ $shipment->secured_yarddate ? \Carbon\Carbon::parse($shipment->secured_yarddate)->format('m/d/Y H:i') : 'No disponible' }}</td>
-                            <td>{{ \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y H:i:s') }}</td>
-
-                            <td>{{ $shipment->sec_incident }}</td>
-                            <td>{{ $shipment->incident_type }}</td>
-                            <td>{{ \Carbon\Carbon::parse($shipment->incident_date)->format('m/d/Y') }}</td>
-                            <td>{{ $shipment->incident_notes }}</td>
-                            <td>{{ $shipment->wh_status }}</td>
-                            <td>{{ \Carbon\Carbon::parse($shipment->at_door_date)->format('H:i') }}</td>
-                            <td>{{ \Carbon\Carbon::parse($shipment->offloading_time)->format('H:i') }}</td>
-                            <td>{{ $shipment->device_number }}</td>
-                            <td>{{ $shipment->overhaul_id }}</td>
+                            <td>{{ $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y H:i:s') : 'No disponible' }}</td>
+                            <td>{{ $shipment->sec_incident ?? 'No disponible' }}</td>
+                            <td>{{ $shipment->incident_type ?? 'No disponible' }}</td>
+                            <td>{{ $shipment->incident_date ? \Carbon\Carbon::parse($shipment->incident_date)->format('m/d/Y') : 'No disponible' }}</td>
+                            <td>{{ $shipment->incident_notes ?? 'No disponible' }}</td>
+                            <td>{{ $shipment->wh_status ?? 'No disponible' }}</td>
+                            <td>{{ $shipment->at_door_date ? \Carbon\Carbon::parse($shipment->at_door_date)->format('H:i') : 'No disponible' }}</td>
+                            <td>{{ $shipment->offloading_time ? \Carbon\Carbon::parse($shipment->offloading_time)->format('H:i') : 'No disponible' }}</td>
+                            <td>{{ $shipment->device_number ?? 'No disponible' }}</td>
+                            <td>{{ $shipment->overhaul_id ?? 'No disponible' }}</td>
                         </tr>
                         @endforeach
                     </tbody>
