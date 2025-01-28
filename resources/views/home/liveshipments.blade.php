@@ -89,11 +89,11 @@
                         <div class="card">
                             <div class="card-body text-black border border-1 rounded" style="">
                                 <h5 class="card-title fw-bolder" style="color:#1e4877">{{ $shipment->stm_id }}</h5>
-                                <p class="origin fw-medium" style="color: #252525;">{{ $shipment->company->CoName ?? 'Origen no disponible' }}</p>
+                                <p class="origin" style="color: #252525;">{{ $shipment->company->CoName ?? 'Origen no disponible' }}</p>
 
-                                <p class="status fw-medium" style="color: #252525;">{{ $shipment->currentStatus->gntc_description ?? 'Estado no disponible' }}</p>
-                                <p class="fw-medium" style="color: #252525;">{{ $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y') : 'Approved ETA date no disponible' }}</p>
-                                <p class="driver fw-medium" style="color: #252525;">{{ $shipment->driver->drivername ?? 'Conductor no asignado' }}</p>
+                                <p class="status" style="color: #252525;">{{ $shipment->currentStatus->gntc_description ?? 'Estado no disponible' }}</p>
+                                <p class="" style="color: #252525;">{{ $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y') : 'Approved ETA date no disponible' }}</p>
+                                <p class="driver" style="color: #252525;">{{ $shipment->driver->drivername ?? 'Conductor no asignado' }}</p>
                                 <div class="d-flex justify-content-between">
                                     <button class="btn btn-sm text-white" data-bs-toggle="offcanvas" style="background-color: rgb(13, 82, 200);"
                                         data-bs-target="#offcanvasUpdateStatus-{{ $shipment->stm_id }}">
@@ -110,9 +110,9 @@
 
         @foreach ($shipments as $shipment)
             <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasUpdateStatus-{{ $shipment->stm_id }}" aria-labelledby="offcanvasUpdateStatusLabel-{{ $shipment->stm_id }}">
-                <div class="offcanvas-header">
+                <div class="offcanvas-header" style="background-color:white; border:none; color:black">
                     <h5 id="offcanvasUpdateStatusLabel-{{ $shipment->stm_id }}">Shipment Status & Details</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 </div>
                 <div class="offcanvas-body">
                     <ul class="nav nav-pills mb-3" id="pills-tab-{{ $shipment->stm_id }}" role="tablist">
@@ -150,12 +150,8 @@
                             </a>
                         </li>
                     </ul>
-                    <!-- Contenido de las pestañas -->
-                    <div class="tab-content" id="pills-tabContent-{{ $shipment->stm_id }}">
-                        <div class="tab-pane fade show active"
-                            id="pills-initial-status-{{ $shipment->stm_id }}"
-                            role="tabpanel"
-                            aria-labelledby="pills-initial-status-tab-{{ $shipment->stm_id }}">
+                    <div class="tab-content" style="border: none;" id="pills-tabContent-{{ $shipment->stm_id }}">
+                        <div class="tab-pane fade show active" id="pills-initial-status-{{ $shipment->stm_id }}" role="tabpanel" aria-labelledby="pills-initial-status-tab">
                             <form>
                                 <div class="mb-3">
                                     <label for="stm_id" class="form-label">STM ID</label>

@@ -280,7 +280,7 @@
         <div class="modal fade" id="shipmentModal{{ $shipment->stm_id }}" tabindex="-1" aria-labelledby="shipmentModalLabel{{ $shipment->stm_id }}" aria-hidden="true">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
-                    <div class="modal-header">
+                    <div class="modal-header" style="background-color: #0056b3;" >
                         <h5 class="modal-title" id="shipmentModalLabel{{ $shipment->stm_id }}">Shipment Details - {{ $shipment->stm_id }}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
@@ -294,11 +294,8 @@
                                    role="tab" aria-controls="pills-shipment-details{{ $shipment->stm_id }}"
                                    aria-selected="true">Shipment Details</a>
                             </li>
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link" id="pills-update-status-tab{{ $shipment->stm_id }}"
-                                   data-bs-toggle="pill" href="#pills-update-status{{ $shipment->stm_id }}"
-                                   role="tab" aria-controls="pills-update-status{{ $shipment->stm_id }}"
-                                   aria-selected="false">Initial Shipment Info</a>
+                            <li class="nav-item mx-2" role="presentation">
+                                <a class="nav-link" id="pills-update-status-tab{{ $shipment->stm_id }}" data-bs-toggle="pill" href="#pills-update-status{{ $shipment->stm_id }}" role="tab" aria-controls="pills-update-status{{ $shipment->stm_id }}" aria-selected="false">Initial Shipment Info</a>
                             </li>
                             <li class="nav-item" role="presentation">
                                 <a class="nav-link" id="notes-tab{{ $shipment->stm_id }}"
