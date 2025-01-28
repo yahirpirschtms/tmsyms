@@ -15,7 +15,7 @@ class CalendarController extends Controller
     {
         if (Auth::check()) {
             // Obtener el ID del estado 'Finalized' desde el catálogo
-            $finalizedStatus = GenericCatalog::where('gntc_value', 'Finalized')
+            $finalizedStatus = GenericCatalog::where('gntc_value', 'Delivered')
                 ->where('gntc_group', 'current_status')
                 ->first();
 
