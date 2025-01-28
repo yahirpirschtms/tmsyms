@@ -82,20 +82,20 @@
                 </div>
             </div>
            <!-- Contenedor de tarjetas -->
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="cardsContainer">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-2" id="cardsContainer">
                 @foreach ($shipments as $shipment)
                     <div class="col shipment-card"
                         data-search="{{ $shipment->stm_id }} {{ $shipment->shipment_type }} {{ $shipment->status }} {{ $shipment->company->CoName ?? '' }} {{ $shipment->currentStatus->gntc_description ?? '' }} {{ $shipment->driver->drivername ?? '' }}">
                         <div class="card">
-                            <div class="card-body text-white bg-dark">
-                                <h5 class="card-title">{{ $shipment->stm_id }}</h5>
-                                <p class="origin">{{ $shipment->company->CoName ?? 'Origen no disponible' }}</p>
+                            <div class="card-body text-black border border-1 rounded" style="">
+                                <h5 class="card-title fw-bolder" style="color:#1e4877">{{ $shipment->stm_id }}</h5>
+                                <p class="origin fw-medium" style="color: #252525;">{{ $shipment->company->CoName ?? 'Origen no disponible' }}</p>
 
-                                <p class="status">{{ $shipment->currentStatus->gntc_description ?? 'Estado no disponible' }}</p>
-                                <p>{{ $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y') : 'Approved ETA date no disponible' }}</p>
-                                <p class="driver">{{ $shipment->driver->drivername ?? 'Conductor no asignado' }}</p>
+                                <p class="status fw-medium" style="color: #252525;">{{ $shipment->currentStatus->gntc_description ?? 'Estado no disponible' }}</p>
+                                <p class="fw-medium" style="color: #252525;">{{ $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y') : 'Approved ETA date no disponible' }}</p>
+                                <p class="driver fw-medium" style="color: #252525;">{{ $shipment->driver->drivername ?? 'Conductor no asignado' }}</p>
                                 <div class="d-flex justify-content-between">
-                                    <button class="btn btn-primary btn-sm" data-bs-toggle="offcanvas"
+                                    <button class="btn btn-sm text-white" data-bs-toggle="offcanvas" style="background-color: rgb(13, 82, 200);"
                                         data-bs-target="#offcanvasUpdateStatus-{{ $shipment->stm_id }}">
                                         Update Status & Details
                                     </button>
