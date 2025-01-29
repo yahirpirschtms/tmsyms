@@ -162,6 +162,7 @@ class CalendarController extends Controller
         ]);
     }
 
+
     public function updateOffloadingStatus(Request $request, $pk_shipment)
     {
         try {
@@ -181,8 +182,6 @@ class CalendarController extends Controller
                 ]);
 
             // Actualizar el envío con los nuevos datos
-
-
             $shipment->update($validatedData);
 
 
