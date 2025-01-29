@@ -114,8 +114,8 @@ class CalendarController extends Controller
 
                 return [
                     'title' => 'STM ID: ' . $shipment->stm_id,
-                    'start' => $whAuthDate->format('Y-m-d\TH:i:s'),  // Ahora usa wh_auth_date
-                    'end' => $whAuthDate->addHours(1)->format('Y-m-d\TH:i:s'), // Duración de 1 hora
+                    'start' => $whAuthDate ? $whAuthDate->format('Y-m-d\TH:i:s') : null,  // Comprobamos si whAuthDate no es nulo
+'end' => $whAuthDate ? $whAuthDate->addHours(1)->format('Y-m-d\TH:i:s') : null,  // Comprobamos si whAuthDate no es nulo antes de añadir hora
                     'extendedProps' => [
                         'stm_id' => $shipment->stm_id,
                         'reference' => $shipment->reference,
