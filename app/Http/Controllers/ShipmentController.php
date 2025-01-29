@@ -39,17 +39,20 @@ class ShipmentController extends Controller
     }
 
     public function allshipmentsshow()
-    {
-     if (Auth::check()) {
-        $shipments = Shipments::all();  // Obtén los envíos desde la base de datos
-          // Esto te ayudará a verificar si los envíos se están obteniendo correctamente
+{
+    if (Auth::check()) {
+        // Obtener todos los envíos desde la base de datos
+        $shipments = Shipments::all();
 
-          // Obtener los estados actuales desde la base de datos (usando un modelo genérico como ejemplo)
+
+        // Obtener los estados actuales desde la base de datos
         $currentStatus = GenericCatalog::where('gntc_group', 'current_status')->get();
-        return view('home.all-shipments', compact('shipments', 'currentStatus'));  // Cambia aquí el nombre de la vista
-        }
-     return redirect('/login');
+
+        // Pasar los datos a la vista
+        return view('home.all-shipments', compact('shipments', 'currentStatus'));
     }
+    return redirect('/login');
+}
 
     public function liveshipmentsshow()
     {

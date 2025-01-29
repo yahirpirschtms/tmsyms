@@ -14,7 +14,7 @@ class CalendarController extends Controller
     public function calendarshow()
     {
         if (Auth::check()) {
-            // Obtener el ID del estado 'Finalized' desde el catálogo
+            // Obtener el ID del estado 'Delivered' desde el catálogo
             $finalizedStatus = GenericCatalog::where('gntc_value', 'Delivered')
                 ->where('gntc_group', 'current_status')
                 ->first();
@@ -36,6 +36,11 @@ class CalendarController extends Controller
                 $etd = Carbon::parse($shipment->etd);  // Cambiado de suggestedDeliveryDate a etd
                 $whAuthDate = $shipment->wh_auth_date ? Carbon::parse($shipment->wh_auth_date) : null;
 
+                // Si no hay fecha de autorización de almacén, no se incluirá el evento
+                if ($whAuthDate === null) {
+                    return null;  // Si no tiene fecha de autorización, no se incluye
+                }
+
                 // Obtener las descripciones para 'origin' y 'gnct_id_current_status'
                 $originDescription = isset($originCatalog[$shipment->origin])
                     ? $originCatalog[$shipment->origin]->gntc_value
@@ -47,21 +52,26 @@ class CalendarController extends Controller
 
                 return [
                     'title' => 'STM ID: ' . $shipment->stm_id,
-                    'start' => $etd->format('Y-m-d\TH:i:s'),
-                    'end' => $etd->addHours(1)->format('Y-m-d\TH:i:s'),
+                    'start' => $whAuthDate->format('Y-m-d\TH:i:s'),  // Ahora usa wh_auth_date
+                    'end' => $whAuthDate->addHours(1)->format('Y-m-d\TH:i:s'), // Duración de 1 hora
                     'extendedProps' => [
                         'stm_id' => $shipment->stm_id,
                         'reference' => $shipment->reference,
                         'origin' => $originDescription,
                         'destination' => $shipment->destination,
                         'current_status' => $statusDescription,
-                        'etd' => $etd->format('m/d/Y H:i'),  // Cambiado de suggested_delivery_date a etd
-                        'wh_auth_date' => $whAuthDate ? $whAuthDate->format('m/d/Y H:i') : 'N/A',
+                        'etd' => $etd->format('m/d/Y H:i'),
+                        'wh_auth_date' => $whAuthDate->format('m/d/Y H:i'),
                         'units' => $shipment->units,
                         'pallets' => $shipment->pallets,
                         'id_trailer' => $shipment->id_trailer,
                     ],
                 ];
+            });
+
+            // Filtrar eventos nulos
+            $events = $events->filter(function ($event) {
+                return $event !== null;  // Asegurarse de que solo los eventos con fecha válida de autorización sean incluidos
             });
 
             // Retornar la vista con los datos necesarios
@@ -104,16 +114,16 @@ class CalendarController extends Controller
 
                 return [
                     'title' => 'STM ID: ' . $shipment->stm_id,
-                    'start' => $etd->format('Y-m-d\TH:i:s'),
-                    'end' => $etd->addHours(1)->format('Y-m-d\TH:i:s'),
+                    'start' => $whAuthDate->format('Y-m-d\TH:i:s'),  // Ahora usa wh_auth_date
+                    'end' => $whAuthDate->addHours(1)->format('Y-m-d\TH:i:s'), // Duración de 1 hora
                     'extendedProps' => [
                         'stm_id' => $shipment->stm_id,
                         'reference' => $shipment->reference,
                         'origin' => $originDescription,
                         'destination' => $shipment->destination,
                         'current_status' => $statusDescription,
-                        'etd' => $etd->format('m/d/Y H:i'), // Cambiado de suggested_delivery_date a etd
-                        'wh_auth_date' => $whAuthDate ? $whAuthDate->format('m/d/Y H:i') : 'N/A',
+                        'etd' => $etd->format('m/d/Y H:i'),
+                        'wh_auth_date' => $whAuthDate->format('m/d/Y H:i'),
                         'units' => $shipment->units,
                         'pallets' => $shipment->pallets,
                         'id_trailer' => $shipment->id_trailer,

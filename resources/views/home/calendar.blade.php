@@ -153,52 +153,58 @@
         var statusCatalog = @json($statusCatalog);
     </script>
     <script>
-            document.addEventListener('DOMContentLoaded', function () {
+           document.addEventListener('DOMContentLoaded', function () {
             const events = {!! json_encode($events) !!};
 
-            var calendarEl = document.getElementById('calendar');
+            console.log(events); // Ver qué tipo de dato es 'events'
 
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'timeGridDay',
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'timeGridDay,timeGridWeek,dayGridMonth'
-                },
-                events: events,
+            // Verifica si 'events' es un array
+            if (Array.isArray(events)) {
+                const filteredEvents = events.filter(event => event.extendedProps.wh_auth_date !== 'N/A');
 
-                // Eliminar la hora
-                eventTimeFormat: {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    meridiem: 'short',
-                    hour12: true
-                },
+                var calendarEl = document.getElementById('calendar');
 
-                // Modificar cómo se muestra el evento
-                eventContent: function(info) {
-                    // Suponiendo que el evento tiene una propiedad llamada 'shipmentInfo' que contiene la información del envío
-                    return { html: '<strong>' + info.event.title + '</strong><br>'};
-                },
+                var calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'timeGridDay',
+                    headerToolbar: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'timeGridDay,timeGridWeek,dayGridMonth'
+                    },
+                    events: filteredEvents,  // Pasar solo los eventos válidos
 
-                eventClick: function(info) {
-                    var event = info.event;
-                    var props = event.extendedProps;
+                    eventTimeFormat: {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        meridiem: 'short',
+                        hour12: true
+                    },
 
-                    var modalTarget = "#shipmentModal" + props.stm_id;
+                    eventContent: function(info) {
+                        return { html: '<strong>' + info.event.title + '</strong><br>'};
+                    },
 
-                    // Verificar si el modal existe en el DOM antes de intentar mostrarlo
-                    var modalElement = document.getElementById(modalTarget.substring(1)); // Eliminar el "#" para obtener el ID correcto
-                    if (modalElement) {
-                        var modal = new bootstrap.Modal(modalElement); // Usar la API de Bootstrap para abrir el modal
-                        modal.show();
-                    } else {
-                        console.error("Modal no encontrado: " + modalTarget);
+                    eventClick: function(info) {
+                        var event = info.event;
+                        var props = event.extendedProps;
+
+                        var modalTarget = "#shipmentModal" + props.stm_id;
+
+                        var modalElement = document.getElementById(modalTarget.substring(1));
+                        if (modalElement) {
+                            var modal = new bootstrap.Modal(modalElement);
+                            modal.show();
+                        } else {
+                            console.error("Modal no encontrado: " + modalTarget);
+                        }
                     }
-                }
-            });
+                });
 
-            calendar.render();
+                calendar.render();
+            } else {
+                console.error('Los eventos no son un array:', events);
+            }
+
             // Filtrar eventos por STM ID
             document.getElementById('searchByStmId').addEventListener('input', function (e) {
                 const searchValue = e.target.value.toLowerCase();
