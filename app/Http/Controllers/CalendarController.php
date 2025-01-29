@@ -52,8 +52,8 @@ class CalendarController extends Controller
 
                 return [
                     'title' => 'STM ID: ' . $shipment->stm_id,
-                    'start' => $whAuthDate->format('Y-m-d\TH:i:s'),  // Ahora usa wh_auth_date
-                    'end' => $whAuthDate->addHours(1)->format('Y-m-d\TH:i:s'), // Duración de 1 hora
+                    'start' => $whAuthDate ? $whAuthDate->format('Y-m-d\TH:i:s') : null,  // Comprobamos si whAuthDate no es nulo
+                    'end' => $whAuthDate ? $whAuthDate->addHours(1)->format('Y-m-d\TH:i:s') : null,
                     'extendedProps' => [
                         'stm_id' => $shipment->stm_id,
                         'reference' => $shipment->reference,
@@ -61,7 +61,7 @@ class CalendarController extends Controller
                         'destination' => $shipment->destination,
                         'current_status' => $statusDescription,
                         'etd' => $etd->format('m/d/Y H:i'),
-                        'wh_auth_date' => $whAuthDate->format('m/d/Y H:i'),
+                        'wh_auth_date' => $whAuthDate ? $whAuthDate->format('m/d/Y H:i') : 'Not Available',
                         'units' => $shipment->units,
                         'pallets' => $shipment->pallets,
                         'id_trailer' => $shipment->id_trailer,
@@ -123,7 +123,7 @@ class CalendarController extends Controller
                         'destination' => $shipment->destination,
                         'current_status' => $statusDescription,
                         'etd' => $etd->format('m/d/Y H:i'),
-                        'wh_auth_date' => $whAuthDate->format('m/d/Y H:i'),
+                        'wh_auth_date' => $whAuthDate ? $whAuthDate->format('m/d/Y H:i') : 'Not Available',
                         'units' => $shipment->units,
                         'pallets' => $shipment->pallets,
                         'id_trailer' => $shipment->id_trailer,
