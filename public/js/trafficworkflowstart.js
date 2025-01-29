@@ -192,6 +192,54 @@ $(document).ready(function() {
     $('#inputshipmentdestination').on('focus', loadDestinations);
     loadDestinations();
 
+
+    /*function loadDestinations() {
+        var locationsRoute = $('#inputshipmentdestination').data('url');
+        $.ajax({
+            url: locationsRoute,
+            type: 'GET',
+            success: function (data) {
+                let datalist = $('#destinations-list');
+                let input = $('#inputshipmentdestination');
+                let currentValue = input.attr('data-selected-id'); // Guardar el ID actual
+    
+                datalist.empty(); // Limpia las opciones
+    
+                if (data.length === 0) {
+                    datalist.append('<option disabled>No options available</option>');
+                } else {
+                    data.forEach(item => {
+                        datalist.append(`<option value="${item.fac_name}" data-id="${item.fac_id}"></option>`);
+                    });
+                }
+    
+                // Restaurar el valor si existía
+                if (currentValue) {
+                    input.val($(`option[data-id="${currentValue}"]`).attr("value"));
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching data locations:', error);
+            }
+        });
+    }
+    
+    // Evento para guardar el ID real en un atributo oculto
+    $('#inputshipmentdestination').on('input', function () {
+        let selectedValue = $(this).val();
+        let selectedOption = $(`#destinations-list option[value="${selectedValue}"]`);
+        if (selectedOption.length > 0) {
+            $(this).attr('data-selected-id', selectedOption.attr('data-id'));
+        } else {
+            $(this).attr('data-selected-id', ''); // Si el usuario ingresa manualmente algo que no está en la lista
+        }
+    });
+    
+    // Cargar datos al enfocar el input y al cargar la página
+    $('#inputshipmentdestination').on('focus', loadDestinations);
+    loadDestinations();*/
+    
+
     //Funcion para buscar el shipmenttype en la pantalla de empty trailer update
     function loadShipmentType() {
         var availabilityRoute = $('#inputshipmentshipmenttype').data('url');
