@@ -14,8 +14,8 @@ class CalendarController extends Controller
     public function calendarshow()
     {
         if (Auth::check()) {
-            // Obtener el ID del estado 'Delivered' desde el catálogo
-            $finalizedStatus = GenericCatalog::where('gntc_value', 'Delivered')
+            // Obtener el ID del estado 'Finalized' desde el catálogo
+            $finalizedStatus = GenericCatalog::where('gntc_value', 'Finalized')
                 ->where('gntc_group', 'current_status')
                 ->first();
 
@@ -155,7 +155,7 @@ class CalendarController extends Controller
             'trailer_id' => $shipment->id_trailer,
             'stm_id' => $shipment->stm_id,
             'current_status' => $shipment->currentStatus ? $shipment->currentStatus->gntc_value : 'Unknown',
-            'delivered_date' => $shipment->formatted_delivered_date,
+            'delivered_date' => $shipment->formatted_delivered_date ? $shipment->formatted_delivered_date->format('m/d/Y H:i') : 'N/A',
             'at_door_date' => $shipment->at_door_date ? $shipment->at_door_date->format('m/d/Y H:i') : 'N/A',
             'offloading_time' => $shipment->offloading_time ?? 'N/A', // Cambio aquí para tipo Time
             'wh_auth_date' => $shipment->wh_auth_date ? $shipment->wh_auth_date->format('m/d/Y H:i') : 'N/A',

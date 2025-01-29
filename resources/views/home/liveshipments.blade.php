@@ -276,27 +276,28 @@
                                     <label for="driverAssignmentDate-{{ $shipment->stm_id }}" class="form-label">Driver Assignment Date</label>
                                     <input type="datetime-local" class="form-control" id="driverAssignmentDate-{{ $shipment->stm_id }}" name="driver_assigned_date"
                                     value="{{ $shipment->driver_assigned_date ? \Carbon\Carbon::parse($shipment->driver_assigned_date)->format('Y-m-d\TH:i') : '' }}"
-                                    onfocus="checkAndChangeStatus('driverAssignmentDate-{{ $shipment->stm_id }}', 9, '{{ $shipment->stm_id }}')">
+                                    onfocus="checkAndChangeStatus('driverAssignmentDate-{{ $shipment->stm_id }}', 'Driver Assigned', '{{ $shipment->stm_id }}')">
                                 </div>
 
                                 <div class="mb-3">
                                     <label for="pickUpDate-{{ $shipment->stm_id }}" class="form-label">Pick Up Date</label>
                                     <input type="datetime-local" class="form-control" id="pickUpDate-{{ $shipment->stm_id }}" name="pick_up_date"
                                         value="{{ $shipment->pick_up_date ? \Carbon\Carbon::parse($shipment->pick_up_date)->format('Y-m-d\TH:i') : '' }}"
-                                        onfocus="checkAndChangeStatus('pickUpDate-{{ $shipment->stm_id }}', 8, '{{ $shipment->stm_id }}')">
+                                        onfocus="checkAndChangeStatus('pickUpDate-{{ $shipment->stm_id }}', 'Picked Up', '{{ $shipment->stm_id }}')">
                                 </div>
 
                                 <div class="mb-3">
                                     <label for="inTransitDate-{{ $shipment->stm_id }}" class="form-label">In Transit Date</label>
                                     <input type="datetime-local" class="form-control" id="inTransitDate-{{ $shipment->stm_id }}" name="intransit_date"
                                         value="{{ $shipment->intransit_date ? \Carbon\Carbon::parse($shipment->intransit_date)->format('Y-m-d\TH:i') : '' }}"
-                                        onfocus="checkAndChangeStatus('inTransitDate-{{ $shipment->stm_id }}', 1, '{{ $shipment->stm_id }}')">
+                                        onfocus="checkAndChangeStatus('inTransitDate-{{ $shipment->stm_id }}', 'In Transit', '{{ $shipment->stm_id }}')">
                                 </div>
 
                                 <div class="mb-3">
                                     <label for="securedYardDate-{{ $shipment->stm_id }}" class="form-label">Secured Yard Date</label>
                                     <input type="datetime-local" class="form-control" id="securedYardDate-{{ $shipment->stm_id }}" name="secured_yarddate"
-                                        value="{{ $shipment->secured_yarddate ? \Carbon\Carbon::parse($shipment->secured_yarddate)->format('Y-m-d\TH:i') : '' }}">
+                                        value="{{ $shipment->secured_yarddate ? \Carbon\Carbon::parse($shipment->secured_yarddate)->format('Y-m-d\TH:i') : '' }}"
+                                        onfocus="checkAndChangeStatus('securedYardDate-{{ $shipment->stm_id }}', 'Secured Yard', '{{ $shipment->stm_id }}')">
                                 </div>
 
                                 <!-- Campos de Incidentes desactivados para pruebas -->
@@ -603,34 +604,56 @@
 </script>
 
 
-  <script>
-function changeStatus(statusId, shipmentId) {
-    console.log('shipmentId recibido:', shipmentId); // Verifica el valor de shipmentId
+<script>
+    function checkAndChangeStatus(dateFieldId, statusDescription, shipmentId) {
+        const dateField = document.getElementById(dateFieldId);
+        const currentDateValue = dateField.value;
 
-    const statusSelect = document.getElementById('currentStatus-' + shipmentId);
-    if (statusSelect) {
-        statusSelect.value = statusId;  // Cambiar el estado al valor correspondiente
-        console.log('Estado cambiado a:', statusId);
-    } else {
-        console.error('No se encontró el select para el envío:', shipmentId);
-    }
-}
+        // Verificar si ya existe una fecha en el campo y evitar el cambio de estado
+        if (currentDateValue) {
+            console.log(`El campo ${dateFieldId} ya tiene una fecha, no se cambiará el estado.`);
+            return; // Si ya hay una fecha, no cambiar el estado
+        }
 
-// Función para verificar si ya existe una fecha en el campo y, si no, cambiar el estado
-function checkAndChangeStatus(dateFieldId, statusId, shipmentId) {
-    const dateField = document.getElementById(dateFieldId);
-    const currentDateValue = dateField.value;
-
-    // Verificar si ya existe una fecha en el campo y evitar el cambio de estado
-    if (currentDateValue) {
-        console.log(`El campo ${dateFieldId} ya tiene una fecha, no se cambiará el estado.`);
-        return; // Si ya hay una fecha, no cambiar el estado
+        // Cambiar el estado solo si el campo está vacío, usando la descripción
+        changeStatusByDescription(statusDescription, shipmentId);
     }
 
-    // Cambiar el estado solo si el campo está vacío
-    console.log(`El campo ${dateFieldId} está vacío, cambiando el estado...`);
-    changeStatus(statusId, shipmentId);
-}
+    // Cambiar el estado utilizando la descripción
+    function changeStatusByDescription(statusDescription, shipmentId) {
+        console.log('shipmentId recibido:', shipmentId); // Verifica el valor de shipmentId
+        console.log('Estado recibido:', statusDescription); // Verifica la descripción del estado
+
+        // Aquí es donde mapeamos la descripción al valor correspondiente de gntc_description
+        const statusMapping = {
+            'Picked Up': 'Picked Up',       // gntc_description 'Picked Up'
+            'Driver Assigned': 'Driver Assigned', // gntc_description 'Driver Assigned'
+            'In Transit': 'In Transit',     // gntc_description 'In Transit'
+            'Secured Yard': 'Secured Yard',
+            // Agrega otras descripciones si es necesario
+        };
+
+        const gntcDescription = statusMapping[statusDescription];
+
+        if (gntcDescription) {
+            const statusSelect = document.getElementById('currentStatus-' + shipmentId);
+            if (statusSelect) {
+                // Buscar el option que tenga el gntc_description correspondiente
+                const options = statusSelect.getElementsByTagName('option');
+                for (let i = 0; i < options.length; i++) {
+                    if (options[i].textContent.trim() === gntcDescription) {
+                        statusSelect.value = options[i].value; // Establecer el valor del select según el texto de la opción
+                        console.log('Estado cambiado a:', gntcDescription);
+                        break;
+                    }
+                }
+            } else {
+                console.error('No se encontró el select para el envío:', shipmentId);
+            }
+        } else {
+            console.error('Descripción de estado no mapeada:', statusDescription);
+        }
+    }
 </script>
 
 @endsection

@@ -102,21 +102,28 @@
                         </div>
                         <div class="mb-3">
                         <label for="currentStatus{{ $shipment->stm_id }}" class="form-label">Current Status</label>
-                        <select class="form-select" id="currentStatus{{ $shipment->stm_id }}" name="gnct_id_current_status">
-                            @foreach($statusCatalog as $status)
-                            <option value="{{ $status->gnct_id }}" {{ $status->gnct_id == old('gnct_id_current_status', $shipment->gnct_id_current_status) ? 'selected' : '' }}>
-                                {{ $status->gntc_value }}
-                            </option>
+                        <select class="form-select" id="currentStatus-{{ $shipment->stm_id }}" name="gnct_id_current_status">
+                            @foreach ($currentStatus as $status)
+                                <option value="{{ $status->gnct_id }}"
+                                    {{ old('gnct_id_current_status', $shipment->gnct_id_current_status) == $status->gnct_id ? 'selected' : '' }}>
+                                    {{ $status->gntc_description }}
+                                </option>
                             @endforeach
                         </select>
                         </div>
                         <div class="mb-3">
-                        <label for="deliveredDate{{ $shipment->stm_id }}" class="form-label">Delivered Date</label>
-                        <input type="datetime-local" class="form-control" id="deliveredDate{{ $shipment->stm_id }}" name="delivered_date" value="{{ old('delivered_date', $shipment->delivered_date ? \Carbon\Carbon::parse($shipment->delivered_date)->format('Y-m-d\TH:i') : '') }}">
+                            <label for="deliveredDate{{ $shipment->stm_id }}" class="form-label">Delivered Date</label>
+                            <input type="datetime-local" class="form-control" id="deliveredDate{{ $shipment->stm_id }}" name="delivered_date"
+                                value="{{ old('delivered_date', $shipment->delivered_date ? \Carbon\Carbon::parse($shipment->delivered_date)->format('Y-m-d\TH:i') : '') }}"
+                                onfocus="checkAndChangeStatus('deliveredDate{{ $shipment->stm_id }}', 'Delivered', '{{ $shipment->stm_id }}')"
+                                onchange="formatDate(this)">
                         </div>
+
                         <div class="mb-3">
-                        <label for="atDoorDate{{ $shipment->stm_id }}" class="form-label">At Door Date</label>
-                        <input type="datetime-local" class="form-control" id="atDoorDate{{ $shipment->stm_id }}" name="at_door_date" value="{{ old('at_door_date', $shipment->at_door_date ? \Carbon\Carbon::parse($shipment->at_door_date)->format('Y-m-d\TH:i') : '') }}">
+                            <label for="atDoorDate{{ $shipment->stm_id }}" class="form-label">At Door Date</label>
+                            <input type="datetime-local" class="form-control" id="atDoorDate{{ $shipment->stm_id }}" name="at_door_date"
+                                value="{{ old('at_door_date', $shipment->at_door_date ? \Carbon\Carbon::parse($shipment->at_door_date)->format('Y-m-d\TH:i') : '') }}"
+                                onchange="formatDate(this)">
                         </div>
                         <div class="mb-3">
                             <label for="offloadTime{{ $shipment->stm_id }}" class="form-label">Offload Time</label>
@@ -274,6 +281,73 @@
 </script>
 
 
+<script>
+    function checkAndChangeStatus(dateFieldId, statusDescription, shipmentId) {
+        const dateField = document.getElementById(dateFieldId);
+
+        if (!dateField) {
+            console.error(`No se encontró el campo con id: ${dateFieldId}`);
+            return; // Si el campo no existe, no continuar con el cambio de estado
+        }
+
+        const currentDateValue = dateField.value;
+
+        // Verificar si ya existe una fecha en el campo y evitar el cambio de estado
+        if (currentDateValue) {
+            console.log(`El campo ${dateFieldId} ya tiene una fecha, no se cambiará el estado.`);
+            return; // Si ya hay una fecha, no cambiar el estado
+        }
+
+        // Cambiar el estado solo si el campo está vacío, usando la descripción
+        changeStatusByDescription(statusDescription, shipmentId);
+    }
+
+    function changeStatusByDescription(statusDescription, shipmentId) {
+        console.log('shipmentId recibido:', shipmentId); // Verifica el valor de shipmentId
+        console.log('Estado recibido:', statusDescription); // Verifica la descripción del estado
+
+        const statusMapping = {
+            'Delivered': 'Delivered', // gntc_description
+            // Agrega otras descripciones si es necesario
+        };
+
+        const gntcDescription = statusMapping[statusDescription];
+
+        if (gntcDescription) {
+            const statusSelect = document.getElementById('currentStatus-' + shipmentId);
+            if (statusSelect) {
+                // Buscar el option que tenga el gntc_description correspondiente
+                const options = statusSelect.getElementsByTagName('option');
+                for (let i = 0; i < options.length; i++) {
+                    if (options[i].textContent.trim() === gntcDescription) {
+                        statusSelect.value = options[i].value; // Establecer el valor del select según el texto de la opción
+                        console.log('Estado cambiado a:', gntcDescription);
+                        break;
+                    }
+                }
+            } else {
+                console.error('No se encontró el select para el envío:', shipmentId);
+            }
+        } else {
+            console.error('Descripción de estado no mapeada:', statusDescription);
+        }
+    }
+</script>
+
+
+<script>
+    function formatDate(input) {
+        let value = input.value;
+        if (value) {
+            // Formatear la fecha a M/D/Y para mostrarla al usuario
+            const date = new Date(value);
+            const formattedDate = (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear();
+
+            // Mostrar la fecha en el formato M/D/Y al usuario
+            input.value = formattedDate;
+        }
+    }
+</script>
 @endsection
 
 @section('custom-css')

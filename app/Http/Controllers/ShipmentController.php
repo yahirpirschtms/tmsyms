@@ -88,6 +88,19 @@ class ShipmentController extends Controller
         // Pasar las variables a la vista
         return view('shipments.details', compact('shipment', 'currentStatus'));
     }
+    public function getStatusIdByDescription(Request $request)
+    {
+        $description = $request->input('description');
+        $status = GenericCatalog::table('generic_catalogs')
+                    ->where('gntc_description', $description)
+                    ->first();
+
+        if ($status) {
+            return response()->json(['status_id' => $status->gntc_id]);
+        } else {
+            return response()->json(['error' => 'Estado no encontrado'], 404);
+        }
+    }
 
         public function update(Request $request, $pk_shipment)
        {
