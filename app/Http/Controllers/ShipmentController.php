@@ -91,7 +91,7 @@ class ShipmentController extends Controller
 
     public function update(Request $request, $pk_shipment)
     {
-        dd($request);
+
         try {
             // Buscar el envío por su ID
             $shipment = Shipments::findOrFail($pk_shipment);
@@ -108,19 +108,19 @@ class ShipmentController extends Controller
                 'incident_date' => 'nullable|date',
             ]);
 
-            // Si se envía un estado manualmente, usarlo; si no, aplicar la lógica automática
-            if ($request->filled('gnct_id_current_status')) {
-                $status_id = $request->gnct_id_current_status;
-            } else {
-                if ($request->intransit_date) {
-                    $status_id = 1; // In Transit
-                } elseif ($request->pick_up_date) {
-                    $status_id = 8; // Picked Up
-                } elseif ($request->driver_assigned_date) {
-                    $status_id = 9; // Driver Assigned
-                } else {
-                    $status_id = $shipment->gnct_id_current_status; // Mantiene el estado actual
-                }
+         // Primero, revisamos si se ha proporcionado un 'gnct_id_current_status'.
+            $status_id = $request->filled('gnct_id_current_status')
+            ? $request->gnct_id_current_status  // Si está presente, lo asignamos.
+            : $shipment->gnct_id_current_status; // Si no está presente, mantenemos el estado actual.
+
+
+            // Luego, verificamos si las fechas están presentes para actualizar el estado según sea necesario.
+            if ($request->intransit_date) {
+            $status_id = 1; // In Transit
+            } elseif ($request->pick_up_date) {
+            $status_id = 8; // Picked Up
+            } elseif ($request->driver_assigned_date) {
+            $status_id = 9; // Driver Assigned
             }
 
             // Actualizar los datos del envío

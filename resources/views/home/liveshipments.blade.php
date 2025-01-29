@@ -277,17 +277,15 @@
                                     <input type="datetime-local" class="form-control" id="driverAssignmentDate-{{ $shipment->stm_id }}" name="driver_assigned_date"
                                         value="{{ $shipment->driver_assigned_date ? \Carbon\Carbon::parse($shipment->driver_assigned_date)->format('Y-m-d\TH:i') : '' }}">
                                 </div>
-
                                 <div class="mb-3">
                                     <label for="pickUpDate-{{ $shipment->stm_id }}" class="form-label">Pick Up Date</label>
                                     <input type="datetime-local" class="form-control" id="pickUpDate-{{ $shipment->stm_id }}" name="pick_up_date"
-                                        value="{{ is_null($shipment->pick_up_date) ? '' : \Carbon\Carbon::parse($shipment->pick_up_date)->format('Y-m-d\TH:i') }}">
+                                        value="{{ $shipment->pick_up_date ? \Carbon\Carbon::parse($shipment->pick_up_date)->format('Y-m-d\TH:i') : '' }}">
                                 </div>
-
                                 <div class="mb-3">
                                     <label for="inTransitDate-{{ $shipment->stm_id }}" class="form-label">In Transit Date</label>
                                     <input type="datetime-local" class="form-control" id="inTransitDate-{{ $shipment->stm_id }}" name="intransit_date"
-                                        value="{{ is_null($shipment->intransit_date) ? '' : \Carbon\Carbon::parse($shipment->intransit_date)->format('Y-m-d\TH:i') }}">
+                                        value="{{ $shipment->intransit_date ? \Carbon\Carbon::parse($shipment->intransit_date)->format('Y-m-d\TH:i') : '' }}">
                                 </div>
 
                                 <div class="mb-3">
@@ -398,19 +396,19 @@
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Driver Assigned Date</label>
-                                    <p>{{ $shipment->driver_assigned_date ? \Carbon\Carbon::parse($shipment->driver_assigned_date)->format('m/d/Y H:i:s') : '' }}</p>
+                                    <p>{{ \Carbon\Carbon::parse($shipment->driver_assigned_date)->format('m/d/Y H:i:s') }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Pick-Up Date</label>
-                                    <p>{{ $shipment->pick_up_date ? \Carbon\Carbon::parse($shipment->pick_up_date)->format('m/d/Y H:i:s') : '' }}</p>
+                                    <p>{{ \Carbon\Carbon::parse($shipment->pick_up_date)->format('m/d/Y H:i:s') }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">In Transit Date</label>
-                                    <p>{{ $shipment->intransit_date ? \Carbon\Carbon::parse($shipment->intransit_date)->format('m/d/Y H:i:s') : '' }}</p>
+                                    <p>{{ \Carbon\Carbon::parse($shipment->intransit_date)->format('m/d/Y H:i:s') }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Secured Yard Date</label>
-                                    <p>{{ $shipment->secured_yarddate ? \Carbon\Carbon::parse($shipment->secured_yarddate)->format('m/d/Y H:i:s') : '' }}</p>
+                                    <p>{{ \Carbon\Carbon::parse($shipment->secured_yarddate)->format('m/d/Y H:i:s') }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Current Status</label>
@@ -451,7 +449,51 @@
 
 @section('scripts')
 <script>
+    $(document).on('submit', '[id^="shipmentForm"]', function (event) {
+        event.preventDefault(); // Previene el envío estándar del formulario
+        console.log('Formulario enviado (delegado)');
 
+        let formAction = $(this).attr('action');
+        let formData = $(this).serialize();
+
+        $.ajax({
+            url: formAction,
+            method: 'PUT',
+            data: formData,
+            beforeSend: function () {
+                Swal.fire({
+                    title: 'Enviando datos...',
+                    text: 'Por favor espera mientras se procesan los datos.',
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading(); // Muestra un indicador de carga
+                    }
+                });
+            },
+            success: function (response) {
+                Swal.fire({
+                    title: '¡Éxito!',
+                    text: response.message || 'Los datos se actualizaron correctamente.',
+                    icon: 'success',
+                    confirmButtonText: 'Aceptar'
+                }).then(() => {
+                    location.reload(); // Recargar la página para reflejar los cambios
+                });
+                console.log('Respuesta recibida:', response);
+            },
+            error: function (xhr) {
+                let errorMessage = xhr.responseJSON?.message || 'Ocurrió un error al actualizar el estado.';
+                Swal.fire({
+                    title: 'Error',
+                    text: errorMessage,
+                    icon: 'error',
+                    confirmButtonText: 'Aceptar'
+                });
+                console.error('Error en la solicitud:', xhr.responseJSON || xhr.responseText);
+            },
+        });
+    });
 </script>
 
 
@@ -552,6 +594,50 @@
                 console.log("Tarjetas recargadas");
             });
         }
+    });
+</script>
+
+<script>
+    // Obtenemos los elementos
+    const selectStatus = document.getElementById('currentStatus');
+    const intransitDate = document.getElementById('intransit_date');
+    const pickUpDate = document.getElementById('pick_up_date');
+    const driverAssignedDate = document.getElementById('driver_assigned_date');
+
+    // Función para actualizar el estado según las fechas
+    function updateStatusByDate() {
+        let statusId = selectStatus.value; // Tomamos el estado del select
+        if (!statusId) {
+            // Si no se ha seleccionado un estado, vemos las fechas
+            if (intransitDate.value) {
+                statusId = 1; // In Transit
+            } else if (pickUpDate.value) {
+                statusId = 8; // Picked Up
+            } else if (driverAssignedDate.value) {
+                statusId = 9; // Driver Assigned
+            }
+        }
+
+        // Si no hemos actualizado el select y hay fechas, actualizamos el valor
+        if (statusId) {
+            selectStatus.value = statusId;
+        }
+    }
+
+    // Escuchamos los cambios en el select
+    selectStatus.addEventListener('change', () => {
+        updateStatusByDate();
+    });
+
+    // Escuchamos los cambios en las fechas
+    intransitDate.addEventListener('change', () => {
+        updateStatusByDate();
+    });
+    pickUpDate.addEventListener('change', () => {
+        updateStatusByDate();
+    });
+    driverAssignedDate.addEventListener('change', () => {
+        updateStatusByDate();
     });
 </script>
 @endsection
