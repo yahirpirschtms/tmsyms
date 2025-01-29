@@ -89,57 +89,34 @@ class ShipmentController extends Controller
         return view('shipments.details', compact('shipment', 'currentStatus'));
     }
 
-    public function update(Request $request, $pk_shipment)
-    {
+        public function update(Request $request, $pk_shipment)
+       {
+                try {
+                    // Buscar el envío por su ID
+                    $shipment = Shipments::findOrFail($pk_shipment);
 
-        try {
-            // Buscar el envío por su ID
-            $shipment = Shipments::findOrFail($pk_shipment);
-
-            // Validar los datos recibidos
-            $validated = $request->validate([
-                'gnct_id_current_status' => 'nullable|integer',
-                'driver_assigned_date' => 'nullable|date',
-                'pick_up_date' => 'nullable|date',
-                'intransit_date' => 'nullable|date',
-                'secured_yarddate' => 'nullable|date',
-                'sec_incident' => 'nullable|integer',
-                'incident_type' => 'nullable|string',
-                'incident_date' => 'nullable|date',
-            ]);
-
-         // Primero, revisamos si se ha proporcionado un 'gnct_id_current_status'.
-            $status_id = $request->filled('gnct_id_current_status')
-            ? $request->gnct_id_current_status  // Si está presente, lo asignamos.
-            : $shipment->gnct_id_current_status; // Si no está presente, mantenemos el estado actual.
+                    // Validar los datos recibidos
+                    $validated = $request->validate([
+                        'gnct_id_current_status' => 'nullable|integer',
+                        'driver_assigned_date' => 'nullable|date',
+                        'pick_up_date' => 'nullable|date',
+                        'intransit_date' => 'nullable|date',
+                        'secured_yarddate' => 'nullable|date',
+                        'sec_incident' => 'nullable|integer',
+                        'incident_type' => 'nullable|string',
+                        'incident_date' => 'nullable|date',
+                    ]);
 
 
-            // Luego, verificamos si las fechas están presentes para actualizar el estado según sea necesario.
-            if ($request->intransit_date) {
-            $status_id = 1; // In Transit
-            } elseif ($request->pick_up_date) {
-            $status_id = 8; // Picked Up
-            } elseif ($request->driver_assigned_date) {
-            $status_id = 9; // Driver Assigned
-            }
 
-            // Actualizar los datos del envío
-            $shipment->update([
-                'gnct_id_current_status' => $status_id,
-                'driver_assigned_date' => $request->driver_assigned_date,
-                'pick_up_date' => $request->pick_up_date,
-                'intransit_date' => $request->intransit_date,
-                'secured_yarddate' => $request->secured_yarddate,
-                'sec_incident' => $request->sec_incident,
-                'incident_type' => $request->incident_type,
-                'incident_date' => $request->incident_date,
-            ]);
+                    // Actualizar el envío con los datos validados
+                    $shipment->update($validated);
 
-            return response()->json(['message' => 'Shipment updated successfully'], 200);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to update shipment', 'error' => $e->getMessage()], 500);
+                    return response()->json(['message' => 'Shipment updated successfully'], 200);
+                } catch (\Exception $e) {
+                    return response()->json(['message' => 'Failed to update shipment', 'error' => $e->getMessage()], 500);
+                }
         }
-    }
     // Método para actualizar las notas del envío
     public function updateNotes(Request $request, Shipments $shipment)
     {

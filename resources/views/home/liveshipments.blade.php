@@ -263,7 +263,7 @@
                                 <input type="hidden" name="_method" value="PUT">
 
                                 <label for="currentStatus" class="form-label">Current Status</label>
-                                <select class="form-select" id="currentStatus" name="gnct_id_current_status">
+                                <select class="form-select" id="currentStatus-{{ $shipment->stm_id }}" name="gnct_id_current_status">
                                     @foreach ($currentStatus as $status)
                                         <option value="{{ $status->gnct_id }}"
                                             {{ old('gnct_id_current_status', $shipment->gnct_id_current_status) == $status->gnct_id ? 'selected' : '' }}>
@@ -275,17 +275,22 @@
                                 <div class="mb-3">
                                     <label for="driverAssignmentDate-{{ $shipment->stm_id }}" class="form-label">Driver Assignment Date</label>
                                     <input type="datetime-local" class="form-control" id="driverAssignmentDate-{{ $shipment->stm_id }}" name="driver_assigned_date"
-                                        value="{{ $shipment->driver_assigned_date ? \Carbon\Carbon::parse($shipment->driver_assigned_date)->format('Y-m-d\TH:i') : '' }}">
+                                    value="{{ $shipment->driver_assigned_date ? \Carbon\Carbon::parse($shipment->driver_assigned_date)->format('Y-m-d\TH:i') : '' }}"
+                                    onfocus="checkAndChangeStatus('driverAssignmentDate-{{ $shipment->stm_id }}', 9, '{{ $shipment->stm_id }}')">
                                 </div>
+
                                 <div class="mb-3">
                                     <label for="pickUpDate-{{ $shipment->stm_id }}" class="form-label">Pick Up Date</label>
                                     <input type="datetime-local" class="form-control" id="pickUpDate-{{ $shipment->stm_id }}" name="pick_up_date"
-                                        value="{{ $shipment->pick_up_date ? \Carbon\Carbon::parse($shipment->pick_up_date)->format('Y-m-d\TH:i') : '' }}">
+                                        value="{{ $shipment->pick_up_date ? \Carbon\Carbon::parse($shipment->pick_up_date)->format('Y-m-d\TH:i') : '' }}"
+                                        onfocus="checkAndChangeStatus('pickUpDate-{{ $shipment->stm_id }}', 8, '{{ $shipment->stm_id }}')">
                                 </div>
+
                                 <div class="mb-3">
                                     <label for="inTransitDate-{{ $shipment->stm_id }}" class="form-label">In Transit Date</label>
                                     <input type="datetime-local" class="form-control" id="inTransitDate-{{ $shipment->stm_id }}" name="intransit_date"
-                                        value="{{ $shipment->intransit_date ? \Carbon\Carbon::parse($shipment->intransit_date)->format('Y-m-d\TH:i') : '' }}">
+                                        value="{{ $shipment->intransit_date ? \Carbon\Carbon::parse($shipment->intransit_date)->format('Y-m-d\TH:i') : '' }}"
+                                        onfocus="checkAndChangeStatus('inTransitDate-{{ $shipment->stm_id }}', 1, '{{ $shipment->stm_id }}')">
                                 </div>
 
                                 <div class="mb-3">
@@ -597,49 +602,37 @@
     });
 </script>
 
-<script>
-    // Obtenemos los elementos
-    const selectStatus = document.getElementById('currentStatus');
-    const intransitDate = document.getElementById('intransit_date');
-    const pickUpDate = document.getElementById('pick_up_date');
-    const driverAssignedDate = document.getElementById('driver_assigned_date');
 
-    // Función para actualizar el estado según las fechas
-    function updateStatusByDate() {
-        let statusId = selectStatus.value; // Tomamos el estado del select
-        if (!statusId) {
-            // Si no se ha seleccionado un estado, vemos las fechas
-            if (intransitDate.value) {
-                statusId = 1; // In Transit
-            } else if (pickUpDate.value) {
-                statusId = 8; // Picked Up
-            } else if (driverAssignedDate.value) {
-                statusId = 9; // Driver Assigned
-            }
-        }
+  <script>
+function changeStatus(statusId, shipmentId) {
+    console.log('shipmentId recibido:', shipmentId); // Verifica el valor de shipmentId
 
-        // Si no hemos actualizado el select y hay fechas, actualizamos el valor
-        if (statusId) {
-            selectStatus.value = statusId;
-        }
+    const statusSelect = document.getElementById('currentStatus-' + shipmentId);
+    if (statusSelect) {
+        statusSelect.value = statusId;  // Cambiar el estado al valor correspondiente
+        console.log('Estado cambiado a:', statusId);
+    } else {
+        console.error('No se encontró el select para el envío:', shipmentId);
+    }
+}
+
+// Función para verificar si ya existe una fecha en el campo y, si no, cambiar el estado
+function checkAndChangeStatus(dateFieldId, statusId, shipmentId) {
+    const dateField = document.getElementById(dateFieldId);
+    const currentDateValue = dateField.value;
+
+    // Verificar si ya existe una fecha en el campo y evitar el cambio de estado
+    if (currentDateValue) {
+        console.log(`El campo ${dateFieldId} ya tiene una fecha, no se cambiará el estado.`);
+        return; // Si ya hay una fecha, no cambiar el estado
     }
 
-    // Escuchamos los cambios en el select
-    selectStatus.addEventListener('change', () => {
-        updateStatusByDate();
-    });
-
-    // Escuchamos los cambios en las fechas
-    intransitDate.addEventListener('change', () => {
-        updateStatusByDate();
-    });
-    pickUpDate.addEventListener('change', () => {
-        updateStatusByDate();
-    });
-    driverAssignedDate.addEventListener('change', () => {
-        updateStatusByDate();
-    });
+    // Cambiar el estado solo si el campo está vacío
+    console.log(`El campo ${dateFieldId} está vacío, cambiando el estado...`);
+    changeStatus(statusId, shipmentId);
+}
 </script>
+
 @endsection
 
 @section('custom-css')
