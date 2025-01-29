@@ -78,16 +78,26 @@ class ShipmentController extends Controller
     }
 
     public function details($pk_shipment)
-    {
-        // Obtener el envío con las relaciones de currentStatus, driver y originCatalog
-        $shipment = Shipments::with(['currentStatus', 'driver', 'originCatalog'])->findOrFail($pk_shipment);
+{
+    // Obtener el envío con las relaciones de currentStatus, driver y originCatalog
+    $shipment = Shipments::with(['currentStatus', 'driver', 'originCatalog'])->findOrFail($pk_shipment);
 
-        // Obtener los estatus disponibles bajo el grupo 'STATUS_E_REPORT'
-        $currentStatus = GenericCatalog::where('gntc_group', 'current_status')->get();
+    // Formatear las fechas en el formato M/D/Y
+    $shipment->pre_alerted_datetime = \Carbon\Carbon::parse($shipment->pre_alerted_datetime)->format('m/d/Y');
+    $shipment->delivered_date = \Carbon\Carbon::parse($shipment->delivered_date)->format('m/d/Y');
+    $shipment->at_door_date = \Carbon\Carbon::parse($shipment->at_door_date)->format('m/d/Y');
+    $shipment->driver_assigned_date = \Carbon\Carbon::parse($shipment->driver_assigned_date)->format('m/d/Y');
+    $shipment->pick_up_date = \Carbon\Carbon::parse($shipment->pick_up_date)->format('m/d/Y');
+    $shipment->intransit_date = \Carbon\Carbon::parse($shipment->intransit_date)->format('m/d/Y');
+    $shipment->secured_yarddate = \Carbon\Carbon::parse($shipment->secured_yarddate)->format('m/d/Y');
+    $shipment->wh_auth_date = \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y');
 
-        // Pasar las variables a la vista
-        return view('shipments.details', compact('shipment', 'currentStatus'));
-    }
+    // Obtener los estatus disponibles bajo el grupo 'STATUS_E_REPORT'
+    $currentStatus = GenericCatalog::where('gntc_group', 'current_status')->get();
+
+    // Pasar las variables a la vista
+    return view('shipments.details', compact('shipment', 'currentStatus'));
+}
     public function getStatusIdByDescription(Request $request)
     {
         $description = $request->input('description');
@@ -102,34 +112,41 @@ class ShipmentController extends Controller
         }
     }
 
-        public function update(Request $request, $pk_shipment)
-       {
-                try {
-                    // Buscar el envío por su ID
-                    $shipment = Shipments::findOrFail($pk_shipment);
+    public function update(Request $request, $pk_shipment)
+    {
+        try {
+            // Buscar el envío por su ID
+            $shipment = Shipments::findOrFail($pk_shipment);
 
-                    // Validar los datos recibidos
-                    $validated = $request->validate([
-                        'gnct_id_current_status' => 'nullable|integer',
-                        'driver_assigned_date' => 'nullable|date',
-                        'pick_up_date' => 'nullable|date',
-                        'intransit_date' => 'nullable|date',
-                        'secured_yarddate' => 'nullable|date',
-                        'sec_incident' => 'nullable|integer',
-                        'incident_type' => 'nullable|string',
-                        'incident_date' => 'nullable|date',
-                    ]);
+            // Validar los datos recibidos
+            $validated = $request->validate([
+                'gnct_id_current_status' => 'nullable|integer',
+                'driver_assigned_date' => 'nullable|string',
+                'pick_up_date' => 'nullable|string',
+                'intransit_date' => 'nullable|string',
+                'secured_yarddate' => 'nullable|string',
+                'sec_incident' => 'nullable|integer',
+                'incident_type' => 'nullable|string',
+                'incident_date' => 'nullable|string',
+            ]);
 
-
-
-                    // Actualizar el envío con los datos validados
-                    $shipment->update($validated);
-
-                    return response()->json(['message' => 'Shipment updated successfully'], 200);
-                } catch (\Exception $e) {
-                    return response()->json(['message' => 'Failed to update shipment', 'error' => $e->getMessage()], 500);
+            // Convertir fechas del formato m/d/Y H:i al formato Y-m-d H:i:s para MySQL
+            foreach (['driver_assigned_date', 'pick_up_date', 'intransit_date', 'secured_yarddate', 'incident_date'] as $field) {
+                if (!empty($validated[$field])) {
+                    $validated[$field] = Carbon::createFromFormat('m/d/Y H:i', $validated[$field])->format('Y-m-d H:i:s');
+                } else {
+                    $validated[$field] = null;
                 }
+            }
+
+            // Actualizar el envío con los datos validados
+            $shipment->update($validated);
+
+            return response()->json(['message' => 'Shipment updated successfully'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Failed to update shipment', 'error' => $e->getMessage()], 500);
         }
+    }
     // Método para actualizar las notas del envío
     public function updateNotes(Request $request, Shipments $shipment)
     {
