@@ -83,15 +83,17 @@ class Shipments extends Model
     }*/
     public function getPickUpDateAttribute($value)
     {
-            return Carbon::parse($value)->format('m/d/Y H:i:s');
+        return $value ? Carbon::parse($value)->format('m/d/Y H:i:s') : null;
     }
+
     public function getIntransitDateAttribute($value)
     {
-            return Carbon::parse($value)->format('m/d/Y H:i:s');
+        return $value ? Carbon::parse($value)->format('m/d/Y H:i:s') : null;
     }
+
     public function getDriverAssignedDateAttribute($value)
     {
-            return Carbon::parse($value)->format('m/d/Y H:i:s');
+        return $value ? Carbon::parse($value)->format('m/d/Y H:i:s') : null;
     }
     public function getetdAttribute($value)
     {

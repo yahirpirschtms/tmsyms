@@ -181,7 +181,9 @@
 
                                 <div class="mb-3">
                                     <label for="pre_alerted_datetime" class="form-label">Pre-Alert Date & Time</label>
-                                    <input type="text" class="form-control" id="pre_alerted_datetime" value="{{ $shipment->pre_alerted_datetime }}" readonly>
+                                    <input type="text" class="form-control" id="pre_alerted_datetime"
+                                           value="{{ $shipment->pre_alerted_datetime ? \Carbon\Carbon::parse($shipment->pre_alerted_datetime)->format('m/d/Y H:i:s') : '' }}"
+                                           readonly>
                                 </div>
 
                                 <div class="mb-3">
@@ -210,7 +212,7 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="etd" class="form-label">ETD (Estimated Time of Departure)</label>
+                                    <label for="etd" class="form-label">ETD</label>
                                     <input type="text" class="form-control" id="etd" value="{{ $shipment->etd }}" readonly>
                                 </div>
 
@@ -263,7 +265,7 @@
                                 <input type="hidden" name="_method" value="PUT">
 
                                 <label for="currentStatus" class="form-label">Current Status</label>
-                                <select class="form-select" id="currentStatus" name="gnct_id_current_status">
+                                <select class="form-select" id="currentStatus-{{ $shipment->stm_id }}" name="gnct_id_current_status">
                                     @foreach ($currentStatus as $status)
                                         <option value="{{ $status->gnct_id }}"
                                             {{ old('gnct_id_current_status', $shipment->gnct_id_current_status) == $status->gnct_id ? 'selected' : '' }}>
@@ -274,25 +276,32 @@
 
                                 <div class="mb-3">
                                     <label for="driverAssignmentDate-{{ $shipment->stm_id }}" class="form-label">Driver Assignment Date</label>
-                                    <input type="datetime-local" class="form-control" id="driverAssignmentDate-{{ $shipment->stm_id }}" name="driver_assigned_date"
-                                        value="{{ $shipment->driver_assigned_date ? \Carbon\Carbon::parse($shipment->driver_assigned_date)->format('Y-m-d\TH:i') : '' }}">
+                                    <input type="text" class="form-control flatpickr" id="driverAssignmentDate-{{ $shipment->stm_id }}" name="driver_assigned_date"
+                                        value="{{ $shipment->driver_assigned_date ? \Carbon\Carbon::parse($shipment->driver_assigned_date)->format('m/d/Y H:i') : '' }}"
+                                        onfocus="checkAndChangeStatus('driverAssignmentDate-{{ $shipment->stm_id }}', 'Driver Assigned', '{{ $shipment->stm_id }}')">
                                 </div>
+
                                 <div class="mb-3">
                                     <label for="pickUpDate-{{ $shipment->stm_id }}" class="form-label">Pick Up Date</label>
-                                    <input type="datetime-local" class="form-control" id="pickUpDate-{{ $shipment->stm_id }}" name="pick_up_date"
-                                        value="{{ $shipment->pick_up_date ? \Carbon\Carbon::parse($shipment->pick_up_date)->format('Y-m-d\TH:i') : '' }}">
+                                    <input type="text" class="form-control flatpickr" id="pickUpDate-{{ $shipment->stm_id }}" name="pick_up_date"
+                                        value="{{ $shipment->pick_up_date ? \Carbon\Carbon::parse($shipment->pick_up_date)->format('m/d/Y H:i') : '' }}"
+                                        onfocus="checkAndChangeStatus('pickUpDate-{{ $shipment->stm_id }}', 'Picked Up', '{{ $shipment->stm_id }}')">
                                 </div>
+
                                 <div class="mb-3">
                                     <label for="inTransitDate-{{ $shipment->stm_id }}" class="form-label">In Transit Date</label>
-                                    <input type="datetime-local" class="form-control" id="inTransitDate-{{ $shipment->stm_id }}" name="intransit_date"
-                                        value="{{ $shipment->intransit_date ? \Carbon\Carbon::parse($shipment->intransit_date)->format('Y-m-d\TH:i') : '' }}">
+                                    <input type="text" class="form-control flatpickr" id="inTransitDate-{{ $shipment->stm_id }}" name="intransit_date"
+                                        value="{{ $shipment->intransit_date ? \Carbon\Carbon::parse($shipment->intransit_date)->format('m/d/Y H:i') : '' }}"
+                                        onfocus="checkAndChangeStatus('inTransitDate-{{ $shipment->stm_id }}', 'In Transit', '{{ $shipment->stm_id }}')">
                                 </div>
 
                                 <div class="mb-3">
                                     <label for="securedYardDate-{{ $shipment->stm_id }}" class="form-label">Secured Yard Date</label>
-                                    <input type="datetime-local" class="form-control" id="securedYardDate-{{ $shipment->stm_id }}" name="secured_yarddate"
-                                        value="{{ $shipment->secured_yarddate ? \Carbon\Carbon::parse($shipment->secured_yarddate)->format('Y-m-d\TH:i') : '' }}">
+                                    <input type="text" class="form-control flatpickr" id="securedYardDate-{{ $shipment->stm_id }}" name="secured_yarddate"
+                                        value="{{ $shipment->secured_yarddate ? \Carbon\Carbon::parse($shipment->secured_yarddate)->format('m/d/Y H:i') : '' }}"
+                                        onfocus="checkAndChangeStatus('securedYardDate-{{ $shipment->stm_id }}', 'Secured Yard', '{{ $shipment->stm_id }}')">
                                 </div>
+
 
                                 <!-- Campos de Incidentes desactivados para pruebas -->
                                 <div class="mb-3">
@@ -324,15 +333,15 @@
                                 @csrf
                                 <div class="mb-3">
                                     <label class="form-label">STM ID</label>
-                                    <p>{{ $shipment->stm_id }}</p>
+                                    <p>{{ $shipment->stm_id ?? 'No disponible' }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Reference</label>
-                                    <p>{{ $shipment->reference }}</p>
+                                    <p>{{ $shipment->reference ?? 'No disponible' }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Bonded</label>
-                                    <p>{{ $shipment->bonded }}</p>
+                                    <p>{{ $shipment->bonded ?? 'No disponible' }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Origin</label>
@@ -340,95 +349,95 @@
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Destination</label>
-                                    <p>{{ $shipment->destinationFacility->fac_name }}</p>
+                                    <p>{{ $shipment->destinationFacility->fac_name ?? 'Destino no disponible' }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Pre-Alerted Date & Time</label>
-                                    <p>{{ \Carbon\Carbon::parse($shipment->pre_alerted_datetime)->format('m/d/Y H:i:s') }}</p>
+                                    <p>{{ $shipment->pre_alerted_datetime ? \Carbon\Carbon::parse($shipment->pre_alerted_datetime)->format('m/d/Y H:i:s') : 'No disponible' }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Trailer ID</label>
-                                    <p>{{ $shipment->id_trailer }}</p>
+                                    <p>{{ $shipment->id_trailer ?? 'No disponible' }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Company ID</label>
-                                    <p>{{ $shipment->company->id_company }}</p>
+                                    <p>{{ $shipment->company->id_company ?? 'No disponible' }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Trailer</label>
-                                    <p>{{ $shipment->trailer }}</p>
+                                    <p>{{ $shipment->trailer ?? 'No disponible' }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Truck</label>
-                                    <p>{{ $shipment->truck }}</p>
+                                    <p>{{ $shipment->truck ?? 'No disponible' }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Driver ID</label>
-                                    <p>{{ $shipment->id_driver }}</p>
+                                    <p>{{ $shipment->id_driver ?? 'No disponible' }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">ETD (Estimated Time of Departure)</label>
-                                    <p>{{ \Carbon\Carbon::parse($shipment->etd)->format('m/d/Y H:i:s') }}</p>
+                                    <p>{{ $shipment->etd ? \Carbon\Carbon::parse($shipment->etd)->format('m/d/Y H:i:s') : 'No disponible' }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Units</label>
-                                    <p>{{ $shipment->units }}</p>
+                                    <p>{{ $shipment->units ?? 'No disponible' }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Pallets</label>
-                                    <p>{{ $shipment->pallets }}</p>
+                                    <p>{{ $shipment->pallets ?? 'No disponible' }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Security Seals</label>
-                                    <p>{{ $shipment->security_seals }}</p>
+                                    <p>{{ $shipment->security_seals ?? 'No disponible' }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Overhaul ID</label>
-                                    <p>{{ $shipment->overhaul_id }}</p>
+                                    <p>{{ $shipment->overhaul_id ?? 'No disponible' }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Device Number</label>
-                                    <p>{{ $shipment->device_number }}</p>
+                                    <p>{{ $shipment->device_number ?? 'No disponible' }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Secondary Shipment ID</label>
-                                    <p>{{ $shipment->secondary_shipment_id }}</p>
+                                    <p>{{ $shipment->secondary_shipment_id ?? 'No disponible' }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Driver Assigned Date</label>
-                                    <p>{{ \Carbon\Carbon::parse($shipment->driver_assigned_date)->format('m/d/Y H:i:s') }}</p>
+                                    <p>{{ $shipment->driver_assigned_date ? \Carbon\Carbon::parse($shipment->driver_assigned_date)->format('m/d/Y H:i:s') : 'No disponible' }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Pick-Up Date</label>
-                                    <p>{{ \Carbon\Carbon::parse($shipment->pick_up_date)->format('m/d/Y H:i:s') }}</p>
+                                    <p>{{ $shipment->pick_up_date ? \Carbon\Carbon::parse($shipment->pick_up_date)->format('m/d/Y H:i:s') : 'No disponible' }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">In Transit Date</label>
-                                    <p>{{ \Carbon\Carbon::parse($shipment->intransit_date)->format('m/d/Y H:i:s') }}</p>
+                                    <p>{{ $shipment->intransit_date ? \Carbon\Carbon::parse($shipment->intransit_date)->format('m/d/Y H:i:s') : 'No disponible' }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Secured Yard Date</label>
-                                    <p>{{ \Carbon\Carbon::parse($shipment->secured_yarddate)->format('m/d/Y H:i:s') }}</p>
+                                    <p>{{ $shipment->secured_yarddate ? \Carbon\Carbon::parse($shipment->secured_yarddate)->format('m/d/Y H:i:s') : 'No disponible' }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Current Status</label>
-                                    <p>{{ $shipment->currentStatus->gntc_description ?? 'Unknown' }}</p>
+                                    <p>{{ $shipment->currentStatus->gntc_description ?? 'No disponible' }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Shipment Type (GNCT ID)</label>
-                                    <p>{{ $shipment->gnct_id_shipment_type }}</p>
+                                    <p>{{ $shipment->gnct_id_shipment_type ?? 'No disponible' }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Delivered Date</label>
-                                    <p>{{ \Carbon\Carbon::parse($shipment->delivered_date)->format('m/d/Y H:i:s') }}</p>
+                                    <p>{{ $shipment->delivered_date ? \Carbon\Carbon::parse($shipment->delivered_date)->format('m/d/Y H:i:s') : 'No disponible' }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">At Door Date</label>
-                                    <p>{{ \Carbon\Carbon::parse($shipment->at_door_date)->format('m/d/Y H:i:s') }}</p>
+                                    <p>{{ $shipment->at_door_date ? \Carbon\Carbon::parse($shipment->at_door_date)->format('m/d/Y H:i:s') : 'No disponible' }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Approved ETA date & Time</label>
-                                    <p>{{ $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y H:i:s') : 'Approved ETA date no disponible' }}</p>
+                                    <p>{{ $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y H:i:s') : 'No disponible' }}</p>
                                 </div>
                             </form>
 
@@ -594,6 +603,66 @@
                 console.log("Tarjetas recargadas");
             });
         }
+    });
+</script>
+
+
+<script>
+    function checkAndChangeStatus(dateFieldId, statusDescription, shipmentId) {
+        const dateField = document.getElementById(dateFieldId);
+        const currentDateValue = dateField.value;
+
+        // Verificar si ya existe una fecha en el campo y evitar el cambio de estado
+        if (currentDateValue) {
+            console.log(`El campo ${dateFieldId} ya tiene una fecha, no se cambiará el estado.`);
+            return; // Si ya hay una fecha, no cambiar el estado
+        }
+
+        // Cambiar el estado solo si el campo está vacío, usando la descripción
+        changeStatusByDescription(statusDescription, shipmentId);
+    }
+
+    // Cambiar el estado utilizando la descripción
+    function changeStatusByDescription(statusDescription, shipmentId) {
+        console.log('shipmentId recibido:', shipmentId); // Verifica el valor de shipmentId
+        console.log('Estado recibido:', statusDescription); // Verifica la descripción del estado
+
+        // Aquí es donde mapeamos la descripción al valor correspondiente de gntc_description
+        const statusMapping = {
+            'Picked Up': 'Picked Up',       // gntc_description 'Picked Up'
+            'Driver Assigned': 'Driver Assigned', // gntc_description 'Driver Assigned'
+            'In Transit': 'In Transit',     // gntc_description 'In Transit'
+            'Secured Yard': 'Secured Yard',
+            // Agrega otras descripciones si es necesario
+        };
+
+        const gntcDescription = statusMapping[statusDescription];
+
+        if (gntcDescription) {
+            const statusSelect = document.getElementById('currentStatus-' + shipmentId);
+            if (statusSelect) {
+                // Buscar el option que tenga el gntc_description correspondiente
+                const options = statusSelect.getElementsByTagName('option');
+                for (let i = 0; i < options.length; i++) {
+                    if (options[i].textContent.trim() === gntcDescription) {
+                        statusSelect.value = options[i].value; // Establecer el valor del select según el texto de la opción
+                        console.log('Estado cambiado a:', gntcDescription);
+                        break;
+                    }
+                }
+            } else {
+                console.error('No se encontró el select para el envío:', shipmentId);
+            }
+        } else {
+            console.error('Descripción de estado no mapeada:', statusDescription);
+        }
+    }
+</script>
+<script>
+    flatpickr('.flatpickr', {
+        dateFormat: 'm/d/Y H:i', // Define el formato que deseas mostrar
+        enableTime: true, // Habilita la selección de hora
+        time_24hr: true, // Si deseas que la hora sea en formato de 24 horas
     });
 </script>
 @endsection

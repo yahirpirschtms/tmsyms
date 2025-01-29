@@ -102,21 +102,26 @@
                         </div>
                         <div class="mb-3">
                         <label for="currentStatus{{ $shipment->stm_id }}" class="form-label">Current Status</label>
-                        <select class="form-select" id="currentStatus{{ $shipment->stm_id }}" name="gnct_id_current_status">
-                            @foreach($statusCatalog as $status)
-                            <option value="{{ $status->gnct_id }}" {{ $status->gnct_id == old('gnct_id_current_status', $shipment->gnct_id_current_status) ? 'selected' : '' }}>
-                                {{ $status->gntc_value }}
-                            </option>
+                        <select class="form-select" id="currentStatus-{{ $shipment->stm_id }}" name="gnct_id_current_status">
+                            @foreach ($currentStatus as $status)
+                                <option value="{{ $status->gnct_id }}"
+                                    {{ old('gnct_id_current_status', $shipment->gnct_id_current_status) == $status->gnct_id ? 'selected' : '' }}>
+                                    {{ $status->gntc_description }}
+                                </option>
                             @endforeach
                         </select>
                         </div>
                         <div class="mb-3">
-                        <label for="deliveredDate{{ $shipment->stm_id }}" class="form-label">Delivered Date</label>
-                        <input type="datetime-local" class="form-control" id="deliveredDate{{ $shipment->stm_id }}" name="delivered_date" value="{{ old('delivered_date', $shipment->delivered_date ? \Carbon\Carbon::parse($shipment->delivered_date)->format('Y-m-d\TH:i') : '') }}">
+                            <label for="deliveredDate{{ $shipment->stm_id }}" class="form-label">Delivered Date</label>
+                            <input type="text" class="form-control datetime-picker" id="deliveredDate{{ $shipment->stm_id }}" name="delivered_date"
+                                value="{{ old('delivered_date', $shipment->delivered_date ? \Carbon\Carbon::parse($shipment->delivered_date)->format('m/d/Y H:i') : '') }}"
+                                onfocus="checkAndChangeStatus('deliveredDate{{ $shipment->stm_id }}', 'Delivered', '{{ $shipment->stm_id }}')">
                         </div>
+
                         <div class="mb-3">
-                        <label for="atDoorDate{{ $shipment->stm_id }}" class="form-label">At Door Date</label>
-                        <input type="datetime-local" class="form-control" id="atDoorDate{{ $shipment->stm_id }}" name="at_door_date" value="{{ old('at_door_date', $shipment->at_door_date ? \Carbon\Carbon::parse($shipment->at_door_date)->format('Y-m-d\TH:i') : '') }}">
+                            <label for="atDoorDate{{ $shipment->stm_id }}" class="form-label">At Door Date</label>
+                            <input type="text" class="form-control datetime-picker" id="atDoorDate{{ $shipment->stm_id }}" name="at_door_date"
+                                value="{{ old('at_door_date', $shipment->at_door_date ? \Carbon\Carbon::parse($shipment->at_door_date)->format('m/d/Y H:i') : '') }}">
                         </div>
                         <div class="mb-3">
                             <label for="offloadTime{{ $shipment->stm_id }}" class="form-label">Offload Time</label>
@@ -124,7 +129,8 @@
                         </div>
                         <div class="mb-3">
                             <label for="approvedETADateTime{{ $shipment->stm_id }}" class="form-label">Approved ETA Date & Time</label>
-                            <input type="datetime-local" class="form-control" id="approvedETADateTime{{ $shipment->stm_id }}" name="wh_auth_date" value="{{ old('wh_auth_date', $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('Y-m-d\TH:i') : '') }}">
+                            <input type="text" class="form-control datetime-picker" id="approvedETADateTime{{ $shipment->stm_id }}" name="wh_auth_date"
+                                value="{{ old('wh_auth_date', $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y H:i') : '') }}">
                         </div>
                         <div class="d-flex justify-content-end">
                             <button type="submit" class="btn btn-primary" id="saveButton{{ $shipment->stm_id }}">Save</button>
@@ -153,52 +159,58 @@
         var statusCatalog = @json($statusCatalog);
     </script>
     <script>
-            document.addEventListener('DOMContentLoaded', function () {
+           document.addEventListener('DOMContentLoaded', function () {
             const events = {!! json_encode($events) !!};
 
-            var calendarEl = document.getElementById('calendar');
+            console.log(events); // Ver qué tipo de dato es 'events'
 
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'timeGridDay',
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'timeGridDay,timeGridWeek,dayGridMonth'
-                },
-                events: events,
+            // Verifica si 'events' es un array
+            if (Array.isArray(events)) {
+                const filteredEvents = events.filter(event => event.extendedProps.wh_auth_date !== 'N/A');
 
-                // Eliminar la hora
-                eventTimeFormat: {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    meridiem: 'short',
-                    hour12: true
-                },
+                var calendarEl = document.getElementById('calendar');
 
-                // Modificar cómo se muestra el evento
-                eventContent: function(info) {
-                    // Suponiendo que el evento tiene una propiedad llamada 'shipmentInfo' que contiene la información del envío
-                    return { html: '<strong>' + info.event.title + '</strong><br>'};
-                },
+                var calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'timeGridDay',
+                    headerToolbar: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'timeGridDay,timeGridWeek,dayGridMonth'
+                    },
+                    events: filteredEvents,  // Pasar solo los eventos válidos
 
-                eventClick: function(info) {
-                    var event = info.event;
-                    var props = event.extendedProps;
+                    eventTimeFormat: {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        meridiem: 'short',
+                        hour12: true
+                    },
 
-                    var modalTarget = "#shipmentModal" + props.stm_id;
+                    eventContent: function(info) {
+                        return { html: '<strong>' + info.event.title + '</strong><br>'};
+                    },
 
-                    // Verificar si el modal existe en el DOM antes de intentar mostrarlo
-                    var modalElement = document.getElementById(modalTarget.substring(1)); // Eliminar el "#" para obtener el ID correcto
-                    if (modalElement) {
-                        var modal = new bootstrap.Modal(modalElement); // Usar la API de Bootstrap para abrir el modal
-                        modal.show();
-                    } else {
-                        console.error("Modal no encontrado: " + modalTarget);
+                    eventClick: function(info) {
+                        var event = info.event;
+                        var props = event.extendedProps;
+
+                        var modalTarget = "#shipmentModal" + props.stm_id;
+
+                        var modalElement = document.getElementById(modalTarget.substring(1));
+                        if (modalElement) {
+                            var modal = new bootstrap.Modal(modalElement);
+                            modal.show();
+                        } else {
+                            console.error("Modal no encontrado: " + modalTarget);
+                        }
                     }
-                }
-            });
+                });
 
-            calendar.render();
+                calendar.render();
+            } else {
+                console.error('Los eventos no son un array:', events);
+            }
+
             // Filtrar eventos por STM ID
             document.getElementById('searchByStmId').addEventListener('input', function (e) {
                 const searchValue = e.target.value.toLowerCase();
@@ -267,6 +279,70 @@
     });
 </script>
 
+
+<script>
+    function checkAndChangeStatus(dateFieldId, statusDescription, shipmentId) {
+        const dateField = document.getElementById(dateFieldId);
+
+        if (!dateField) {
+            console.error(`No se encontró el campo con id: ${dateFieldId}`);
+            return; // Si el campo no existe, no continuar con el cambio de estado
+        }
+
+        const currentDateValue = dateField.value;
+
+        // Verificar si ya existe una fecha en el campo y evitar el cambio de estado
+        if (currentDateValue) {
+            console.log(`El campo ${dateFieldId} ya tiene una fecha, no se cambiará el estado.`);
+            return; // Si ya hay una fecha, no cambiar el estado
+        }
+
+        // Cambiar el estado solo si el campo está vacío, usando la descripción
+        changeStatusByDescription(statusDescription, shipmentId);
+    }
+
+    function changeStatusByDescription(statusDescription, shipmentId) {
+        console.log('shipmentId recibido:', shipmentId); // Verifica el valor de shipmentId
+        console.log('Estado recibido:', statusDescription); // Verifica la descripción del estado
+
+        const statusMapping = {
+            'Delivered': 'Delivered', // gntc_description
+            // Agrega otras descripciones si es necesario
+        };
+
+        const gntcDescription = statusMapping[statusDescription];
+
+        if (gntcDescription) {
+            const statusSelect = document.getElementById('currentStatus-' + shipmentId);
+            if (statusSelect) {
+                // Buscar el option que tenga el gntc_description correspondiente
+                const options = statusSelect.getElementsByTagName('option');
+                for (let i = 0; i < options.length; i++) {
+                    if (options[i].textContent.trim() === gntcDescription) {
+                        statusSelect.value = options[i].value; // Establecer el valor del select según el texto de la opción
+                        console.log('Estado cambiado a:', gntcDescription);
+                        break;
+                    }
+                }
+            } else {
+                console.error('No se encontró el select para el envío:', shipmentId);
+            }
+        } else {
+            console.error('Descripción de estado no mapeada:', statusDescription);
+        }
+    }
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        flatpickr(".datetime-picker", {
+            enableTime: true,        // Permite seleccionar hora
+            dateFormat: "m/d/Y H:i", // Formato M/D/Y H:i
+            time_24hr: false,        // Usa formato de 12 horas (AM/PM)
+            allowInput: true         // Permite escribir la fecha manualmente
+        });
+    });
+</script>
 
 @endsection
 
