@@ -58,6 +58,12 @@
                     </select>
                     <div class="invalid-feedback"></div>
                 </div>
+                <!--<div class="mb-3">
+                    <label for="inputshipmentdestination" class="form-label">Destination</label>
+                    <input type="text" class="form-control" id="inputshipmentdestination" name="inputshipmentdestination" list="destinations-list" data-url="{{ route('destinations-shipments') }}">
+                    <datalist id="destinations-list"></datalist>
+                    <div class="invalid-feedback"></div>
+                </div>-->
 
                 <div class="mb-3">
                     <label for="inputshipmentprealertdatetime" class="form-label ">PreAlert DateTime</label>

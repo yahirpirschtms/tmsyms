@@ -18,7 +18,7 @@
     <!--Flatpickr para fechas en inputs-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <link rel="icon" type="image/png" href="{!! asset('/icons/tms_logo.png')!!}">
+    <link rel="icon" type="image/png" href="{!! asset('/icons/tms_logo.jpg')!!}">
     @vite([
         'resources/sass/app.scss',
         'resources/js/app.js'
