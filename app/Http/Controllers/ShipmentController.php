@@ -37,7 +37,7 @@ class ShipmentController extends Controller
 
         return view('shipments', compact('shipments', 'origins'));
     }
-    
+
     public function allshipmentsshow()
     {
      if (Auth::check()) {
@@ -88,28 +88,36 @@ class ShipmentController extends Controller
 
     public function update(Request $request, $pk_shipment)
     {
-
-
-
         try {
             // Buscar el envío por su ID
             $shipment = Shipments::findOrFail($pk_shipment);
 
             // Validar los datos recibidos
             $validated = $request->validate([
-                'gnct_id_current_status' => 'nullable|integer', // El campo de estado actual (deshabilitado en el formulario)
-                'driver_assigned_date' => 'nullable|date', // Fecha de asignación del conductor
-                'pick_up_date' => 'nullable|date', // Fecha de recogida
-                'intransit_date' => 'nullable|date', // Fecha de tránsito
-                'secured_yarddate' => 'nullable|date', // Fecha de depósito asegurado
-                'sec_incident' => 'nullable|integer', // Incidente (si aplica)
-                'incident_type' => 'nullable|string', // Tipo de incidente (si aplica)
-                'incident_date' => 'nullable|date', // Fecha del incidente (si aplica)
+                'gnct_id_current_status' => 'nullable|integer',
+                'driver_assigned_date' => 'nullable|date',
+                'pick_up_date' => 'nullable|date',
+                'intransit_date' => 'nullable|date',
+                'secured_yarddate' => 'nullable|date',
+                'sec_incident' => 'nullable|integer',
+                'incident_type' => 'nullable|string',
+                'incident_date' => 'nullable|date',
             ]);
+
+            // Determinar el estado según las fechas ingresadas
+            if ($request->intransit_date) {
+                $status_id = 1; // In Transit
+            } elseif ($request->pick_up_date) {
+                $status_id = 8; // Picked Up
+            } elseif ($request->driver_assigned_date) {
+                $status_id = 9; // Driver Assigned
+            } else {
+                $status_id = $shipment->gnct_id_current_status; // Mantiene el estado actual si no se asigna ninguna fecha
+            }
 
             // Actualizar los datos del envío
             $shipment->update([
-                'gnct_id_current_status' => $request->gnct_id_current_status ?? $shipment->gnct_id_current_status, // Solo actualizar si el campo no está vacío
+                'gnct_id_current_status' => $status_id,
                 'driver_assigned_date' => $request->driver_assigned_date,
                 'pick_up_date' => $request->pick_up_date,
                 'intransit_date' => $request->intransit_date,
@@ -119,15 +127,11 @@ class ShipmentController extends Controller
                 'incident_date' => $request->incident_date,
             ]);
 
-            // Redirigir a la lista de envíos con un mensaje de éxito
             return response()->json(['message' => 'Shipment updated successfully'], 200);
         } catch (\Exception $e) {
-            // Si ocurre un error, redirigir con un mensaje de error
-
             return response()->json(['message' => 'Failed to update shipment', 'error' => $e->getMessage()], 500);
         }
     }
-
     // Método para actualizar las notas del envío
     public function updateNotes(Request $request, Shipments $shipment)
     {
@@ -168,12 +172,12 @@ class ShipmentController extends Controller
             //$dateout = $request->query('dateout', session(''));
             //$transaction = $request->query('transaction', session(''));
             $username = $request->query('username', session(''));
-            
+
             // Verificar si la solicitud proviene del botón (usamos una bandera)
             $from_button = $request->query('from_button', 1); // 1 si viene del botón, 0 si no
 
             // Pasar los datos a la vista
-            return view('home.trafficworkflowstart', compact('trailerId', 'status', 'palletsontrailer', 
+            return view('home.trafficworkflowstart', compact('trailerId', 'status', 'palletsontrailer',
             'palletsonfloor', 'carrier', 'availability', 'location', 'datein',/* 'dateout', 'transaction',*/ 'username',  'from_button'));
         }
 
@@ -274,7 +278,7 @@ class ShipmentController extends Controller
             'overhaul_id' => $request->inputshipmentoverhaulid,
             'device_number' => $request->inputshipmentdevicenumber,
             'gnct_id_current_status' => $request->inputshipmentcurrentstatus,
-            
+
         ]);
 
         // Actualizar la tabla `empty_trailer` para el trailer correspondiente
@@ -284,7 +288,7 @@ class ShipmentController extends Controller
             'date_out' => now(), // Establece la fecha y hora actual
             'transaction_date' => now() // También aquí
         ]);
-    
+
         // Redirigir con mensaje de éxito
         return redirect()->route('workflowtrafficstart')->with('success', 'Shipment successfully added!');
     }
@@ -297,7 +301,7 @@ class ShipmentController extends Controller
             })
             ->whereNull('wh_auth_date')
             ->get();
-            
+
             return view('home.whapptapproval', compact('shipments'));
             //return view('home.whapptapproval');
         }
@@ -331,25 +335,25 @@ class ShipmentController extends Controller
             //'carrier.string' => 'El campo Carrier debe ser una cadena de texto.',
             //'carrier.max' => 'El campo Carrier no puede exceder los 50 caracteres.',
             //'etd.required' => 'ETD is required.',
-            
+
             'wh_auth_date.required' => 'WH Auth Date is required.',
         ]);
-    
+
         // Buscar el trailer
         $shipment = Shipments::findOrFail($validated['pk_shipment']);
 
         // Convertir las fechas al formato adecuado
         /*$validated['status'] = $validated['status']
-            ? Carbon::createFromFormat('m/d/Y', $validated['status'])->format('Y-m-d') 
+            ? Carbon::createFromFormat('m/d/Y', $validated['status'])->format('Y-m-d')
             : null;*/
-        /*$validated['etd'] = $validated['etd'] 
-            ? Carbon::createFromFormat('m/d/Y H:i:s', $validated['etd'])->format('Y-m-d H:i:s') 
+        /*$validated['etd'] = $validated['etd']
+            ? Carbon::createFromFormat('m/d/Y H:i:s', $validated['etd'])->format('Y-m-d H:i:s')
             : null;*/
-        $validated['wh_auth_date'] = $validated['wh_auth_date'] 
-            ? Carbon::createFromFormat('m/d/Y H:i:s', $validated['wh_auth_date'])->format('Y-m-d H:i:s') 
+        $validated['wh_auth_date'] = $validated['wh_auth_date']
+            ? Carbon::createFromFormat('m/d/Y H:i:s', $validated['wh_auth_date'])->format('Y-m-d H:i:s')
             : null;
-        /*$validated['transaction_date'] = $validated['transaction_date'] 
-            ? Carbon::createFromFormat('m/d/Y H:i:s', $validated['transaction_date'])->format('Y-m-d H:i:s') 
+        /*$validated['transaction_date'] = $validated['transaction_date']
+            ? Carbon::createFromFormat('m/d/Y H:i:s', $validated['transaction_date'])->format('Y-m-d H:i:s')
             : null;*/
 
             // Log para depuración
@@ -376,7 +380,7 @@ class ShipmentController extends Controller
             $formattedDateTime = null;
             //$formattedDate = \DateTime::createFromFormat('m/d/Y', $search);
             $formattedDateTime = \DateTime::createFromFormat('m/d/Y H:i:s',$search);
-            
+
             //$finalstatus = $date->format('Y-m-d');
             $query->where(function($q) use ($search, $formattedDateTime) {
                 $q->where('stm_id', 'like', "%$search%")
@@ -399,11 +403,11 @@ class ShipmentController extends Controller
                 //->orWhereNull('pallets')
 
                 ->orWhere('driver_assigned_date', 'like', $formattedDateTime)
-                //->orWhereNull('driver_assigned_date')
+                ->orWhereNull('driver_assigned_date')
                 ->orWhere('pick_up_date', 'like', $formattedDateTime)
-                //->orWhereNull('pick_up_date')
+                ->orWhereNull('pick_up_date')
                 ->orWhere('intransit_date', 'like', $formattedDateTime)
-                //->orWhereNull('intransit_date')
+                ->orWhereNull('intransit_date')
                 ->orWhere('delivered_date', 'like', $formattedDateTime)
                 //->orWhereNull('delivered_date')
                 ->orWhere('secured_yarddate', 'like', $formattedDateTime)
@@ -423,7 +427,7 @@ class ShipmentController extends Controller
                 //->orWhereNull('device_number');
             });
         }
-        
+
 
         //Filtros específicos de parámetros (inputs de filtros aplicados)
         if ($request->has('stm_id') && $request->input('stm_id') != '') {
@@ -525,7 +529,7 @@ class ShipmentController extends Controller
             $query->whereBetween('offloading_time', [
                 $request->input('offlanding_time_start'),
                 $request->input('offlanding_time_end')
-                
+
             ]);
         }
 
@@ -539,14 +543,14 @@ class ShipmentController extends Controller
                 $endDate
             ]);
         }
-        
+
         if ($request->has('billing_id') && $request->input('billing_id') != '') {
             $query->where('billing_id', 'like', "%{$request->input('billing_id')}%");
         }
         if ($request->has('device_number') && $request->input('device_number') != '') {
             $query->where('device_number', 'like', "%{$request->input('device_number')}%");
         }
-        
+
 
         // Obtener los trailers con los filtros aplicados
         $shipments = $query->get();

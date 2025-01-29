@@ -275,17 +275,19 @@
                                 <div class="mb-3">
                                     <label for="driverAssignmentDate-{{ $shipment->stm_id }}" class="form-label">Driver Assignment Date</label>
                                     <input type="datetime-local" class="form-control" id="driverAssignmentDate-{{ $shipment->stm_id }}" name="driver_assigned_date"
-                                        value="{{ $shipment->driver_assigned_date ? \Carbon\Carbon::parse($shipment->driver_assigned_date)->format('Y-m-d\TH:i') : '' }}">
+                                    value="{{ $shipment->driver_assigned_date ? \Carbon\Carbon::parse($shipment->driver_assigned_date)->format('Y-m-d\TH:i') : '' }}">
                                 </div>
+
                                 <div class="mb-3">
                                     <label for="pickUpDate-{{ $shipment->stm_id }}" class="form-label">Pick Up Date</label>
                                     <input type="datetime-local" class="form-control" id="pickUpDate-{{ $shipment->stm_id }}" name="pick_up_date"
-                                        value="{{ $shipment->pick_up_date ? \Carbon\Carbon::parse($shipment->pick_up_date)->format('Y-m-d\TH:i') : '' }}">
+                                        value="{{ is_null($shipment->pick_up_date) ? '' : \Carbon\Carbon::parse($shipment->pick_up_date)->format('Y-m-d\TH:i') }}">
                                 </div>
+
                                 <div class="mb-3">
                                     <label for="inTransitDate-{{ $shipment->stm_id }}" class="form-label">In Transit Date</label>
                                     <input type="datetime-local" class="form-control" id="inTransitDate-{{ $shipment->stm_id }}" name="intransit_date"
-                                        value="{{ $shipment->intransit_date ? \Carbon\Carbon::parse($shipment->intransit_date)->format('Y-m-d\TH:i') : '' }}">
+                                        value="{{ is_null($shipment->intransit_date) ? '' : \Carbon\Carbon::parse($shipment->intransit_date)->format('Y-m-d\TH:i') }}">
                                 </div>
 
                                 <div class="mb-3">
