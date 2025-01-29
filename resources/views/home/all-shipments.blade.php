@@ -247,7 +247,8 @@
                             <td>{{ $shipment->pre_alerted_datetime ? \Carbon\Carbon::parse($shipment->pre_alerted_datetime)->format('m/d/Y H:i') : 'Not available' }}</td>
                             <td>{{ $shipment->carrier_dropping_trailer ?? 'Not available' }}</td>
                             <td>{{ $shipment->trailer_owner ?? 'Not available' }}</td>
-                            <td>{{ $shipment->driver->drivername ? $shipment->driver->drivername . ' - ' . $shipment->truck : 'Not available' }}</td>
+                            <td>{{ isset($shipment->driver) && $shipment->driver->drivername ? $shipment->driver->drivername . ' - ' . $shipment->truck : 'Not available' }}</td>
+
                             <td>{{ $shipment->etd ? \Carbon\Carbon::parse($shipment->etd)->format('m/d/Y') : 'Not available' }}</td>
                             <td>{{ $shipment->units ?? 'Not available' }}</td>
                             <td>{{ $shipment->pallets ?? 'Not available' }}</td>

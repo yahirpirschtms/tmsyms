@@ -113,15 +113,17 @@
                         </div>
                         <div class="mb-3">
                             <label for="deliveredDate{{ $shipment->stm_id }}" class="form-label">Delivered Date</label>
-                            <input type="text" class="form-control datetime-picker" id="deliveredDate{{ $shipment->stm_id }}" name="delivered_date"
-                                value="{{ old('delivered_date', $shipment->delivered_date ? \Carbon\Carbon::parse($shipment->delivered_date)->format('m/d/Y H:i') : '') }}"
-                                onfocus="checkAndChangeStatus('deliveredDate{{ $shipment->stm_id }}', 'Delivered', '{{ $shipment->stm_id }}')">
+                            <input type="datetime-local" class="form-control" id="deliveredDate{{ $shipment->stm_id }}" name="delivered_date"
+                                value="{{ old('delivered_date', $shipment->delivered_date ? \Carbon\Carbon::parse($shipment->delivered_date)->format('Y-m-d\TH:i') : '') }}"
+                                onfocus="checkAndChangeStatus('deliveredDate{{ $shipment->stm_id }}', 'Delivered', '{{ $shipment->stm_id }}')"
+                                onchange="formatDate(this)">
                         </div>
 
                         <div class="mb-3">
                             <label for="atDoorDate{{ $shipment->stm_id }}" class="form-label">At Door Date</label>
-                            <input type="text" class="form-control datetime-picker" id="atDoorDate{{ $shipment->stm_id }}" name="at_door_date"
-                                value="{{ old('at_door_date', $shipment->at_door_date ? \Carbon\Carbon::parse($shipment->at_door_date)->format('m/d/Y H:i') : '') }}">
+                            <input type="datetime-local" class="form-control" id="atDoorDate{{ $shipment->stm_id }}" name="at_door_date"
+                                value="{{ old('at_door_date', $shipment->at_door_date ? \Carbon\Carbon::parse($shipment->at_door_date)->format('Y-m-d\TH:i') : '') }}"
+                                onchange="formatDate(this)">
                         </div>
                         <div class="mb-3">
                             <label for="offloadTime{{ $shipment->stm_id }}" class="form-label">Offload Time</label>
