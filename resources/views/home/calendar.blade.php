@@ -113,14 +113,14 @@
                         </div>
                         <div class="mb-3">
                             <label for="deliveredDate{{ $shipment->stm_id }}" class="form-label">Delivered Date</label>
-                            <input type="text" class="form-control" id="deliveredDate{{ $shipment->stm_id }}" name="delivered_date"
+                            <input type="text" class="form-control datetime-picker" id="deliveredDate{{ $shipment->stm_id }}" name="delivered_date"
                                 value="{{ old('delivered_date', $shipment->delivered_date ? \Carbon\Carbon::parse($shipment->delivered_date)->format('m/d/Y H:i') : '') }}"
                                 onfocus="checkAndChangeStatus('deliveredDate{{ $shipment->stm_id }}', 'Delivered', '{{ $shipment->stm_id }}')">
                         </div>
 
                         <div class="mb-3">
                             <label for="atDoorDate{{ $shipment->stm_id }}" class="form-label">At Door Date</label>
-                            <input type="text" class="form-control" id="atDoorDate{{ $shipment->stm_id }}" name="at_door_date"
+                            <input type="text" class="form-control datetime-picker" id="atDoorDate{{ $shipment->stm_id }}" name="at_door_date"
                                 value="{{ old('at_door_date', $shipment->at_door_date ? \Carbon\Carbon::parse($shipment->at_door_date)->format('m/d/Y H:i') : '') }}">
                         </div>
 
@@ -132,7 +132,7 @@
 
                         <div class="mb-3">
                             <label for="approvedETADateTime{{ $shipment->stm_id }}" class="form-label">Approved ETA Date & Time</label>
-                            <input type="text" class="form-control" id="approvedETADateTime{{ $shipment->stm_id }}" name="wh_auth_date"
+                            <input type="text" class="form-control datetime-picker" id="approvedETADateTime{{ $shipment->stm_id }}" name="wh_auth_date"
                                 value="{{ old('wh_auth_date', $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y H:i') : '') }}">
                         </div>
                         <div class="d-flex justify-content-end">
@@ -337,14 +337,14 @@
 </script>
 
 <script>
-    // document.addEventListener("DOMContentLoaded", function() {
-    //     flatpickr(".datetime-picker", {
-    //         enableTime: true,        // Permite seleccionar hora
-    //         dateFormat: "m/d/Y H:i", // Formato M/D/Y H:i
-    //         time_24hr: false,        // Usa formato de 12 horas (AM/PM)
-    //         allowInput: true         // Permite escribir la fecha manualmente
-    //     });
-    // });
+    document.addEventListener("DOMContentLoaded", function() {
+        flatpickr(".datetime-picker", {
+            enableTime: true,        // Permite seleccionar hora
+            dateFormat: "m/d/Y H:i", // Formato M/D/Y H:i
+            time_24hr: false,        // Usa formato de 12 horas (AM/PM)
+            allowInput: true         // Permite escribir la fecha manualmente
+        });
+    });
 </script>
 
 @endsection
