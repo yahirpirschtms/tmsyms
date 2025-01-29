@@ -91,6 +91,7 @@ class ShipmentController extends Controller
 
     public function update(Request $request, $pk_shipment)
     {
+        dd($request);
         try {
             // Buscar el envío por su ID
             $shipment = Shipments::findOrFail($pk_shipment);

@@ -451,51 +451,7 @@
 
 @section('scripts')
 <script>
-    $(document).on('submit', '[id^="shipmentForm"]', function (event) {
-        event.preventDefault(); // Previene el envío estándar del formulario
-        console.log('Formulario enviado (delegado)');
 
-        let formAction = $(this).attr('action');
-        let formData = $(this).serialize();
-
-        $.ajax({
-            url: formAction,
-            method: 'PUT',
-            data: formData,
-            beforeSend: function () {
-                Swal.fire({
-                    title: 'Enviando datos...',
-                    text: 'Por favor espera mientras se procesan los datos.',
-                    icon: 'info',
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading(); // Muestra un indicador de carga
-                    }
-                });
-            },
-            success: function (response) {
-                Swal.fire({
-                    title: '¡Éxito!',
-                    text: response.message || 'Los datos se actualizaron correctamente.',
-                    icon: 'success',
-                    confirmButtonText: 'Aceptar'
-                }).then(() => {
-                    location.reload(); // Recargar la página para reflejar los cambios
-                });
-                console.log('Respuesta recibida:', response);
-            },
-            error: function (xhr) {
-                let errorMessage = xhr.responseJSON?.message || 'Ocurrió un error al actualizar el estado.';
-                Swal.fire({
-                    title: 'Error',
-                    text: errorMessage,
-                    icon: 'error',
-                    confirmButtonText: 'Aceptar'
-                });
-                console.error('Error en la solicitud:', xhr.responseJSON || xhr.responseText);
-            },
-        });
-    });
 </script>
 
 

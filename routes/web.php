@@ -89,18 +89,21 @@ Route::put('/shipment/whetaapproval', [ShipmentController::class, 'whetaapproval
 //Rutas para el calendario
 Route::get('/shipment/{pk_shipment}', [CalendarController::class, 'getShipmentDetails'])->name('shipment.details');
 
-Route::put('/update-status/{pk_shipment}', [CalendarController::class, 'updateOffloadingStatus'])->name('update.status');
-
 Route::get('/calendar', [CalendarController::class, 'calendarshow'])->name('calendar.view');
 
 Route::get('/historicalcalendar', [CalendarController::class, 'historicalcalendarshow'])->name('historicalcalendar.view');
 
 //Rutas Christian
+Route::get('/liveshipments', [ShipmentController::class, 'liveshipmentsshow'])->name('liveshipments');
+Route::get('/all-shipments', [ShipmentController::class, 'allshipmentsshow'])->name('all-shipments');
+
+
+
 Route::get('/shipments/details/{pk_shipment}', [ShipmentController::class, 'details'])->name('shipments.details');
 Route::put('/shipments/{id}', [ShipmentController::class, 'update'])->name('shipments.update');
 Route::put('/shipments/{shipment}/updateNotes', [ShipmentController::class, 'updateNotes'])->name('shipments.updateNotes');
 Route::put('/update-status-endpoint/{pk_shipment}', [ShipmentController::class, 'update'])->name('update.status');
+Route::get('/shipment/status', [GenericCatalogController::class, 'getOrigin']);
 
-
-Route::get('/liveshipments', [ShipmentController::class, 'liveshipmentsshow'])->name('liveshipments');
-Route::get('/all-shipments', [ShipmentController::class, 'allshipmentsshow'])->name('all-shipments');
+Route::get('/shipment/{pk_shipment}', [CalendarController::class, 'getShipmentDetails'])->name('shipment.details');
+Route::put('/update-status/{pk_shipment}', [CalendarController::class, 'updateOffloadingStatus'])->name('update.status');
