@@ -107,15 +107,19 @@ class ShipmentController extends Controller
                 'incident_date' => 'nullable|date',
             ]);
 
-            // Determinar el estado según las fechas ingresadas
-            if ($request->intransit_date) {
-                $status_id = 1; // In Transit
-            } elseif ($request->pick_up_date) {
-                $status_id = 8; // Picked Up
-            } elseif ($request->driver_assigned_date) {
-                $status_id = 9; // Driver Assigned
+            // Si se envía un estado manualmente, usarlo; si no, aplicar la lógica automática
+            if ($request->filled('gnct_id_current_status')) {
+                $status_id = $request->gnct_id_current_status;
             } else {
-                $status_id = $shipment->gnct_id_current_status; // Mantiene el estado actual si no se asigna ninguna fecha
+                if ($request->intransit_date) {
+                    $status_id = 1; // In Transit
+                } elseif ($request->pick_up_date) {
+                    $status_id = 8; // Picked Up
+                } elseif ($request->driver_assigned_date) {
+                    $status_id = 9; // Driver Assigned
+                } else {
+                    $status_id = $shipment->gnct_id_current_status; // Mantiene el estado actual
+                }
             }
 
             // Actualizar los datos del envío
