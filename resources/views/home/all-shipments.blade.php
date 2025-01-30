@@ -245,9 +245,19 @@
                             <td>{{ $shipment->id_trailer ?? 'Not available' }}</td>
                             <td>{{ $shipment->destinationFacility->fac_name ?? 'Not available' }}</td>
                             <td>{{ $shipment->pre_alerted_datetime ? \Carbon\Carbon::parse($shipment->pre_alerted_datetime)->format('m/d/Y H:i') : 'Not available' }}</td>
-                            <td>{{ $shipment->carrier_dropping_trailer ?? 'Not available' }}</td>
-                            <td>{{ $shipment->trailer_owner ?? 'Not available' }}</td>
-                            <td>{{ isset($shipment->driver) && $shipment->driver->drivername ? $shipment->driver->drivername . ' - ' . $shipment->truck : 'Not available' }}</td>
+                            <td>{{ $shipment->company->CoName ?? 'Not available' }}</td>
+                            <td>{{ $shipment->trailer ?? 'Not available' }}</td>
+                            <td>
+                                @if(!empty($shipment->driver->drivername) && !empty($shipment->truck))
+                                    {{ $shipment->driver->drivername . ' - ' . $shipment->truck }}
+                                @elseif(!empty($shipment->driver->drivername))
+                                    {{ $shipment->driver->drivername }}
+                                @elseif(!empty($shipment->truck))
+                                    {{ $shipment->truck }}
+                                @else
+                                    Not available
+                                @endif
+                            </td>
 
                             <td>{{ $shipment->etd ? \Carbon\Carbon::parse($shipment->etd)->format('m/d/Y') : 'Not available' }}</td>
                             <td>{{ $shipment->units ?? 'Not available' }}</td>
@@ -339,8 +349,8 @@
                                     <p>{{ $shipment->id_trailer ?? 'No disponible' }}</p>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label">Company ID</label>
-                                    <p>{{ $shipment->company->id_company ?? 'No disponible' }}</p>
+                                    <label class="form-label">Company</label>
+                                    <p>{{ $shipment->company->CoName ?? 'No disponible' }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Trailer</label>
@@ -462,7 +472,7 @@
 
                                     <div class="mb-3">
                                         <label for="id_company" class="form-label">Company ID</label>
-                                        <input type="text" class="form-control" id="id_company" value="{{ $shipment->company->id_company }}" readonly>
+                                        <input type="text" class="form-control" id="id_company" value="{{ $shipment->company->CoName }}" readonly>
                                     </div>
 
                                     <div class="mb-3">
