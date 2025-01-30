@@ -89,11 +89,11 @@
                         <div class="card">
                             <div class="card-body text-black border border-1 rounded" style="">
                                 <h5 class="card-title fw-bolder" style="color:#1e4877">{{ $shipment->stm_id }}</h5>
-                                <p class="origin" style="color: #252525;">{{ $shipment->company->CoName ?? 'Origen not Available' }}</p>
+                                <p class="origin" style="color: #252525;">{{ $shipment->company->CoName ?? 'Origen no disponible' }}</p>
 
                                 <p class="status" style="color: #252525;">{{ $shipment->currentStatus->gntc_description ?? 'Estado no disponible' }}</p>
-                                <p class="" style="color: #252525;">{{ $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y') : 'Approved ETA date not available' }}</p>
-                                <p class="driver" style="color: #252525;">{{ $shipment->driver->drivername ?? 'Driver not assigned' }}</p>
+                                <p class="" style="color: #252525;">{{ $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y') : 'Approved ETA date no disponible' }}</p>
+                                <p class="driver" style="color: #252525;">{{ $shipment->driver->drivername ?? 'Conductor no asignado' }}</p>
                                 <div class="d-flex justify-content-between">
                                     <button class="btn btn-sm text-white" data-bs-toggle="offcanvas" style="background-color: rgb(13, 82, 200);"
                                         data-bs-target="#offcanvasUpdateStatus-{{ $shipment->stm_id }}">
@@ -192,8 +192,8 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="id_company" class="form-label">Company</label>
-                                    <input type="text" class="form-control" id="id_company" value="{{ $shipment->company->CoName }}" readonly>
+                                    <label for="id_company" class="form-label">Company ID</label>
+                                    <input type="text" class="form-control" id="id_company" value="{{ $shipment->company->id_company }}" readonly>
                                 </div>
 
                                 <div class="mb-3">
@@ -278,7 +278,6 @@
                                     <label for="driverAssignmentDate-{{ $shipment->stm_id }}" class="form-label">Driver Assignment Date</label>
                                     <input type="text" class="form-control flatpickr" id="driverAssignmentDate-{{ $shipment->stm_id }}" name="driver_assigned_date"
                                         value="{{ $shipment->driver_assigned_date ? \Carbon\Carbon::parse($shipment->driver_assigned_date)->format('m/d/Y H:i') : '' }}"
-                                        placeholder="mm/dd/yyyy --:--"
                                         onfocus="checkAndChangeStatus('driverAssignmentDate-{{ $shipment->stm_id }}', 'Driver Assigned', '{{ $shipment->stm_id }}')">
                                 </div>
 
@@ -286,7 +285,6 @@
                                     <label for="pickUpDate-{{ $shipment->stm_id }}" class="form-label">Pick Up Date</label>
                                     <input type="text" class="form-control flatpickr" id="pickUpDate-{{ $shipment->stm_id }}" name="pick_up_date"
                                         value="{{ $shipment->pick_up_date ? \Carbon\Carbon::parse($shipment->pick_up_date)->format('m/d/Y H:i') : '' }}"
-                                        placeholder="mm/dd/yyyy --:--"
                                         onfocus="checkAndChangeStatus('pickUpDate-{{ $shipment->stm_id }}', 'Picked Up', '{{ $shipment->stm_id }}')">
                                 </div>
 
@@ -294,7 +292,6 @@
                                     <label for="inTransitDate-{{ $shipment->stm_id }}" class="form-label">In Transit Date</label>
                                     <input type="text" class="form-control flatpickr" id="inTransitDate-{{ $shipment->stm_id }}" name="intransit_date"
                                         value="{{ $shipment->intransit_date ? \Carbon\Carbon::parse($shipment->intransit_date)->format('m/d/Y H:i') : '' }}"
-                                        placeholder="mm/dd/yyyy --:--"
                                         onfocus="checkAndChangeStatus('inTransitDate-{{ $shipment->stm_id }}', 'In Transit', '{{ $shipment->stm_id }}')">
                                 </div>
 
@@ -302,7 +299,6 @@
                                     <label for="securedYardDate-{{ $shipment->stm_id }}" class="form-label">Secured Yard Date</label>
                                     <input type="text" class="form-control flatpickr" id="securedYardDate-{{ $shipment->stm_id }}" name="secured_yarddate"
                                         value="{{ $shipment->secured_yarddate ? \Carbon\Carbon::parse($shipment->secured_yarddate)->format('m/d/Y H:i') : '' }}"
-                                        placeholder="mm/dd/yyyy --:--"
                                         onfocus="checkAndChangeStatus('securedYardDate-{{ $shipment->stm_id }}', 'Secured Yard', '{{ $shipment->stm_id }}')">
                                 </div>
 
@@ -364,8 +360,8 @@
                                     <p>{{ $shipment->id_trailer ?? 'No disponible' }}</p>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label">Company</label>
-                                    <p>{{ $shipment->company->CoName ?? 'No disponible' }}</p>
+                                    <label class="form-label">Company ID</label>
+                                    <p>{{ $shipment->company->id_company ?? 'No disponible' }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Trailer</label>
