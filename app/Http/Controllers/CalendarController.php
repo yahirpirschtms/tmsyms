@@ -15,7 +15,7 @@ class CalendarController extends Controller
     {
         if (Auth::check()) {
             // Obtener el ID del estado 'Finalized' desde el catálogo
-            $finalizedStatus = GenericCatalog::where('gntc_value', 'Delivered')
+            $finalizedStatus = GenericCatalog::where('gntc_value', 'Finalized')
                 ->where('gntc_group', 'current_status')
                 ->first();
 
@@ -36,6 +36,11 @@ class CalendarController extends Controller
                 $etd = Carbon::parse($shipment->etd);  // Cambiado de suggestedDeliveryDate a etd
                 $whAuthDate = $shipment->wh_auth_date ? Carbon::parse($shipment->wh_auth_date) : null;
 
+                // Si no hay fecha de autorización de almacén, no se incluirá el evento
+                if ($whAuthDate === null) {
+                    return null;  // Si no tiene fecha de autorización, no se incluye
+                }
+
                 // Obtener las descripciones para 'origin' y 'gnct_id_current_status'
                 $originDescription = isset($originCatalog[$shipment->origin])
                     ? $originCatalog[$shipment->origin]->gntc_value
@@ -47,21 +52,26 @@ class CalendarController extends Controller
 
                 return [
                     'title' => 'STM ID: ' . $shipment->stm_id,
-                    'start' => $etd->format('Y-m-d\TH:i:s'),
-                    'end' => $etd->addHours(1)->format('Y-m-d\TH:i:s'),
+                    'start' => $whAuthDate ? $whAuthDate->format('Y-m-d\TH:i:s') : null,  // Comprobamos si whAuthDate no es nulo
+                    'end' => $whAuthDate ? $whAuthDate->addHours(1)->format('Y-m-d\TH:i:s') : null,
                     'extendedProps' => [
                         'stm_id' => $shipment->stm_id,
                         'reference' => $shipment->reference,
                         'origin' => $originDescription,
                         'destination' => $shipment->destination,
                         'current_status' => $statusDescription,
-                        'etd' => $etd->format('m/d/Y H:i'),  // Cambiado de suggested_delivery_date a etd
-                        'wh_auth_date' => $whAuthDate ? $whAuthDate->format('m/d/Y H:i') : 'N/A',
+                        'etd' => $etd->format('m/d/Y H:i'),
+                        'wh_auth_date' => $whAuthDate ? $whAuthDate->format('m/d/Y H:i') : 'Not Available',
                         'units' => $shipment->units,
                         'pallets' => $shipment->pallets,
                         'id_trailer' => $shipment->id_trailer,
                     ],
                 ];
+            });
+
+            // Filtrar eventos nulos
+            $events = $events->filter(function ($event) {
+                return $event !== null;  // Asegurarse de que solo los eventos con fecha válida de autorización sean incluidos
             });
 
             // Retornar la vista con los datos necesarios
@@ -77,7 +87,6 @@ class CalendarController extends Controller
 
         return redirect('/login');
     }
-
     public function historicalcalendarshow()
     {
         if (Auth::check()) {
@@ -104,16 +113,16 @@ class CalendarController extends Controller
 
                 return [
                     'title' => 'STM ID: ' . $shipment->stm_id,
-                    'start' => $etd->format('Y-m-d\TH:i:s'),
-                    'end' => $etd->addHours(1)->format('Y-m-d\TH:i:s'),
+                    'start' => $whAuthDate ? $whAuthDate->format('Y-m-d\TH:i:s') : null,  // Comprobamos si whAuthDate no es nulo
+'end' => $whAuthDate ? $whAuthDate->addHours(1)->format('Y-m-d\TH:i:s') : null,  // Comprobamos si whAuthDate no es nulo antes de añadir hora
                     'extendedProps' => [
                         'stm_id' => $shipment->stm_id,
                         'reference' => $shipment->reference,
                         'origin' => $originDescription,
                         'destination' => $shipment->destination,
                         'current_status' => $statusDescription,
-                        'etd' => $etd->format('m/d/Y H:i'), // Cambiado de suggested_delivery_date a etd
-                        'wh_auth_date' => $whAuthDate ? $whAuthDate->format('m/d/Y H:i') : 'N/A',
+                        'etd' => $etd->format('m/d/Y H:i'),
+                        'wh_auth_date' => $whAuthDate ? $whAuthDate->format('m/d/Y H:i') : 'Not Available',
                         'units' => $shipment->units,
                         'pallets' => $shipment->pallets,
                         'id_trailer' => $shipment->id_trailer,
@@ -145,39 +154,58 @@ class CalendarController extends Controller
             'trailer_id' => $shipment->id_trailer,
             'stm_id' => $shipment->stm_id,
             'current_status' => $shipment->currentStatus ? $shipment->currentStatus->gntc_value : 'Unknown',
-            'delivered_date' => $shipment->formatted_delivered_date,
+            'delivered_date' => $shipment->formatted_delivered_date ? $shipment->formatted_delivered_date->format('m/d/Y H:i') : 'N/A',
             'at_door_date' => $shipment->at_door_date ? $shipment->at_door_date->format('m/d/Y H:i') : 'N/A',
-            'offload_date' => $shipment->offload_date ? $shipment->offload_date->format('m/d/Y H:i') : 'N/A',
+            'offloading_time' => $shipment->offloading_time ?? 'N/A', // Cambio aquí para tipo Time
             'wh_auth_date' => $shipment->wh_auth_date ? $shipment->wh_auth_date->format('m/d/Y H:i') : 'N/A',
         ]);
     }
 
+
     public function updateOffloadingStatus(Request $request, $pk_shipment)
-    {
-        try {
-            // Buscar el envío por pk_shipment
-            $shipment = Shipments::findOrFail($pk_shipment);
+{
+    try {
+        // Buscar el envío por pk_shipment
+        $shipment = Shipments::findOrFail($pk_shipment);
 
+        // Validar los datos recibidos
+        $validatedData = $request->validate([
+            'trailer_id' => 'nullable|string|max:255', // ID del remolque
+            'stm_id' => 'nullable|integer', // ID del STM
+            'gnct_id_current_status' => 'nullable|integer', // Estado actual
+            'delivered_date' => 'nullable|date_format:m/d/Y H:i', // Fecha de entrega
+            'at_door_date' => 'nullable|date_format:m/d/Y H:i', // Fecha de llegada
+            'offloading_time' => 'nullable|date_format:H:i', // Hora de descarga
+            'wh_auth_date' => 'nullable|date_format:m/d/Y H:i', // Fecha de autorización
+        ]);
 
-            // Validar los datos recibidos
-            $validatedData = $request->validate([
-                'trailer_id' => 'nullable|string|max:255', // ID del remolque
-                'stm_id' => 'nullable|integer', // ID del STM
-                'gnct_id_current_status' => 'nullable|integer', // Estado actual
-                'delivered_date' => 'nullable|date', // Fecha de entrega
-                'at_door_date' => 'nullable|date', // Fecha de llegada
-                'offload_date' => 'nullable|date', // Fecha de descarga
-                'wh_auth_date' => 'nullable|date', // Fecha de autorización
-            ]);
-
-            // Actualizar el envío con los nuevos datos
-            $shipment->update($validatedData);
-
-
-            // Devolver respuesta con el estado de la actualización
-            return response()->json(['message' => 'Shipment updated successfully'], 200);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Error updating shipment: ' . $e->getMessage()], 500);
+        // Convertir las fechas a formato compatible con la base de datos
+        if ($request->has('delivered_date') && $request->input('delivered_date')) {
+            $validatedData['delivered_date'] = Carbon::createFromFormat('m/d/Y H:i', $request->input('delivered_date'))->format('Y-m-d H:i:s');
+        } else {
+            $validatedData['delivered_date'] = null;
         }
+
+        if ($request->has('at_door_date') && $request->input('at_door_date')) {
+            $validatedData['at_door_date'] = Carbon::createFromFormat('m/d/Y H:i', $request->input('at_door_date'))->format('Y-m-d H:i:s');
+        } else {
+            $validatedData['at_door_date'] = null;
+        }
+
+        if ($request->has('wh_auth_date') && $request->input('wh_auth_date')) {
+            $validatedData['wh_auth_date'] = Carbon::createFromFormat('m/d/Y H:i', $request->input('wh_auth_date'))->format('Y-m-d H:i:s');
+        } else {
+            $validatedData['wh_auth_date'] = null;
+        }
+
+        // Actualizar el envío con los nuevos datos
+        $shipment->update($validatedData);
+
+        // Devolver respuesta con el estado de la actualización
+        return response()->json(['message' => 'Shipment updated successfully'], 200);
+
+    } catch (\Exception $e) {
+        return response()->json(['message' => 'Error updating shipment: ' . $e->getMessage()], 500);
     }
+}
 }

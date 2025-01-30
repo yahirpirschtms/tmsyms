@@ -148,8 +148,78 @@ $(document).ready(function() {
     $('#inputorigin').on('focus', loadOrigins);
     loadOrigins();
 
+// Función para cargar las destinos desde la base de datos
+function loadDestinations(query = '') {
+    var locationsRoute = $('#inputshipmentdestination').data('url') + '?query=' + query;
+    $.ajax({
+        url: locationsRoute,
+        type: 'GET',
+        success: function (data) {
+            let select = $('#inputshipmentdestination');
+            let selectedValue = select.val(); // Obtener el valor seleccionado antes de actualizar
+
+            // Agregar la opción de "Seleccione una opción"
+            // Si las opciones no se encuentran, no limpiar el select
+            if (data.length === 0) {
+                if (select.find('option').length === 0) {
+                    select.append('<option disabled>No options available</option>');
+                }
+            } else {
+                // Si las opciones ya están, solo agregar las nuevas
+                if (select.find('option').length === 0) {
+                    select.append('<option value="" selected disabled hidden>Seleccione una opción</option>');
+                }
+                data.forEach(item => {
+                    // Verificar si la opción ya existe
+                    if (!select.find(`option[value="${item.fac_id}"]`).length) {
+                        select.append(`<option value="${item.fac_id}">${item.fac_name}</option>`);
+                    }
+                });
+            }
+
+            // Restaura la selección anterior si existe
+            if (selectedValue) {
+                select.val(selectedValue);
+            }
+
+            // Forzar a Select2 que se actualice con las nuevas opciones
+            select.trigger('change.select2');
+        },
+        error: function (xhr, status, error) {
+            console.error('Error fetching data locations:', error);
+        }
+    });
+}
+
+// Ejecutar la función al cargar la página y al escribir en el select
+$(document).ready(function() {
+    // Inicializa Select2 una sola vez
+    if (!$('#inputshipmentdestination').data('select2')) {
+        $('#inputshipmentdestination').select2({
+            placeholder: "Escribe para buscar o selecciona una opción",
+            allowClear: true, // Permitir borrar la selección
+        });
+    }
+
+    // Cargar las opciones al iniciar
+    loadDestinations();
+
+    // Cargar las opciones al escribir en el select
+    $('#inputshipmentdestination').on('input', function() {
+        var query = $(this).val();
+        loadDestinations(query); // Llamar a la función con el texto ingresado
+    });
+
+    // Asegurarse de que el valor seleccionado no se pierda al cambiar el focus
+    $('#inputshipmentdestination').on('select2:select', function (e) {
+        let selectedValue = e.params.data.id;
+        $(this).val(selectedValue);  // Asegurarse de que el valor quede seleccionado
+    });
+});
+
+
     //Funcion para buscar las Destinations en la pantalla de shipments
-    function loadDestinations() {
+    /*function loadDestinations() {
         var locationsRoute = $('#inputshipmentdestination').data('url');
         $.ajax({
                 url: locationsRoute,
@@ -190,7 +260,55 @@ $(document).ready(function() {
         
     // Ejecutar la función al enfocar el select y al cargar la página
     $('#inputshipmentdestination').on('focus', loadDestinations);
-    loadDestinations();
+    loadDestinations();*/
+
+
+    /*function loadDestinations() {
+        var locationsRoute = $('#inputshipmentdestination').data('url');
+        $.ajax({
+            url: locationsRoute,
+            type: 'GET',
+            success: function (data) {
+                let datalist = $('#destinations-list');
+                let input = $('#inputshipmentdestination');
+                let currentValue = input.attr('data-selected-id'); // Guardar el ID actual
+    
+                datalist.empty(); // Limpia las opciones
+    
+                if (data.length === 0) {
+                    datalist.append('<option disabled>No options available</option>');
+                } else {
+                    data.forEach(item => {
+                        datalist.append(`<option value="${item.fac_name}" data-id="${item.fac_id}"></option>`);
+                    });
+                }
+    
+                // Restaurar el valor si existía
+                if (currentValue) {
+                    input.val($(`option[data-id="${currentValue}"]`).attr("value"));
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching data locations:', error);
+            }
+        });
+    }
+    
+    // Evento para guardar el ID real en un atributo oculto
+    $('#inputshipmentdestination').on('input', function () {
+        let selectedValue = $(this).val();
+        let selectedOption = $(`#destinations-list option[value="${selectedValue}"]`);
+        if (selectedOption.length > 0) {
+            $(this).attr('data-selected-id', selectedOption.attr('data-id'));
+        } else {
+            $(this).attr('data-selected-id', ''); // Si el usuario ingresa manualmente algo que no está en la lista
+        }
+    });
+    
+    // Cargar datos al enfocar el input y al cargar la página
+    $('#inputshipmentdestination').on('focus', loadDestinations);
+    loadDestinations();*/
+    
 
     //Funcion para buscar el shipmenttype en la pantalla de empty trailer update
     function loadShipmentType() {

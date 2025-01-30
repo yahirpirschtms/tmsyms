@@ -33,14 +33,14 @@
     @foreach ($shipments as $shipment)
     <div id="shipmentModal{{ $shipment->stm_id }}" class="modal fade" tabindex="-1" aria-labelledby="shipmentModalLabel{{ $shipment->stm_id }}" aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content" >
-                <div class="modal-header" style="background-color: #0056b3;" >
-                    <h5 class="modal-title"id="shipmentModalLabel{{ $shipment->stm_id }}">Shipment Details</h5>
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #0056b3;">
+                    <h5 class="modal-title" id="shipmentModalLabel{{ $shipment->stm_id }}">Shipment Details</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                   <!-- Pestañas de detalle -->
-                   <ul class="nav nav-pills mb-3" id="pills-tab{{ $shipment->stm_id }}" role="tablist">
+                    <!-- Pestañas de detalle -->
+                    <ul class="nav nav-pills mb-3" id="pills-tab{{ $shipment->stm_id }}" role="tablist">
                         <li class="nav-item me-2" role="presentation">
                             <a class="nav-link active" id="pills-shipment-details-tab{{ $shipment->stm_id }}" data-bs-toggle="pill" href="#pills-shipment-details{{ $shipment->stm_id }}" role="tab" aria-controls="pills-shipment-details{{ $shipment->stm_id }}" aria-selected="true">Shipment Details</a>
                         </li>
@@ -48,6 +48,7 @@
                             <a class="nav-link" id="pills-update-status-tab{{ $shipment->stm_id }}" data-bs-toggle="pill" href="#pills-update-status{{ $shipment->stm_id }}" role="tab" aria-controls="pills-update-status{{ $shipment->stm_id }}" aria-selected="false">Offloading Menu</a>
                         </li>
                     </ul>
+
                     <div class="tab-content" id="pills-tabContent{{ $shipment->stm_id }}">
                         <!-- Shipment Details -->
                         <div class="tab-pane fade show active" id="pills-shipment-details{{ $shipment->stm_id }}" role="tabpanel" aria-labelledby="pills-shipment-details-tab{{ $shipment->stm_id }}">
@@ -88,51 +89,62 @@
                                 <p>{{ $shipment->pallets }}</p>
                             </div>
                         </div>
-                    </div>
 
-                   <!-- Update Shipment Status -->
-                   <div class="tab-pane fade" id="pills-update-status{{ $shipment->stm_id }}" role="tabpanel" aria-labelledby="pills-update-status-tab{{ $shipment->stm_id }}">
-                    @if ($shipment)
-                    <form id="offloadingForm{{ $shipment->stm_id }}" method="POST" action="{{ route('update.status', ['pk_shipment' => $shipment->pk_shipment]) }}">
-                        @method('PUT')
-                        @csrf
-                        <div class="mb-3">
-                        <label for="trailerId{{ $shipment->stm_id }}" class="form-label">Trailer ID</label>
-                        <input type="text" class="form-control" id="trailerId{{ $shipment->stm_id }}" name="id_trailer" value="{{ $shipment->id_trailer ?? '' }}" readonly>
+                        <!-- Update Shipment Status (Offloading Menu) -->
+                        <div class="tab-pane fade" id="pills-update-status{{ $shipment->stm_id }}" role="tabpanel" aria-labelledby="pills-update-status-tab{{ $shipment->stm_id }}">
+                            @if ($shipment)
+                            <form id="offloadingForm{{ $shipment->stm_id }}" method="POST" action="{{ route('update.status', ['pk_shipment' => $shipment->pk_shipment]) }}">
+                                @method('PUT')
+                                @csrf
+                                <div class="mb-3">
+                                    <label for="trailerId{{ $shipment->stm_id }}" class="form-label">Trailer ID</label>
+                                    <input type="text" class="form-control" id="trailerId{{ $shipment->stm_id }}" name="id_trailer" value="{{ $shipment->id_trailer ?? '' }}" readonly>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="currentStatus{{ $shipment->stm_id }}" class="form-label">Current Status</label>
+                                    <select class="form-select" id="currentStatus-{{ $shipment->stm_id }}" name="gnct_id_current_status">
+                                        @foreach ($currentStatus as $status)
+                                            <option value="{{ $status->gnct_id }}"
+                                                {{ old('gnct_id_current_status', $shipment->gnct_id_current_status) == $status->gnct_id ? 'selected' : '' }}>
+                                                {{ $status->gntc_description }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="deliveredDate{{ $shipment->stm_id }}" class="form-label">Delivered Date</label>
+                                    <input type="text" class="form-control datetime-picker" id="deliveredDate{{ $shipment->stm_id }}" name="delivered_date"
+                                        value="{{ old('delivered_date', $shipment->delivered_date ? \Carbon\Carbon::parse($shipment->delivered_date)->format('m/d/Y H:i') : '') }}"
+                                         placeholder="mm/dd/yyyy --:--"
+                                        onfocus="checkAndChangeStatus('deliveredDate{{ $shipment->stm_id }}', 'Delivered', '{{ $shipment->stm_id }}')">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="atDoorDate{{ $shipment->stm_id }}" class="form-label">At Door Date</label>
+                                    <input type="text" class="form-control datetime-picker" id="atDoorDate{{ $shipment->stm_id }}" name="at_door_date"
+                                        value="{{ old('at_door_date', $shipment->at_door_date ? \Carbon\Carbon::parse($shipment->at_door_date)->format('m/d/Y H:i') : '') }}"  placeholder="mm/dd/yyyy --:--">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="offloadTime{{ $shipment->stm_id }}" class="form-label">Offload Time</label>
+                                    <input type="time" class="form-control" id="offloadTime{{ $shipment->stm_id }}" name="offloading_time"
+                                        value="{{ old('offloading_time', $shipment->offloading_time ? \Carbon\Carbon::parse($shipment->offloading_time)->format('H:i') : '') }}" placeholder="--:--">
+
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="approvedETADateTime{{ $shipment->stm_id }}" class="form-label">Approved ETA Date & Time</label>
+                                    <input type="text" class="form-control datetime-picker" id="approvedETADateTime{{ $shipment->stm_id }}" name="wh_auth_date"
+                                        value="{{ old('wh_auth_date', $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y H:i') : '') }}">
+                                </div>
+                                <div class="d-flex justify-content-end">
+                                    <button type="submit" class="btn btn-primary" id="saveButton{{ $shipment->stm_id }}">Save</button>
+                                </div>
+                            </form>
+                            @else
+                                <p>No hay envíos disponibles actualmente.</p>
+                            @endif
                         </div>
-                        <div class="mb-3">
-                        <label for="currentStatus{{ $shipment->stm_id }}" class="form-label">Current Status</label>
-                        <select class="form-select" id="currentStatus{{ $shipment->stm_id }}" name="gnct_id_current_status">
-                            @foreach($statusCatalog as $status)
-                            <option value="{{ $status->gnct_id }}" {{ $status->gnct_id == old('gnct_id_current_status', $shipment->gnct_id_current_status) ? 'selected' : '' }}>
-                                {{ $status->gntc_value }}
-                            </option>
-                            @endforeach
-                        </select>
-                        </div>
-                        <div class="mb-3">
-                        <label for="deliveredDate{{ $shipment->stm_id }}" class="form-label">Delivered Date</label>
-                        <input type="datetime-local" class="form-control" id="deliveredDate{{ $shipment->stm_id }}" name="delivered_date" value="{{ old('delivered_date', $shipment->delivered_date ? \Carbon\Carbon::parse($shipment->delivered_date)->format('Y-m-d\TH:i') : '') }}">
-                        </div>
-                        <div class="mb-3">
-                        <label for="atDoorDate{{ $shipment->stm_id }}" class="form-label">At Door Date</label>
-                        <input type="datetime-local" class="form-control" id="atDoorDate{{ $shipment->stm_id }}" name="at_door_date" value="{{ old('at_door_date', $shipment->at_door_date ? \Carbon\Carbon::parse($shipment->at_door_date)->format('Y-m-d\TH:i') : '') }}">
-                        </div>
-                        <div class="mb-3">
-                            <label for="offloadTime{{ $shipment->stm_id }}" class="form-label">Offload Time</label>
-                            <input type="time" class="form-control" id="offloadTime{{ $shipment->stm_id }}" name="offloading_time" value="{{ old('offloading_time', $shipment->offloading_time ? \Carbon\Carbon::parse($shipment->offloading_time)->format('H:i') : '') }}">
-                        </div>
-                        <div class="mb-3">
-                            <label for="approvedETADateTime{{ $shipment->stm_id }}" class="form-label">Approved ETA Date & Time</label>
-                            <input type="datetime-local" class="form-control" id="approvedETADateTime{{ $shipment->stm_id }}" name="wh_auth_date" value="{{ old('wh_auth_date', $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('Y-m-d\TH:i') : '') }}">
-                        </div>
-                        <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-primary" id="saveButton{{ $shipment->stm_id }}">Save</button>
-                        </div>
-                    </form>
-                    @else
-                        <p>No hay envíos disponibles actualmente.</p>
-                    @endif
                     </div>
                 </div>
             </div>
@@ -154,7 +166,18 @@
     </script>
     <script>
             document.addEventListener('DOMContentLoaded', function () {
-            const events = {!! json_encode($events) !!};
+            let events = {!! json_encode($events) !!};
+
+            // Verifica que 'events' sea un array, sino lo inicializa como un array vacío
+            if (!Array.isArray(events)) {
+                console.warn('Los eventos no son un array, inicializando como array vacío.');
+                events = [];
+            }
+
+            // Filtrar eventos con wh_auth_date válido
+            const filteredEvents = events.filter(event => event.extendedProps.wh_auth_date !== 'N/A' && event.extendedProps.wh_auth_date !== null);
+
+            console.log(filteredEvents); // Verifica qué tipo de datos son ahora los eventos filtrados
 
             var calendarEl = document.getElementById('calendar');
 
@@ -165,9 +188,8 @@
                     center: 'title',
                     right: 'timeGridDay,timeGridWeek,dayGridMonth'
                 },
-                events: events,
+                events: filteredEvents,  // Pasar solo los eventos válidos
 
-                // Eliminar la hora
                 eventTimeFormat: {
                     hour: '2-digit',
                     minute: '2-digit',
@@ -175,9 +197,7 @@
                     hour12: true
                 },
 
-                // Modificar cómo se muestra el evento
                 eventContent: function(info) {
-                    // Suponiendo que el evento tiene una propiedad llamada 'shipmentInfo' que contiene la información del envío
                     return { html: '<strong>' + info.event.title + '</strong><br>'};
                 },
 
@@ -187,10 +207,9 @@
 
                     var modalTarget = "#shipmentModal" + props.stm_id;
 
-                    // Verificar si el modal existe en el DOM antes de intentar mostrarlo
-                    var modalElement = document.getElementById(modalTarget.substring(1)); // Eliminar el "#" para obtener el ID correcto
+                    var modalElement = document.getElementById(modalTarget.substring(1));
                     if (modalElement) {
-                        var modal = new bootstrap.Modal(modalElement); // Usar la API de Bootstrap para abrir el modal
+                        var modal = new bootstrap.Modal(modalElement);
                         modal.show();
                     } else {
                         console.error("Modal no encontrado: " + modalTarget);
@@ -199,6 +218,7 @@
             });
 
             calendar.render();
+
             // Filtrar eventos por STM ID
             document.getElementById('searchByStmId').addEventListener('input', function (e) {
                 const searchValue = e.target.value.toLowerCase();
@@ -211,6 +231,7 @@
                 calendar.addEventSource(filteredEvents);
             });
         });
+
     </script>
 
 <script>
@@ -267,6 +288,70 @@
     });
 </script>
 
+
+<script>
+    function checkAndChangeStatus(dateFieldId, statusDescription, shipmentId) {
+        const dateField = document.getElementById(dateFieldId);
+
+        if (!dateField) {
+            console.error(`No se encontró el campo con id: ${dateFieldId}`);
+            return; // Si el campo no existe, no continuar con el cambio de estado
+        }
+
+        const currentDateValue = dateField.value;
+
+        // Verificar si ya existe una fecha en el campo y evitar el cambio de estado
+        if (currentDateValue) {
+            console.log(`El campo ${dateFieldId} ya tiene una fecha, no se cambiará el estado.`);
+            return; // Si ya hay una fecha, no cambiar el estado
+        }
+
+        // Cambiar el estado solo si el campo está vacío, usando la descripción
+        changeStatusByDescription(statusDescription, shipmentId);
+    }
+
+    function changeStatusByDescription(statusDescription, shipmentId) {
+        console.log('shipmentId recibido:', shipmentId); // Verifica el valor de shipmentId
+        console.log('Estado recibido:', statusDescription); // Verifica la descripción del estado
+
+        const statusMapping = {
+            'Delivered': 'Delivered', // gntc_description
+            // Agrega otras descripciones si es necesario
+        };
+
+        const gntcDescription = statusMapping[statusDescription];
+
+        if (gntcDescription) {
+            const statusSelect = document.getElementById('currentStatus-' + shipmentId);
+            if (statusSelect) {
+                // Buscar el option que tenga el gntc_description correspondiente
+                const options = statusSelect.getElementsByTagName('option');
+                for (let i = 0; i < options.length; i++) {
+                    if (options[i].textContent.trim() === gntcDescription) {
+                        statusSelect.value = options[i].value; // Establecer el valor del select según el texto de la opción
+                        console.log('Estado cambiado a:', gntcDescription);
+                        break;
+                    }
+                }
+            } else {
+                console.error('No se encontró el select para el envío:', shipmentId);
+            }
+        } else {
+            console.error('Descripción de estado no mapeada:', statusDescription);
+        }
+    }
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        flatpickr(".datetime-picker", {
+            enableTime: true,        // Permite seleccionar hora
+            dateFormat: "m/d/Y H:i", // Formato M/D/Y H:i
+            time_24hr: false,        // Usa formato de 12 horas (AM/PM)
+            allowInput: true         // Permite escribir la fecha manualmente
+        });
+    });
+</script>
 
 @endsection
 
@@ -375,28 +460,56 @@
 }
 
  /* Estilo para las pestañas nav-pills */
- .nav-pills .nav-link {
-        font-weight: 600;
-        background-color: #f8f9fa;
-        color: #007bff;
-        border: 1px solid #ddd;
-        border-radius: 50px;
-        transition: background-color 0.3s, color 0.3s;
+
+ .nav-tabs {
+    font-weight: 600;
+    background-color: #f8f9fa;
+    color: #007bff;
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    transition: background-color 0.3s, color 0.3s;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap; /* Esto permite que las pestañas se ajusten en pantallas más pequeñas */
+}
+
+/* Pestañas inactivas con texto oscuro */
+.nav-pills .nav-link {
+    font-weight: 600;
+    background-color: #f8f9fa;
+    color: #007bff;
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    margin: 0 10px 10px 10px; /* Separación horizontal y vertical */
+    padding: 10px 15px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Estilo para la pestaña activa */
+.nav-pills .nav-link.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+/* Estilo para la pestaña cuando se pasa el cursor */
+.nav-pills .nav-link:hover {
+    background-color: #e2e6ea;
+    color: #0056b3;
+}
+
+
+/* Media query para pantallas móviles */
+@media (max-width: 576px) {
+    .nav-tabs {
+        flex-direction: column; /* Hace que las pestañas se alineen verticalmente */
+        align-items: center; /* Centra las pestañas en la pantalla */
     }
 
-    /* Estilo para la pestaña activa */
-    .nav-pills .nav-link.active {
-        background-color: #007bff;
-        color: white;
-        border-color: #007bff;
+    .nav-pills .nav-link {
+        margin: 5px 0; /* Espaciado vertical en pantallas pequeñas */
     }
-
-    /* Estilo para la pestaña cuando se pasa el cursor */
-    .nav-pills .nav-link:hover {
-        background-color: #e2e6ea;
-        color: #0056b3;
-    }
-
+}
     /* Estilo para el modal */
     .modal-header {
         background-color: #007bff;
@@ -421,6 +534,7 @@
         font-size: 14px;
         line-height: 1.6;
     }
+
 </style>
 
 

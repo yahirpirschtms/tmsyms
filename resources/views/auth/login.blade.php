@@ -3,7 +3,7 @@
 @section('content')
     <div class="login-container">
         <div class="header">
-            <img class="w-50" src="{!! asset('/icons/tms_logo.png')!!}" alt="Logo">
+            <img class="w-50" src="{!! asset('/icons/tms_logo1.png')!!}" alt="Logo">
             <div class="title text-white fw-bolder">YMS</div>
         </div>
         <div class="mt-3">

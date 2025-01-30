@@ -55,9 +55,16 @@
                 <div class="mb-3">
                     <label for="inputshipmentdestination" class="form-label ">Destination</label>
                     <select class="form-select" aria-label="Default select example"  id="inputshipmentdestination" name="inputshipmentdestination" data-url="{{ route('destinations-shipments') }}">
+                    <option value="" selected disabled hidden>Seleccione una opción</option>
                     </select>
                     <div class="invalid-feedback"></div>
                 </div>
+                <!--<div class="mb-3">
+                    <label for="inputshipmentdestination" class="form-label">Destination</label>
+                    <input type="text" class="form-control" id="inputshipmentdestination" name="inputshipmentdestination" list="destinations-list" data-url="{{ route('destinations-shipments') }}">
+                    <datalist id="destinations-list"></datalist>
+                    <div class="invalid-feedback"></div>
+                </div>-->
 
                 <div class="mb-3">
                     <label for="inputshipmentprealertdatetime" class="form-label ">PreAlert DateTime</label>
@@ -67,18 +74,18 @@
 
                 <div class="mb-3">
                     <label for="inputidtrailer" class="form-label ">Trailer ID</label>
-                    <input type="text" class="form-control" id="inputidtrailer" name="inputidtrailer" disabled value="{{ old('inputidtrailer', $from_button == 1 ? $trailerId : '') }}">
+                    <input type="text" class="form-control" id="inputidtrailer" name="inputidtrailer"  value="{{ old('inputidtrailer', $from_button == 1 ? $trailerId : '') }}">
                     <div class="invalid-feedback"></div>
-                    <input type="hidden" name="inputidtrailer" value="{{ old('inputidtrailer', $from_button == 1 ? $trailerId : '') }}">
+                    <!--<input type="hidden" name="inputidtrailer" value="{{ old('inputidtrailer', $from_button == 1 ? $trailerId : '') }}">-->
                 </div>
 
                 <div class="mb-3">
                     <label for="inputshipmentcarrier" class="form-label ">Carrier Dropping Trailer</label>
-                    <select class="form-select" aria-label="Default select example" disabled  id="inputshipmentcarrier" name="inputshipmentcarrier" value="{{ old('inputshipmentcarrier', $from_button == 1 ? $carrier : '') }}" data-url="{{ route('locations-emptytrailer') }}">
+                    <select class="form-select" aria-label="Default select example"   id="inputshipmentcarrier" name="inputshipmentcarrier" value="{{ old('inputshipmentcarrier', $from_button == 1 ? $carrier : '') }}" data-url="{{ route('locations-emptytrailer') }}">
                     <option value="">Choose an option</option>
                     </select>
                     <div class="invalid-feedback"></div>
-                    <input type="hidden" name="inputshipmentcarrier" value="{{ old('inputshipmentcarrier', $from_button == 1 ? $carrier : '') }}">
+                    <!--<input type="hidden" name="inputshipmentcarrier" value="{{ old('inputshipmentcarrier', $from_button == 1 ? $carrier : '') }}">-->
                 </div>
 
                 <div class="mb-3">
@@ -89,10 +96,10 @@
 
                 <div class="mb-3">
                     <label for="inputshipmenttrailer" class="form-label ">Trailer Owner</label>
-                    <select class="form-select" aria-label="Default select example" disabled id="inputshipmenttrailer" name="inputshipmenttrailer" value="{{ old('inputshipmenttrailer', $from_button == 1 ? $carrier : '') }}" data-url="{{ route('locations-emptytrailer') }}">
+                    <select class="form-select" aria-label="Default select example"  id="inputshipmenttrailer" name="inputshipmenttrailer" value="{{ old('inputshipmenttrailer', $from_button == 1 ? $carrier : '') }}" data-url="{{ route('locations-emptytrailer') }}">
                     </select>
                     <div class="invalid-feedback"></div>
-                    <input type="hidden" name="inputshipmenttrailer" value="{{ old('inputshipmenttrailer', $from_button == 1 ? $carrier : '') }}">
+                    <!--<input type="hidden" name="inputshipmenttrailer" value="{{ old('inputshipmenttrailer', $from_button == 1 ? $carrier : '') }}">-->
                 </div>
 
                 <div class="mb-3">

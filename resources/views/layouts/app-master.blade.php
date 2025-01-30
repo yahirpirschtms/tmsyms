@@ -15,10 +15,13 @@
     <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@5.11.0/main.min.js"></script>
     <!--JQuery-->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Asegúrate de incluir los archivos necesarios de Select2 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <!--Flatpickr para fechas en inputs-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <link rel="icon" type="image/png" href="{!! asset('/icons/tms_logo.png')!!}">
+    <link rel="icon" type="image/png" href="{!! asset('/icons/tms_logo.jpg')!!}">
     @vite([
         'resources/sass/app.scss',
         'resources/js/app.js'
