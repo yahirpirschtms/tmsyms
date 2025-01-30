@@ -162,57 +162,59 @@
         var statusCatalog = @json($statusCatalog);
     </script>
     <script>
-           document.addEventListener('DOMContentLoaded', function () {
-            const events = {!! json_encode($events) !!};
+            document.addEventListener('DOMContentLoaded', function () {
+            let events = {!! json_encode($events) !!};
 
-            console.log(events); // Ver qué tipo de dato es 'events'
-
-            // Verifica si 'events' es un array
-            if (Array.isArray(events)) {
-                const filteredEvents = events.filter(event => event.extendedProps.wh_auth_date !== 'N/A');
-
-                var calendarEl = document.getElementById('calendar');
-
-                var calendar = new FullCalendar.Calendar(calendarEl, {
-                    initialView: 'timeGridDay',
-                    headerToolbar: {
-                        left: 'prev,next today',
-                        center: 'title',
-                        right: 'timeGridDay,timeGridWeek,dayGridMonth'
-                    },
-                    events: filteredEvents,  // Pasar solo los eventos válidos
-
-                    eventTimeFormat: {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        meridiem: 'short',
-                        hour12: true
-                    },
-
-                    eventContent: function(info) {
-                        return { html: '<strong>' + info.event.title + '</strong><br>'};
-                    },
-
-                    eventClick: function(info) {
-                        var event = info.event;
-                        var props = event.extendedProps;
-
-                        var modalTarget = "#shipmentModal" + props.stm_id;
-
-                        var modalElement = document.getElementById(modalTarget.substring(1));
-                        if (modalElement) {
-                            var modal = new bootstrap.Modal(modalElement);
-                            modal.show();
-                        } else {
-                            console.error("Modal no encontrado: " + modalTarget);
-                        }
-                    }
-                });
-
-                calendar.render();
-            } else {
-                console.error('Los eventos no son un array:', events);
+            // Verifica que 'events' sea un array, sino lo inicializa como un array vacío
+            if (!Array.isArray(events)) {
+                console.warn('Los eventos no son un array, inicializando como array vacío.');
+                events = [];
             }
+
+            // Filtrar eventos con wh_auth_date válido
+            const filteredEvents = events.filter(event => event.extendedProps.wh_auth_date !== 'N/A' && event.extendedProps.wh_auth_date !== null);
+
+            console.log(filteredEvents); // Verifica qué tipo de datos son ahora los eventos filtrados
+
+            var calendarEl = document.getElementById('calendar');
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'timeGridDay',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'timeGridDay,timeGridWeek,dayGridMonth'
+                },
+                events: filteredEvents,  // Pasar solo los eventos válidos
+
+                eventTimeFormat: {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    meridiem: 'short',
+                    hour12: true
+                },
+
+                eventContent: function(info) {
+                    return { html: '<strong>' + info.event.title + '</strong><br>'};
+                },
+
+                eventClick: function(info) {
+                    var event = info.event;
+                    var props = event.extendedProps;
+
+                    var modalTarget = "#shipmentModal" + props.stm_id;
+
+                    var modalElement = document.getElementById(modalTarget.substring(1));
+                    if (modalElement) {
+                        var modal = new bootstrap.Modal(modalElement);
+                        modal.show();
+                    } else {
+                        console.error("Modal no encontrado: " + modalTarget);
+                    }
+                }
+            });
+
+            calendar.render();
 
             // Filtrar eventos por STM ID
             document.getElementById('searchByStmId').addEventListener('input', function (e) {
@@ -226,6 +228,7 @@
                 calendar.addEventSource(filteredEvents);
             });
         });
+
     </script>
 
 <script>
