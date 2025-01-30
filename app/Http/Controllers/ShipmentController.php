@@ -225,7 +225,8 @@ class ShipmentController extends Controller
             'inputorigin' => 'required|exists:companies,pk_company',
             'inputshipmentdestination' => 'required|exists:facilities,fac_id',
             'inputshipmentprealertdatetime' => 'required|date',
-            'inputidtrailer' => 'required|unique:shipments,id_trailer|exists:empty_trailer,trailer_num',
+            //'inputidtrailer' => 'required|unique:shipments,id_trailer|exists:empty_trailer,trailer_num',
+            'inputidtrailer' => 'required|unique:shipments,id_trailer',
             'inputshipmentcarrier' => 'required|exists:companies,pk_company',
             'inputshipmenttrailer' => 'required',
             'inputshipmenttruck' => 'nullable',
@@ -270,6 +271,39 @@ class ShipmentController extends Controller
         $bounded = $request->has('inputshipmentcheckbonded') ? true : false;
         //$bounded = $request->has('inputshipmentcheckbonded') ? 'Bonded' : 'Not Bonded';
 
+        // Buscar o crear el trailer
+        $trailer = EmptyTrailer::firstOrCreate(
+            ['trailer_num' => $request->inputidtrailer],
+            [
+                //'trailer_num' => $request->inputidtrailer,
+                'status' => now(), 
+                'pallets_on_trailer' => $request->inputpallets ?? 0,
+                'pallets_on_floor' => null,
+                'carrier' => $request->inputshipmentcarrier,
+                'gnct_id_availability_indicator' => null,
+                'location' => $request->inputorigin,
+                'date_in' => now(),
+                'username' => Auth::check() ? Auth::user()->username : 'system',
+                'availability' => 'Used',
+                'date_out' => now(), // Establece la fecha y hora actual
+                'transaction_date' => now() // También aquí
+            ]
+        );
+
+        // Si el trailer ya existía, actualizar los valores
+        if (!$trailer->wasRecentlyCreated) {
+            $trailer->update([
+                'status' => now(), 
+                'pallets_on_trailer' => $request->inputpallets ?? 0,
+                'carrier' => $request->inputshipmentcarrier,
+                'location' => $request->inputorigin,
+                'username' => Auth::check() ? Auth::user()->username : 'system',
+                'availability' => 'Used',
+                'date_out' => now(),
+                'transaction_date' => now(),
+            ]);
+        }
+
         // Crear un nuevo registro
         Shipments::create([
             //'pk_trailer' => $request->inputidtrailer,
@@ -280,7 +314,7 @@ class ShipmentController extends Controller
             'origin' => $request->inputorigin,
             'destination' => $request->inputshipmentdestination,
             'pre_alerted_datetime' => $prealertdatetime,
-            'id_trailer' => $request->inputidtrailer,
+            'id_trailer' => $trailer->trailer_num,
             'id_company' => $request->inputshipmentcarrier,
             'trailer' => $request->inputshipmenttrailer,
             'truck' => $request->inputshipmenttruck,
@@ -297,12 +331,12 @@ class ShipmentController extends Controller
         ]);
 
         // Actualizar la tabla `empty_trailer` para el trailer correspondiente
-        EmptyTrailer::where('trailer_num', $request->inputidtrailer)
+        /*EmptyTrailer::where('trailer_num', $request->inputidtrailer)
         ->update([
             'availability' => 'Used',
             'date_out' => now(), // Establece la fecha y hora actual
             'transaction_date' => now() // También aquí
-        ]);
+        ]);*/
 
         // Redirigir con mensaje de éxito
         return redirect()->route('workflowtrafficstart')->with('success', 'Shipment successfully added!');
