@@ -184,6 +184,194 @@ $(document).ready(function () {
     }
 });
 
+
+//Busqueda de las location en el nuevo registros de los empty trailers 
+//Busqueda de Location en un nuevo registro
+$(document).ready(function () {
+    var carrierRoute = $('#inputlocation').data('url');
+    var newlyCreatedCarrierId = null; // Variable para almacenar el ID del carrier recién creado
+
+    function loadLocations() {
+        $('#inputlocation').select2({
+            placeholder: 'Select or enter a New Location',
+            allowClear: true,
+            tags: true, // Permite agregar nuevas opciones
+            dropdownParent: $('#newtrailerempty'),
+            ajax: {
+                url: carrierRoute,
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        search: params.term || '' // Si no hay texto, envía un string vacío
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.map(item => ({
+                            id: item.pk_company,
+                            text: item.CoName
+                        }))
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 0
+        });
+    }
+
+    loadLocations();
+
+    // Actualizar la lista cuando se haga clic en el select
+    $('#inputlocation').on('click', function () {
+        loadLocations();
+    });
+
+    // Cuando el usuario seleccione o ingrese un nuevo valor
+    $('#inputlocation').on('change', function () {
+        var selectedOption = $(this).select2('data')[0]; // Obtener la opción seleccionada
+        var selectedText = selectedOption ? selectedOption.text : ''; // Obtener el texto (nombre) de la opción seleccionada
+
+        // Si no es el nuevo carrier, lo procesamos
+        if (selectedText  !== newlyCreatedCarrierId) {
+            console.log(selectedText);
+            saveNewCarrier(selectedText);
+        }
+    });
+
+    // Guardar un nuevo carrier en la base de datos
+    function saveNewCarrier(carrierName) {
+        $.ajax({
+            url: '/save-new-location',  // Ruta que manejará el backend
+            type: 'POST',
+            data: {
+                carrierName: carrierName,
+                _token: $('meta[name="csrf-token"]').attr('content')  // Asegúrate de incluir el CSRF token
+            },
+            success: function (response) {
+                console.log(response);
+
+                // Crear una nueva opción para el select2 con el nuevo carrier
+                var newOption = new Option(response.newCarrier.CoName, response.newCarrier.pk_company, true, true);
+
+                // Agregar la nueva opción al select2
+                $('#inputlocation').append(newOption).trigger('change');
+
+                // Seleccionar el nuevo carrier automáticamente
+                $('#inputlocation').val(response.newCarrier.pk_company).trigger('change');
+
+                // Marcar el nuevo ID para evitar que se haga otra solicitud
+                newlyCreatedCarrierId = response.newCarrier.CoName;
+
+                // Cuando el nuevo carrier sea creado, aseguramos que no se haga más AJAX para este carrier
+                $('#inputlocation').on('select2:select', function (e) {
+                    var selectedId = e.params.data.id;
+                    if (selectedId === newlyCreatedCarrierId) {
+                        // Evitar que se reenvíe la solicitud para el nuevo carrier
+                        newlyCreatedCarrierId = null;  // Restablecer el ID del carrier creado
+                    }
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error('Error al guardar la Location', error);
+            }
+        });
+    }
+});
+
+//Busqueda de carries en el update 
+$(document).ready(function () {
+    var carrierRoute = $('#updateinputlocation').data('url');
+    var newlyCreatedCarrierId = null; // Variable para almacenar el ID del carrier recién creado
+
+    function loadLocationsUpdate() {
+        $('#updateinputlocation').select2({
+            placeholder: 'Select or enter a New Carrier',
+            allowClear: true,
+            tags: true, // Permite agregar nuevas opciones
+            dropdownParent: $('#updatenewtrailerempty'),
+            ajax: {
+                url: carrierRoute,
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        search: params.term || '' // Si no hay texto, envía un string vacío
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.map(item => ({
+                            id: item.pk_company,
+                            text: item.CoName
+                        }))
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 0
+        });
+    }
+
+    loadLocationsUpdate();
+
+    // Actualizar la lista cuando se haga clic en el select
+    $('#updateinputlocation').on('click', function () {
+        loadLocationsUpdate();
+    });
+
+    // Cuando el usuario seleccione o ingrese un nuevo valor
+    $('#updateinputlocation').on('change', function () {
+        var selectedOption = $(this).select2('data')[0]; // Obtener la opción seleccionada
+        var selectedText = selectedOption ? selectedOption.text : ''; // Obtener el texto (nombre) de la opción seleccionada
+
+        // Si no es el nuevo carrier, lo procesamos
+        if (selectedText  !== newlyCreatedCarrierId) {
+            console.log(selectedText);
+            saveNewLocation(selectedText);
+        }
+    });
+
+    // Guardar un nuevo carrier en la base de datos
+    function saveNewLocation(carrierName) {
+        $.ajax({
+            url: '/save-new-location',  // Ruta que manejará el backend
+            type: 'POST',
+            data: {
+                carrierName: carrierName,
+                _token: $('meta[name="csrf-token"]').attr('content')  // Asegúrate de incluir el CSRF token
+            },
+            success: function (response) {
+                console.log(response);
+
+                // Crear una nueva opción para el select2 con el nuevo carrier
+                var newOption = new Option(response.newCarrier.CoName, response.newCarrier.pk_company, true, true);
+
+                // Agregar la nueva opción al select2
+                $('#updateinputlocation').append(newOption).trigger('change');
+
+                // Seleccionar el nuevo carrier automáticamente
+                $('#updateinputlocation').val(response.newCarrier.pk_company).trigger('change');
+
+                // Marcar el nuevo ID para evitar que se haga otra solicitud
+                newlyCreatedCarrierId = response.newCarrier.CoName;
+
+                // Cuando el nuevo carrier sea creado, aseguramos que no se haga más AJAX para este carrier
+                $('#updateinputlocation').on('select2:select', function (e) {
+                    var selectedId = e.params.data.id;
+                    if (selectedId === newlyCreatedCarrierId) {
+                        // Evitar que se reenvíe la solicitud para el nuevo carrier
+                        newlyCreatedCarrierId = null;  // Restablecer el ID del carrier creado
+                    }
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error('Error al guardar el Location', error);
+            }
+        });
+    }
+});
+
 document.getElementById('exportfile').addEventListener('click', function () {
     // Obtén la tabla con el id "table_empty_trailers"
     var table = document.getElementById('table_empty_trailers');
@@ -335,7 +523,7 @@ $(document).ready(function() {
     loadCarriers();*/
     
     //Funcion para buscar las locations en la pantalla de empty trailer update
-    function loadLocationsupdate() {
+    /*function loadLocationsupdate() {
         var locationsRoute = $('#updateinputlocation').data('url');
         $.ajax({
             url: locationsRoute,
@@ -363,14 +551,14 @@ $(document).ready(function() {
                 console.error('Error fetching data locations:', error);
             }
         });
-    }
+    }*/
 
     //Ejecurtar la funcion al picarle al boton update 
-    $('#updateinputlocation').on('focus', loadLocationsupdate);
-    loadLocationsupdate();
+    /*$('#updateinputlocation').on('focus', loadLocationsupdate);
+    loadLocationsupdate();*/
 
     //Funcion para buscar las locations en la pantalla de empty trailer
-    function loadLocations() {
+    /*function loadLocations() {
         var locationsRoute = $('#inputlocation').data('url');
         $.ajax({
             url: locationsRoute,
@@ -398,11 +586,11 @@ $(document).ready(function() {
                 console.error('Error fetching data locations:', error);
             }
         });
-    }
+    }*/
 
     //Ejecurtar la funcion al picarle al boton 
-    $('#inputlocation').on('focus', loadLocations);
-    loadLocations();
+    /*$('#inputlocation').on('focus', loadLocations);
+    loadLocations();*/
 
 
 
@@ -794,11 +982,11 @@ $(document).ready(function() {
             });
 
             // Resetear Select2 manualmente
-        $('#inputcarrier').val(null).trigger('change');  // Restablecer el valor del select
-        $('#inputcarrier').select2("destroy").select2(); // Reiniciar select2
+            $('#inputcarrier').val(null).trigger('change');  // Restablecer el valor del select
+            $('#inputcarrier').select2("destroy").select2(); // Reiniciar select2
 
-            
-
+            $('#inputlocation').val(null).trigger('change');  // Restablecer el valor del select
+            $('#inputlocation').select2("destroy").select2(); // Reiniciar select2
         });
   });
   
@@ -942,7 +1130,7 @@ $(document).ready(function() {
           document.getElementById('updateinputpalletsonfloor').value = trailer.pallets_on_floor || '';
           //document.getElementById('updateinputcarrier').value = trailer.carrier || '';
           document.getElementById('updateinputavailabilityindicator').value = trailer.gnct_id_availability_indicator || '';
-          document.getElementById('updateinputlocation').value = trailer.location || '';
+          //document.getElementById('updateinputlocation').value = trailer.location || '';
           document.getElementById('updateinputdatein').value = trailer.date_in || '';
           //document.getElementById('updateinputdateout').value = trailer.date_out || '';
           //document.getElementById('updateinputtransactiondate').value = trailer.transaction_date || '';
@@ -950,6 +1138,29 @@ $(document).ready(function() {
         
           // Asignar el valor al select2 de Carrier
           // Obtener el CoName del carrier a partir de su ID
+          /*if (trailer.location) {
+            $.ajax({
+                url: 'locations-emptytrailerAjax', // Llamamos a la misma API de carriers
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    let location = data.find(item => item.pk_company == trailer.location);
+                    if (location) {
+                        let newOption = new Option(location.CoName, location.pk_company, true, true);
+                        $('#updateinputlocation').append(newOption).trigger('change');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error al cargar las locations:', error);
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'There was an error loading locarion information.',
+                        icon: 'error',
+                        confirmButtonText: 'Ok'
+                    });
+                }
+            });
+          }
           if (trailer.carrier) {
             $.ajax({
                 url: 'carrier-emptytrailerAjax', // Llamamos a la misma API de carriers
@@ -981,7 +1192,70 @@ $(document).ready(function() {
           const updateCanvas = new bootstrap.Offcanvas(document.getElementById('updatenewtrailerempty'));
           updateCanvas.show();
 
-        }
+        }*/
+        // Crear promesas para las dos solicitudes AJAX
+        let locationPromise = new Promise((resolve, reject) => {
+            if (trailer.location) {
+                $.ajax({
+                    url: 'locations-emptytrailerAjax', // Cambia esta URL si es necesario
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        let location = data.find(item => item.pk_company == trailer.location);
+                        if (location) {
+                            let newOption = new Option(location.CoName, location.pk_company, true, true);
+                            $('#updateinputlocation').append(newOption).trigger('change');
+                        }
+                        resolve(); // Resolver la promesa cuando termine esta solicitud
+                    },
+                    error: function (xhr, status, error) {
+                        reject('Error al cargar las locations: ' + error); // Rechazar si hay error
+                    }
+                });
+            } else {
+                resolve(); // Resolver inmediatamente si no hay ubicación
+            }
+        });
+
+        let carrierPromise = new Promise((resolve, reject) => {
+            if (trailer.carrier) {
+                $.ajax({
+                    url: 'carrier-emptytrailerAjax', // Cambia esta URL si es necesario
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function (data) {
+                        let carrier = data.find(item => item.pk_company == trailer.carrier);
+                        if (carrier) {
+                            let newOption = new Option(carrier.CoName, carrier.pk_company, true, true);
+                            $('#updateinputcarrier').append(newOption).trigger('change');
+                        }
+                        resolve(); // Resolver la promesa cuando termine esta solicitud
+                    },
+                    error: function (xhr, status, error) {
+                        reject('Error al cargar los carriers: ' + error); // Rechazar si hay error
+                    }
+                });
+            } else {
+                resolve(); // Resolver inmediatamente si no hay carrier
+            }
+        });
+
+        // Esperar a que ambas promesas se resuelvan antes de mostrar el offcanvas
+        Promise.all([locationPromise, carrierPromise])
+            .then(() => {
+                const updateCanvas = new bootstrap.Offcanvas(document.getElementById('updatenewtrailerempty'));
+                updateCanvas.show(); // Mostrar el offcanvas cuando ambas solicitudes terminen
+            })
+            .catch((error) => {
+                console.error(error);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Hubo un problema al cargar los datos.',
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
+                });
+            });
+
 
           // Restaurar el título al cerrar el canvas
           document.getElementById('updatenewtrailerempty').addEventListener('hidden.bs.offcanvas', function () {
@@ -1273,9 +1547,9 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
                 }
             });
             // **LIMPIAR EL SELECT2**
-        let carrierSelect = $('#updateinputcarrier');
+        /*let carrierSelect = $('#updateinputcarrier');
         carrierSelect.val(null).trigger('change'); // Quitar selección actual
-        carrierSelect.find('option').remove(); // Eliminar opciones dinámicas
+        carrierSelect.find('option').remove(); // Eliminar opciones dinámicas*/
         //carrierSelect.append(new Option("Select or enter a New Carrier", "", true, true)); // Restaurar placeholder
         });
     });

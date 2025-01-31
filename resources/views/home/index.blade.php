@@ -474,7 +474,7 @@
                                             </div>
                                             <div class="mb-3 ">
                                                 <label for="inputlocation" class="form-label ">Location</label>
-                                                <select class="form-select searchlocation" aria-label="Default select example"  id="inputlocation" name="inputlocation" value="{{ old('inputlocation') }}" data-url="{{ route('locations-emptytrailer') }}">
+                                                <select class="form-select searchlocation" aria-label="Default select example"  id="inputlocation" name="inputlocation" value="{{ old('inputlocation') }}" data-url="{{ route('locations-emptytrailerAjax') }}">
                                                     <option selected disabled hidden></option>
                                                 </select>
                                                 <div class="invalid-feedback"></div>
@@ -580,7 +580,7 @@
 
                                             <div class="mb-3 ">
                                                 <label for="updateinputlocation" class="form-label ">Location</label>
-                                                <select class="form-select searchlocation" aria-label="Default select example"  id="updateinputlocation" name="updateinputlocation" value="{{ old('updateinputlocation') }}" data-url="{{ route('locations-emptytrailer') }}">
+                                                <select class="form-select searchlocation" aria-label="Default select example"  id="updateinputlocation" name="updateinputlocation" value="{{ old('updateinputlocation') }}" data-url="{{ route('locations-emptytrailerAjax') }}">
                                                 </select>
                                                 <div class="invalid-feedback" id="error-updateinputlocation"></div>
                                             </div>
