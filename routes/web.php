@@ -47,6 +47,11 @@ Route::get('/locations-emptytrailer', [CompaniesController::class, 'getLocations
 
 Route::get('/carrier-emptytrailer', [CompaniesController::class, 'getLocations'])->name('carrier-emptytrailer');
 
+Route::get('/carrier-emptytrailerAjax', [CompaniesController::class, 'getCarriersAjax'])->name('carrier-emptytrailerAjax');
+
+//Agregar un nuevo carrier en la pantalla empty trailer
+Route::post('/save-new-carrier', [CompaniesController::class, 'saveNewCarrier']);
+
 //Ruta actualizacion de Tabla EmptyTrailer con boton refresh o automaticamente
 Route::get('/emptytrailer/data', [HomeController::class, 'getEmptyTrailers'])->name('emptytrailer.data');
 

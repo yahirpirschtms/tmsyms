@@ -291,6 +291,8 @@
 .ooffcanvasDetails .form-label {
   color: #f8f9fa;
 }
+
+
     </style>
 </head>
 <body>

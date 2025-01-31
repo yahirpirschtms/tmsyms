@@ -149,7 +149,7 @@ $(document).ready(function() {
     loadOrigins();
 
 // Función para cargar las destinos desde la base de datos
-function loadDestinations(query = '') {
+/*function loadDestinations(query = '') {
     var locationsRoute = $('#inputshipmentdestination').data('url') + '?query=' + query;
     $.ajax({
         url: locationsRoute,
@@ -215,11 +215,12 @@ $(document).ready(function() {
         let selectedValue = e.params.data.id;
         $(this).val(selectedValue);  // Asegurarse de que el valor quede seleccionado
     });
-});
+});*/
 
 
+//Funcion Buena
     //Funcion para buscar las Destinations en la pantalla de shipments
-    /*function loadDestinations() {
+    function loadDestinations() {
         var locationsRoute = $('#inputshipmentdestination').data('url');
         $.ajax({
                 url: locationsRoute,
@@ -260,7 +261,7 @@ $(document).ready(function() {
         
     // Ejecutar la función al enfocar el select y al cargar la página
     $('#inputshipmentdestination').on('focus', loadDestinations);
-    loadDestinations();*/
+    loadDestinations();
 
 
     /*function loadDestinations() {

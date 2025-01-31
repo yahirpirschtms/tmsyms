@@ -1,3 +1,76 @@
+$(document).ready(function () {
+    var carrierRoute = $('#inputcarrier').data('url');
+
+    function loadCarriers() {
+        $('#inputcarrier').select2({
+            placeholder: 'Select or enter a New Carrier',
+            allowClear: true,
+            tags: true, // Permite agregar nuevas opciones
+            dropdownParent: $('#newtrailerempty'),
+            ajax: {
+                url: carrierRoute,
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        search: params.term || '' // Si no hay texto, envía un string vacío
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.map(item => ({
+                            id: item.pk_company,
+                            text: item.CoName
+                        }))
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 0
+        });
+    }
+
+    loadCarriers();
+
+    // Actualizar la lista cuando se haga clic en el select
+    $('#inputcarrier').on('click', function () {
+        loadCarriers();
+    });
+
+    // Cuando el usuario seleccione o ingrese un nuevo valor
+    $('#inputcarrier').on('change', function () {
+        var selectedOption = $(this).select2('data')[0]; // Obtener la opción seleccionada
+        var selectedText = selectedOption ? selectedOption.text : ''; // Obtener el texto (nombre) de la opción seleccionada
+        //console.log(selectedText);
+        /*var selectedValue = $(this).val(); // Obtén el valor seleccionado o agregado
+        */if (selectedText) {
+            // Si el valor es nuevo, guardarlo en la base de datos
+            console.log(selectedText)
+            saveNewCarrier(selectedText);
+        }
+    });
+    
+    // Guardar un nuevo carrier en la base de datos (se asume que "saveNewCarrier" es una función AJAX que manda la petición)
+    function saveNewCarrier(carrierName) {
+        $.ajax({
+            url: '/save-new-carrier',  // Ruta que manejará el backend
+            type: 'POST',
+            data: {
+                carrierName: carrierName,
+                _token: $('meta[name="csrf-token"]').attr('content')  // Asegúrate de incluir el CSRF token
+            },
+            success: function (response) {
+                // Si la respuesta es exitosa, tal vez puedes agregar el nuevo carrier a la lista de opciones
+                console.log(response);
+            },
+            error: function (xhr, status, error) {
+                console.error('Error al guardar el carrier', error);
+            }
+        });
+    }
+});
+
+
 document.getElementById('exportfile').addEventListener('click', function () {
     // Obtén la tabla con el id "table_empty_trailers"
     var table = document.getElementById('table_empty_trailers');
@@ -114,7 +187,7 @@ $(document).ready(function() {
     loadCarriersupdate();
 
     //Funcion para buscar los carriers en la pantalla de empty trailer
-    function loadCarriers() {
+    /*function loadCarriers() {
         var carrierRoute = $('#inputcarrier').data('url');
         $.ajax({
             url: carrierRoute,
@@ -146,11 +219,8 @@ $(document).ready(function() {
 
     //Ejecutar la funcion al picarle al select
     $('#inputcarrier').on('focus', loadCarriers);
-    loadCarriers();
-
-
-
-
+    loadCarriers();*/
+    
     //Funcion para buscar las locations en la pantalla de empty trailer update
     function loadLocationsupdate() {
         var locationsRoute = $('#updateinputlocation').data('url');
