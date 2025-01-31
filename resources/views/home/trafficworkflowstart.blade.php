@@ -25,7 +25,7 @@
                     <div class="invalid-feedback"></div>
                 </div>
 
-                <div class="mb-3" style="display: none;">
+                <div class="mb-3" style="">
                     <label for="inputshipmentcurrentstatus" class="form-label ">Current Status</label>
                     <select class="form-select" aria-label="Default select example"  id="inputshipmentcurrentstatus" name="inputshipmentcurrentstatus" data-url="{{ route('currentstatus-shipment') }}">
                     </select>

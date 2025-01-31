@@ -523,7 +523,7 @@ $(document).ready(function() {
     LoadDrivers();
 
     //Funcion para buscar las Destinations en la pantalla de shipments
-    function LoadCurrentStatus() {
+    /*function LoadCurrentStatus() {
         var locationsRoute = $('#inputshipmentcurrentstatus').data('url');
         $.ajax({
             url: locationsRoute,
@@ -550,15 +550,16 @@ $(document).ready(function() {
                     data.forEach(item => {
                         select.append(`<option value="${item.gnct_id}">${item.gntc_description}</option>`);
                         // Si la descripción es "Prealerted", seleccionamos esa opción automáticamente
-                        if (item.gntc_description === 'Prealerted' && !prealertedFound) {
-                            select.val(item.gnct_id); // Establece el valor de la opción como seleccionada
-                            prealertedFound = true; // Marca que se encontró "Prealerted"
-                        }
+                        //if (item.gntc_description === 'Prealerted' && !prealertedFound) {
+                        //  select.val(item.gnct_id); // Establece el valor de la opción como seleccionada
+                        //   prealertedFound = true; // Marca que se encontró "Prealerted"
+                        //}
                     });
                 }
     
                 // Restaura el valor seleccionado si existe
-                if (selectedValue && !prealertedFound) {
+                if (selectedValue) {
+                //if (selectedValue && !prealertedFound) {
                     select.val(selectedValue); // Si no se encontró "Prealerted", restaura el valor inicial
                 }
             },
@@ -566,8 +567,73 @@ $(document).ready(function() {
                 console.error('Error fetching data locations:', error);
             }
         });
-    }
+    }*/
     
+    // Funcion para buscar las Destinations en la pantalla de shipments
+function LoadCurrentStatus() {
+    var locationsRoute = $('#inputshipmentcurrentstatus').data('url');
+    $.ajax({
+        url: locationsRoute,
+        type: 'GET',
+        success: function (data) {
+            let select = $('#inputshipmentcurrentstatus');
+            let currentValue = select.val(); // Valor actual seleccionado por el usuario
+            let initialValue = select.attr('value'); // Valor inicial definido en el HTML
+    
+            // Si no hay valor actual (por ejemplo, al cargar por primera vez), usa el inicial
+            let selectedValue = currentValue || initialValue;
+    
+            select.empty(); // Limpia el contenido del select
+    
+            // Agrega la opción deshabilitada y oculta solo si no hay valor seleccionado
+            if (!selectedValue) {
+                select.append('<option selected disabled hidden></option>');
+            }
+    
+            if (data.length === 0) {
+                select.append('<option disabled>No options available</option>');
+            } else {
+                let prealertedFound = false;
+                let driverAssignedFound = false;
+                
+                // Añadir las opciones al select
+                data.forEach(item => {
+                    select.append(`<option value="${item.gnct_id}">${item.gntc_description}</option>`);
+                    
+                    // Verificar si la opción "Prealerted" está entre las opciones
+                    if (item.gntc_description === 'Prealerted' && !prealertedFound) {
+                        prealertedFound = true;
+                    }
+                    
+                    // Verificar si la opción "Driver Assigned" está entre las opciones
+                    if (item.gntc_description === 'Driver Assigned' && !driverAssignedFound) {
+                        driverAssignedFound = true;
+                    }
+                });
+    
+                // Si "Driver Assigned" está disponible y el segundo select tiene un valor
+                let driverValue = $('#inputshipmentdriver').val();
+                if (driverValue) {
+                    if (driverAssignedFound) {
+                        select.val(data.find(item => item.gntc_description === 'Driver Assigned').gnct_id);
+                    }
+                } else if (prealertedFound) {
+                    // Si no hay conductor asignado, seleccionamos "Prealerted" por defecto
+                    select.val(data.find(item => item.gntc_description === 'Prealerted').gnct_id);
+                }
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error('Error fetching data locations:', error);
+        }
+    });
+}
+
+// Ejecutar la función al enfocar el select y al cargar la página
+$('#inputshipmentcurrentstatus').on('focus', LoadCurrentStatus);
+$('#inputshipmentdriver').on('change', LoadCurrentStatus);
+LoadCurrentStatus();
+
     // Ejecutar la función al enfocar el select y al cargar la página
     $('#inputshipmentcurrentstatus').on('focus', LoadCurrentStatus);
     LoadCurrentStatus();
