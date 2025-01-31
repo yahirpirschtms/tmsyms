@@ -114,7 +114,7 @@
                                 <div class="mb-3">
                                     <label for="deliveredDate{{ $shipment->stm_id }}" class="form-label">Delivered Date</label>
                                     <input type="text" class="form-control datetime-picker" id="deliveredDate{{ $shipment->stm_id }}" name="delivered_date"
-                                        value="{{ old('delivered_date', $shipment->delivered_date ? \Carbon\Carbon::parse($shipment->delivered_date)->format('m/d/Y H:i') : '') }}"
+                                        value="{{ old('delivered_date', $shipment->delivered_date ? \Carbon\Carbon::parse($shipment->delivered_date)->format('m/d/Y H:i') : '') }} "
                                          placeholder="mm/dd/yyyy --:--"
                                         onfocus="checkAndChangeStatus('deliveredDate{{ $shipment->stm_id }}', 'Delivered', '{{ $shipment->stm_id }}')">
                                 </div>
@@ -122,14 +122,13 @@
                                 <div class="mb-3">
                                     <label for="atDoorDate{{ $shipment->stm_id }}" class="form-label">At Door Date</label>
                                     <input type="text" class="form-control datetime-picker" id="atDoorDate{{ $shipment->stm_id }}" name="at_door_date"
-                                        value="{{ old('at_door_date', $shipment->at_door_date ? \Carbon\Carbon::parse($shipment->at_door_date)->format('m/d/Y H:i') : '') }}"  placeholder="mm/dd/yyyy --:--">
+                                        value="{{ old('at_door_date', $shipment->at_door_date ? \Carbon\Carbon::parse($shipment->at_door_date)->format('m/d/Y H:i') : '') }}">
                                 </div>
 
                                 <div class="mb-3">
                                     <label for="offloadTime{{ $shipment->stm_id }}" class="form-label">Offload Time</label>
                                     <input type="time" class="form-control" id="offloadTime{{ $shipment->stm_id }}" name="offloading_time"
-                                        value="{{ old('offloading_time', $shipment->offloading_time ? \Carbon\Carbon::parse($shipment->offloading_time)->format('H:i') : '') }}" placeholder="--:--">
-
+                                        value="{{ old('offloading_time', $shipment->offloading_time ? \Carbon\Carbon::parse($shipment->offloading_time)->format('H:i') : '') }}">
                                 </div>
 
                                 <div class="mb-3">
@@ -498,7 +497,6 @@
     color: #0056b3;
 }
 
-
 /* Media query para pantallas móviles */
 @media (max-width: 576px) {
     .nav-tabs {
@@ -534,7 +532,6 @@
         font-size: 14px;
         line-height: 1.6;
     }
-
 </style>
 
 

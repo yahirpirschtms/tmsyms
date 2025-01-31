@@ -450,7 +450,7 @@
                                             </div>
                                             <div class="mb-3 ">
                                                 <label for="inputcarrier" class="form-label ">Carrier</label>
-                                                <select class="form-select searchcarrier" aria-label="Default select example"  id="inputcarrier" name="inputcarrier" value="{{ old('inputcarrier') }}" data-url="{{ route('carrier-emptytrailer') }}">
+                                                <select class="form-control searchcarrier" aria-label="Default select example"  id="inputcarrier" name="inputcarrier" value="{{ old('inputcarrier') }}" data-url="{{ route('carrier-emptytrailerAjax') }}">
                                                     <option selected disabled hidden></option>
                                                 </select>
                                                 <div class="invalid-feedback"></div>
@@ -565,7 +565,7 @@
 
                                             <div class="mb-3 ">
                                                 <label for="updateinputcarrier" class="form-label ">Carrier</label>
-                                                <select class="form-select searchcarrier" aria-label="Default select example"  id="updateinputcarrier" name="updateinputcarrier" value="{{ old('updateinputcarrier') }}" data-url="{{ route('carrier-emptytrailer') }}">
+                                                <select class="form-select searchcarrier" aria-label="Default select example"  id="updateinputcarrier" name="updateinputcarrier" value="{{ old('updateinputcarrier') }}" data-url="{{ route('carrier-emptytrailerAjax') }}">
                                                 </select>
                                                 <div class="invalid-feedback" id="error-updateinputcarrier"></div>
                                             </div>

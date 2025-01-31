@@ -89,7 +89,7 @@
                         <div class="card">
                             <div class="card-body text-black border border-1 rounded" style="">
                                 <h5 class="card-title fw-bolder" style="color:#1e4877">{{ $shipment->stm_id }}</h5>
-                                <p class="origin" style="color: #252525;">{{ $shipment->company->CoName ?? 'Origen not Available' }}</p>
+                                <p class="origin" style="color: #252525;">{{ $shipment->company->CoName ?? 'Origen no disponible' }}</p>
 
                                 <p class="status" style="color: #252525;">{{ $shipment->currentStatus->gntc_description ?? 'Estado no disponible' }}</p>
                                 <p class="" style="color: #252525;">{{ $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y') : 'Approved ETA date not available' }}</p>
@@ -278,7 +278,7 @@
                                     <label for="driverAssignmentDate-{{ $shipment->stm_id }}" class="form-label">Driver Assignment Date</label>
                                     <input type="text" class="form-control flatpickr" id="driverAssignmentDate-{{ $shipment->stm_id }}" name="driver_assigned_date"
                                         value="{{ $shipment->driver_assigned_date ? \Carbon\Carbon::parse($shipment->driver_assigned_date)->format('m/d/Y H:i') : '' }}"
-                                        placeholder="mm/dd/yyyy --:--"
+                                         placeholder="mm/dd/yyyy --:--"
                                         onfocus="checkAndChangeStatus('driverAssignmentDate-{{ $shipment->stm_id }}', 'Driver Assigned', '{{ $shipment->stm_id }}')">
                                 </div>
 
@@ -286,7 +286,7 @@
                                     <label for="pickUpDate-{{ $shipment->stm_id }}" class="form-label">Pick Up Date</label>
                                     <input type="text" class="form-control flatpickr" id="pickUpDate-{{ $shipment->stm_id }}" name="pick_up_date"
                                         value="{{ $shipment->pick_up_date ? \Carbon\Carbon::parse($shipment->pick_up_date)->format('m/d/Y H:i') : '' }}"
-                                        placeholder="mm/dd/yyyy --:--"
+                                         placeholder="mm/dd/yyyy --:--"
                                         onfocus="checkAndChangeStatus('pickUpDate-{{ $shipment->stm_id }}', 'Picked Up', '{{ $shipment->stm_id }}')">
                                 </div>
 
@@ -305,7 +305,6 @@
                                         placeholder="mm/dd/yyyy --:--"
                                         onfocus="checkAndChangeStatus('securedYardDate-{{ $shipment->stm_id }}', 'Secured Yard', '{{ $shipment->stm_id }}')">
                                 </div>
-
 
                                 <!-- Campos de Incidentes desactivados para pruebas -->
                                 <div class="mb-3">

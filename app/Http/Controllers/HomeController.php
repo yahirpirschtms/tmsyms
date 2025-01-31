@@ -218,7 +218,7 @@ public function update(Request $request)
             'inputdateofstatus' => 'required|date',
             'inputpalletsontrailer' => 'nullable',
             'inputpalletsonfloor' => 'nullable',
-            'inputcarrier' => 'required|exists:companies,pk_company',
+            'inputcarrier' => 'required',
             'inputavailabilityindicator' => 'nullable|exists:generic_catalogs,gnct_id',
             'inputlocation' => 'required|exists:companies,pk_company',
             'inputdatein' => 'required|date',

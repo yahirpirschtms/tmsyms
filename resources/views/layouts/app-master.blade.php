@@ -291,6 +291,45 @@
 .ooffcanvasDetails .form-label {
   color: #f8f9fa;
 }
+
+/* Asegúrate de que el select2 y el input tengan el mismo estilo */
+.select2-container--default .select2-selection--single {
+    height: calc(2.25rem + 2px);  /* Igual que los inputs */
+    border-radius: 0.375rem; /* Asegura bordes redondeados */
+    font-size: 1rem; /* Igual al tamaño de los inputs */
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 2.25rem; /* Asegura que el texto esté centrado verticalmente */
+}
+/* Asegura que el borde del select2 coincida con el borde del input */
+.select2-container--default .select2-selection--single {
+    border: 1px solid #dee2e6;  /* Color del borde, igual al del input .form-control */
+    border-radius: 0.375rem;    /* Bordes redondeados, como el input */
+}
+
+/* Cuando el select2 está en foco, cambia el borde a azul (como el input) */
+.select2-container--default .select2-selection--single:focus-within {
+    border-color: #80bdff;      /* Color del borde azul al estar enfocado */
+    box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.25); /* Sombra azul para el enfoque */
+}
+/* Centrar la flecha dentro del select2 */
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    top: 50%;                /* Centra la flecha verticalmente */
+    right: 10px;             /* Ajusta la posición horizontal */
+    transform: translateY(-50%); /* Centra la flecha correctamente */
+}
+/* Eliminar el borde negro del campo de búsqueda cuando está enfocado */
+.select2-container--default .select2-search__field:focus {
+    border-color: transparent;  /* Eliminar el borde */
+    box-shadow: none;            /* Eliminar cualquier sombra aplicada */
+}
+
+/*.select2-container--default .select2-search--dropdown .select2-search__field {
+  border-color: transparent; 
+  box-shadow: none;   
+  border: none;
+}*/
+
     </style>
 </head>
 <body>

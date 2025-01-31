@@ -114,7 +114,7 @@ class CalendarController extends Controller
                 return [
                     'title' => 'STM ID: ' . $shipment->stm_id,
                     'start' => $whAuthDate ? $whAuthDate->format('Y-m-d\TH:i:s') : null,  // Comprobamos si whAuthDate no es nulo
-'end' => $whAuthDate ? $whAuthDate->addHours(1)->format('Y-m-d\TH:i:s') : null,  // Comprobamos si whAuthDate no es nulo antes de añadir hora
+                    'end' => $whAuthDate ? $whAuthDate->addHours(1)->format('Y-m-d\TH:i:s') : null,  // Comprobamos si whAuthDate no es nulo antes de añadir hora
                     'extendedProps' => [
                         'stm_id' => $shipment->stm_id,
                         'reference' => $shipment->reference,
@@ -163,49 +163,49 @@ class CalendarController extends Controller
 
 
     public function updateOffloadingStatus(Request $request, $pk_shipment)
-{
-    try {
-        // Buscar el envío por pk_shipment
-        $shipment = Shipments::findOrFail($pk_shipment);
+    {
+        try {
+            // Buscar el envío por pk_shipment
+            $shipment = Shipments::findOrFail($pk_shipment);
 
-        // Validar los datos recibidos
-        $validatedData = $request->validate([
-            'trailer_id' => 'nullable|string|max:255', // ID del remolque
-            'stm_id' => 'nullable|integer', // ID del STM
-            'gnct_id_current_status' => 'nullable|integer', // Estado actual
-            'delivered_date' => 'nullable|date_format:m/d/Y H:i', // Fecha de entrega
-            'at_door_date' => 'nullable|date_format:m/d/Y H:i', // Fecha de llegada
-            'offloading_time' => 'nullable|date_format:H:i', // Hora de descarga
-            'wh_auth_date' => 'nullable|date_format:m/d/Y H:i', // Fecha de autorización
-        ]);
+            // Validar los datos recibidos
+            $validatedData = $request->validate([
+                'trailer_id' => 'nullable|string|max:255', // ID del remolque
+                'stm_id' => 'nullable|integer', // ID del STM
+                'gnct_id_current_status' => 'nullable|integer', // Estado actual
+                'delivered_date' => 'nullable|date_format:m/d/Y H:i', // Fecha de entrega
+                'at_door_date' => 'nullable|date_format:m/d/Y H:i', // Fecha de llegada
+                'offloading_time' => 'nullable|date_format:H:i', // Hora de descarga
+                'wh_auth_date' => 'nullable|date_format:m/d/Y H:i', // Fecha de autorización
+            ]);
 
-        // Convertir las fechas a formato compatible con la base de datos
-        if ($request->has('delivered_date') && $request->input('delivered_date')) {
-            $validatedData['delivered_date'] = Carbon::createFromFormat('m/d/Y H:i', $request->input('delivered_date'))->format('Y-m-d H:i:s');
-        } else {
-            $validatedData['delivered_date'] = null;
+            // Convertir las fechas a formato compatible con la base de datos
+            if ($request->has('delivered_date') && $request->input('delivered_date')) {
+                $validatedData['delivered_date'] = Carbon::createFromFormat('m/d/Y H:i', $request->input('delivered_date'))->format('Y-m-d H:i:s');
+            } else {
+                $validatedData['delivered_date'] = null;
+            }
+
+            if ($request->has('at_door_date') && $request->input('at_door_date')) {
+                $validatedData['at_door_date'] = Carbon::createFromFormat('m/d/Y H:i', $request->input('at_door_date'))->format('Y-m-d H:i:s');
+            } else {
+                $validatedData['at_door_date'] = null;
+            }
+
+            if ($request->has('wh_auth_date') && $request->input('wh_auth_date')) {
+                $validatedData['wh_auth_date'] = Carbon::createFromFormat('m/d/Y H:i', $request->input('wh_auth_date'))->format('Y-m-d H:i:s');
+            } else {
+                $validatedData['wh_auth_date'] = null;
+            }
+
+            // Actualizar el envío con los nuevos datos
+            $shipment->update($validatedData);
+
+            // Devolver respuesta con el estado de la actualización
+            return response()->json(['message' => 'Shipment updated successfully'], 200);
+
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error updating shipment: ' . $e->getMessage()], 500);
         }
-
-        if ($request->has('at_door_date') && $request->input('at_door_date')) {
-            $validatedData['at_door_date'] = Carbon::createFromFormat('m/d/Y H:i', $request->input('at_door_date'))->format('Y-m-d H:i:s');
-        } else {
-            $validatedData['at_door_date'] = null;
-        }
-
-        if ($request->has('wh_auth_date') && $request->input('wh_auth_date')) {
-            $validatedData['wh_auth_date'] = Carbon::createFromFormat('m/d/Y H:i', $request->input('wh_auth_date'))->format('Y-m-d H:i:s');
-        } else {
-            $validatedData['wh_auth_date'] = null;
-        }
-
-        // Actualizar el envío con los nuevos datos
-        $shipment->update($validatedData);
-
-        // Devolver respuesta con el estado de la actualización
-        return response()->json(['message' => 'Shipment updated successfully'], 200);
-
-    } catch (\Exception $e) {
-        return response()->json(['message' => 'Error updating shipment: ' . $e->getMessage()], 500);
     }
-}
 }
