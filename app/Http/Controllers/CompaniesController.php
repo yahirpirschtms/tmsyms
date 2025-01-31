@@ -49,12 +49,18 @@ class CompaniesController extends Controller
             // Si no existe, crear un nuevo carrier
             $newCarrier = new Companies();
             $newCarrier->CoName = $request->carrierName;
-            $newCarrier->Notes = 'yms'; // Establecer otros campos según sea necesario
+            $newCarrier->Notes = 'yms'; // Establecer otros campos según sea 
+            //$newCarrier->code = $request->code; // Save the code value
             $newCarrier->save();
 
             return response()->json([
                 'message' => 'New carrier saved successfully.',
-                'newCarrier' => $newCarrier // Devuelves el nuevo carrier guardado
+                'newCarrier' => [
+                    'pk_company' => $newCarrier->pk_company,  // Este es el `id` autoincremental
+                    'CoName' => $newCarrier->CoName
+                ]
+                /*'message' => 'New carrier saved successfully.',
+                'newCarrier' => $newCarrier // Devuelves el nuevo carrier guardado*/
             ]);
         } else {
             return response()->json([

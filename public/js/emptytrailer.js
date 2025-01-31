@@ -1,5 +1,7 @@
+//Busqueda de carries en un nuevo registro
 $(document).ready(function () {
     var carrierRoute = $('#inputcarrier').data('url');
+    var newlyCreatedCarrierId = null; // Variable para almacenar el ID del carrier recién creado
 
     function loadCarriers() {
         $('#inputcarrier').select2({
@@ -41,16 +43,15 @@ $(document).ready(function () {
     $('#inputcarrier').on('change', function () {
         var selectedOption = $(this).select2('data')[0]; // Obtener la opción seleccionada
         var selectedText = selectedOption ? selectedOption.text : ''; // Obtener el texto (nombre) de la opción seleccionada
-        //console.log(selectedText);
-        /*var selectedValue = $(this).val(); // Obtén el valor seleccionado o agregado
-        */if (selectedText) {
-            // Si el valor es nuevo, guardarlo en la base de datos
-            console.log(selectedText)
+
+        // Si no es el nuevo carrier, lo procesamos
+        if (selectedText  !== newlyCreatedCarrierId) {
+            console.log(selectedText);
             saveNewCarrier(selectedText);
         }
     });
-    
-    // Guardar un nuevo carrier en la base de datos (se asume que "saveNewCarrier" es una función AJAX que manda la petición)
+
+    // Guardar un nuevo carrier en la base de datos
     function saveNewCarrier(carrierName) {
         $.ajax({
             url: '/save-new-carrier',  // Ruta que manejará el backend
@@ -60,8 +61,28 @@ $(document).ready(function () {
                 _token: $('meta[name="csrf-token"]').attr('content')  // Asegúrate de incluir el CSRF token
             },
             success: function (response) {
-                // Si la respuesta es exitosa, tal vez puedes agregar el nuevo carrier a la lista de opciones
                 console.log(response);
+
+                // Crear una nueva opción para el select2 con el nuevo carrier
+                var newOption = new Option(response.newCarrier.CoName, response.newCarrier.pk_company, true, true);
+
+                // Agregar la nueva opción al select2
+                $('#inputcarrier').append(newOption).trigger('change');
+
+                // Seleccionar el nuevo carrier automáticamente
+                $('#inputcarrier').val(response.newCarrier.pk_company).trigger('change');
+
+                // Marcar el nuevo ID para evitar que se haga otra solicitud
+                newlyCreatedCarrierId = response.newCarrier.CoName;
+
+                // Cuando el nuevo carrier sea creado, aseguramos que no se haga más AJAX para este carrier
+                $('#inputcarrier').on('select2:select', function (e) {
+                    var selectedId = e.params.data.id;
+                    if (selectedId === newlyCreatedCarrierId) {
+                        // Evitar que se reenvíe la solicitud para el nuevo carrier
+                        newlyCreatedCarrierId = null;  // Restablecer el ID del carrier creado
+                    }
+                });
             },
             error: function (xhr, status, error) {
                 console.error('Error al guardar el carrier', error);
@@ -70,6 +91,98 @@ $(document).ready(function () {
     }
 });
 
+//Busqueda de carries en el update 
+$(document).ready(function () {
+    var carrierRoute = $('#updateinputcarrier').data('url');
+    var newlyCreatedCarrierId = null; // Variable para almacenar el ID del carrier recién creado
+
+    function loadCarriersUpdate() {
+        $('#updateinputcarrier').select2({
+            placeholder: 'Select or enter a New Carrier',
+            allowClear: true,
+            tags: true, // Permite agregar nuevas opciones
+            dropdownParent: $('#updatenewtrailerempty'),
+            ajax: {
+                url: carrierRoute,
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        search: params.term || '' // Si no hay texto, envía un string vacío
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.map(item => ({
+                            id: item.pk_company,
+                            text: item.CoName
+                        }))
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 0
+        });
+    }
+
+    loadCarriersUpdate();
+
+    // Actualizar la lista cuando se haga clic en el select
+    $('#updateinputcarrier').on('click', function () {
+        loadCarriersUpdate();
+    });
+
+    // Cuando el usuario seleccione o ingrese un nuevo valor
+    $('#updateinputcarrier').on('change', function () {
+        var selectedOption = $(this).select2('data')[0]; // Obtener la opción seleccionada
+        var selectedText = selectedOption ? selectedOption.text : ''; // Obtener el texto (nombre) de la opción seleccionada
+
+        // Si no es el nuevo carrier, lo procesamos
+        if (selectedText  !== newlyCreatedCarrierId) {
+            console.log(selectedText);
+            saveNewCarrier(selectedText);
+        }
+    });
+
+    // Guardar un nuevo carrier en la base de datos
+    function saveNewCarrier(carrierName) {
+        $.ajax({
+            url: '/save-new-carrier',  // Ruta que manejará el backend
+            type: 'POST',
+            data: {
+                carrierName: carrierName,
+                _token: $('meta[name="csrf-token"]').attr('content')  // Asegúrate de incluir el CSRF token
+            },
+            success: function (response) {
+                console.log(response);
+
+                // Crear una nueva opción para el select2 con el nuevo carrier
+                var newOption = new Option(response.newCarrier.CoName, response.newCarrier.pk_company, true, true);
+
+                // Agregar la nueva opción al select2
+                $('#updateinputcarrier').append(newOption).trigger('change');
+
+                // Seleccionar el nuevo carrier automáticamente
+                $('#updateinputcarrier').val(response.newCarrier.pk_company).trigger('change');
+
+                // Marcar el nuevo ID para evitar que se haga otra solicitud
+                newlyCreatedCarrierId = response.newCarrier.CoName;
+
+                // Cuando el nuevo carrier sea creado, aseguramos que no se haga más AJAX para este carrier
+                $('#updateinputcarrier').on('select2:select', function (e) {
+                    var selectedId = e.params.data.id;
+                    if (selectedId === newlyCreatedCarrierId) {
+                        // Evitar que se reenvíe la solicitud para el nuevo carrier
+                        newlyCreatedCarrierId = null;  // Restablecer el ID del carrier creado
+                    }
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error('Error al guardar el carrier', error);
+            }
+        });
+    }
+});
 
 document.getElementById('exportfile').addEventListener('click', function () {
     // Obtén la tabla con el id "table_empty_trailers"
@@ -152,7 +265,7 @@ $(document).ready(function() {
     //Script para buscar el availability indicator en la pantalla de empty trailer
     $(document).ready(function () {
       //Funcion para buscar los carriers en la pantalla de empty trailer update
-    function loadCarriersupdate() {
+    /*function loadCarriersupdate() {
         var carrierRoute = $('#updateinputcarrier').data('url');
         $.ajax({
             url: carrierRoute,
@@ -184,7 +297,7 @@ $(document).ready(function() {
 
     //Ejecutar la funcion al picarle al select update
     $('#updateinputcarrier').on('focus', loadCarriersupdate);
-    loadCarriersupdate();
+    loadCarriersupdate();*/
 
     //Funcion para buscar los carriers en la pantalla de empty trailer
     /*function loadCarriers() {
@@ -680,6 +793,10 @@ $(document).ready(function() {
                 select.selectedIndex = 0; // Restablecer al primer valor (placeholder)
             });
 
+            // Resetear Select2 manualmente
+        $('#inputcarrier').val(null).trigger('change');  // Restablecer el valor del select
+        $('#inputcarrier').select2("destroy").select2(); // Reiniciar select2
+
             
 
         });
@@ -823,17 +940,48 @@ $(document).ready(function() {
           document.getElementById('updateinputdateofstatus').value = trailer.status || ''; // Ajusta según tu modelo
           document.getElementById('updateinputpalletsontrailer').value = trailer.pallets_on_trailer || '';
           document.getElementById('updateinputpalletsonfloor').value = trailer.pallets_on_floor || '';
-          document.getElementById('updateinputcarrier').value = trailer.carrier || '';
+          //document.getElementById('updateinputcarrier').value = trailer.carrier || '';
           document.getElementById('updateinputavailabilityindicator').value = trailer.gnct_id_availability_indicator || '';
           document.getElementById('updateinputlocation').value = trailer.location || '';
           document.getElementById('updateinputdatein').value = trailer.date_in || '';
           //document.getElementById('updateinputdateout').value = trailer.date_out || '';
           //document.getElementById('updateinputtransactiondate').value = trailer.transaction_date || '';
           //document.getElementById('updateinputusername').value = trailer.username || '';
+        
+          // Asignar el valor al select2 de Carrier
+          // Obtener el CoName del carrier a partir de su ID
+          if (trailer.carrier) {
+            $.ajax({
+                url: 'carrier-emptytrailerAjax', // Llamamos a la misma API de carriers
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    let carrier = data.find(item => item.pk_company == trailer.carrier);
+                    if (carrier) {
+                        let newOption = new Option(carrier.CoName, carrier.pk_company, true, true);
+                        $('#updateinputcarrier').append(newOption).trigger('change');
+                    }
+                    // Mostrar el canvas de actualización después de que todo esté listo
+                    const updateCanvas = new bootstrap.Offcanvas(document.getElementById('updatenewtrailerempty'));
+                    updateCanvas.show();
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error al cargar los carriers:', error);
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'There was an error loading carrier information.',
+                        icon: 'error',
+                        confirmButtonText: 'Ok'
+                    });
+                }
+            });
+        } else{
 
           // Mostrar el canvas de actualización
           const updateCanvas = new bootstrap.Offcanvas(document.getElementById('updatenewtrailerempty'));
           updateCanvas.show();
+
+        }
 
           // Restaurar el título al cerrar el canvas
           document.getElementById('updatenewtrailerempty').addEventListener('hidden.bs.offcanvas', function () {
@@ -1124,6 +1272,11 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
                     console.log(`No se encontró el campo: ${fieldId}`);  // Verifica si no encuentras los campos
                 }
             });
+            // **LIMPIAR EL SELECT2**
+        let carrierSelect = $('#updateinputcarrier');
+        carrierSelect.val(null).trigger('change'); // Quitar selección actual
+        carrierSelect.find('option').remove(); // Eliminar opciones dinámicas
+        //carrierSelect.append(new Option("Select or enter a New Carrier", "", true, true)); // Restaurar placeholder
         });
     });
     
