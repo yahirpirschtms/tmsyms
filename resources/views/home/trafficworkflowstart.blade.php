@@ -25,7 +25,7 @@
                     <div class="invalid-feedback"></div>
                 </div>
 
-                <div class="mb-3" style="display: none;">
+                <div class="mb-3" style="">
                     <label for="inputshipmentcurrentstatus" class="form-label ">Current Status</label>
                     <select class="form-select" aria-label="Default select example"  id="inputshipmentcurrentstatus" name="inputshipmentcurrentstatus" data-url="{{ route('currentstatus-shipment') }}">
                     </select>
@@ -81,8 +81,8 @@
 
                 <div class="mb-3">
                     <label for="inputshipmentcarrier" class="form-label ">Carrier Dropping Trailer</label>
-                    <select class="form-select" aria-label="Default select example"   id="inputshipmentcarrier" name="inputshipmentcarrier" value="{{ old('inputshipmentcarrier', $from_button == 1 ? $carrier : '') }}" data-url="{{ route('locations-emptytrailer') }}">
-                    <option value="">Choose an option</option>
+                    <select class="form-select" aria-label="Default select example"   id="inputshipmentcarrier" name="inputshipmentcarrier" data-carrier="{{ old('inputshipmentcarrier', $from_button == 1 ? $carrier : '') }}" data-url="{{ route('carrier-emptytrailerAjax') }}">
+                    <!--<option value="">Choose an option</option>-->
                     </select>
                     <div class="invalid-feedback"></div>
                     <!--<input type="hidden" name="inputshipmentcarrier" value="{{ old('inputshipmentcarrier', $from_button == 1 ? $carrier : '') }}">-->

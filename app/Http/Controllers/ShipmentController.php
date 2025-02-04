@@ -353,6 +353,9 @@ class ShipmentController extends Controller
             ]);
         }
 
+        // Obtener la fecha y hora actual
+        $currentDateTime = now(); // Usa `now()` para obtener la fecha y hora actuales en Laravel
+
         // Crear un nuevo registro
         Shipments::create([
             //'pk_trailer' => $request->inputidtrailer,
@@ -376,6 +379,9 @@ class ShipmentController extends Controller
             'overhaul_id' => $request->inputshipmentoverhaulid,
             'device_number' => $request->inputshipmentdevicenumber,
             'gnct_id_current_status' => $request->inputshipmentcurrentstatus,
+
+            // Asignar la fecha y hora actual solo si el parámetro `inputshipmentdriver` no está vacío
+            'driver_assigned_date' => $request->inputshipmentdriver ? $currentDateTime : null,
 
         ]);
 
