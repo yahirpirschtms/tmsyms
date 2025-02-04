@@ -36,10 +36,7 @@ class CalendarController extends Controller
                 $etd = Carbon::parse($shipment->etd);  // Cambiado de suggestedDeliveryDate a etd
                 $whAuthDate = $shipment->wh_auth_date ? Carbon::parse($shipment->wh_auth_date) : null;
 
-                // Si no hay fecha de autorización de almacén, no se incluirá el evento
-                if ($whAuthDate === null) {
-                    return null;  // Si no tiene fecha de autorización, no se incluye
-                }
+
 
                 // Obtener las descripciones para 'origin' y 'gnct_id_current_status'
                 $originDescription = isset($originCatalog[$shipment->origin])

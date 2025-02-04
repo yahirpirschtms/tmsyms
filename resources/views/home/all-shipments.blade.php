@@ -242,7 +242,7 @@
                             <td>{{ $shipment->secondary_shipment_id ?? 'Not available' }}</td>
                             <td>{{ $shipment->reference ?? 'Not available' }}</td>
                             <td>{{ $shipment->company->CoName ?? 'Origin not available' }}</td>
-                            <td>{{ $shipment->id_trailer ?? 'Not available' }}</td>
+                            <td>{{ $shipment->company->CoName ?? 'Not available' }}</td>
                             <td>{{ $shipment->destinationFacility->fac_name ?? 'Not available' }}</td>
                             <td>{{ $shipment->pre_alerted_datetime ? \Carbon\Carbon::parse($shipment->pre_alerted_datetime)->format('m/d/Y H:i') : 'Not available' }}</td>
                             <td>{{ $shipment->company->CoName ?? 'Not available' }}</td>
@@ -259,21 +259,21 @@
                                 @endif
                             </td>
 
-                            <td>{{ $shipment->etd ? \Carbon\Carbon::parse($shipment->etd)->format('m/d/Y') : 'Not available' }}</td>
+                            <td>{{ $shipment->etd ? \Carbon\Carbon::parse($shipment->etd)->format('m/d/Y ') : 'Not available' }}</td>
                             <td>{{ $shipment->units ?? 'Not available' }}</td>
                             <td>{{ $shipment->pallets ?? 'Not available' }}</td>
                             <td>{{ $shipment->security_seals ?? 'Not available' }}</td>
                             <td>{{ $shipment->notes ?? 'Not available' }}</td>
                             <td>{{ $shipment->currentStatus->gntc_value ?? 'Status not available' }}</td>
-                            <td>{{ $shipment->driver_assigned_date ? \Carbon\Carbon::parse($shipment->driver_assigned_date)->format('m/d/Y H:i') : 'Not available' }}</td>
-                            <td>{{ $shipment->pick_up_date ? \Carbon\Carbon::parse($shipment->pick_up_date)->format('m/d/Y') : 'Not available' }}</td>
-                            <td>{{ $shipment->intransit_date ? \Carbon\Carbon::parse($shipment->intransit_date)->format('m/d/Y') : 'Not available' }}</td>
-                            <td>{{ $shipment->delivered_date ? \Carbon\Carbon::parse($shipment->delivered_date)->format('m/d/Y') : 'Not available' }}</td>
-                            <td>{{ $shipment->secured_yarddate ? \Carbon\Carbon::parse($shipment->secured_yarddate)->format('m/d/Y H:i') : 'Not available' }}</td>
+                            <td>{{ $shipment->driver_assigned_date ? \Carbon\Carbon::parse($shipment->driver_assigned_date)->format('m/d/Y H:i:s') : 'Not available' }}</td>
+                            <td>{{ $shipment->pick_up_date ? \Carbon\Carbon::parse($shipment->pick_up_date)->format('m/d/Y H:i:s') : 'Not available' }}</td>
+                            <td>{{ $shipment->intransit_date ? \Carbon\Carbon::parse($shipment->intransit_date)->format('m/d/Y H:i:s') : 'Not available' }}</td>
+                            <td>{{ $shipment->delivered_date ? \Carbon\Carbon::parse($shipment->delivered_date)->format('m/d/Y H:i:s') : 'Not available' }}</td>
+                            <td>{{ $shipment->secured_yarddate ? \Carbon\Carbon::parse($shipment->secured_yarddate)->format('m/d/Y H:i:s') : 'Not available' }}</td>
                             <td>{{ $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y H:i:s') : 'Not available' }}</td>
                             <td>{{ $shipment->sec_incident ?? 'Not available' }}</td>
                             <td>{{ $shipment->incident_type ?? 'Not available' }}</td>
-                            <td>{{ $shipment->incident_date ? \Carbon\Carbon::parse($shipment->incident_date)->format('m/d/Y') : 'Not available' }}</td>
+                            <td>{{ $shipment->incident_date ? \Carbon\Carbon::parse($shipment->incident_date)->format('m/d/Y H:i:s') : 'Not available' }}</td>
                             <td>{{ $shipment->incident_notes ?? 'Not available' }}</td>
                             <td>{{ $shipment->wh_status ?? 'Not available' }}</td>
                             <td>{{ $shipment->at_door_date ? \Carbon\Carbon::parse($shipment->at_door_date)->format('H:i') : 'Not available' }}</td>
@@ -413,8 +413,8 @@
                                     <p>{{ $shipment->currentStatus->gntc_description ?? 'No disponible' }}</p>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label">Shipment Type (GNCT ID)</label>
-                                    <p>{{ $shipment->gnct_id_shipment_type ?? 'No disponible' }}</p>
+                                    <label class="form-label">Shipment Type</label>
+                                    <p>{{ $shipment->shipmentType->gntc_description ?? 'No disponible' }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Delivered Date</label>
@@ -438,96 +438,140 @@
                                     </div>
 
                                     <div class="mb-3">
-                                        <label for="reference" class="form-label">Reference</label>
-                                        <input type="text" class="form-control" id="reference" value="{{ $shipment->reference }}" readonly>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="bonded" class="form-label">Bonded</label>
-                                        <input type="text" class="form-control" id="bonded" value="{{ $shipment->bonded }}" readonly>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="origin" class="form-label">Origin</label>
-                                        <input type="text" class="form-control" id="origin" value="{{ $shipment->company->CoName ?? 'Origen no disponible' }}" readonly>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="destination" class="form-label">Destination</label>
-                                        <input type="text" class="form-control" id="destination"
-                                               value="{{ $shipment->destinationFacility->fac_name ?? 'Destination not available' }}" readonly>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="pre_alerted_datetime" class="form-label">Pre-Alert Date & Time</label>
-                                        <input type="text" class="form-control" id="pre_alerted_datetime"
-                                               value="{{ $shipment->pre_alerted_datetime ? \Carbon\Carbon::parse($shipment->pre_alerted_datetime)->format('m/d/Y H:i:s') : '' }}"
-                                               readonly>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="id_trailer" class="form-label">Trailer ID</label>
-                                        <input type="text" class="form-control" id="id_trailer" value="{{ $shipment->id_trailer }}" readonly>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="id_company" class="form-label">Company</label>
-                                        <input type="text" class="form-control" id="id_company" value="{{ $shipment->company->CoName }}" readonly>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="trailer" class="form-label">Trailer</label>
-                                        <input type="text" class="form-control" id="trailer" value="{{ $shipment->trailer }}" readonly>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="truck" class="form-label">Truck</label>
-                                        <input type="text" class="form-control" id="truck" value="{{ $shipment->truck }}" readonly>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="id_driver" class="form-label">Driver ID</label>
-                                        <input type="text" class="form-control" id="id_driver" value="{{ $shipment->id_driver }}" readonly>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="etd" class="form-label">ETD</label>
-                                        <input type="text" class="form-control" id="etd" value="{{ $shipment->etd }}" readonly>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="units" class="form-label">Units</label>
-                                        <input type="text" class="form-control" id="units" value="{{ $shipment->units }}" readonly>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="pallets" class="form-label">Pallets</label>
-                                        <input type="text" class="form-control" id="pallets" value="{{ $shipment->pallets }}" readonly>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="security_seals" class="form-label">Security Seal</label>
-                                        <input type="text" class="form-control" id="security_seals" value="{{ $shipment->security_seals }}" readonly>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="notes" class="form-label">Notes</label>
-                                        <textarea class="form-control" id="notes" rows="3" readonly>{{ $shipment->notes }}</textarea>
+                                        <label for="device_number" class="form-label">Device Number</label>
+                                        <input type="text" class="form-control" id="device_number" name="device_number" value="{{ $shipment->device_number }}">
                                     </div>
 
                                     <div class="mb-3">
                                         <label for="overhaul_id" class="form-label">Overhaul ID</label>
-                                        <input type="text" class="form-control" id="overhaul_id" value="{{ $shipment->overhaul_id }}" readonly>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="device_number" class="form-label">Device Number</label>
-                                        <input type="text" class="form-control" id="device_number" value="{{ $shipment->device_number }}" readonly>
+                                        <input type="text" class="form-control" id="overhaul_id" name="overhaul_id" value="{{ $shipment->overhaul_id }}">
                                     </div>
 
                                     <div class="mb-3">
                                         <label for="secondary_shipment_id" class="form-label">Secondary Shipment ID</label>
-                                        <input type="text" class="form-control" id="secondary_shipment_id" value="{{ $shipment->secondary_shipment_id }}" readonly>
+                                        <input type="text" class="form-control" id="secondary_shipment_id" name="secondary_shipment_id" value="{{ $shipment->secondary_shipment_id }}">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="reference" class="form-label">Landstar Reference</label>
+                                        <input type="text" class="form-control" id="reference" name="reference" value="{{ $shipment->reference }}">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="shipment_type" class="form-label">Shipment Type</label>
+                                        <input type="text" class="form-control" id="shipment_type" name="shipment_type" value="{{ $shipment->shipmentType->gntc_description ?? 'No disponible' }}">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="etd-{{ $shipment->stm_id }}" class="form-label">ETD</label>
+                                        <input type="text" class="form-control flatpickr" id="etd-{{ $shipment->stm_id }}" name="etd"
+                                            value="{{ $shipment->etd ? \Carbon\Carbon::parse($shipment->etd)->format('m/d/Y H:i') : '' }}"
+                                            placeholder="mm/dd/yyyy --:--">
+                                    </div>
+
+                                    <!-- Origin -->
+                                    <div class="mb-3">
+                                        <label for="origin-{{ $shipment->stm_id }}" class="form-label">Origin</label>
+                                        <select class="form-select" id="origin-{{ $shipment->stm_id }}" name="origin">
+                                            @foreach ($companies as $company)
+                                                <option value="{{ $company->pk_company }}"
+                                                    {{ old('origin', $shipment->origin) == $company->pk_company ? 'selected' : '' }}>
+                                                    {{ $company->CoName }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+
+                                    <!-- Destination -->
+                                    <div class="mb-3">
+                                        <label for="destination-{{ $shipment->stm_id }}" class="form-label">Destination</label>
+                                        <select class="form-select" id="destination-{{ $shipment->stm_id }}" name="destination">
+                                            @foreach ($facilities as $facility)
+                                                <option value="{{ $facility->fac_id }}"
+                                                    {{ old('destination', $shipment->destination) == $facility->fac_id ? 'selected' : '' }}>
+                                                    {{ $facility->fac_name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="preAlertedDatetime-{{ $shipment->stm_id }}" class="form-label">Pre-Alerted Datetime</label>
+                                        <input type="text" class="form-control flatpickr" id="preAlertedDatetime-{{ $shipment->stm_id }}" name="pre_alerted_datetime"
+                                            value="{{ $shipment->pre_alerted_datetime ? \Carbon\Carbon::parse($shipment->pre_alerted_datetime)->format('m/d/Y H:i') : '' }}"
+                                            placeholder="mm/dd/yyyy --:--">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="id_trailer-{{ $shipment->stm_id }}" class="form-label">Trailer ID</label>
+                                        <input type="text" class="form-control" id="id_trailer-{{ $shipment->stm_id }}" name="id_trailer"
+                                               value="{{ old('id_trailer', $shipment->id_trailer) }}" placeholder="Enter Trailer ID">
+                                    </div>
+
+
+                                   <!-- Trailer Owner -->
+                                    <div class="mb-3">
+                                        <label for="trailer_owner-{{ $shipment->stm_id }}" class="form-label">Trailer Owner</label>
+                                        <select class="form-select" id="trailer_owner-{{ $shipment->stm_id }}" name="trailer_owner">
+                                            @foreach ($companies as $company)
+                                                <option value="{{ $company->pk_company }}"
+                                                    {{ old('trailer_owner', $shipment->origin) == $company->pk_company ? 'selected' : '' }}>
+                                                    {{ $company->CoName }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+
+                                    <!-- Carrier -->
+                                    <div class="mb-3">
+                                        <label for="carrier-{{ $shipment->stm_id }}" class="form-label">Carrier Dropping Trailer</label>
+                                        <select class="form-select" id="carrier-{{ $shipment->stm_id }}" name="carrier">
+                                            @foreach ($companies as $company)
+                                                <option value="{{ $company->pk_company }}"
+                                                    {{ old('carrier', $shipment->origin) == $company->pk_company ? 'selected' : '' }}>
+                                                    {{ $company->CoName }}
+                                                </option>
+                                            @endforeach
+
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="driver_truck" class="form-label">Driver & Truck</label>
+                                        <select class="form-select" id="driver_truck" name="driver_truck">
+                                            <option value="">Not available</option>
+                                            @foreach ($drivers as $driver)
+                                                <option value="{{ $driver->id }}"
+                                                    {{ old('driver_truck', $shipment->driver_truck) == $driver->id ? 'selected' : '' }}>
+                                                    {{ !empty($driver->drivername) && !empty($driver->truck) ?
+                                                        $driver->drivername . ' - ' . $driver->truck :
+                                                        (!empty($driver->drivername) ? $driver->drivername : $driver->truck)
+                                                    }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="units" class="form-label">Units</label>
+                                        <input type="text" class="form-control" id="units" name="units" value="{{ $shipment->units }}">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="pallets" class="form-label">Pallets</label>
+                                        <input type="text" class="form-control" id="pallets" name="pallets" value="{{ $shipment->pallets }}">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="security_seals" class="form-label">Security Seal</label>
+                                        <input type="text" class="form-control" id="security_seals" name="security_seals" value="{{ $shipment->security_seals }}">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="notes" class="form-label">Notes</label>
+                                        <textarea class="form-control" id="notes" name="notes" rows="3">{{ $shipment->notes }}</textarea>
                                     </div>
 
                                     <!-- Agrega más campos si es necesario -->
@@ -703,8 +747,8 @@
                                         <p>{{ $shipment->currentStatus->gntc_description ?? 'No disponible' }}</p>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label">Shipment Type (GNCT ID)</label>
-                                        <p>{{ $shipment->gnct_id_shipment_type ?? 'No disponible' }}</p>
+                                        <label class="form-label">Shipment Type</label>
+                                        <p>{{ $shipment->shipmentType->gntc_description ?? 'No disponible' }}</p>
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label">Delivered Date</label>

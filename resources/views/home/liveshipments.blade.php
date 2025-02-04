@@ -150,116 +150,173 @@
                             </a>
                         </li>
                     </ul>
-                    <div class="tab-content" style="border: none;" id="pills-tabContent-{{ $shipment->stm_id }}">
+
+                    <form id="shipmentForm-{{ $shipment->stm_id }}" method="POST" action="/update-status-endpoint/{{ $shipment->pk_shipment }}">
+                        <div class="tab-content" style="border: none;" id="pills-tabContent-{{ $shipment->stm_id }}">
                         <div class="tab-pane fade show active" id="pills-initial-status-{{ $shipment->stm_id }}" role="tabpanel" aria-labelledby="pills-initial-status-tab">
-                            <form>
+
                                 <div class="mb-3">
                                     <label for="stm_id" class="form-label">STM ID</label>
                                     <input type="text" class="form-control" id="stm_id" value="{{ $shipment->stm_id ?? 'STM ID no disponible' }}" readonly>
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="reference" class="form-label">Reference</label>
-                                    <input type="text" class="form-control" id="reference" value="{{ $shipment->reference }}" readonly>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="bonded" class="form-label">Bonded</label>
-                                    <input type="text" class="form-control" id="bonded" value="{{ $shipment->bonded }}" readonly>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="origin" class="form-label">Origin</label>
-                                    <input type="text" class="form-control" id="origin" value="{{ $shipment->company->CoName ?? 'Origen no disponible' }}" readonly>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="destination" class="form-label">Destination</label>
-                                    <input type="text" class="form-control" id="destination"
-                                           value="{{ $shipment->destinationFacility->fac_name ?? 'Destination not available' }}" readonly>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="pre_alerted_datetime" class="form-label">Pre-Alert Date & Time</label>
-                                    <input type="text" class="form-control" id="pre_alerted_datetime"
-                                           value="{{ $shipment->pre_alerted_datetime ? \Carbon\Carbon::parse($shipment->pre_alerted_datetime)->format('m/d/Y H:i:s') : '' }}"
-                                           readonly>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="id_trailer" class="form-label">Trailer ID</label>
-                                    <input type="text" class="form-control" id="id_trailer" value="{{ $shipment->id_trailer }}" readonly>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="id_company" class="form-label">Company</label>
-                                    <input type="text" class="form-control" id="id_company" value="{{ $shipment->company->CoName }}" readonly>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="trailer" class="form-label">Trailer</label>
-                                    <input type="text" class="form-control" id="trailer" value="{{ $shipment->trailer }}" readonly>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="truck" class="form-label">Truck</label>
-                                    <input type="text" class="form-control" id="truck" value="{{ $shipment->truck }}" readonly>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="id_driver" class="form-label">Driver ID</label>
-                                    <input type="text" class="form-control" id="id_driver" value="{{ $shipment->id_driver }}" readonly>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="etd" class="form-label">ETD</label>
-                                    <input type="text" class="form-control" id="etd" value="{{ $shipment->etd }}" readonly>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="units" class="form-label">Units</label>
-                                    <input type="text" class="form-control" id="units" value="{{ $shipment->units }}" readonly>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="pallets" class="form-label">Pallets</label>
-                                    <input type="text" class="form-control" id="pallets" value="{{ $shipment->pallets }}" readonly>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="security_seals" class="form-label">Security Seal</label>
-                                    <input type="text" class="form-control" id="security_seals" value="{{ $shipment->security_seals }}" readonly>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="notes" class="form-label">Notes</label>
-                                    <textarea class="form-control" id="notes" rows="3" readonly>{{ $shipment->notes }}</textarea>
+                                    <label for="device_number" class="form-label">Device Number</label>
+                                    <input type="text" class="form-control" id="device_number" name="device_number" value="{{ $shipment->device_number }}">
                                 </div>
 
                                 <div class="mb-3">
                                     <label for="overhaul_id" class="form-label">Overhaul ID</label>
-                                    <input type="text" class="form-control" id="overhaul_id" value="{{ $shipment->overhaul_id }}" readonly>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="device_number" class="form-label">Device Number</label>
-                                    <input type="text" class="form-control" id="device_number" value="{{ $shipment->device_number }}" readonly>
+                                    <input type="text" class="form-control" id="overhaul_id" name="overhaul_id" value="{{ $shipment->overhaul_id }}">
                                 </div>
 
                                 <div class="mb-3">
                                     <label for="secondary_shipment_id" class="form-label">Secondary Shipment ID</label>
-                                    <input type="text" class="form-control" id="secondary_shipment_id" value="{{ $shipment->secondary_shipment_id }}" readonly>
+                                    <input type="text" class="form-control" id="secondary_shipment_id" name="secondary_shipment_id" value="{{ $shipment->secondary_shipment_id }}">
                                 </div>
 
+                                <div class="mb-3">
+                                    <label for="reference" class="form-label">Landstar Reference</label>
+                                    <input type="text" class="form-control" id="reference" name="reference" value="{{ $shipment->reference }}">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="shipment_type" class="form-label">Shipment Type</label>
+                                    <input type="text" class="form-control" id="shipment_type" name="shipment_type" value="{{ $shipment->shipmentType->gntc_description ?? 'No disponible' }}">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="etd-{{ $shipment->stm_id }}" class="form-label">ETD</label>
+                                    <input type="text" class="form-control flatpickr" id="etd-{{ $shipment->stm_id }}" name="etd"
+                                        value="{{ $shipment->etd ? \Carbon\Carbon::parse($shipment->etd)->format('m/d/Y H:i') : '' }}"
+                                        placeholder="mm/dd/yyyy --:--">
+                                </div>
+
+                                <!-- Origin -->
+                                <div class="mb-3">
+                                    <label for="origin-{{ $shipment->stm_id }}" class="form-label">Origin</label>
+                                    <select class="form-select" id="origin-{{ $shipment->stm_id }}" name="origin">
+                                        @foreach ($companies as $company)
+                                            <option value="{{ $company->pk_company }}"
+                                                {{ old('origin', $shipment->origin) == $company->pk_company ? 'selected' : '' }}>
+                                                {{ $company->CoName }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+
+                                <!-- Destination -->
+                                <div class="mb-3">
+                                    <label for="destination-{{ $shipment->stm_id }}" class="form-label">Destination</label>
+                                    <select class="form-select" id="destination-{{ $shipment->stm_id }}" name="destination">
+                                        @foreach ($facilities as $facility)
+                                            <option value="{{ $facility->fac_id }}"
+                                                {{ old('destination', $shipment->destination) == $facility->fac_id ? 'selected' : '' }}>
+                                                {{ $facility->fac_name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="preAlertedDatetime-{{ $shipment->stm_id }}" class="form-label">Pre-Alerted Datetime</label>
+                                    <input type="text" class="form-control flatpickr" id="preAlertedDatetime-{{ $shipment->stm_id }}" name="pre_alerted_datetime"
+                                        value="{{ $shipment->pre_alerted_datetime ? \Carbon\Carbon::parse($shipment->pre_alerted_datetime)->format('m/d/Y H:i') : '' }}"
+                                        placeholder="mm/dd/yyyy --:--">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="id_trailer-{{ $shipment->stm_id }}" class="form-label">Trailer ID</label>
+                                    <input type="text" class="form-control" id="id_trailer-{{ $shipment->stm_id }}" name="id_trailer"
+                                           value="{{ old('id_trailer', $shipment->id_trailer) }}" placeholder="Enter Trailer ID">
+                                </div>
+
+
+                               <!-- Trailer Owner -->
+                                <div class="mb-3">
+                                    <label for="trailer_owner-{{ $shipment->stm_id }}" class="form-label">Trailer Owner</label>
+                                    <select class="form-select" id="trailer_owner-{{ $shipment->stm_id }}" name="trailer_owner">
+                                        @foreach ($companies as $company)
+                                            <option value="{{ $company->pk_company }}"
+                                                {{ old('trailer_owner', $shipment->origin) == $company->pk_company ? 'selected' : '' }}>
+                                                {{ $company->CoName }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+
+                                <!-- Carrier -->
+                                <div class="mb-3">
+                                    <label for="carrier-{{ $shipment->stm_id }}" class="form-label">Carrier Dropping Trailer</label>
+                                    <select class="form-select" id="carrier-{{ $shipment->stm_id }}" name="carrier">
+                                        @foreach ($companies as $company)
+                                            <option value="{{ $company->pk_company }}"
+                                                {{ old('carrier', $shipment->origin) == $company->pk_company ? 'selected' : '' }}>
+                                                {{ $company->CoName }}
+                                            </option>
+                                        @endforeach
+
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="driver_truck-{{ $shipment->stm_id }}" class="form-label">Driver & Truck</label>
+                                    <select class="form-select" id="driver_truck-{{ $shipment->stm_id }}" name="id_driver"
+                                        onclick="checkAndChangeStatusForSelect('driver_truck-{{ $shipment->stm_id }}', 'Driver Assigned', '{{ $shipment->stm_id }}')">
+
+                                        <!-- Si id_driver es nulo, dejamos el campo vacío sin ninguna opción seleccionada -->
+                                        @if(is_null($shipment->id_driver))
+                                            <option value="" disabled selected>Not available</option>
+                                        @else
+                                            <option value="">Select a driver</option>
+                                        @endif
+
+                                        @foreach ($drivers as $driver)
+                                            @php
+                                                // Concatenamos el drivername y truck para mostrar
+                                                $currentDriverTruck = (!empty($shipment->driver->drivername) ? $shipment->driver->drivername : '') .
+                                                                      (!empty($shipment->driver->drivername) && !empty($shipment->truck) ? ' - ' : '') .
+                                                                      (!empty($shipment->truck) ? $shipment->truck : '');
+                                            @endphp
+                                            <!-- Usamos el id_driver como valor en el select -->
+                                            <option value="{{ $driver->id_driver }}" {{ old('id_driver', $shipment->id_driver) == $driver->id_driver ? 'selected' : '' }}>
+                                                {{ $driver->drivername }} - {{ $shipment->truck }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="units" class="form-label">Units</label>
+                                    <input type="text" class="form-control" id="units" name="units" value="{{ $shipment->units }}">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="pallets" class="form-label">Pallets</label>
+                                    <input type="text" class="form-control" id="pallets" name="pallets" value="{{ $shipment->pallets }}">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="security_seals" class="form-label">Security Seal</label>
+                                    <input type="text" class="form-control" id="security_seals" name="security_seals" value="{{ $shipment->security_seals }}">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="notes" class="form-label">Notes</label>
+                                    <textarea class="form-control" id="notes" name="notes" rows="3">{{ $shipment->notes }}</textarea>
+                                </div>
+
+
                                 <!-- Agrega más campos si es necesario -->
-                            </form>
+                                <button id="nextButton-{{ $shipment->stm_id }}" class="btn btn-primary" type="button">Next</button>
 
                         </div>
                         <div class="tab-pane fade"
                             id="pills-update-status-{{ $shipment->stm_id }}"
                             role="tabpanel"
                             aria-labelledby="pills-update-status-tab-{{ $shipment->stm_id }}">
-                            <form id="shipmentForm-{{ $shipment->stm_id }}" method="POST" action="/update-status-endpoint/{{ $shipment->pk_shipment }}">
+
                                 @method('PUT')
                                 @csrf
                                 <input type="hidden" name="_method" value="PUT">
@@ -323,9 +380,10 @@
                                 </div>
 
                                 <div class="d-flex justify-content-end">
+                                    <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="offcanvas">Cancel</button>
                                     <button type="submit" class="btn btn-primary">Save</button>
                                 </div>
-                            </form>
+                    </form>
 
                         </div>
                         <div class="tab-pane fade"
@@ -427,8 +485,8 @@
                                     <p>{{ $shipment->currentStatus->gntc_description ?? 'No disponible' }}</p>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label">Shipment Type (GNCT ID)</label>
-                                    <p>{{ $shipment->gnct_id_shipment_type ?? 'No disponible' }}</p>
+                                    <label class="form-label">Shipment Type </label>
+                                    <p>{{ $shipment->shipmentType->gntc_description ?? 'No disponible' }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Delivered Date</label>
@@ -625,6 +683,13 @@
         changeStatusByDescription(statusDescription, shipmentId);
     }
 
+    function checkAndChangeStatusForSelect(selectFieldId, statusDescription, shipmentId) {
+    const selectField = document.getElementById(selectFieldId);
+
+    // Cambiar el estado inmediatamente al hacer clic
+    changeStatusByDescription(statusDescription, shipmentId);
+    }
+
     // Cambiar el estado utilizando la descripción
     function changeStatusByDescription(statusDescription, shipmentId) {
         console.log('shipmentId recibido:', shipmentId); // Verifica el valor de shipmentId
@@ -666,7 +731,58 @@
         dateFormat: 'm/d/Y H:i', // Define el formato que deseas mostrar
         enableTime: true, // Habilita la selección de hora
         time_24hr: true, // Si deseas que la hora sea en formato de 24 horas
+        onOpen: function (selectedDates, dateStr, instance) {
+            // Si el campo está vacío, se coloca la fecha y hora actual
+            if (dateStr === "") {
+                instance.setDate(new Date(), true); // Establece la fecha actual
+            }
+        },
     });
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll("[id^='nextButton-']").forEach(button => {
+        button.addEventListener("click", function () {
+            // Obtener el ID del shipment
+            var shipmentId = button.id.replace("nextButton-", "");
+
+            // Buscar la pestaña de destino
+            var nextTab = document.querySelector("#pills-update-status-tab-" + shipmentId);
+
+            if (nextTab) {
+                console.log("Cambiando a la pestaña:", nextTab.id); // Debug
+                var tab = new bootstrap.Tab(nextTab);
+                tab.show();
+
+                // Esperar a que la pestaña se muestre antes de hacer scroll
+                setTimeout(() => {
+                    document.querySelector("#pills-update-status-" + shipmentId).scrollIntoView({ behavior: "smooth" });
+                }, 100);
+            } else {
+                console.error("No se encontró la pestaña de destino.");
+            }
+        });
+    });
+});
+</script>
+
+<script>
+ // JavaScript para cambiar de pestaña al hacer clic en "Next"
+ document.getElementById('nextButton').addEventListener('click', function () {
+    // Obtener el STM ID dinámicamente
+    var stmId = '{{ $shipment->stm_id }}';
+
+    // Obtener la siguiente pestaña basada en el STM ID
+    var nextTab = document.getElementById('pills-update-status-tab-' + stmId);
+
+    if (nextTab) {
+        // Cambiar a la siguiente pestaña usando Bootstrap
+        var tab = new bootstrap.Tab(nextTab);
+        tab.show(); // Muestra la siguiente pestaña
+    }
+});
 </script>
 @endsection
 
