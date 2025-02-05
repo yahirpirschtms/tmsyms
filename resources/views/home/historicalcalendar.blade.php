@@ -34,20 +34,21 @@
 <div id="shipmentModal{{ $shipment->stm_id }}" class="modal fade" tabindex="-1" aria-labelledby="shipmentModalLabel{{ $shipment->stm_id }}" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header" style="background-color: #0056b3;" >
+            <div class="modal-header" style="background-color: #0056b3;">
                 <h5 class="modal-title" id="shipmentModalLabel{{ $shipment->stm_id }}">Shipment Details</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-               <!-- Pestañas de detalle -->
-               <ul class="nav nav-pills mb-3" id="pills-tab{{ $shipment->stm_id }}" role="tablist">
-                    <li class="nav-item" role="presentation">
+                <!-- Pestañas de detalle -->
+                <ul class="nav nav-pills mb-3" id="pills-tab{{ $shipment->stm_id }}" role="tablist">
+                    <li class="nav-item me-2" role="presentation">
                         <a class="nav-link active" id="pills-shipment-details-tab{{ $shipment->stm_id }}" data-bs-toggle="pill" href="#pills-shipment-details{{ $shipment->stm_id }}" role="tab" aria-controls="pills-shipment-details{{ $shipment->stm_id }}" aria-selected="true">Shipment Details</a>
                     </li>
                     <li class="nav-item" role="presentation">
                         <a class="nav-link" id="pills-update-status-tab{{ $shipment->stm_id }}" data-bs-toggle="pill" href="#pills-update-status{{ $shipment->stm_id }}" role="tab" aria-controls="pills-update-status{{ $shipment->stm_id }}" aria-selected="false">Offloading Menu</a>
                     </li>
                 </ul>
+
                 <div class="tab-content" id="pills-tabContent{{ $shipment->stm_id }}">
                     <!-- Shipment Details -->
                     <div class="tab-pane fade show active" id="pills-shipment-details{{ $shipment->stm_id }}" role="tabpanel" aria-labelledby="pills-shipment-details-tab{{ $shipment->stm_id }}">
@@ -72,6 +73,10 @@
                             <p>{{ $shipment->currentStatus->gntc_description ?? 'Unknown' }}</p>
                         </div>
                         <div class="mb-3">
+                            <label class="form-label">Suggested Delivery Date</label>
+                            <p>{{ \Carbon\Carbon::parse($shipment->etd)->format('m/d/Y H:i') }}</p>
+                        </div>
+                        <div class="mb-3">
                             <label class="form-label">Approved ETA Date & Time</label>
                             <p>{{ $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y H:i') : 'N/A' }}</p>
                         </div>
@@ -84,49 +89,61 @@
                             <p>{{ $shipment->pallets }}</p>
                         </div>
                     </div>
-                </div>
 
-               <!-- Update Shipment Status -->
-               <div class="tab-pane fade" id="pills-update-status{{ $shipment->stm_id }}" role="tabpanel" aria-labelledby="pills-update-status-tab{{ $shipment->stm_id }}">
+                    <!-- Update Shipment Status (Offloading Menu) -->
+                    <div class="tab-pane fade" id="pills-update-status{{ $shipment->stm_id }}" role="tabpanel" aria-labelledby="pills-update-status-tab{{ $shipment->stm_id }}">
+                        @if ($shipment)
+                        <form id="offloadingForm{{ $shipment->stm_id }}" method="POST" action="{{ route('update.status', ['pk_shipment' => $shipment->pk_shipment]) }}">
+                            @method('PUT')
+                            @csrf
+                            <div class="mb-3">
+                                <label for="trailerId{{ $shipment->stm_id }}" class="form-label">Trailer ID</label>
+                                <input type="text" class="form-control" id="trailerId{{ $shipment->stm_id }}" name="id_trailer" value="{{ $shipment->id_trailer ?? '' }}" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="currentStatus{{ $shipment->stm_id }}" class="form-label">Current Status</label>
+                                <select class="form-select" id="currentStatus-{{ $shipment->stm_id }}" name="gnct_id_current_status">
+                                    @foreach ($currentStatus as $status)
+                                        <option value="{{ $status->gnct_id }}"
+                                            {{ old('gnct_id_current_status', $shipment->gnct_id_current_status) == $status->gnct_id ? 'selected' : '' }}>
+                                            {{ $status->gntc_description }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="deliveredDate{{ $shipment->stm_id }}" class="form-label">Delivered Date</label>
+                                <input type="text" class="form-control datetime-picker" id="deliveredDate{{ $shipment->stm_id }}" name="delivered_date"
+                                    value="{{ old('delivered_date', $shipment->delivered_date ? \Carbon\Carbon::parse($shipment->delivered_date)->format('m/d/Y H:i') : '') }} "
+                                     placeholder="mm/dd/yyyy --:--"
+                                   >
+                            </div>
 
-                <form id="offloadingForm{{ $shipment->stm_id }}" method="POST" action="{{ route('update.status', ['pk_shipment' => $shipment->pk_shipment]) }}">
-                    @method('PUT')
-                    @csrf
-                    <div class="mb-3">
-                    <label for="trailerId{{ $shipment->stm_id }}" class="form-label">Trailer ID</label>
-                    <input type="text" class="form-control" id="trailerId{{ $shipment->stm_id }}" name="id_trailer" value="{{ $shipment->id_trailer ?? '' }}" readonly>
-                    </div>
-                    <div class="mb-3">
-                    <label for="currentStatus{{ $shipment->stm_id }}" class="form-label">Current Status</label>
-                    <select class="form-select" id="currentStatus{{ $shipment->stm_id }}" name="gnct_id_current_status">
-                        @foreach($statusCatalog as $status)
-                        <option value="{{ $status->gnct_id }}" {{ $status->gnct_id == old('gnct_id_current_status', $shipment->gnct_id_current_status) ? 'selected' : '' }}>
-                            {{ $status->gntc_value }}
-                        </option>
-                        @endforeach
-                    </select>
-                    </div>
-                    <div class="mb-3">
-                    <label for="deliveredDate{{ $shipment->stm_id }}" class="form-label">Delivered Date</label>
-                    <input type="datetime-local" class="form-control" id="deliveredDate{{ $shipment->stm_id }}" name="delivered_date" value="{{ old('delivered_date', $shipment->delivered_date ? \Carbon\Carbon::parse($shipment->delivered_date)->format('Y-m-d\TH:i') : '') }}">
-                    </div>
-                    <div class="mb-3">
-                    <label for="atDoorDate{{ $shipment->stm_id }}" class="form-label">At Door Date</label>
-                    <input type="datetime-local" class="form-control" id="atDoorDate{{ $shipment->stm_id }}" name="at_door_date" value="{{ old('at_door_date', $shipment->at_door_date ? \Carbon\Carbon::parse($shipment->at_door_date)->format('Y-m-d\TH:i') : '') }}">
-                    </div>
-                    <div class="mb-3">
-                        <label for="offloadTime{{ $shipment->stm_id }}" class="form-label">Offload Time</label>
-                        <input type="time" class="form-control" id="offloadTime{{ $shipment->stm_id }}" name="offloading_time" value="{{ old('offloading_time', $shipment->offloading_time ? \Carbon\Carbon::parse($shipment->offloading_time)->format('H:i') : '') }}">
-                    </div>
-                    <div class="mb-3">
-                        <label for="approvedETADateTime{{ $shipment->stm_id }}" class="form-label">Approved ETA Date & Time</label>
-                        <input type="datetime-local" class="form-control" id="approvedETADateTime{{ $shipment->stm_id }}" name="wh_auth_date" value="{{ old('wh_auth_date', $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('Y-m-d\TH:i') : '') }}">
-                    </div>
-                    <div class="d-flex justify-content-end">
-                        <button type="submit" class="btn btn-primary" id="saveButton{{ $shipment->stm_id }}">Save</button>
-                    </div>
-                </form>
+                            <div class="mb-3">
+                                <label for="atDoorDate{{ $shipment->stm_id }}" class="form-label">At Door Date</label>
+                                <input type="text" class="form-control datetime-picker" id="atDoorDate{{ $shipment->stm_id }}" name="at_door_date"
+                                    value="{{ old('at_door_date', $shipment->at_door_date ? \Carbon\Carbon::parse($shipment->at_door_date)->format('m/d/Y H:i') : '') }}"placeholder="mm/dd/yyyy --:--">
+                            </div>
 
+                            <div class="mb-3">
+                                <label for="offloadTime{{ $shipment->stm_id }}" class="form-label">Offload Time</label>
+                                <input type="time" class="form-control" id="offloadTime{{ $shipment->stm_id }}" name="offloading_time"
+                                    value="{{ old('offloading_time', $shipment->offloading_time ? \Carbon\Carbon::parse($shipment->offloading_time)->format('H:i') : '') }}">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="approvedETADateTime{{ $shipment->stm_id }}" class="form-label">Approved ETA Date & Time</label>
+                                <input type="text" class="form-control datetime-picker" id="approvedETADateTime{{ $shipment->stm_id }}" name="wh_auth_date"
+                                    value="{{ old('wh_auth_date', $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y H:i') : '') }}">
+                            </div>
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary" id="saveButton{{ $shipment->stm_id }}">Save</button>
+                            </div>
+                        </form>
+                        @else
+                            <p>No hay envíos disponibles actualmente.</p>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
@@ -262,7 +279,16 @@
     });
 </script>
 
-
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        flatpickr(".datetime-picker", {
+            enableTime: true,        // Permite seleccionar hora
+            dateFormat: "m/d/Y H:i", // Formato M/D/Y H:i
+            time_24hr: false,        // Usa formato de 12 horas (AM/PM)
+            allowInput: true         // Permite escribir la fecha manualmente
+        });
+    });
+</script>
 @endsection
 
 @section('custom-css')

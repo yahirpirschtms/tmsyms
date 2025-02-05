@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\EmptyTrailer;
 use App\Models\GenericCatalog;
 use App\Models\Shipments;
+use App\Models\Companies;
+use App\Models\Facilities;
+use App\Models\Driver;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -48,8 +51,20 @@ class ShipmentController extends Controller
         // Obtener los estados actuales desde la base de datos
         $currentStatus = GenericCatalog::where('gntc_group', 'current_status')->get();
 
-        // Pasar los datos a la vista
-        return view('home.all-shipments', compact('shipments', 'currentStatus'));
+        // Obtener los tipos de envío desde la base de datos
+        $shipmentType = GenericCatalog::where('gntc_group', 'shipment_type')->get();
+
+        // Obtener todas las compañías para los selects
+        $companies = Companies::all();
+
+        $facilities = Facilities::all();
+
+        $trailers = EmptyTrailer::all();
+         // Obtener la lista de conductores
+        $drivers = Driver::all();
+
+        // Pasar los envíos, estados, tipos de envío y compañías a la vista
+        return view('home.all-shipments', compact('shipments', 'currentStatus', 'shipmentType', 'companies', 'facilities', 'trailers', 'drivers'));
     }
     return redirect('/login');
 }
@@ -67,11 +82,21 @@ class ShipmentController extends Controller
 
             // Obtener los estados actuales desde la base de datos
             $currentStatus = GenericCatalog::where('gntc_group', 'current_status')->get();
-            // Obtener los estados actuales desde la base de datos
+
+            // Obtener los tipos de envío desde la base de datos
             $shipmentType = GenericCatalog::where('gntc_group', 'shipment_type')->get();
 
-            // Pasar los envíos y los estados a la vista
-            return view('home.liveshipments', compact('shipments', 'currentStatus', 'shipmentType'));
+            // Obtener todas las compañías para los selects
+            $companies = Companies::all();
+
+            $facilities = Facilities::all();
+
+            $trailers = EmptyTrailer::all();
+             // Obtener la lista de conductores
+            $drivers = Driver::all();
+
+            // Pasar los envíos, estados, tipos de envío y compañías a la vista
+            return view('home.liveshipments', compact('shipments', 'currentStatus', 'shipmentType', 'companies', 'facilities', 'trailers', 'drivers'));
         }
 
         return redirect('/login');
@@ -114,7 +139,9 @@ class ShipmentController extends Controller
 
     public function update(Request $request, $pk_shipment)
     {
+
         try {
+
             // Buscar el envío por su ID
             $shipment = Shipments::findOrFail($pk_shipment);
 
@@ -128,16 +155,38 @@ class ShipmentController extends Controller
                 'sec_incident' => 'nullable|integer',
                 'incident_type' => 'nullable|string',
                 'incident_date' => 'nullable|string',
+                'device_number' => 'nullable|string',
+                'overhaul_id' => 'nullable|string',
+                'secondary_shipment_id' => 'nullable|string',
+                'reference' => 'nullable|string',
+                'shipment_type' => 'nullable|string',
+                'etd' => 'nullable|string',
+                'origin' => 'nullable|integer',
+                'destination' => 'nullable|integer',
+                'pre_alerted_datetime' => 'nullable|string',
+                'trailer_owner' => 'nullable|integer',
+                'carrier' => 'nullable|integer',
+                'id_driver' => 'nullable|integer',
+                'units' => 'nullable|string',
+                'pallets' => 'nullable|string',
+                'security_seals' => 'nullable|string',
+                'notes' => 'nullable|string',
             ]);
 
             // Convertir fechas del formato m/d/Y H:i al formato Y-m-d H:i:s para MySQL
-            foreach (['driver_assigned_date', 'pick_up_date', 'intransit_date', 'secured_yarddate', 'incident_date'] as $field) {
-                if (!empty($validated[$field])) {
-                    $validated[$field] = Carbon::createFromFormat('m/d/Y H:i', $validated[$field])->format('Y-m-d H:i:s');
-                } else {
-                    $validated[$field] = null;
-                }
-            }
+            foreach (['driver_assigned_date', 'pick_up_date', 'intransit_date', 'secured_yarddate', 'incident_date', 'pre_alerted_datetime', 'etd'] as $field) {
+    if (!empty($validated[$field])) {
+        if ($field == 'pre_alerted_datetime') {
+            // Para pre_alerted_datetime, convertir a Y-m-d\TH:i
+            $validated[$field] = Carbon::createFromFormat('m/d/Y H:i', $validated[$field])->format('Y-m-d H:i:s');
+        } else {
+            // Para otros campos, mantener la conversión original
+            $validated[$field] = Carbon::createFromFormat('m/d/Y H:i', $validated[$field])->format('Y-m-d H:i:s');
+        }
+    } else {
+        $validated[$field] = null;
+    }
+}
 
             // Actualizar el envío con los datos validados
             $shipment->update($validated);
@@ -301,7 +350,7 @@ class ShipmentController extends Controller
             ['trailer_num' => $request->inputidtrailer],
             [
                 //'trailer_num' => $request->inputidtrailer,
-                'status' => now(), 
+                'status' => now(),
                 'pallets_on_trailer' => $request->inputpallets ?? 0,
                 'pallets_on_floor' => null,
                 'carrier' => $request->inputshipmentcarrier,
@@ -318,7 +367,7 @@ class ShipmentController extends Controller
         // Si el trailer ya existía, actualizar los valores
         if (!$trailer->wasRecentlyCreated) {
             $trailer->update([
-                'status' => now(), 
+                'status' => now(),
                 'pallets_on_trailer' => $request->inputpallets ?? 0,
                 'carrier' => $request->inputshipmentcarrier,
                 'location' => $request->inputorigin,
