@@ -132,11 +132,11 @@ public function update(Request $request)
             'updateinputpktrailer' => 'required', // pk_trailer
             'updateinputidtrailer' => 'required|unique:empty_trailer,trailer_num',
             'updateinputdateofstatus' => 'required|date', // status
-            'updateinputpalletsontrailer' => 'nullable|numeric', // pallets_on_trailer
-            'updateinputpalletsonfloor' => 'nullable|numeric', // pallets_on_floor
-            'updateinputcarrier' => 'required|exists:companies,pk_company', // carrier
+            'updateinputpalletsontrailer' => 'required|numeric|min:1', // pallets_on_trailer
+            'updateinputpalletsonfloor' => 'required|numeric|min:1', // pallets_on_floor
+            'updateinputcarrier' => 'required', // carrier
             'updateinputavailabilityindicator' => 'nullable|exists:generic_catalogs,gnct_id', // gnct_id_availability_indicator
-            'updateinputlocation' => 'required|exists:companies,pk_company', // location
+            'updateinputlocation' => 'required', // location
             'updateinputdatein' => 'required|date', // date_in
         ], [
             'updateinputidtrailer.required' => 'ID Trailer is required.',
@@ -144,12 +144,16 @@ public function update(Request $request)
             'updateinputdateofstatus.required' => 'Status date is required.',
             'updateinputdateofstatus.date' => 'The status date field must be a valid date.',
             'updateinputcarrier.required' => 'Carrier is required.',
-            'updateinputcarrier.exists' => 'Carrier selected is not valid.',
+            //'updateinputcarrier.exists' => 'Carrier selected is not valid.',
             'updateinputlocation.required' => 'Location is required.',
-            'updateinputlocation.exists' => 'Location selected is not valid.',
+            //'updateinputlocation.exists' => 'Location selected is not valid.',
             'updateinputdatein.required' => 'Date In is required.',
             'updateinputpalletsontrailer.numeric' => 'Pallets on trailer must be an integer',
             'updateinputpalletsonfloor.numeric' => 'Pallets on floor must be an integer',
+            'updateinputpalletsontrailer.required' => 'Pallets on trailer is required',
+            'updateinputpalletsonfloor.required' => 'Pallets on floor is required',
+            'updateinputpalletsontrailer.min' => 'Pallets on trailer must have a valid value',
+            'updateinputpalletsonfloor.min' => 'Pallets on floor must have a valid value',
         ]);
 
         // Buscar el trailer
@@ -216,11 +220,11 @@ public function update(Request $request)
 
             'inputidtrailer' => 'required|unique:empty_trailer,trailer_num',
             'inputdateofstatus' => 'required|date',
-            'inputpalletsontrailer' => 'nullable',
-            'inputpalletsonfloor' => 'nullable',
+            'inputpalletsontrailer' => 'required|numeric|min:1',
+            'inputpalletsonfloor' => 'required|numeric|min:1',
             'inputcarrier' => 'required',
             'inputavailabilityindicator' => 'nullable|exists:generic_catalogs,gnct_id',
-            'inputlocation' => 'required|exists:companies,pk_company',
+            'inputlocation' => 'required',
             'inputdatein' => 'required|date',
             'inputdateout' => 'nullable',
             'inputtransactiondate' => 'nullable',
@@ -232,27 +236,29 @@ public function update(Request $request)
             //'inputidtrailer.max' => 'The Trailer ID field cannot exceed 50 characters.',
             'inputdateofstatus.required' => 'Status date is required.',
             'inputdateofstatus.date' => 'The status date field must be a valid date.',
-            //'inputpalletsontrailer.required' => 'Pallets on trailer are required.',
+            'inputpalletsontrailer.required' => 'Pallets on trailer are required.',
             //'inputpalletsontrailer.string' => 'The Pallets on Trailer field must be a text string.',
-            //'inputpalletsontrailer.max' => 'The Pallets on Trailer field cannot exceed 50 characters.',
-            //'inputpalletsonfloor.required' => 'Pallets on floor are required.',
+            'inputpalletsontrailer.min' => 'The Pallets On Trailer must have a valid value.',
+            'inputpalletsonfloor.required' => 'Pallets on floor are required.',
             //'inputpalletsonfloor.string' => 'The Pallets on Floor field must be a text string.',
-            //'inputpalletsonfloor.max' => 'The Pallets on Floor field cannot exceed 50 characters.',
+            'inputpalletsonfloor.min' => 'The Pallets On Floor must have a valid value.',
             'inputcarrier.required' => 'Carrier is required.',
-            'inputcarrier.exists' => 'Carrier selected is not valid.',
+            //'inputcarrier.exists' => 'Carrier selected is not valid.',
             //'inputcarrier.max' => 'The Carrier field cannot exceed 50 characters.',
             //'inputavailabilityindicator.required' => 'Availability Indicator is required.',
             //'inputavailabilityindicator.integer' => 'Availability Indicator must be an integer.',
             'inputavailabilityindicator.exists' => 'Availability Indicator selected is not valid.',
             'inputlocation.required' => 'Location is required.',
             //'inputlocation.string' => 'Location must be a text string.',
-            'inputlocation.exists' => 'Location selected is not valid.',
+            //'inputlocation.exists' => 'Location selected is not valid.',
             'inputdatein.required' => 'Date In is required.',
             //'inputdateout.required' => 'Date Out is required.',
             //'inputtransactiondate.required' => 'Transaction Date is required.',
             //'inputusername.required' => 'Username is required.',
             //'inputusername.string' => 'Username must be a text string.',
             //'inputusername.max' => 'Username cannot exceed 50 characters.',
+            'inputpalletsontrailer.numeric' => 'Pallets on trailer must be an integer',
+            'inputpalletsonfloor.numeric' => 'Pallets on floor must be an integer',
 
         ]);
     

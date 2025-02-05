@@ -113,16 +113,19 @@
                                 </div>
                                 <div class="mb-3">
                                     <label for="deliveredDate{{ $shipment->stm_id }}" class="form-label">Delivered Date</label>
-                                    <input type="text" class="form-control datetime-picker" id="deliveredDate{{ $shipment->stm_id }}" name="delivered_date"
-                                        value="{{ old('delivered_date', $shipment->delivered_date ? \Carbon\Carbon::parse($shipment->delivered_date)->format('m/d/Y H:i') : '') }} "
-                                         placeholder="mm/dd/yyyy --:--"
+                                    <input type="text"
+                                        class="form-control datetime-picker"
+                                        id="deliveredDate{{ $shipment->stm_id }}"
+                                        name="delivered_date"
+                                        value="{{ $shipment->delivered_date ? \Carbon\Carbon::parse($shipment->delivered_date)->format('m/d/Y H:i') : '' }}"
+                                        placeholder="{{ $shipment->delivered_date ? '' : 'mm/dd/yyyy --:--' }}"
                                         onfocus="checkAndChangeStatus('deliveredDate{{ $shipment->stm_id }}', 'Delivered', '{{ $shipment->stm_id }}')">
                                 </div>
 
                                 <div class="mb-3">
                                     <label for="atDoorDate{{ $shipment->stm_id }}" class="form-label">At Door Date</label>
                                     <input type="text" class="form-control datetime-picker" id="atDoorDate{{ $shipment->stm_id }}" name="at_door_date"
-                                        value="{{ old('at_door_date', $shipment->at_door_date ? \Carbon\Carbon::parse($shipment->at_door_date)->format('m/d/Y H:i') : '') }}">
+                                        value="{{ old('at_door_date', $shipment->at_door_date ? \Carbon\Carbon::parse($shipment->at_door_date)->format('m/d/Y H:i') : '') }}" placeholder="mm/dd/yyyy --:--">
                                 </div>
 
                                 <div class="mb-3">
@@ -164,72 +167,65 @@
         var statusCatalog = @json($statusCatalog);
     </script>
     <script>
-            document.addEventListener('DOMContentLoaded', function () {
-            let events = {!! json_encode($events) !!};
+           document.addEventListener('DOMContentLoaded', function () {
+        const events = {!! json_encode($events) !!};
 
-            // Verifica que 'events' sea un array, sino lo inicializa como un array vacío
-            if (!Array.isArray(events)) {
-                console.warn('Los eventos no son un array, inicializando como array vacío.');
-                events = [];
-            }
+        var calendarEl = document.getElementById('calendar');
 
-            // Filtrar eventos con wh_auth_date válido
-            const filteredEvents = events.filter(event => event.extendedProps.wh_auth_date !== 'N/A' && event.extendedProps.wh_auth_date !== null);
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'timeGridDay',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'timeGridDay,timeGridWeek,dayGridMonth'
+            },
+            events: events,
 
-            console.log(filteredEvents); // Verifica qué tipo de datos son ahora los eventos filtrados
-
-            var calendarEl = document.getElementById('calendar');
-
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'timeGridDay',
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'timeGridDay,timeGridWeek,dayGridMonth'
-                },
-                events: filteredEvents,  // Pasar solo los eventos válidos
-
-                eventTimeFormat: {
+              // Eliminar la hora
+              eventTimeFormat: {
                     hour: '2-digit',
                     minute: '2-digit',
                     meridiem: 'short',
                     hour12: true
                 },
 
+                // Modificar cómo se muestra el evento
                 eventContent: function(info) {
+                    // Suponiendo que el evento tiene una propiedad llamada 'shipmentInfo' que contiene la información del envío
                     return { html: '<strong>' + info.event.title + '</strong><br>'};
                 },
 
-                eventClick: function(info) {
-                    var event = info.event;
-                    var props = event.extendedProps;
 
-                    var modalTarget = "#shipmentModal" + props.stm_id;
+            eventClick: function(info) {
+                var event = info.event;
+                var props = event.extendedProps;
 
-                    var modalElement = document.getElementById(modalTarget.substring(1));
-                    if (modalElement) {
-                        var modal = new bootstrap.Modal(modalElement);
-                        modal.show();
-                    } else {
-                        console.error("Modal no encontrado: " + modalTarget);
-                    }
+                var modalTarget = "#shipmentModal" + props.stm_id;
+
+                // Verificar si el modal existe en el DOM antes de intentar mostrarlo
+                var modalElement = document.getElementById(modalTarget.substring(1)); // Eliminar el "#" para obtener el ID correcto
+                if (modalElement) {
+                    var modal = new bootstrap.Modal(modalElement); // Usar la API de Bootstrap para abrir el modal
+                    modal.show();
+                } else {
+                    console.error("Modal no encontrado: " + modalTarget);
                 }
-            });
-
-            calendar.render();
-
-            // Filtrar eventos por STM ID
-            document.getElementById('searchByStmId').addEventListener('input', function (e) {
-                const searchValue = e.target.value.toLowerCase();
-
-                const filteredEvents = events.filter(event =>
-                    event.extendedProps.stm_id.toLowerCase().includes(searchValue)
-                );
-
-                calendar.removeAllEvents();
-                calendar.addEventSource(filteredEvents);
-            });
+            }
         });
+
+        calendar.render();
+        // Filtrar eventos por STM ID
+        document.getElementById('searchByStmId').addEventListener('input', function (e) {
+            const searchValue = e.target.value.toLowerCase();
+
+            const filteredEvents = events.filter(event =>
+                event.extendedProps.stm_id.toLowerCase().includes(searchValue)
+            );
+
+            calendar.removeAllEvents();
+            calendar.addEventSource(filteredEvents);
+        });
+    });
 
     </script>
 

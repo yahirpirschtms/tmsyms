@@ -1,10 +1,103 @@
+//Busqueda de Driver en un nuevo registro
+$(document).ready(function () {
+    var carrierRoute = $('#inputshipmentdriver').data('url');
+    var newlyCreatedCarrierId = null; // Variable para almacenar el ID del carrier recién creado
 
+    function loadDriversAjax() {
+        $('#inputshipmentdriver').select2({
+            placeholder: 'Select or enter a New Driver',
+            allowClear: true,
+            tags: true, // Permite agregar nuevas opciones
+            //dropdownParent: $('#newtrailerempty'),
+            ajax: {
+                url: carrierRoute,
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        search: params.term || '' // Si no hay texto, envía un string vacío
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.map(item => ({
+                            id: item.pk_driver,
+                            text: item.drivername
+                        }))
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 0
+        });
+    }
+
+    loadDriversAjax();
+
+    // Actualizar la lista cuando se haga clic en el select
+    $('#inputshipmentdriver').on('click', function () {
+        loadDriversAjax();
+    });
+
+    // Cuando el usuario seleccione o ingrese un nuevo valor
+    $('#inputshipmentdriver').on('change', function () {
+        var selectedOption = $(this).select2('data')[0]; // Obtener la opción seleccionada
+        var selectedText = selectedOption ? selectedOption.text : ''; // Obtener el texto (nombre) de la opción seleccionada
+
+        // Si no es el nuevo carrier, lo procesamos
+        if (selectedText  !== newlyCreatedCarrierId) {
+            console.log(selectedText);
+            saveNewDriver(selectedText);
+        }
+    });
+
+    // Guardar un nuevo carrier en la base de datos
+    function saveNewDriver(driversName) {
+        $.ajax({
+            url: '/save-new-driver',  // Ruta que manejará el backend
+            type: 'POST',
+            data: {
+                driversName: driversName,
+                _token: $('meta[name="csrf-token"]').attr('content')  // Asegúrate de incluir el CSRF token
+            },
+            success: function (response) {
+                console.log(response);
+
+                // Crear una nueva opción para el select2 con el nuevo carrier
+                var newOption = new Option(response.newDriver.drivername, response.newDriver.pk_driver, true, true);
+
+                // Agregar la nueva opción al select2
+                $('#inputshipmentdriver').append(newOption).trigger('change');
+
+                // Seleccionar el nuevo carrier automáticamente
+                $('#inputshipmentdriver').val(response.newDriver.pk_driver).trigger('change');
+
+                // Marcar el nuevo ID para evitar que se haga otra solicitud
+                newlyCreatedCarrierId = response.newDriver.drivername;
+
+                // Cuando el nuevo carrier sea creado, aseguramos que no se haga más AJAX para este carrier
+                $('#inputshipmentdriver').on('select2:select', function (e) {
+                    var selectedId = e.params.data.id;
+                    if (selectedId === newlyCreatedCarrierId) {
+                        // Evitar que se reenvíe la solicitud para el nuevo carrier
+                        newlyCreatedCarrierId = null;  // Restablecer el ID del carrier creado
+                    }
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error('Error al guardar el Driver', error);
+            }
+        });
+    }
+});
+
+//Cargar Carries en la pantalla de registro de shipments
 $(document).ready(function () {
     
     var newlyCreatedCarrierId = null; // Asegúrate de que esta variable esté definida al inicio
     var carrierRoute = $('#inputshipmentcarrier').data('url');
     var selectedCarrierId = $('#inputshipmentcarrier').data('carrier'); // Recuperar el valor predeterminado
-
+    console.log(selectedCarrierId)
     if (selectedCarrierId) {
         console.log(selectedCarrierId)
         $.ajax({
@@ -126,12 +219,305 @@ $(document).ready(function () {
     }
 });
 
+//Cargar Origins en la pantalla de registro de shipments
+$(document).ready(function () {
+    
+    var newlyCreatedCarrierId = null; // Asegúrate de que esta variable esté definida al inicio
+    var carrierRoute = $('#inputorigin').data('url');
+    var selectedCarrierId = $('#inputorigin').data('location'); // Recuperar el valor predeterminado
+    console.log(selectedCarrierId);
+
+    if (selectedCarrierId) {
+        console.log(selectedCarrierId)
+        $.ajax({
+            url: 'locations-emptytrailerAjax', // Llamamos a la misma API de carriers
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                let carrier = data.find(item => item.pk_company == selectedCarrierId);
+                if (carrier) {
+                    let newOption = new Option(carrier.CoName, carrier.pk_company, true, true);
+                    $('#inputorigin').append(newOption).trigger('change');
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error al cargar los carriers:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'There was an error loading carrier information.',
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
+                });
+            }
+        });
+    }
+    
+    loadCarriersShipment();
+
+    function loadCarriersShipment() {
+        $('#inputorigin').select2({
+            placeholder: 'Select or enter a New Origin',
+            //allowClear: true,
+            tags: true, // Permite agregar nuevas opciones
+            ajax: {
+                url: carrierRoute,
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        search: params.term || '' // Si no hay texto, envía un string vacío
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.map(item => ({
+                            id: item.pk_company,
+                            text: item.CoName
+                        }))
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 0
+        });
+
+        // Asegúrate de que el valor se establezca después de la inicialización
+        
+        setTimeout(function() {
+            if (selectedCarrierId) {
+                console.log("Valor predeterminado a establecer: ", selectedCarrierId);
+                $('#inputorigin').val(selectedCarrierId).trigger('change');
+            }
+        }, 500); // Ajusta el tiempo según lo necesario para asegurar que los datos estén listos
+    }
+
+    // Actualizar la lista cuando se haga clic en el select
+    $('#inputorigin').on('click', function () {
+        loadCarriersShipment();
+    });
+
+    // Cuando el usuario seleccione o ingrese un nuevo valor
+    $('#inputorigin').on('change', function () {
+        var selectedOption = $(this).select2('data')[0]; // Obtener la opción seleccionada
+        var selectedText = selectedOption ? selectedOption.text : ''; // Obtener el texto (nombre) de la opción seleccionada
+        
+        // Si no es el nuevo carrier, lo procesamos
+        if (selectedText !== newlyCreatedCarrierId) {
+            console.log(selectedText);
+            saveNewLocationShipment(selectedText);
+        }
+    });
+
+    // Guardar un nuevo carrier en la base de datos
+    function saveNewLocationShipment(carrierName) {
+        $.ajax({
+            url: '/save-new-location',  // Ruta que manejará el backend
+            type: 'POST',
+            data: {
+                carrierName: carrierName,
+                _token: $('meta[name="csrf-token"]').attr('content')  // Asegúrate de incluir el CSRF token
+            },
+            success: function (response) {
+                console.log(response);
+
+                // Crear una nueva opción para el select2 con el nuevo carrier
+                var newOption = new Option(response.newCarrier.CoName, response.newCarrier.pk_company, true, true);
+
+                // Agregar la nueva opción al select2
+                $('#inputorigin').append(newOption).trigger('change');
+
+                // Seleccionar el nuevo carrier automáticamente
+                $('#inputorigin').val(response.newCarrier.pk_company).trigger('change');
+
+                // Marcar el nuevo ID para evitar que se haga otra solicitud
+                newlyCreatedCarrierId = response.newCarrier.CoName;
+
+                // Cuando el nuevo carrier sea creado, aseguramos que no se haga más AJAX para este carrier
+                $('#inputorigin').on('select2:select', function (e) {
+                    var selectedId = e.params.data.id;
+                    if (selectedId === newlyCreatedCarrierId) {
+                        // Evitar que se reenvíe la solicitud para el nuevo carrier
+                        newlyCreatedCarrierId = null;  // Restablecer el ID del carrier creado
+                    }
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error('Error al guardar el carrier', error);
+            }
+        });
+    }
+});
+
+//Cargar TrailerOwners en la pantalla de registro de shipments
+$(document).ready(function () {
+    
+    var newlyCreatedCarrierId = null; // Asegúrate de que esta variable esté definida al inicio
+    var carrierRoute = $('#inputshipmenttrailer').data('url');
+    var selectedCarrierId = $('#inputshipmenttrailer').data('trailerowner'); // Recuperar el valor predeterminado
+    console.log(selectedCarrierId);
+
+    if (selectedCarrierId) {
+        console.log(selectedCarrierId)
+        $.ajax({
+            url: 'trailerowner-emptytrailerAjax', // Llamamos a la misma API de carriers
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                let carrier = data.find(item => item.pk_company == selectedCarrierId);
+                if (carrier) {
+                    let newOption = new Option(carrier.CoName, carrier.pk_company, true, true);
+                    $('#inputshipmenttrailer').append(newOption).trigger('change');
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error al cargar los carriers:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'There was an error loading carrier information.',
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
+                });
+            }
+        });
+    }
+    
+    loadTrailerOwnersShipment();
+
+    function loadTrailerOwnersShipment() {
+        $('#inputshipmenttrailer').select2({
+            placeholder: 'Select or enter a New Trailer Owner',
+            allowClear: true,
+            tags: true, // Permite agregar nuevas opciones
+            ajax: {
+                url: carrierRoute,
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        search: params.term || '' // Si no hay texto, envía un string vacío
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.map(item => ({
+                            id: item.pk_company,
+                            text: item.CoName
+                        }))
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 0
+        });
+
+        // Asegúrate de que el valor se establezca después de la inicialización
+        
+        setTimeout(function() {
+            if (selectedCarrierId) {
+                console.log("Valor predeterminado a establecer: ", selectedCarrierId);
+                $('#inputshipmenttrailer').val(selectedCarrierId).trigger('change');
+            }
+        }, 500); // Ajusta el tiempo según lo necesario para asegurar que los datos estén listos
+    }
+
+    // Actualizar la lista cuando se haga clic en el select
+    $('#inputshipmenttrailer').on('click', function () {
+        loadTrailerOwnersShipment();
+    });
+
+    // Cuando el usuario seleccione o ingrese un nuevo valor
+    $('#inputshipmenttrailer').on('change', function () {
+        var selectedOption = $(this).select2('data')[0]; // Obtener la opción seleccionada
+        var selectedText = selectedOption ? selectedOption.text : ''; // Obtener el texto (nombre) de la opción seleccionada
+        
+        // Si no es el nuevo carrier, lo procesamos
+        if (selectedText !== newlyCreatedCarrierId) {
+            console.log(selectedText);
+            saveNewLocationShipment(selectedText);
+        }
+    });
+
+    // Guardar un nuevo carrier en la base de datos
+    function saveNewLocationShipment(carrierName) {
+        $.ajax({
+            url: '/save-new-trailerowner',  // Ruta que manejará el backend
+            type: 'POST',
+            data: {
+                carrierName: carrierName,
+                _token: $('meta[name="csrf-token"]').attr('content')  // Asegúrate de incluir el CSRF token
+            },
+            success: function (response) {
+                console.log(response);
+
+                // Crear una nueva opción para el select2 con el nuevo carrier
+                var newOption = new Option(response.newCarrier.CoName, response.newCarrier.pk_company, true, true);
+
+                // Agregar la nueva opción al select2
+                $('#inputshipmenttrailer').append(newOption).trigger('change');
+
+                // Seleccionar el nuevo carrier automáticamente
+                $('#inputshipmenttrailer').val(response.newCarrier.pk_company).trigger('change');
+
+                // Marcar el nuevo ID para evitar que se haga otra solicitud
+                newlyCreatedCarrierId = response.newCarrier.CoName;
+
+                // Cuando el nuevo carrier sea creado, aseguramos que no se haga más AJAX para este carrier
+                $('#inputshipmenttrailer').on('select2:select', function (e) {
+                    var selectedId = e.params.data.id;
+                    if (selectedId === newlyCreatedCarrierId) {
+                        // Evitar que se reenvíe la solicitud para el nuevo carrier
+                        newlyCreatedCarrierId = null;  // Restablecer el ID del carrier creado
+                    }
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error('Error al guardar el Trailer Owner', error);
+            }
+        });
+    }
+});
+
+//Cargar destinations 
+$(document).ready(function () {
+    $('#inputshipmentdestination').select2({
+        placeholder: "Select a destination",
+        //allowClear: true,
+        ajax: {
+            url: $('#inputshipmentdestination').data('url'),
+            dataType: 'json',
+            delay: 250, // Evita demasiadas peticiones
+            data: function (params) {
+                return {
+                    query: params.term // Lo que el usuario está escribiendo
+                };
+            },
+            processResults: function (data) {
+                return {
+                    results: data.map(item => ({
+                        id: item.pk_company,
+                        text: item.CoName
+                    }))
+                };
+            },
+            cache: true
+        },
+        minimumInputLength: 0 // Mínimo de caracteres antes de buscar
+    });
+});
+
+
 $(document).ready(function() {
  
     //Formatos fecha y hora
     flatpickr(".datetms", {
       dateFormat: "m/d/Y",  // Establece el formato como mes/día/año
       //defaultDate: "today",     // Establece la fecha y hora actuales como predeterminados
+        onOpen: function (selectedDates, dateStr, instance) {
+        // Si el campo está vacío, se coloca la fecha y hora actual
+            if (dateStr === "") {
+                instance.setDate(new Date(), true); // Establece la fecha actual
+            }
+        },
     });
     
     flatpickr(".datetimepicker", {
@@ -140,6 +526,12 @@ $(document).ready(function() {
     time_24hr: true,          // Si quieres el formato de 24 horas
     enableSeconds: true,      // Habilita la selección de segundos
     //defaultDate: new Date(),
+    onOpen: function (selectedDates, dateStr, instance) {
+        // Si el campo está vacío, se coloca la fecha y hora actual
+        if (dateStr === "") {
+            instance.setDate(new Date(), true); // Establece la fecha actual
+        }
+    },
     });
 
     //Funcion para buscar las Carriers en la pantalla de shipments
@@ -188,7 +580,7 @@ $(document).ready(function() {
     loadCarriers();*/
 
     //Funcion para buscar las Trailers Owners en la pantalla de shipments
-    function LoadTrailersOwners() {
+    /*function LoadTrailersOwners() {
         var locationsRoute = $('#inputshipmenttrailer').data('url');
         $.ajax({
                 url: locationsRoute,
@@ -204,9 +596,9 @@ $(document).ready(function() {
                     select.empty(); // Limpia el contenido del select
         
                     // Agrega la opción deshabilitada y oculta solo si no hay valor seleccionado
-                    /*if (!selectedValue) {
+                    if (!selectedValue) {
                         select.append('<option selected disabled hidden></option>');
-                    }*/
+                    }
         
                     if (data.length === 0) {
                         select.append('<option disabled>No options available</option>');
@@ -226,14 +618,14 @@ $(document).ready(function() {
                     console.error('Error fetching data locations:', error);
                 }
         });
-    }
+    }*/
         
     // Ejecutar la función al enfocar el select y al cargar la página
-    $('#inputshipmenttrailer').on('focus', LoadTrailersOwners);
-    LoadTrailersOwners();
+    /*$('#inputshipmenttrailer').on('focus', LoadTrailersOwners);
+    LoadTrailersOwners();*/
 
     //Funcion para buscar las Origins en la pantalla de shipments
-    function loadOrigins() {
+    /*function loadOrigins() {
         var locationsRoute = $('#inputorigin').data('url');
         $.ajax({
                 url: locationsRoute,
@@ -270,11 +662,11 @@ $(document).ready(function() {
                     console.error('Error fetching data locations:', error);
                 }
         });
-    }
+    }*/
         
     // Ejecutar la función al enfocar el select y al cargar la página
-    $('#inputorigin').on('focus', loadOrigins);
-    loadOrigins();
+    /*$('#inputorigin').on('focus', loadOrigins);
+    loadOrigins();*/
 
 // Función para cargar las destinos desde la base de datos
 /*function loadDestinations(query = '') {
@@ -348,7 +740,7 @@ $(document).ready(function() {
 
 //Funcion Buena
     //Funcion para buscar las Destinations en la pantalla de shipments
-    function loadDestinations() {
+    /*function loadDestinations() {
         var locationsRoute = $('#inputshipmentdestination').data('url');
         $.ajax({
                 url: locationsRoute,
@@ -385,11 +777,11 @@ $(document).ready(function() {
                     console.error('Error fetching data locations:', error);
                 }
         });
-    }
+    }*/
         
     // Ejecutar la función al enfocar el select y al cargar la página
-    $('#inputshipmentdestination').on('focus', loadDestinations);
-    loadDestinations();
+    /*$('#inputshipmentdestination').on('focus', loadDestinations);
+    loadDestinations();*/
 
 
     /*function loadDestinations() {
@@ -475,7 +867,7 @@ $(document).ready(function() {
     loadShipmentType();
 
     //Funcion para buscar los Drivers
-    function LoadDrivers() {
+    /*function LoadDrivers() {
         let selectedCarrierId = $('#inputshipmentcarrier').val(); // Obtener el ID seleccionado
     
         if (!selectedCarrierId) {
@@ -513,14 +905,14 @@ $(document).ready(function() {
                 console.error('Error fetching drivers:', error);
             }
         });
-    }
+    }*/
     
     // Cargar drivers cuando cambia el carrier seleccionado
-    $('#inputshipmentcarrier').on('change', LoadDrivers);
+    //$('#inputshipmentcarrier').on('change', LoadDrivers);
     
     // Cargar datos al enfocarse y al cargar la página update 
-    $('#inputshipmentdriver').on('focus', LoadDrivers);
-    LoadDrivers();
+    /*$('#inputshipmentdriver').on('focus', LoadDrivers);
+    LoadDrivers();*/
 
     //Funcion para buscar las Destinations en la pantalla de shipments
     /*function LoadCurrentStatus() {
@@ -722,15 +1114,15 @@ LoadCurrentStatus();
                 errorContainer.text('El campo Pallets On Floor no debe exceder los 50 caracteres.');
             }*/
     
-            /*if (fieldName === 'inputorigin' && field.val().trim().length === 0) {
+            if (fieldName === 'inputorigin' && field.val().trim().length === 0) {
                 field.addClass('is-invalid');
                 errorContainer.text('Origin is required.');
-            }*/
+            }
     
-            /*if (fieldName === 'inputshipmentdestination' && field.val().trim().length === 0) {
+            if (fieldName === 'inputshipmentdestination' && field.val().trim().length === 0) {
                 field.addClass('is-invalid');
                 errorContainer.text('Destination is required.');
-            }*/
+            }
     
             if (fieldName === 'inputshipmentprealertdatetime' && field.val().trim().length === 0) {
                 field.addClass('is-invalid');
@@ -738,10 +1130,10 @@ LoadCurrentStatus();
             }
     
             // Validación simple para las fechas (solo obligatorio)
-            /*if (fieldName === 'inputidtrailer' && field.val().trim().length === 0) {
+            if (fieldName === 'inputidtrailer' && field.val().trim().length === 0) {
                 field.addClass('is-invalid');
                 errorContainer.text('ID Trailer is required.');
-            }*/
+            }
     
             /*if (fieldName === 'inputshipmentcarrier' && field.val().trim().length === 0) {
                 field.addClass('is-invalid');
@@ -768,11 +1160,83 @@ LoadCurrentStatus();
             /*if (fieldName === 'inputshipmentsunits' && field.val().trim().length === 0) {
                 field.addClass('is-invalid');
                 errorContainer.text('Units are required.');
+            }
+
+            if (fieldName === 'inputshipmentsunits' && field.val().trim() === '0' || field.value <= 0) {
+                field.addClass('is-invalid');
+                errorContainer.text('Units must have a valid value.');
             }*/
+                if (fieldName === 'inputshipmentsunits') {
+                    const value = field.val().trim(); // Obtener el valor del campo
+                
+                    // Verificar si el campo está vacío
+                    if (value.length === 0) {
+                        field.addClass('is-invalid');
+                        errorContainer.text('Units are required.');
+                    }
+                    // Verificar si el valor es 0 o menor que 0
+                    else if (parseFloat(value) === 0 || parseFloat(value) <= 0) {
+                        field.addClass('is-invalid');
+                        errorContainer.text('Units must have a valid value.');
+                    }
+                    // Verificar si el valor es una letra (no un número)
+                    else if (isNaN(value)) {
+                        field.addClass('is-invalid');
+                        errorContainer.text('The value must be an integer.');
+                    }
+                    else {
+                        field.removeClass('is-invalid');
+                        errorContainer.text('');
+                    }
+                }
+                
+                if (fieldName === 'inputpallets') {
+                    const value = field.val().trim(); // Obtener el valor del campo
+                
+                    // Verificar si el campo está vacío
+                    if (value.length === 0) {
+                        field.addClass('is-invalid');
+                        errorContainer.text('Pallets are required.');
+                    }
+                    // Verificar si el valor es 0 o menor que 0
+                    else if (parseFloat(value) === 0 || parseFloat(value) <= 0) {
+                        field.addClass('is-invalid');
+                        errorContainer.text('Pallets must have a valid value.');
+                    }
+                    // Verificar si el valor es una letra (no un número)
+                    else if (isNaN(value)) {
+                        field.addClass('is-invalid');
+                        errorContainer.text('The value must be an integer.');
+                    }
+                    else {
+                        field.removeClass('is-invalid');
+                        errorContainer.text('');
+                    }
+                }
+                
             /*if (fieldName === 'inputpallets' && field.val().trim().length === 0) {
                 field.addClass('is-invalid');
                 errorContainer.text('Pallets are required.');
+            }
+
+            if (fieldName === 'inputpallets' && field.val().trim() === '0' || field.value <= 0) {
+                field.addClass('is-invalid');
+                errorContainer.text('The Pallets must have a valid value.');
+            }
+            if (fieldName === 'inputpallets' && field.value <= 0) {
+                field.addClass('is-invalid');
+                errorContainer.text('The Pallets must have a valid value.');
             }*/
+            // Validar que inputpallets no sea mayor que inputshipmentsunits
+            if (fieldName === 'inputpallets') {
+                let units = parseInt($('#inputshipmentsunits').val().trim(), 10); // Obtener el valor de inputshipmentsunits
+                let pallets = parseInt(field.val().trim(), 10); // Obtener el valor de inputpallets
+
+                if (!isNaN(units) && !isNaN(pallets) && pallets > units) {
+                    field.addClass('is-invalid');
+                    errorContainer.text('The number of pallets cannot be greater than the number of shipment units.');
+                }
+            }
             /*if (fieldName === 'inputshipmentsecurityseals' && field.val().trim().length === 0) {
                 field.addClass('is-invalid');
                 errorContainer.text('Security seals are required.');
