@@ -222,18 +222,37 @@ class ShipmentController extends Controller
             'inputshipmentshipmenttype' => 'required|exists:generic_catalogs,gnct_id',
             'inputshipmentreference' => 'nullable',
             'inputshipmentcheckbonded' => 'nullable',
-            'inputorigin' => 'required|exists:companies,pk_company',
-            'inputshipmentdestination' => 'required|exists:facilities,fac_id',
+            //'inputorigin' => 'required|exists:companies,pk_company',
+            'inputorigin' => 'required',
+            'inputshipmentdestination' => 'required',
             'inputshipmentprealertdatetime' => 'required|date',
             //'inputidtrailer' => 'required|unique:shipments,id_trailer|exists:empty_trailer,trailer_num',
             'inputidtrailer' => 'required|unique:shipments,id_trailer',
-            'inputshipmentcarrier' => 'required|exists:companies,pk_company',
-            'inputshipmenttrailer' => 'required',
+            //'inputshipmentcarrier' => 'required|exists:companies,pk_company',
+            'inputshipmentcarrier' => 'nullable',
+            'inputshipmenttrailer' => 'nullable',
             'inputshipmenttruck' => 'nullable',
-            'inputshipmentdriver' => 'nullable|exists:driver,pk_driver',
+            'inputshipmentdriver' => 'nullable',
             'inputshipmentetd' => 'required|date',
-            'inputshipmentsunits' => 'nullable',
-            'inputpallets' => 'nullable',
+            'inputshipmentsunits' => 'required|min:1|integer',
+            'inputpallets' => [
+        '', 
+        'required', 
+        'min:1', // No puede ser nulo ni 0
+        function ($attribute, $value, $fail) use ($request) {
+            // Mensaje personalizado si no es un número entero
+            $valuee = intval($value); // Asegurarse de que el valor es un entero
+            if($value < 1){
+                $fail('Pallets must have a valid value.');
+            }
+            if (!is_int($valuee)) {
+                $fail('Pallets must be an integerguviybuohijpkl.');
+            }
+            if ($request->input('inputshipmentsunits') !== null && $value > $request->input('inputshipmentsunits')) {
+                $fail('The number of pallets cannot be greater than the number of shipment units.');
+            }
+        },
+    ],
             'inputshipmentsecurityseals' => 'nullable',
             'inputshipmentnotes' => 'nullable',
             'inputshipmentoverhaulid' => 'nullable',
@@ -241,7 +260,7 @@ class ShipmentController extends Controller
             'inputshipmentcurrentstatus' => 'required|exists:generic_catalogs,gnct_id'
         ], [
             'inputidtrailer.required'=>'ID Trailer is required',
-            'inputidtrailer.exists' =>'ID Trailer doesnt exists',
+            //'inputidtrailer.exists' =>'ID Trailer doesnt exists',
             'inputidtrailer.unique' =>'ID Trailer has already been taken',
             'inputshipmentstmid.required'=>'ID STM is required',
             'inputshipmentstmid.exists'=>'ID STM doesnt exists',
@@ -249,19 +268,25 @@ class ShipmentController extends Controller
             'inputshipmentshipmenttype.required' => 'Shipment Type is requiered',
             'inputshipmentshipmenttype.exists' => 'Shipment Type doesnt exists',
             'inputorigin.required' => 'Origin is required',
-            'inputorigin.exists' => 'Origin doesnt exists',
+            //'inputorigin.exists' => 'Origin doesnt exists',
             'inputshipmentdestination.required' => 'Destination is required',
-            'inputshipmentdestination.exists' => 'Destination doesnt exists',
+            //'inputshipmentdestination.exists' => 'Destination doesnt exists',
             'inputshipmentcarrier.required' => 'Carrier is required',
-            'inputshipmentcarrier.exists' => 'Carrier doesnt exists',
+            //'inputshipmentcarrier.exists' => 'Carrier doesnt exists',
             'inputshipmenttrailer.required' => 'Trailer Owner is required',
-            'inputshipmentdriver.exists' => 'Driver doesnt exists',
+            //'inputshipmentdriver.exists' => 'Driver doesnt exists',
             'inputshipmentprealertdatetime.required' => 'PreAlert Date is required',
             'inputshipmentprealertdatetime.date' => 'Format no valid',
             'inputshipmentetd.required' => 'Estimated date of departure is required',
             'inputshipmentetd.date' => 'Estimated date of departure format is invalid',
             'inputshipmentcurrentstatus.required' => 'Current Status is required',
             'inputshipmentcurrentstatus.exists' => 'Current Status doesnt exists',
+            'inputshipmentsunits.required' => 'Unist are required',
+            'inputshipmentsunits.integer' => 'Units must be an integer',
+            'inputshipmentsunits.min' => 'Units must have a valid value',
+            'inputpallets.required' => 'Pallets are required',
+            'inputpallets.integer' => 'Pallets must be an integer',
+            'inputpallets.min' => 'Pallets must have a valid value',
         ]);
 
         // Convertir las fechas al formato 'm/d/Y'
@@ -351,10 +376,14 @@ class ShipmentController extends Controller
     public function indexwhapptapproval(){
         if (Auth::check()) {
             $shipments = Shipments::with(['shipmenttype', 'currentstatus', 'origin', 'destinations', 'carrier', 'emptytrailer', 'services', 'driverowner', 'drivers'])
-            ->whereHas('destinations', function ($query) {
+            /*->whereHas('destinations', function ($query) {
                 $query->where('fac_auth', 1); // Filtrar las relaciones destinations con fac_auth = 1
-            })
+            })*/
             ->whereNull('wh_auth_date')
+            ->whereHas('destinations', function ($query) {
+                $query->join('facilities', 'companies.CoName', '=', 'facilities.fac_name')
+                      ->where('facilities.fac_auth', 1);
+            })
             ->get();
 
             return view('home.whapptapproval', compact('shipments'));
@@ -370,8 +399,8 @@ class ShipmentController extends Controller
             'pk_shipment' => 'required',
             //'id_trailer' => 'required',
             //'stm_id' =>  'nullable',
-            'pallets' => 'required',
-            'units' => 'required',
+            'pallets' => 'required|min:1|integer',
+            'units' => 'required|min:1|integer',
             //'etd' => 'required',
             'wh_auth_date' => 'required',
         ], [
@@ -384,8 +413,6 @@ class ShipmentController extends Controller
             //'pallets_on_trailer.string' => 'El campo Pallets on Trailer debe ser una cadena de texto.',
             //'pallets_on_trailer.max' => 'El campo Pallets on Trailer no puede exceder los 50 caracteres.',
             //'pallets_on_floor.required' => 'El campo Pallets on Floor es obligatorio.',
-            //'pallets_on_floor.string' => 'El campo Pallets on Floor debe ser una cadena de texto.',
-            //'pallets_on_floor.max' => 'El campo Pallets on Floor no puede exceder los 50 caracteres.',
             'units.required' => 'Units are rquired.',
             //'carrier.string' => 'El campo Carrier debe ser una cadena de texto.',
             //'carrier.max' => 'El campo Carrier no puede exceder los 50 caracteres.',
@@ -423,10 +450,14 @@ class ShipmentController extends Controller
     public function getShipmentswh(Request $request){
         $query = Shipments::with(['shipmenttype', 'currentstatus', 'origin', 'destinations', 'carrier', 'emptytrailer', 'services', 'driverowner', 'drivers'])
             // Aplicar filtro de 'fac_auth' directamente
-            ->whereHas('destinations', function ($query) {
+            /*->whereHas('destinations', function ($query) {
                     $query->where('fac_auth', 1); // Filtrar las relaciones destinations con fac_auth = 1
-            })
-            ->whereNull('wh_auth_date');
+            })*/
+            ->whereNull('wh_auth_date')
+            ->whereHas('destinations', function ($query) {
+                $query->join('facilities', 'companies.CoName', '=', 'facilities.fac_name')
+                      ->where('facilities.fac_auth', 1);
+            });
 
         // Filtros generales (searchemptytrailergeneral)
         if ($request->has('search')) {

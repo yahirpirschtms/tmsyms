@@ -65,6 +65,10 @@ class Companies extends Model
     {
         return $this->hasMany(Shipments::class, 'trailer', 'pk_company');
     }
+    public function destinations()
+    {
+        return $this->hasMany(Shipments::class, 'destination', 'pk_company');
+    }
 
 
 }

@@ -47,7 +47,7 @@
                 
                 <div class="mb-3">
                     <label for="inputorigin" class="form-label ">Origin</label>
-                    <select class="form-select" aria-label="Default select example"  id="inputorigin" name="inputorigin" value="{{ old('inputorigin', $from_button == 1 ? $location : '') }}" data-url="{{ route('locations-emptytrailer') }}">
+                    <select class="form-select" aria-label="Default select example"  id="inputorigin" name="inputorigin" data-location="{{ old('inputorigin', $from_button == 1 ? $location : '') }}" data-url="{{ route('locations-emptytrailerAjax') }}">
                     </select>
                     <div class="invalid-feedback"></div>
                 </div>
@@ -90,13 +90,13 @@
 
                 <div class="mb-3">
                     <label for="inputshipmentdriver" class="form-label ">Driver</label>
-                    <select class="form-select" aria-label="Default select example"  id="inputshipmentdriver" name="inputshipmentdriver" data-url="{{ url('drivers-shipments') }}">
+                    <select class="form-select" aria-label="Default select example"  id="inputshipmentdriver" name="inputshipmentdriver" data-url="{{ url('drivers-shipment') }}">
                     </select>
                 </div>
 
                 <div class="mb-3">
                     <label for="inputshipmenttrailer" class="form-label ">Trailer Owner</label>
-                    <select class="form-select" aria-label="Default select example"  id="inputshipmenttrailer" name="inputshipmenttrailer" value="{{ old('inputshipmenttrailer', $from_button == 1 ? $carrier : '') }}" data-url="{{ route('locations-emptytrailer') }}">
+                    <select class="form-select" aria-label="Default select example"  id="inputshipmenttrailer" name="inputshipmenttrailer" data-trailerowner="{{ old('inputshipmenttrailer', $from_button == 1 ? $carrier : '') }}" data-url="{{ route('trailerowner-emptytrailerAjax') }}">
                     </select>
                     <div class="invalid-feedback"></div>
                     <!--<input type="hidden" name="inputshipmenttrailer" value="{{ old('inputshipmenttrailer', $from_button == 1 ? $carrier : '') }}">-->

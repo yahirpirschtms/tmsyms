@@ -52,11 +52,21 @@ Route::get('/locations-emptytrailerAjax', [CompaniesController::class, 'getLocat
 
 Route::get('/carrier-emptytrailerAjax', [CompaniesController::class, 'getCarriersAjax'])->name('carrier-emptytrailerAjax');
 
+Route::get('/trailerowner-emptytrailerAjax', [CompaniesController::class, 'getTrailerOwnersAjax'])->name('trailerowner-emptytrailerAjax');
+
+Route::get('/drivers-shipment', [DriversController::class, 'getDriversAjax'])->name('drivers-shipment');
+
 //Agregar un nuevo carrier en la pantalla empty trailer
 Route::post('/save-new-carrier', [CompaniesController::class, 'saveNewCarrier']);
 
 //Agregar un nuevo location en la pantalla empty trailer
 Route::post('/save-new-location', [CompaniesController::class, 'saveNewLocation']);
+
+//Agregar un nuevo trailer owner en la pantalla empty trailer
+Route::post('/save-new-trailerowner', [CompaniesController::class, 'saveNewTrailerOwner']);
+
+//Agregar un nuevo driver en la pantalla empty trailer
+Route::post('/save-new-driver', [DriversController::class, 'saveNewDriver']);
 
 //Ruta actualizacion de Tabla EmptyTrailer con boton refresh o automaticamente
 Route::get('/emptytrailer/data', [HomeController::class, 'getEmptyTrailers'])->name('emptytrailer.data');
@@ -86,7 +96,8 @@ Route::get('/current-status', [GenericCatalogController::class, 'getCurrentStatu
 Route::get('/services', [ServicesController::class, 'getServices'])->name('services-shipment');
 
 //Rutas nutrir selects para la pantalla de Shipments con los destinations
-Route::get('/destinations-shipments', [FacilitiesController::class, 'getFacilities'])->name('destinations-shipments');
+//Route::get('/destinations-shipments', [FacilitiesController::class, 'getFacilities'])->name('destinations-shipments');
+Route::get('/destinations-shipments', [CompaniesController::class, 'getDestinationsAjax'])->name('destinations-shipments');
 
 //Rutas nutrir selects para la pantalla de Shipments con los Drivers
 Route::get('/drivers-shipments/{id_company}', [DriversController::class, 'getDriversByCompany'])->name('drivers-shipments');

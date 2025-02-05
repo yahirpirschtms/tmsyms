@@ -34,8 +34,8 @@ class Facilities extends Model
     ];
 
     // Relación inversa con Shipments
-    public function destinations()
+    /*public function destinations()
     {
         return $this->hasMany(Shipments::class, 'destination', 'fac_id');
-    }
+    }*/
 }

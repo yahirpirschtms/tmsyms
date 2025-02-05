@@ -150,9 +150,13 @@ class Shipments extends Model
     }
 
     // Relación con la tabla `facilities` para el tipo de envío
-    public function destinations()
+    /*public function destinations()
     {
         return $this->belongsTo(Facilities::class, 'destination', 'fac_id');
+    }*/
+    public function destinations()
+    {
+        return $this->belongsTo(Companies::class, 'destination', 'pk_company');
     }
 
 
