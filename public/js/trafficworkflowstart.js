@@ -45,7 +45,7 @@ $(document).ready(function () {
         var selectedText = selectedOption ? selectedOption.text : ''; // Obtener el texto (nombre) de la opción seleccionada
 
         // Si no es el nuevo carrier, lo procesamos
-        if (selectedText  !== newlyCreatedCarrierId) {
+        if (selectedText  !== newlyCreatedCarrierId &&  selectedText.trim() !== '') {
             console.log(selectedText);
             saveNewDriver(selectedText);
         }
@@ -173,7 +173,7 @@ $(document).ready(function () {
         var selectedText = selectedOption ? selectedOption.text : ''; // Obtener el texto (nombre) de la opción seleccionada
         
         // Si no es el nuevo carrier, lo procesamos
-        if (selectedText !== newlyCreatedCarrierId) {
+        if (selectedText !== newlyCreatedCarrierId &&  selectedText.trim() !== '') {
             console.log(selectedText);
             saveNewCarrierShipment(selectedText);
         }
@@ -302,7 +302,7 @@ $(document).ready(function () {
         var selectedText = selectedOption ? selectedOption.text : ''; // Obtener el texto (nombre) de la opción seleccionada
         
         // Si no es el nuevo carrier, lo procesamos
-        if (selectedText !== newlyCreatedCarrierId) {
+        if (selectedText !== newlyCreatedCarrierId &&  selectedText.trim() !== '') {
             console.log(selectedText);
             saveNewLocationShipment(selectedText);
         }
@@ -431,7 +431,7 @@ $(document).ready(function () {
         var selectedText = selectedOption ? selectedOption.text : ''; // Obtener el texto (nombre) de la opción seleccionada
         
         // Si no es el nuevo carrier, lo procesamos
-        if (selectedText !== newlyCreatedCarrierId) {
+        if (selectedText !== newlyCreatedCarrierId &&  selectedText.trim() !== '') {
             console.log(selectedText);
             saveNewLocationShipment(selectedText);
         }
