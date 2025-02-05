@@ -151,7 +151,7 @@
                         </li>
                     </ul>
 
-                    <form id="shipmentForm-{{ $shipment->stm_id }}" method="POST" action="/update-status-endpoint/{{ $shipment->pk_shipment }}">
+                    <form id="shipmentForm-{{ $shipment->stm_id }}" method="POST" action="/update-status-endpoint/{{ $shipment->pk_shipment }}" onsubmit="return validateShipment('{{ $shipment->stm_id }}')">
                         <div class="tab-content" style="border: none;" id="pills-tabContent-{{ $shipment->stm_id }}">
                         <div class="tab-pane fade show active" id="pills-initial-status-{{ $shipment->stm_id }}" role="tabpanel" aria-labelledby="pills-initial-status-tab">
 
@@ -198,22 +198,21 @@
                                     <select class="form-select" id="origin-{{ $shipment->stm_id }}" name="origin">
                                         @foreach ($companies as $company)
                                             <option value="{{ $company->pk_company }}"
-                                                {{ old('origin', $shipment->origin) == $company->pk_company ? 'selected' : '' }}>
+                                                {{ old("origin-{$shipment->stm_id}", $shipment->origin) == $company->pk_company ? 'selected' : '' }}>
                                                 {{ $company->CoName }}
                                             </option>
                                         @endforeach
                                     </select>
                                 </div>
 
-
                                 <!-- Destination -->
                                 <div class="mb-3">
                                     <label for="destination-{{ $shipment->stm_id }}" class="form-label">Destination</label>
                                     <select class="form-select" id="destination-{{ $shipment->stm_id }}" name="destination">
-                                        @foreach ($facilities as $facility)
-                                            <option value="{{ $facility->fac_id }}"
-                                                {{ old('destination', $shipment->destination) == $facility->fac_id ? 'selected' : '' }}>
-                                                {{ $facility->fac_name }}
+                                        @foreach ($companies as $company)
+                                            <option value="{{ $company->pk_company }}"
+                                                {{ old("destination-{$shipment->stm_id}", $shipment->destination) == $company->pk_company ? 'selected' : '' }}>
+                                                {{ $company->CoName }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -262,40 +261,33 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="driver_truck-{{ $shipment->stm_id }}" class="form-label">Driver & Truck</label>
-                                    <select class="form-select" id="driver_truck-{{ $shipment->stm_id }}" name="id_driver"
-                                        onclick="checkAndChangeStatusForSelect('driver_truck-{{ $shipment->stm_id }}', 'Driver Assigned', '{{ $shipment->stm_id }}')">
-
-                                        <!-- Si id_driver es nulo, dejamos el campo vacío sin ninguna opción seleccionada -->
-                                        @if(is_null($shipment->id_driver))
-                                            <option value="" disabled selected>Not available</option>
-                                        @else
-                                            <option value="">Select a driver</option>
-                                        @endif
-
+                                    <label for="driver-{{ $shipment->stm_id }}" class="form-label">Driver</label>
+                                    <select class="form-select" id="driver-{{ $shipment->stm_id }}" name="id_driver">
                                         @foreach ($drivers as $driver)
-                                            @php
-                                                // Concatenamos el drivername y truck para mostrar
-                                                $currentDriverTruck = (!empty($shipment->driver->drivername) ? $shipment->driver->drivername : '') .
-                                                                      (!empty($shipment->driver->drivername) && !empty($shipment->truck) ? ' - ' : '') .
-                                                                      (!empty($shipment->truck) ? $shipment->truck : '');
-                                            @endphp
-                                            <!-- Usamos el id_driver como valor en el select -->
-                                            <option value="{{ $driver->id_driver }}" {{ old('id_driver', $shipment->id_driver) == $driver->id_driver ? 'selected' : '' }}>
-                                                {{ $driver->drivername }} - {{ $shipment->truck }}
+                                            <option value="{{ $driver->id_driver }}"
+                                                {{ old('id_driver', $shipment->id_driver) == $driver->id_driver ? 'selected' : '' }}>
+                                                {{ $driver->drivername }}
                                             </option>
                                         @endforeach
                                     </select>
                                 </div>
+
                                 <div class="mb-3">
-                                    <label for="units" class="form-label">Units</label>
-                                    <input type="text" class="form-control" id="units" name="units" value="{{ $shipment->units }}">
+                                    <label for="Truck" class="form-label">Truck</label>
+                                    <input type="text" class="form-control" id="Truck" name="units" value="{{ $shipment->truck }}">
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="pallets" class="form-label">Pallets</label>
-                                    <input type="text" class="form-control" id="pallets" name="pallets" value="{{ $shipment->pallets }}">
+                                    <label for="units-{{ $shipment->stm_id }}" class="form-label">Units</label>
+                                    <input type="text" class="form-control" id="units-{{ $shipment->stm_id }}" name="units" value="{{ $shipment->units }}" oninput="validateShipment('{{ $shipment->stm_id }}')">
                                 </div>
+
+                                <div class="mb-3">
+                                    <label for="pallets-{{ $shipment->stm_id }}" class="form-label">Pallets</label>
+                                    <input type="text" class="form-control" id="pallets-{{ $shipment->stm_id }}" name="pallets" value="{{ $shipment->pallets }}" oninput="validateShipment('{{ $shipment->stm_id }}')">
+                                </div>
+
+                                <span id="error-message-{{ $shipment->stm_id }}" style="color: red; display: none;"></span>
 
                                 <div class="mb-3">
                                     <label for="security_seals" class="form-label">Security Seal</label>
@@ -783,6 +775,48 @@ document.addEventListener("DOMContentLoaded", function () {
         tab.show(); // Muestra la siguiente pestaña
     }
 });
+</script>
+
+
+<script>
+    function validateShipment(stm_id) {
+        const unitsInput = document.getElementById('units-' + stm_id);
+        const palletsInput = document.getElementById('pallets-' + stm_id);
+        const errorMessage = document.getElementById('error-message-' + stm_id);
+
+        const units = parseInt(unitsInput.value.trim());
+        const pallets = parseInt(palletsInput.value.trim());
+
+        if (isNaN(units) || units <= 0) {
+            errorMessage.textContent = "Units cannot be empty or 0.";
+            errorMessage.style.display = "block";
+            unitsInput.classList.add('is-invalid');
+            return false;
+        } else {
+            unitsInput.classList.remove('is-invalid');
+        }
+
+        if (isNaN(pallets) || pallets <= 0) {
+            errorMessage.textContent = "Pallets cannot be empty or 0.";
+            errorMessage.style.display = "block";
+            palletsInput.classList.add('is-invalid');
+            return false;
+        } else {
+            palletsInput.classList.remove('is-invalid');
+        }
+
+        if (pallets > units) {
+            errorMessage.textContent = "Pallets cannot be greater than Units.";
+            errorMessage.style.display = "block";
+            palletsInput.classList.add('is-invalid');
+            return false;
+        } else {
+            palletsInput.classList.remove('is-invalid');
+        }
+
+        errorMessage.style.display = "none";
+        return true;
+    }
 </script>
 @endsection
 

@@ -55,7 +55,7 @@ class ShipmentController extends Controller
         $shipmentType = GenericCatalog::where('gntc_group', 'shipment_type')->get();
 
         // Obtener todas las compañías para los selects
-        $companies = Companies::all();
+        $companies = Companies::where('notes', 'ym')->get();
 
         $facilities = Facilities::all();
 
@@ -87,7 +87,7 @@ class ShipmentController extends Controller
             $shipmentType = GenericCatalog::where('gntc_group', 'shipment_type')->get();
 
             // Obtener todas las compañías para los selects
-            $companies = Companies::all();
+            $companies = Companies::where('notes', 'ym')->get();
 
             $facilities = Facilities::all();
 
