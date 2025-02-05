@@ -323,6 +323,9 @@
     border-color: transparent;  /* Eliminar el borde */
     box-shadow: none;            /* Eliminar cualquier sombra aplicada */
 }
+.select2-container--default .select2-selection--single .select2-selection__clear {
+    right: 15px; /* Mueve la "X" más a la izquierda */
+}
 
 /*.select2-container--default .select2-search--dropdown .select2-search__field {
   border-color: transparent; 

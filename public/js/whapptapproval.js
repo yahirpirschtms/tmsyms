@@ -219,6 +219,12 @@ document.addEventListener('DOMContentLoaded', function () {
         flatpickr(".datetms", {
         dateFormat: "m/d/Y",  // Establece el formato como mes/día/año
         //defaultDate: "today",     // Establece la fecha y hora actuales como predeterminados
+        onOpen: function (selectedDates, dateStr, instance) {
+            // Si el campo está vacío, se coloca la fecha y hora actual
+            if (dateStr === "") {
+                instance.setDate(new Date(), true); // Establece la fecha actual
+            }
+        },
         });
         
         flatpickr(".datetimepicker", {
@@ -227,6 +233,12 @@ document.addEventListener('DOMContentLoaded', function () {
         time_24hr: true,          // Si quieres el formato de 24 horas
         enableSeconds: true,      // Habilita la selección de segundos
         //defaultDate: new Date(),
+        onOpen: function (selectedDates, dateStr, instance) {
+            // Si el campo está vacío, se coloca la fecha y hora actual
+            if (dateStr === "") {
+                instance.setDate(new Date(), true); // Establece la fecha actual
+            }
+        },
         });
     });
 
@@ -356,11 +368,33 @@ document.addEventListener('DOMContentLoaded', function () {
             field.classList.add('is-invalid');
             errorElement.textContent = 'This field is required'; // Mensaje de error
         }
-        // Validar si el campo excede los 50 caracteres
-        /*else if ((field.id === 'updateinputusername' || field.id === 'updateinputpalletsonfloor' || field.id === 'updateinputpalletsontrailer') && field.value.length > 50) {
-            field.classList.add('is-invalid');
-            errorElement.textContent = 'This field cannot exceed 50 characters'; // Mensaje de error
-        }*/ else {
+            // Validar si el campo es un número entero y mayor que 0
+           else if ((field.id === 'whetainputpallets' || field.id === 'whetainputunits')) {
+                const value = field.value.trim();
+                
+                // Verificar si el valor no es un número o no es entero
+                if (isNaN(value) || !Number.isInteger(parseFloat(value))) {
+                    //valid = false;
+                    field.classList.add('is-invalid');
+                    errorElement.textContent = 'This field must be an integer.'; // Mensaje de error
+                }
+                // Verificar si el valor es 0 o menor
+                else if (parseFloat(value) <= 0) {
+                    //valid = false;
+                    field.classList.add('is-invalid');
+                    errorElement.textContent = 'This field must have a valid value.'; // Mensaje de error
+                }
+                // Validar si whetainputpallets es mayor que whetainputunits
+                else if (field.id === 'whetainputpallets' && document.getElementById('whetainputunits').value !== '' && parseFloat(value) > parseFloat(document.getElementById('whetainputunits').value)) {
+                    //valid = false;
+                    field.classList.add('is-invalid');
+                    errorElement.textContent = 'The number of pallets cannot be greater than the number of units.'; // Mensaje de error
+                }else {
+                    field.classList.remove('is-invalid');
+                    errorElement.textContent = '';
+                }
+            }
+        else {
             field.classList.remove('is-invalid');
             errorElement.textContent = ''; // Limpiar el mensaje de error
         }
@@ -381,12 +415,33 @@ document.addEventListener('DOMContentLoaded', function () {
                 field.classList.add('is-invalid');
                 errorElement.textContent = 'This field is required';
             }
-            // Validar si el campo excede los 50 caracteres (solo para los campos específicos)
-            /*else if ((fieldId === 'updateinputusername' || fieldId === 'updateinputpalletsonfloor' || fieldId === 'updateinputpalletsontrailer') && field.value.length > 50) {
-                valid = false;
-                field.classList.add('is-invalid');
-                errorElement.textContent = 'This field cannot exceed 50 characters';
-            }*/ else {
+            // Validar si el campo es un número entero y mayor que 0
+            else if ((field.id === 'whetainputpallets' || field.id === 'whetainputunits')) {
+                const value = field.value.trim();
+                
+                // Verificar si el valor no es un número o no es entero
+                if (isNaN(value) || !Number.isInteger(parseFloat(value))) {
+                    valid = false;
+                    field.classList.add('is-invalid');
+                    errorElement.textContent = 'This field must be an integer.'; // Mensaje de error
+                }
+                // Verificar si el valor es 0 o menor
+                else if (parseFloat(value) <= 0) {
+                    valid = false;
+                    field.classList.add('is-invalid');
+                    errorElement.textContent = 'This field must have a valid value.'; // Mensaje de error
+                }
+                // Validar si whetainputpallets es mayor que whetainputunits
+                else if (field.id === 'whetainputpallets' && document.getElementById('whetainputunits').value !== '' && parseFloat(value) > parseFloat(document.getElementById('whetainputunits').value)) {
+                    valid = false;
+                    field.classList.add('is-invalid');
+                    errorElement.textContent = 'The number of pallets cannot be greater than the number of units.'; // Mensaje de error
+                }else {
+                    field.classList.remove('is-invalid');
+                    errorElement.textContent = '';
+                }
+            }
+            else {
                 field.classList.remove('is-invalid');
                 errorElement.textContent = '';
             }

@@ -6,7 +6,7 @@ $(document).ready(function () {
     function loadCarriers() {
         $('#inputcarrier').select2({
             placeholder: 'Select or enter a New Carrier',
-            allowClear: true,
+            //allowClear: true,
             tags: true, // Permite agregar nuevas opciones
             dropdownParent: $('#newtrailerempty'),
             ajax: {
@@ -99,7 +99,7 @@ $(document).ready(function () {
     function loadCarriersUpdate() {
         $('#updateinputcarrier').select2({
             placeholder: 'Select or enter a New Carrier',
-            allowClear: true,
+            //allowClear: true,
             tags: true, // Permite agregar nuevas opciones
             dropdownParent: $('#updatenewtrailerempty'),
             ajax: {
@@ -194,7 +194,7 @@ $(document).ready(function () {
     function loadLocations() {
         $('#inputlocation').select2({
             placeholder: 'Select or enter a New Location',
-            allowClear: true,
+            //allowClear: true,
             tags: true, // Permite agregar nuevas opciones
             dropdownParent: $('#newtrailerempty'),
             ajax: {
@@ -279,7 +279,7 @@ $(document).ready(function () {
     }
 });
 
-//Busqueda de carries en el update 
+//Busqueda de Locations en el update 
 $(document).ready(function () {
     var carrierRoute = $('#updateinputlocation').data('url');
     var newlyCreatedCarrierId = null; // Variable para almacenar el ID del carrier recién creado
@@ -287,7 +287,7 @@ $(document).ready(function () {
     function loadLocationsUpdate() {
         $('#updateinputlocation').select2({
             placeholder: 'Select or enter a New Carrier',
-            allowClear: true,
+            //allowClear: true,
             tags: true, // Permite agregar nuevas opciones
             dropdownParent: $('#updatenewtrailerempty'),
             ajax: {
@@ -440,6 +440,12 @@ $(document).ready(function() {
     flatpickr(".datetms", {
       dateFormat: "m/d/Y",  // Establece el formato como mes/día/año
       //defaultDate: "today",     // Establece la fecha y hora actuales como predeterminados
+      onOpen: function (selectedDates, dateStr, instance) {
+            // Si el campo está vacío, se coloca la fecha y hora actual
+            if (dateStr === "") {
+                instance.setDate(new Date(), true); // Establece la fecha actual
+            }
+        },
     });
     
     flatpickr(".datetimepicker", {
@@ -448,6 +454,13 @@ $(document).ready(function() {
     time_24hr: true,          // Si quieres el formato de 24 horas
     enableSeconds: true,      // Habilita la selección de segundos
     //defaultDate: new Date(),
+    onOpen: function (selectedDates, dateStr, instance) {
+        // Si el campo está vacío, se coloca la fecha y hora actual
+        if (dateStr === "") {
+            instance.setDate(new Date(), true); // Establece la fecha actual
+        }
+    },
+
     });
 });
     //Script para buscar el availability indicator en la pantalla de empty trailer
@@ -695,13 +708,68 @@ $(document).ready(function() {
             /*if (fieldName === 'inputpalletsontrailer' && field.val().trim().length === 0) {
                 field.addClass('is-invalid');
                 errorContainer.text('The Pallets On Trailer is required.');
+            }
+
+            if (fieldName === 'inputpalletsontrailer' && field.val().trim() === '0') {
+                field.addClass('is-invalid');
+                errorContainer.text('The Pallets On Trailer must have a valid value.');
             }*/
-    
+                if (fieldName === 'inputpalletsontrailer') {
+                    const value = field.val().trim(); // Obtener el valor del campo
+                
+                    // Verificar si el campo está vacío
+                    if (value.length === 0) {
+                        field.addClass('is-invalid');
+                        errorContainer.text('Pallets On Trailer are required.');
+                    }
+                    // Verificar si el valor es 0 o menor que 0
+                    else if (parseFloat(value) === 0 || parseFloat(value) <= 0) {
+                        field.addClass('is-invalid');
+                        errorContainer.text('Pallets On Trailer must have a valid value.');
+                    }
+                    // Verificar si el valor es una letra (no un número)
+                    else if (isNaN(value)) {
+                        field.addClass('is-invalid');
+                        errorContainer.text('The value must be an integer.');
+                    }
+                    else {
+                        field.removeClass('is-invalid');
+                        errorContainer.text('');
+                    }
+                }
 
             /*if (fieldName === 'inputpalletsonfloor' && field.val().trim().length === 0) {
                 field.addClass('is-invalid');
                 errorContainer.text('The Pallets On Floor is required.');
+            }
+
+            if (fieldName === 'inputpalletsonfloor' && field.val().trim() === '0') {
+                field.addClass('is-invalid');
+                errorContainer.text('The Pallets On Floor must have a valid value.');
             }*/
+                if (fieldName === 'inputpalletsonfloor') {
+                    const value = field.val().trim(); // Obtener el valor del campo
+                
+                    // Verificar si el campo está vacío
+                    if (value.length === 0) {
+                        field.addClass('is-invalid');
+                        errorContainer.text('Pallets On Floor are required.');
+                    }
+                    // Verificar si el valor es 0 o menor que 0
+                    else if (parseFloat(value) === 0 || parseFloat(value) <= 0) {
+                        field.addClass('is-invalid');
+                        errorContainer.text('Pallets On Floor must have a valid value.');
+                    }
+                    // Verificar si el valor es una letra (no un número)
+                    else if (isNaN(value)) {
+                        field.addClass('is-invalid');
+                        errorContainer.text('The value must be an integer.');
+                    }
+                    else {
+                        field.removeClass('is-invalid');
+                        errorContainer.text('');
+                    }
+                }
     
             if (fieldName === 'inputcarrier' && field.val().trim().length === 0) {
                 field.addClass('is-invalid');
@@ -1276,8 +1344,8 @@ $(document).ready(function() {
     const formFields = [
         'updateinputidtrailer',
         'updateinputdateofstatus',
-        //'updateinputpalletsontrailer',
-        //'updateinputpalletsonfloor',
+        'updateinputpalletsontrailer',
+        'updateinputpalletsonfloor',
         'updateinputcarrier',
         //'updateinputavailabilityindicator',
         'updateinputlocation',
@@ -1308,6 +1376,19 @@ $(document).ready(function() {
         if (field.value.trim() === '') {
             field.classList.add('is-invalid');
             errorElement.textContent = 'This field is required'; // Mensaje de error
+        }
+        // Validar si el campo es un número entero para los campos 'updateinputpalletsonfloor' y 'updateinputpalletsontrailer'
+        else if ((field.id === 'updateinputpalletsonfloor' || field.id === 'updateinputpalletsontrailer')) {
+            const value = field.value.trim();
+
+            if (isNaN(value) || !Number.isInteger(parseFloat(value))) {
+                field.classList.add('is-invalid');
+                errorElement.textContent = 'This field must be an integer.'; // Mensaje de error
+            }
+            else if (value <= 0) {
+                field.classList.add('is-invalid');
+                errorElement.textContent = 'This field must have a valid value.'; // Mensaje de error
+            }
         }
         else {
             field.classList.remove('is-invalid');
@@ -1419,7 +1500,20 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
             valid = false;
             field.classList.add('is-invalid');
             errorElement.textContent = 'This field is required';
-        } else {
+        }        
+        else if ((field.id === 'updateinputpalletsonfloor' || field.id === 'updateinputpalletsontrailer')) {
+            const value = field.value.trim();
+
+            if (isNaN(value) || !Number.isInteger(parseFloat(value))) {
+                field.classList.add('is-invalid');
+                errorElement.textContent = 'This field must be an integer.'; // Mensaje de error
+            }
+            else if (value <= 0) {
+                field.classList.add('is-invalid');
+                errorElement.textContent = 'This field must have a valid value.'; // Mensaje de error
+            }
+        }
+        else {
             field.classList.remove('is-invalid');
             errorElement.textContent = '';
         }
