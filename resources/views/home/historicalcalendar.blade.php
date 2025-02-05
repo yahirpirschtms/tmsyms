@@ -66,7 +66,7 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Destination</label>
-                            <p>{{ $shipment->destinationFacility->fac_name }}</p>
+                            <p>{{ optional($companies->firstWhere('pk_company', $shipment->destination))->CoName ?? 'Not available' }}</p>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Current Status</label>
@@ -113,16 +113,19 @@
                             </div>
                             <div class="mb-3">
                                 <label for="deliveredDate{{ $shipment->stm_id }}" class="form-label">Delivered Date</label>
-                                <input type="text" class="form-control datetime-picker" id="deliveredDate{{ $shipment->stm_id }}" name="delivered_date"
-                                    value="{{ old('delivered_date', $shipment->delivered_date ? \Carbon\Carbon::parse($shipment->delivered_date)->format('m/d/Y H:i') : '') }} "
-                                     placeholder="mm/dd/yyyy --:--"
-                                   >
+                                <input type="text"
+                                    class="form-control datetime-picker"
+                                    id="deliveredDate{{ $shipment->stm_id }}"
+                                    name="delivered_date"
+                                    value="{{ $shipment->delivered_date ? \Carbon\Carbon::parse($shipment->delivered_date)->format('m/d/Y H:i') : '' }}"
+                                    placeholder="{{ $shipment->delivered_date ? '' : 'mm/dd/yyyy --:--' }}"
+                                    onfocus="checkAndChangeStatus('deliveredDate{{ $shipment->stm_id }}', 'Delivered', '{{ $shipment->stm_id }}')">
                             </div>
 
                             <div class="mb-3">
                                 <label for="atDoorDate{{ $shipment->stm_id }}" class="form-label">At Door Date</label>
                                 <input type="text" class="form-control datetime-picker" id="atDoorDate{{ $shipment->stm_id }}" name="at_door_date"
-                                    value="{{ old('at_door_date', $shipment->at_door_date ? \Carbon\Carbon::parse($shipment->at_door_date)->format('m/d/Y H:i') : '') }}"placeholder="mm/dd/yyyy --:--">
+                                    value="{{ old('at_door_date', $shipment->at_door_date ? \Carbon\Carbon::parse($shipment->at_door_date)->format('m/d/Y H:i') : '') }}" placeholder="mm/dd/yyyy --:--">
                             </div>
 
                             <div class="mb-3">
@@ -280,15 +283,77 @@
 </script>
 
 <script>
+    function checkAndChangeStatus(dateFieldId, statusDescription, shipmentId) {
+        const dateField = document.getElementById(dateFieldId);
+
+        if (!dateField) {
+            console.error(`No se encontró el campo con id: ${dateFieldId}`);
+            return; // Si el campo no existe, no continuar con el cambio de estado
+        }
+
+        const currentDateValue = dateField.value;
+
+        // Verificar si ya existe una fecha en el campo y evitar el cambio de estado
+        if (currentDateValue) {
+            console.log(`El campo ${dateFieldId} ya tiene una fecha, no se cambiará el estado.`);
+            return; // Si ya hay una fecha, no cambiar el estado
+        }
+
+        // Cambiar el estado solo si el campo está vacío, usando la descripción
+        changeStatusByDescription(statusDescription, shipmentId);
+    }
+
+    function changeStatusByDescription(statusDescription, shipmentId) {
+        console.log('shipmentId recibido:', shipmentId); // Verifica el valor de shipmentId
+        console.log('Estado recibido:', statusDescription); // Verifica la descripción del estado
+
+        const statusMapping = {
+            'Delivered': 'Delivered', // gntc_description
+            // Agrega otras descripciones si es necesario
+        };
+
+        const gntcDescription = statusMapping[statusDescription];
+
+        if (gntcDescription) {
+            const statusSelect = document.getElementById('currentStatus-' + shipmentId);
+            if (statusSelect) {
+                // Buscar el option que tenga el gntc_description correspondiente
+                const options = statusSelect.getElementsByTagName('option');
+                for (let i = 0; i < options.length; i++) {
+                    if (options[i].textContent.trim() === gntcDescription) {
+                        statusSelect.value = options[i].value; // Establecer el valor del select según el texto de la opción
+                        console.log('Estado cambiado a:', gntcDescription);
+                        break;
+                    }
+                }
+            } else {
+                console.error('No se encontró el select para el envío:', shipmentId);
+            }
+        } else {
+            console.error('Descripción de estado no mapeada:', statusDescription);
+        }
+    }
+</script>
+
+<script>
     document.addEventListener("DOMContentLoaded", function() {
         flatpickr(".datetime-picker", {
             enableTime: true,        // Permite seleccionar hora
             dateFormat: "m/d/Y H:i", // Formato M/D/Y H:i
             time_24hr: false,        // Usa formato de 12 horas (AM/PM)
-            allowInput: true         // Permite escribir la fecha manualmente
+            allowInput: true,        // Permite escribir la fecha manualmente
+            onOpen: function(selectedDates, dateStr, instance) {
+                // Si el campo está vacío, se coloca la fecha y hora actual
+                if (dateStr === "") {
+                    instance.setDate(new Date(), true); // Establece la fecha y hora actuales
+                }
+            }
         });
     });
 </script>
+
+
+
 @endsection
 
 @section('custom-css')

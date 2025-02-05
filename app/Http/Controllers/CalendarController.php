@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Shipment;
+use App\Models\Companies;
 use Illuminate\Support\Facades\Auth;
 use App\Models\GenericCatalog;
 use App\Models\Shipments;
@@ -29,6 +30,8 @@ class CalendarController extends Controller
 
             // Obtener el primer envío, o dejar $shipment como null si no hay envíos
             $shipment = $shipments->first() ?? null;
+
+            $companies = Companies::where('notes', 'ym')->get();
 
             // Mapear los datos al formato esperado por FullCalendar
             $events = $shipments->map(function ($shipment) use ($originCatalog, $statusCatalog) {
@@ -79,6 +82,7 @@ class CalendarController extends Controller
                 'statusCatalog' => $statusCatalog,
                 'shipment' => $shipment,
                 'currentStatus'=> $currentStatus,
+                'companies' => $companies,
             ]);
         }
 
@@ -97,6 +101,8 @@ class CalendarController extends Controller
 
             // Obtener el primer envío, o dejar $shipment como null si no hay envíos
             $shipment = $shipments->first() ?? null;
+
+            $companies = Companies::where('notes', 'ym')->get();
 
             // Mapear los datos al formato esperado por FullCalendar
             $events = $shipments->map(function ($shipment) use ($originCatalog, $statusCatalog) {
@@ -135,6 +141,7 @@ class CalendarController extends Controller
                 'statusCatalog' => $statusCatalog,
                 'shipment' => $shipment,
                 'currentStatus' => $currentStatus,
+                'companies' => $companies,
             ]);
         }
 

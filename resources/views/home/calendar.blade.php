@@ -66,7 +66,7 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Destination</label>
-                                <p>{{ $shipment->destinationFacility->fac_name }}</p>
+                                <p>{{ optional($companies->firstWhere('pk_company', $shipment->destination))->CoName ?? 'Not available' }}</p>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Current Status</label>
@@ -343,7 +343,13 @@
             enableTime: true,        // Permite seleccionar hora
             dateFormat: "m/d/Y H:i", // Formato M/D/Y H:i
             time_24hr: false,        // Usa formato de 12 horas (AM/PM)
-            allowInput: true         // Permite escribir la fecha manualmente
+            allowInput: true,        // Permite escribir la fecha manualmente
+            onOpen: function(selectedDates, dateStr, instance) {
+                // Si el campo está vacío, se coloca la fecha y hora actual
+                if (dateStr === "") {
+                    instance.setDate(new Date(), true); // Establece la fecha y hora actuales
+                }
+            }
         });
     });
 </script>
