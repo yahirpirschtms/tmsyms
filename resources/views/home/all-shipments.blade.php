@@ -313,149 +313,147 @@
                         <div class="tab-content" id="pills-tabContent{{ $shipment->stm_id }}">
                             <div class="tab-pane fade show active" id="pills-shipment-details{{ $shipment->stm_id }}"
                                 role="tabpanel" aria-labelledby="pills-shipment-details-tab{{ $shipment->stm_id }}">
-                                <div class="mb-3">
-                                    <label for="stm_id" class="form-label">STM ID</label>
-                                    <input type="text" class="form-control" id="stm_id" value="{{ $shipment->stm_id ?? 'STM ID no disponible' }}" readonly>
-                                </div>
 
-                                <div class="mb-3">
-                                    <label for="device_number" class="form-label">Device Number</label>
-                                    <input type="text" class="form-control" id="device_number" name="device_number" value="{{ $shipment->device_number }}">
-                                </div>
+                            <div class="mb-3">
+                                <label for="stm_id" class="form-label">STM ID</label>
+                                <input type="text" class="form-control" id="stm_id" value="{{ $shipment->stm_id ?? 'STM ID no disponible' }}" readonly data-original="{{ $shipment->stm_id ?? 'STM ID no disponible' }}">
+                            </div>
 
-                                <div class="mb-3">
-                                    <label for="overhaul_id" class="form-label">Overhaul ID</label>
-                                    <input type="text" class="form-control" id="overhaul_id" name="overhaul_id" value="{{ $shipment->overhaul_id }}">
-                                </div>
+                            <div class="mb-3">
+                                <label for="device_number" class="form-label">Device Number</label>
+                                <input type="text" class="form-control" id="device_number" name="device_number" value="{{ $shipment->device_number }}" data-original="{{ $shipment->device_number }}">
+                            </div>
 
-                                <div class="mb-3">
-                                    <label for="secondary_shipment_id" class="form-label">Secondary Shipment ID</label>
-                                    <input type="text" class="form-control" id="secondary_shipment_id" name="secondary_shipment_id" value="{{ $shipment->secondary_shipment_id }}">
-                                </div>
+                            <div class="mb-3">
+                                <label for="overhaul_id" class="form-label">Overhaul ID</label>
+                                <input type="text" class="form-control" id="overhaul_id" name="overhaul_id" value="{{ $shipment->overhaul_id }}" data-original="{{ $shipment->overhaul_id }}">
+                            </div>
 
-                                <div class="mb-3">
-                                    <label for="reference" class="form-label">Landstar Reference</label>
-                                    <input type="text" class="form-control" id="reference" name="reference" value="{{ $shipment->reference }}">
-                                </div>
+                            <div class="mb-3">
+                                <label for="secondary_shipment_id" class="form-label">Secondary Shipment ID</label>
+                                <input type="text" class="form-control" id="secondary_shipment_id" name="secondary_shipment_id" value="{{ $shipment->secondary_shipment_id }}" data-original="{{ $shipment->secondary_shipment_id }}">
+                            </div>
 
-                                <div class="mb-3">
-                                    <label for="shipment_type" class="form-label">Shipment Type</label>
-                                    <input type="text" class="form-control" id="shipment_type" name="shipment_type" value="{{ $shipment->shipmentType->gntc_description ?? 'No disponible' }}">
-                                </div>
+                            <div class="mb-3">
+                                <label for="reference" class="form-label">Landstar Reference</label>
+                                <input type="text" class="form-control" id="reference" name="reference" value="{{ $shipment->reference }}" data-original="{{ $shipment->reference }}">
+                            </div>
 
-                                <div class="mb-3">
-                                    <label for="etd-{{ $shipment->stm_id }}" class="form-label">ETD</label>
-                                    <input type="text" class="form-control flatpickr" id="etd-{{ $shipment->stm_id }}" name="etd"
-                                        value="{{ $shipment->etd ? \Carbon\Carbon::parse($shipment->etd)->format('m/d/Y H:i') : '' }}"
-                                        placeholder="mm/dd/yyyy --:--">
-                                </div>
+                            <div class="mb-3">
+                                <label for="shipment_type" class="form-label">Shipment Type</label>
+                                <input type="text" class="form-control" id="shipment_type" name="shipment_type" value="{{ $shipment->shipmentType->gntc_description ?? 'No disponible' }}" data-original="{{ $shipment->shipmentType->gntc_description ?? 'No disponible' }}">
+                            </div>
 
-                                <!-- Origin -->
-                                <div class="mb-3">
-                                    <label for="origin-{{ $shipment->stm_id }}" class="form-label">Origin</label>
-                                    <select class="form-select" id="origin-{{ $shipment->stm_id }}" name="origin">
-                                        @foreach ($companies as $company)
-                                            <option value="{{ $company->pk_company }}"
-                                                {{ old("origin-{$shipment->stm_id}", $shipment->origin) == $company->pk_company ? 'selected' : '' }}>
-                                                {{ $company->CoName }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                            <div class="mb-3">
+                                <label for="etd-{{ $shipment->stm_id }}" class="form-label">ETD</label>
+                                <input type="text" class="form-control flatpickr" id="etd-{{ $shipment->stm_id }}" name="etd"
+                                    value="{{ $shipment->etd ? \Carbon\Carbon::parse($shipment->etd)->format('m/d/Y H:i') : '' }}"
+                                    placeholder="mm/dd/yyyy --:--" data-original="{{ $shipment->etd ? \Carbon\Carbon::parse($shipment->etd)->format('m/d/Y H:i') : '' }}">
+                            </div>
 
-                                <!-- Destination -->
-                                <div class="mb-3">
-                                    <label for="destination-{{ $shipment->stm_id }}" class="form-label">Destination</label>
-                                    <select class="form-select" id="destination-{{ $shipment->stm_id }}" name="destination">
-                                        @foreach ($companies as $company)
-                                            <option value="{{ $company->pk_company }}"
-                                                {{ old("destination-{$shipment->stm_id}", $shipment->destination) == $company->pk_company ? 'selected' : '' }}>
-                                                {{ $company->CoName }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                            <!-- Origin -->
+                            <div class="mb-3">
+                                <label for="origin-{{ $shipment->stm_id }}" class="form-label">Origin</label>
+                                <select class="form-select" id="origin-{{ $shipment->stm_id }}" name="origin" data-original="{{ $shipment->origin }}">
+                                    @foreach ($companies as $company)
+                                        <option value="{{ $company->pk_company }}"
+                                            {{ old("origin-{$shipment->stm_id}", $shipment->origin) == $company->pk_company ? 'selected' : '' }}>
+                                            {{ $company->CoName }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-                                <div class="mb-3">
-                                    <label for="preAlertedDatetime-{{ $shipment->stm_id }}" class="form-label">Pre-Alerted Datetime</label>
-                                    <input type="text" class="form-control flatpickr" id="preAlertedDatetime-{{ $shipment->stm_id }}" name="pre_alerted_datetime"
-                                        value="{{ $shipment->pre_alerted_datetime ? \Carbon\Carbon::parse($shipment->pre_alerted_datetime)->format('m/d/Y H:i') : '' }}"
-                                        placeholder="mm/dd/yyyy --:--">
-                                </div>
+                            <!-- Destination -->
+                            <div class="mb-3">
+                                <label for="destination-{{ $shipment->stm_id }}" class="form-label">Destination</label>
+                                <select class="form-select" id="destination-{{ $shipment->stm_id }}" name="destination" data-original="{{ $shipment->destination }}">
+                                    @foreach ($companies as $company)
+                                        <option value="{{ $company->pk_company }}"
+                                            {{ old("destination-{$shipment->stm_id}", $shipment->destination) == $company->pk_company ? 'selected' : '' }}>
+                                            {{ $company->CoName }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-                                <div class="mb-3">
-                                    <label for="id_trailer-{{ $shipment->stm_id }}" class="form-label">Trailer ID</label>
-                                    <input type="text" class="form-control" id="id_trailer-{{ $shipment->stm_id }}" name="id_trailer"
-                                           value="{{ old('id_trailer', $shipment->id_trailer) }}" placeholder="Enter Trailer ID">
-                                </div>
+                            <div class="mb-3">
+                                <label for="preAlertedDatetime-{{ $shipment->stm_id }}" class="form-label">Pre-Alerted Datetime</label>
+                                <input type="text" class="form-control flatpickr" id="preAlertedDatetime-{{ $shipment->stm_id }}" name="pre_alerted_datetime"
+                                    value="{{ $shipment->pre_alerted_datetime ? \Carbon\Carbon::parse($shipment->pre_alerted_datetime)->format('m/d/Y H:i') : '' }}"
+                                    placeholder="mm/dd/yyyy --:--" data-original="{{ $shipment->pre_alerted_datetime ? \Carbon\Carbon::parse($shipment->pre_alerted_datetime)->format('m/d/Y H:i') : '' }}">
+                            </div>
 
+                            <div class="mb-3">
+                                <label for="id_trailer-{{ $shipment->stm_id }}" class="form-label">Trailer ID</label>
+                                <input type="text" class="form-control" id="id_trailer-{{ $shipment->stm_id }}" name="id_trailer"
+                                       value="{{ old('id_trailer', $shipment->id_trailer) }}" placeholder="Enter Trailer ID" data-original="{{ old('id_trailer', $shipment->id_trailer) }}">
+                            </div>
 
-                               <!-- Trailer Owner -->
-                                <div class="mb-3">
-                                    <label for="trailer_owner-{{ $shipment->stm_id }}" class="form-label">Trailer Owner</label>
-                                    <select class="form-select" id="trailer_owner-{{ $shipment->stm_id }}" name="trailer_owner">
-                                        @foreach ($companies as $company)
-                                            <option value="{{ $company->pk_company }}"
-                                                {{ old('trailer_owner', $shipment->origin) == $company->pk_company ? 'selected' : '' }}>
-                                                {{ $company->CoName }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                            <!-- Trailer Owner -->
+                            <div class="mb-3">
+                                <label for="trailer_owner-{{ $shipment->stm_id }}" class="form-label">Trailer Owner</label>
+                                <select class="form-select" id="trailer_owner-{{ $shipment->stm_id }}" name="trailer_owner" data-original="{{ $shipment->trailer_owner }}">
+                                    @foreach ($companies as $company)
+                                        <option value="{{ $company->pk_company }}"
+                                            {{ old('trailer_owner', $shipment->origin) == $company->pk_company ? 'selected' : '' }}>
+                                            {{ $company->CoName }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
 
+                            <!-- Carrier -->
+                            <div class="mb-3">
+                                <label for="carrier-{{ $shipment->stm_id }}" class="form-label">Carrier Dropping Trailer</label>
+                                <select class="form-select" id="carrier-{{ $shipment->stm_id }}" name="carrier" data-original="{{ $shipment->carrier }}">
+                                    @foreach ($companies as $company)
+                                        <option value="{{ $company->pk_company }}"
+                                            {{ old('carrier', $shipment->origin) == $company->pk_company ? 'selected' : '' }}>
+                                            {{ $company->CoName }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-                                <!-- Carrier -->
-                                <div class="mb-3">
-                                    <label for="carrier-{{ $shipment->stm_id }}" class="form-label">Carrier Dropping Trailer</label>
-                                    <select class="form-select" id="carrier-{{ $shipment->stm_id }}" name="carrier">
-                                        @foreach ($companies as $company)
-                                            <option value="{{ $company->pk_company }}"
-                                                {{ old('carrier', $shipment->origin) == $company->pk_company ? 'selected' : '' }}>
-                                                {{ $company->CoName }}
-                                            </option>
-                                        @endforeach
+                            <div class="mb-3">
+                                <label for="driver-{{ $shipment->stm_id }}" class="form-label">Driver</label>
+                                <select class="form-select" id="driver-{{ $shipment->stm_id }}" name="id_driver" data-original="{{ $shipment->id_driver }}">
+                                    @foreach ($drivers as $driver)
+                                        <option value="{{ $driver->id_driver }}"
+                                            {{ old('id_driver', $shipment->id_driver) == $driver->id_driver ? 'selected' : '' }}>
+                                            {{ $driver->drivername }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-                                    </select>
-                                </div>
+                            <div class="mb-3">
+                                <label for="Truck" class="form-label">Truck</label>
+                                <input type="text" class="form-control" id="Truck" name="units" value="{{ $shipment->truck }}" data-original="{{ $shipment->truck }}">
+                            </div>
 
-                                <div class="mb-3">
-                                    <label for="driver-{{ $shipment->stm_id }}" class="form-label">Driver</label>
-                                    <select class="form-select" id="driver-{{ $shipment->stm_id }}" name="id_driver">
-                                        @foreach ($drivers as $driver)
-                                            <option value="{{ $driver->id_driver }}"
-                                                {{ old('id_driver', $shipment->id_driver) == $driver->id_driver ? 'selected' : '' }}>
-                                                {{ $driver->drivername }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                            <div class="mb-3">
+                                <label for="units-{{ $shipment->stm_id }}" class="form-label">Units</label>
+                                <input type="text" class="form-control" id="units-{{ $shipment->stm_id }}" name="units" value="{{ $shipment->units }}" oninput="validateShipment('{{ $shipment->stm_id }}')" data-original="{{ $shipment->units }}">
+                            </div>
 
-                                <div class="mb-3">
-                                    <label for="Truck" class="form-label">Truck</label>
-                                    <input type="text" class="form-control" id="Truck" name="units" value="{{ $shipment->truck }}">
-                                </div>
+                            <div class="mb-3">
+                                <label for="pallets-{{ $shipment->stm_id }}" class="form-label">Pallets</label>
+                                <input type="text" class="form-control" id="pallets-{{ $shipment->stm_id }}" name="pallets" value="{{ $shipment->pallets }}" oninput="validateShipment('{{ $shipment->stm_id }}')" data-original="{{ $shipment->pallets }}">
+                            </div>
 
-                                <div class="mb-3">
-                                    <label for="units-{{ $shipment->stm_id }}" class="form-label">Units</label>
-                                    <input type="text" class="form-control" id="units-{{ $shipment->stm_id }}" name="units" value="{{ $shipment->units }}" oninput="validateShipment('{{ $shipment->stm_id }}')">
-                                </div>
+                            <span id="error-message-{{ $shipment->stm_id }}" style="color: red; display: none;"></span>
 
-                                <div class="mb-3">
-                                    <label for="pallets-{{ $shipment->stm_id }}" class="form-label">Pallets</label>
-                                    <input type="text" class="form-control" id="pallets-{{ $shipment->stm_id }}" name="pallets" value="{{ $shipment->pallets }}" oninput="validateShipment('{{ $shipment->stm_id }}')">
-                                </div>
+                            <div class="mb-3">
+                                <label for="security_seals" class="form-label">Security Seal</label>
+                                <input type="text" class="form-control" id="security_seals" name="security_seals" value="{{ $shipment->security_seals }}" data-original="{{ $shipment->security_seals }}">
+                            </div>
 
-                                <span id="error-message-{{ $shipment->stm_id }}" style="color: red; display: none;"></span>
-
-                                <div class="mb-3">
-                                    <label for="security_seals" class="form-label">Security Seal</label>
-                                    <input type="text" class="form-control" id="security_seals" name="security_seals" value="{{ $shipment->security_seals }}">
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="notes" class="form-label">Notes</label>
-                                    <textarea class="form-control" id="notes" name="notes" rows="3">{{ $shipment->notes }}</textarea>
-                                </div>
+                            <div class="mb-3">
+                                <label for="notes" class="form-label">Notes</label>
+                                <textarea class="form-control" id="notes" name="notes" rows="3" data-original="{{ $shipment->notes }}">{{ $shipment->notes }}</textarea>
+                            </div>
 
 
                                 <!-- Agrega más campos si es necesario -->
@@ -468,7 +466,7 @@
                                 <input type="hidden" name="_method" value="PUT">
 
                                 <label for="currentStatus" class="form-label">Current Status</label>
-                                <select class="form-select" id="currentStatus-{{ $shipment->stm_id }}" name="gnct_id_current_status">
+                                <select class="form-select" id="currentStatus-{{ $shipment->stm_id }}" name="gnct_id_current_status" data-original="{{ old('gnct_id_current_status', $shipment->gnct_id_current_status) }}">
                                     @foreach ($currentStatus as $status)
                                         <option value="{{ $status->gnct_id }}"
                                             {{ old('gnct_id_current_status', $shipment->gnct_id_current_status) == $status->gnct_id ? 'selected' : '' }}>
@@ -481,7 +479,8 @@
                                     <label for="driverAssignmentDate-{{ $shipment->stm_id }}" class="form-label">Driver Assignment Date</label>
                                     <input type="text" class="form-control flatpickr" id="driverAssignmentDate-{{ $shipment->stm_id }}" name="driver_assigned_date"
                                         value="{{ $shipment->driver_assigned_date ? \Carbon\Carbon::parse($shipment->driver_assigned_date)->format('m/d/Y H:i') : '' }}"
-                                         placeholder="mm/dd/yyyy --:--"
+                                        placeholder="mm/dd/yyyy --:--"
+                                        data-original="{{ $shipment->driver_assigned_date ? \Carbon\Carbon::parse($shipment->driver_assigned_date)->format('m/d/Y H:i') : '' }}"
                                         onfocus="checkAndChangeStatus('driverAssignmentDate-{{ $shipment->stm_id }}', 'Driver Assigned', '{{ $shipment->stm_id }}')">
                                 </div>
 
@@ -489,7 +488,8 @@
                                     <label for="pickUpDate-{{ $shipment->stm_id }}" class="form-label">Pick Up Date</label>
                                     <input type="text" class="form-control flatpickr" id="pickUpDate-{{ $shipment->stm_id }}" name="pick_up_date"
                                         value="{{ $shipment->pick_up_date ? \Carbon\Carbon::parse($shipment->pick_up_date)->format('m/d/Y H:i') : '' }}"
-                                         placeholder="mm/dd/yyyy --:--"
+                                        placeholder="mm/dd/yyyy --:--"
+                                        data-original="{{ $shipment->pick_up_date ? \Carbon\Carbon::parse($shipment->pick_up_date)->format('m/d/Y H:i') : '' }}"
                                         onfocus="checkAndChangeStatus('pickUpDate-{{ $shipment->stm_id }}', 'Picked Up', '{{ $shipment->stm_id }}')">
                                 </div>
 
@@ -498,6 +498,7 @@
                                     <input type="text" class="form-control flatpickr" id="inTransitDate-{{ $shipment->stm_id }}" name="intransit_date"
                                         value="{{ $shipment->intransit_date ? \Carbon\Carbon::parse($shipment->intransit_date)->format('m/d/Y H:i') : '' }}"
                                         placeholder="mm/dd/yyyy --:--"
+                                        data-original="{{ $shipment->intransit_date ? \Carbon\Carbon::parse($shipment->intransit_date)->format('m/d/Y H:i') : '' }}"
                                         onfocus="checkAndChangeStatus('inTransitDate-{{ $shipment->stm_id }}', 'In Transit', '{{ $shipment->stm_id }}')">
                                 </div>
 
@@ -506,23 +507,24 @@
                                     <input type="text" class="form-control flatpickr" id="securedYardDate-{{ $shipment->stm_id }}" name="secured_yarddate"
                                         value="{{ $shipment->secured_yarddate ? \Carbon\Carbon::parse($shipment->secured_yarddate)->format('m/d/Y H:i') : '' }}"
                                         placeholder="mm/dd/yyyy --:--"
+                                        data-original="{{ $shipment->secured_yarddate ? \Carbon\Carbon::parse($shipment->secured_yarddate)->format('m/d/Y H:i') : '' }}"
                                         onfocus="checkAndChangeStatus('securedYardDate-{{ $shipment->stm_id }}', 'Secured Yard', '{{ $shipment->stm_id }}')">
                                 </div>
 
                                 <!-- Campos de Incidentes desactivados para pruebas -->
                                 <div class="mb-3">
                                     <label for="secIncident-{{ $shipment->stm_id }}" class="form-label">Sec Incident</label>
-                                    <select class="form-select" id="secIncident-{{ $shipment->stm_id }}" name="sec_incident" disabled>
+                                    <select class="form-select" id="secIncident-{{ $shipment->stm_id }}" name="sec_incident" disabled data-original="null">
                                         <option value="null" selected>No Incident</option>
                                     </select>
                                 </div>
                                 <div class="mb-3">
                                     <label for="incidentType-{{ $shipment->stm_id }}" class="form-label">Incident Type</label>
-                                    <input type="text" class="form-control" id="incidentType-{{ $shipment->stm_id }}" name="incident_type" disabled placeholder="Type of incident (if any)">
+                                    <input type="text" class="form-control" id="incidentType-{{ $shipment->stm_id }}" name="incident_type" disabled placeholder="Type of incident (if any)" data-original="">
                                 </div>
                                 <div class="mb-3">
                                     <label for="incidentDate-{{ $shipment->stm_id }}" class="form-label">Incident Date</label>
-                                    <input type="datetime-local" class="form-control" id="incidentDate-{{ $shipment->stm_id }}" name="incident_date" disabled>
+                                    <input type="datetime-local" class="form-control" id="incidentDate-{{ $shipment->stm_id }}" name="incident_date" disabled data-original="">
                                 </div>
 
                                 <div class="d-flex justify-content-end">
@@ -945,6 +947,47 @@
                 instance.setDate(new Date(), true); // Establece la fecha actual
             }
         },
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Seleccionamos todos los modales que tienen el prefijo 'shipmentModal' en su ID
+        const shipmentModals = document.querySelectorAll("[id^='shipmentModal']");
+
+        shipmentModals.forEach(shipmentModal => {
+            // Al abrir el modal, guardar los valores actuales de los campos de fecha y otros
+            shipmentModal.addEventListener("shown.bs.modal", function () {
+                const dateInputs = shipmentModal.querySelectorAll("input[type='date'], input[type='datetime-local'], .flatpickr");
+                const selectInputs = shipmentModal.querySelectorAll("select");
+
+                dateInputs.forEach(input => {
+                    if (input.value) {
+                        input.dataset.original = input.value; // Guardar el valor en el dataset original
+                    } else {
+                        input.dataset.original = ''; // Si está vacío, también guardamos ese estado
+                    }
+                });
+
+                selectInputs.forEach(select => {
+                    if (select.value) {
+                        select.dataset.original = select.value; // Guardar el valor en el dataset original
+                    } else {
+                        select.dataset.original = ''; // Si está vacío, también guardamos ese estado
+                    }
+                });
+            });
+
+            // Al cerrar el modal, restaurar los valores originales
+            shipmentModal.addEventListener("hidden.bs.modal", function () {
+                const inputs = shipmentModal.querySelectorAll("input, select, textarea, .flatpickr");
+                inputs.forEach(input => {
+                    if (input.dataset.original !== undefined) {
+                        input.value = input.dataset.original; // Restaurar el valor original
+                    }
+                });
+            });
+        });
     });
 </script>
 

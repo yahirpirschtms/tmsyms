@@ -98,11 +98,12 @@
                             @csrf
                             <div class="mb-3">
                                 <label for="trailerId{{ $shipment->stm_id }}" class="form-label">Trailer ID</label>
-                                <input type="text" class="form-control" id="trailerId{{ $shipment->stm_id }}" name="id_trailer" value="{{ $shipment->id_trailer ?? '' }}" readonly>
+                                <input type="text" class="form-control" id="trailerId{{ $shipment->stm_id }}" name="id_trailer" value="{{ $shipment->id_trailer ?? '' }}" readonly data-original="{{ $shipment->id_trailer ?? '' }}">
                             </div>
+
                             <div class="mb-3">
                                 <label for="currentStatus{{ $shipment->stm_id }}" class="form-label">Current Status</label>
-                                <select class="form-select" id="currentStatus-{{ $shipment->stm_id }}" name="gnct_id_current_status">
+                                <select class="form-select" id="currentStatus-{{ $shipment->stm_id }}" name="gnct_id_current_status" data-original="{{ $shipment->gnct_id_current_status }}">
                                     @foreach ($currentStatus as $status)
                                         <option value="{{ $status->gnct_id }}"
                                             {{ old('gnct_id_current_status', $shipment->gnct_id_current_status) == $status->gnct_id ? 'selected' : '' }}>
@@ -111,6 +112,7 @@
                                     @endforeach
                                 </select>
                             </div>
+
                             <div class="mb-3">
                                 <label for="deliveredDate{{ $shipment->stm_id }}" class="form-label">Delivered Date</label>
                                 <input type="text"
@@ -119,25 +121,30 @@
                                     name="delivered_date"
                                     value="{{ $shipment->delivered_date ? \Carbon\Carbon::parse($shipment->delivered_date)->format('m/d/Y H:i') : '' }}"
                                     placeholder="{{ $shipment->delivered_date ? '' : 'mm/dd/yyyy --:--' }}"
+                                    data-original="{{ $shipment->delivered_date ? \Carbon\Carbon::parse($shipment->delivered_date)->format('m/d/Y H:i') : '' }}"
                                     onfocus="checkAndChangeStatus('deliveredDate{{ $shipment->stm_id }}', 'Delivered', '{{ $shipment->stm_id }}')">
                             </div>
 
                             <div class="mb-3">
                                 <label for="atDoorDate{{ $shipment->stm_id }}" class="form-label">At Door Date</label>
                                 <input type="text" class="form-control datetime-picker" id="atDoorDate{{ $shipment->stm_id }}" name="at_door_date"
-                                    value="{{ old('at_door_date', $shipment->at_door_date ? \Carbon\Carbon::parse($shipment->at_door_date)->format('m/d/Y H:i') : '') }}" placeholder="mm/dd/yyyy --:--">
+                                    value="{{ old('at_door_date', $shipment->at_door_date ? \Carbon\Carbon::parse($shipment->at_door_date)->format('m/d/Y H:i') : '') }}"
+                                    placeholder="mm/dd/yyyy --:--"
+                                    data-original="{{ old('at_door_date', $shipment->at_door_date ? \Carbon\Carbon::parse($shipment->at_door_date)->format('m/d/Y H:i') : '') }}">
                             </div>
 
                             <div class="mb-3">
                                 <label for="offloadTime{{ $shipment->stm_id }}" class="form-label">Offload Time</label>
                                 <input type="time" class="form-control" id="offloadTime{{ $shipment->stm_id }}" name="offloading_time"
-                                    value="{{ old('offloading_time', $shipment->offloading_time ? \Carbon\Carbon::parse($shipment->offloading_time)->format('H:i') : '') }}">
+                                    value="{{ old('offloading_time', $shipment->offloading_time ? \Carbon\Carbon::parse($shipment->offloading_time)->format('H:i') : '') }}"
+                                    data-original="{{ old('offloading_time', $shipment->offloading_time ? \Carbon\Carbon::parse($shipment->offloading_time)->format('H:i') : '') }}">
                             </div>
 
                             <div class="mb-3">
                                 <label for="approvedETADateTime{{ $shipment->stm_id }}" class="form-label">Approved ETA Date & Time</label>
                                 <input type="text" class="form-control datetime-picker" id="approvedETADateTime{{ $shipment->stm_id }}" name="wh_auth_date"
-                                    value="{{ old('wh_auth_date', $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y H:i') : '') }}">
+                                    value="{{ old('wh_auth_date', $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y H:i') : '') }}"
+                                    data-original="{{ old('wh_auth_date', $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y H:i') : '') }}">
                             </div>
                             <div class="d-flex justify-content-end">
                                 <button type="submit" class="btn btn-primary" id="saveButton{{ $shipment->stm_id }}">Save</button>
@@ -352,6 +359,46 @@
     });
 </script>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Seleccionamos todos los modales que tienen el prefijo 'shipmentModal' en su ID
+        const shipmentModals = document.querySelectorAll("[id^='shipmentModal']");
+
+        shipmentModals.forEach(shipmentModal => {
+            // Al abrir el modal, guardar los valores actuales de los campos de fecha y otros
+            shipmentModal.addEventListener("shown.bs.modal", function () {
+                const dateInputs = shipmentModal.querySelectorAll("input[type='date'], input[type='datetime-local'], .flatpickr");
+                const selectInputs = shipmentModal.querySelectorAll("select");
+
+                dateInputs.forEach(input => {
+                    if (input.value) {
+                        input.dataset.original = input.value; // Guardar el valor en el dataset original
+                    } else {
+                        input.dataset.original = ''; // Si está vacío, también guardamos ese estado
+                    }
+                });
+
+                selectInputs.forEach(select => {
+                    if (select.value) {
+                        select.dataset.original = select.value; // Guardar el valor en el dataset original
+                    } else {
+                        select.dataset.original = ''; // Si está vacío, también guardamos ese estado
+                    }
+                });
+            });
+
+            // Al cerrar el modal, restaurar los valores originales
+            shipmentModal.addEventListener("hidden.bs.modal", function () {
+                const inputs = shipmentModal.querySelectorAll("input, select, textarea, .flatpickr");
+                inputs.forEach(input => {
+                    if (input.dataset.original !== undefined) {
+                        input.value = input.dataset.original; // Restaurar el valor original
+                    }
+                });
+            });
+        });
+    });
+</script>
 
 
 @endsection
