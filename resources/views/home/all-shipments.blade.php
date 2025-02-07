@@ -1023,7 +1023,7 @@ document.addEventListener("DOMContentLoaded", function () {
  // JavaScript para cambiar de pestaña al hacer clic en "Next"
  document.getElementById('nextButton').addEventListener('click', function () {
     // Obtener el STM ID dinámicamente
-    var stmId = '{{ $shipment->stm_id }}';
+    var stmId = '{{ $shipment->stm_id ?? '' }}';
 
     // Obtener la siguiente pestaña basada en el STM ID
     var nextTab = document.getElementById('pills-update-status-tab' + stmId);
