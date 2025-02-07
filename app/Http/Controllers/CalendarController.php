@@ -17,16 +17,16 @@ class CalendarController extends Controller
         if (Auth::check()) {
             // Obtener el ID del estado 'Finalized' desde el catálogo
             $finalizedStatus = GenericCatalog::where('gntc_value', 'Finalized')
-                ->where('gntc_group', 'current_status')
+                ->where('gntc_group', 'CURRENT_STATUS')
                 ->first();
 
             // Filtrar los envíos que no tienen el estado 'Finalized'
             $shipments = Shipments::where('gnct_id_current_status', '!=', $finalizedStatus->gnct_id)->get();
-            $currentStatus = GenericCatalog::where('gntc_group', 'current_status')->get();
+            $currentStatus = GenericCatalog::where('gntc_group', 'CURRENT_STATUS')->get();
 
             // Obtener los catálogos para 'MWD_LOCATION' (origen) y 'STATUS_E_REPORT' (estado actual)
             $originCatalog = GenericCatalog::where('gntc_group', 'MWD_LOCATION')->get()->keyBy('gnct_id');
-            $statusCatalog = GenericCatalog::where('gntc_group', 'current_status')->get()->keyBy('gnct_id');
+            $statusCatalog = GenericCatalog::where('gntc_group', 'CURRENT_STATUS')->get()->keyBy('gnct_id');
 
             // Obtener el primer envío, o dejar $shipment como null si no hay envíos
             $shipment = $shipments->first() ?? null;
@@ -93,11 +93,11 @@ class CalendarController extends Controller
         if (Auth::check()) {
             // Obtener todos los envíos
             $shipments = Shipments::all();
-            $currentStatus = GenericCatalog::where('gntc_group', 'current_status')->get();
+            $currentStatus = GenericCatalog::where('gntc_group', 'CURRENT_STATUS')->get();
 
             // Obtener los catálogos para 'MWD_LOCATION' (origen) y 'STATUS_E_REPORT' (estado actual)
             $originCatalog = GenericCatalog::where('gntc_group', 'MWD_LOCATION')->get()->keyBy('gnct_id');
-            $statusCatalog = GenericCatalog::where('gntc_group', 'current_status')->get()->keyBy('gnct_id');
+            $statusCatalog = GenericCatalog::where('gntc_group', 'CURRENT_STATUS')->get()->keyBy('gnct_id');
 
             // Obtener el primer envío, o dejar $shipment como null si no hay envíos
             $shipment = $shipments->first() ?? null;

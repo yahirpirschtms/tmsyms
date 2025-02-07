@@ -49,10 +49,10 @@ class ShipmentController extends Controller
 
 
         // Obtener los estados actuales desde la base de datos
-        $currentStatus = GenericCatalog::where('gntc_group', 'current_status')->get();
+        $currentStatus = GenericCatalog::where('gntc_group', 'CURRENT_STATUS')->get();
 
         // Obtener los tipos de envío desde la base de datos
-        $shipmentType = GenericCatalog::where('gntc_group', 'shipment_type')->get();
+        $shipmentType = GenericCatalog::where('gntc_group', 'SHIPMENT_TYPE')->get();
 
         // Obtener todas las compañías para los selects
         $companies = Companies::where('notes', 'ym')->get();
@@ -74,17 +74,17 @@ class ShipmentController extends Controller
         if (Auth::check()) {
             // Obtener el ID del estado 'Finalized' desde el catálogo
             $finalizedStatus = GenericCatalog::where('gntc_value', 'Finalized')
-                ->where('gntc_group', 'current_status')
+                ->where('gntc_group', 'CURRENT_STATUS')
                 ->first();
 
             // Filtrar los envíos que no tienen el estado 'Finalized'
             $shipments = Shipments::where('gnct_id_current_status', '!=', $finalizedStatus->gnct_id)->get();
 
             // Obtener los estados actuales desde la base de datos
-            $currentStatus = GenericCatalog::where('gntc_group', 'current_status')->get();
+            $currentStatus = GenericCatalog::where('gntc_group', 'CURRENT_STATUS')->get();
 
             // Obtener los tipos de envío desde la base de datos
-            $shipmentType = GenericCatalog::where('gntc_group', 'shipment_type')->get();
+            $shipmentType = GenericCatalog::where('gntc_group', 'SHIPMENT_TYPE')->get();
 
             // Obtener todas las compañías para los selects
             $companies = Companies::where('notes', 'ym')->get();
@@ -118,7 +118,7 @@ class ShipmentController extends Controller
     $shipment->wh_auth_date = \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y');
 
     // Obtener los estatus disponibles bajo el grupo 'STATUS_E_REPORT'
-    $currentStatus = GenericCatalog::where('gntc_group', 'current_status')->get();
+    $currentStatus = GenericCatalog::where('gntc_group', 'CURRENT_STATUS')->get();
 
     // Pasar las variables a la vista
     return view('shipments.details', compact('shipment', 'currentStatus'));
