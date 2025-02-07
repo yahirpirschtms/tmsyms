@@ -51,7 +51,9 @@ document.addEventListener('DOMContentLoaded', function () {
     
     function updateShipmentWHETATable() {
         // Obtener los valores de los filtros
+        
         const searchwh = document.getElementById('searchemptytrailergeneralwh').value;
+        //console.log(searchwh);
         const shipmenttypewh = document.getElementById('emptytrailerfilterinputshipmenttypepk').value;
         const idstmwh = document.getElementById('emptytrailerfilterinputidstm').value;
         const secondaryshipmentwh = document.getElementById('emptytrailerfilterinputsecondaryid').value;
@@ -84,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const params = new URLSearchParams(url.search);
 
         // Agregar los filtros a los parámetros de la URL
-        params.set('search', searchwh);
+        params.set('searchwh', searchwh);
         params.set('gnct_id_shipment_type', shipmenttypewh);
         params.set('stm_id', idstmwh);
         params.set('secondary_shipment_id', secondaryshipmentwh);

@@ -206,6 +206,7 @@ public function update(Request $request)
         if (Auth::check()) {
             $emptyTrailers = EmptyTrailer::with(['availabilityIndicator', 'locations', 'carriers'])
             ->whereNull('availability')
+            ->orWhere('availability', '')
             ->get();
             return view('home.index', compact('emptyTrailers'));
         }
@@ -292,8 +293,8 @@ public function update(Request $request)
     //Funcion actualizar tabla con los filtros o al refresh
     public function getEmptyTrailers(Request $request){
                 $query = EmptyTrailer::with(['availabilityIndicator', 'locations', 'carriers'])
-                ->whereNull('availability');
-                
+                ->whereNull('availability')
+                ->orWhere('availability', '');                
                 
                 // Filtros generales (searchemptytrailergeneral)
                 if ($request->has('search')) {
