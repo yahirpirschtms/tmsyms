@@ -10,7 +10,7 @@ class GenericCatalogController extends Controller
     //Sacar todos los Availability Indicators
     public function getAvailabilityIndicators()
     {
-        $data = GenericCatalog::where('gntc_group', 'availability_indicator')
+        $data = GenericCatalog::where('gntc_group', 'AVAILABILITY_INDICATOR')
             //->where('gntc_status', 1) // Filtrar sólo registros activos
             ->select('gnct_id', 'gntc_description')
             ->get();
@@ -28,7 +28,7 @@ class GenericCatalogController extends Controller
     //Sacar todos los Shipment Types
     public function getShipmentTypes()
     {
-        $data = GenericCatalog::where('gntc_group', 'shipment_type')
+        $data = GenericCatalog::where('gntc_group', 'SHIPMENT_TYPE')
             //->where('gntc_status', 1) // Filtrar sólo registros activos
             ->select('gnct_id', 'gntc_description')
             ->get();
@@ -46,7 +46,7 @@ class GenericCatalogController extends Controller
     //Sacar todos los Current Status
     public function getCurrentStatus()
     {
-        $data = GenericCatalog::where('gntc_group', 'current_status')
+        $data = GenericCatalog::where('gntc_group', 'CURRENT_STATUS')
             //->where('gntc_status', 1) // Filtrar sólo registros activos
             ->select('gnct_id', 'gntc_description')
             ->get();

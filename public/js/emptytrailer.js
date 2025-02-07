@@ -2,7 +2,6 @@
 $(document).ready(function () {
     var carrierRoute = $('#inputcarrier').data('url');
     var newlyCreatedCarrierId = null; // Variable para almacenar el ID del carrier recién creado
-    var selectedCarriers = []; // Arreglo para almacenar todos los drivers seleccionados
 
     function loadCarriers() {
         $('#inputcarrier').select2({
