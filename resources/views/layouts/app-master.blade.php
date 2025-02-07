@@ -327,11 +327,9 @@
     right: 15px; /* Mueve la "X" más a la izquierda */
 }
 
-/*.select2-container--default .select2-search--dropdown .select2-search__field {
-  border-color: transparent; 
-  box-shadow: none;   
-  border: none;
-}*/
+.select2-container {
+    width: 100% !important; 
+}
 
     </style>
 </head>

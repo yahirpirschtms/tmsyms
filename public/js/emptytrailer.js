@@ -33,6 +33,22 @@ $(document).ready(function () {
     }
 
     loadCarriers();
+    $.ajax({
+        url: '/carrier-emptytrailerAjax',  // Ruta que manejará la carga de los drivers existentes
+        type: 'GET',
+        dataType: 'json',
+        success: function (data) {
+            data.forEach(function (carrier) {
+                if (!selectedCarriers.includes(carrier.CoName)) {
+                    selectedCarriers.push(carrier.CoName); // Agregar al arreglo si no está ya
+                }
+            });
+            console.log("Carriers Registro cargados desde la base de datos:", selectedCarriers);
+        },
+        error: function (xhr, status, error) {
+            console.error('Error al cargar los Carriers Registro existentes:', error);
+        }
+    });
 
     // Actualizar la lista cuando se haga clic en el select
     $('#inputcarrier').on('click', function () {
@@ -47,7 +63,12 @@ $(document).ready(function () {
         // Si no es el nuevo carrier, lo procesamos
         if (selectedText  !== newlyCreatedCarrierId &&  selectedText.trim() !== '') {
             console.log(selectedText);
-            saveNewCarrier(selectedText);
+            //saveNewCarrier(selectedText);
+            if (!selectedCarriers.includes(selectedText)) {
+                selectedCarriers.push(selectedText);  // Agregar al arreglo solo si no existe
+                console.log(selectedCarriers);  // Mostrar el arreglo con todos los drivers seleccionados
+                saveNewCarrier(selectedText);
+            }
         }
     });
 
@@ -95,6 +116,7 @@ $(document).ready(function () {
 $(document).ready(function () {
     var carrierRoute = $('#updateinputcarrier').data('url');
     var newlyCreatedCarrierId = null; // Variable para almacenar el ID del carrier recién creado
+    var selectedCarriersUpdate = []; // Arreglo para almacenar todos los drivers seleccionados
 
     function loadCarriersUpdate() {
         $('#updateinputcarrier').select2({
@@ -127,6 +149,23 @@ $(document).ready(function () {
 
     loadCarriersUpdate();
 
+    $.ajax({
+        url: '/carrier-emptytrailerAjax',  // Ruta que manejará la carga de los drivers existentes
+        type: 'GET',
+        dataType: 'json',
+        success: function (data) {
+            data.forEach(function (carrier) {
+                if (!selectedCarriersUpdate.includes(carrier.CoName)) {
+                    selectedCarriersUpdate.push(carrier.CoName); // Agregar al arreglo si no está ya
+                }
+            });
+            console.log("Carriers Update cargados desde la base de datos:", selectedCarriersUpdate);
+        },
+        error: function (xhr, status, error) {
+            console.error('Error al cargar los Carriers Update existentes:', error);
+        }
+    });
+
     // Actualizar la lista cuando se haga clic en el select
     $('#updateinputcarrier').on('click', function () {
         loadCarriersUpdate();
@@ -140,7 +179,12 @@ $(document).ready(function () {
         // Si no es el nuevo carrier, lo procesamos
         if (selectedText  !== newlyCreatedCarrierId &&  selectedText.trim() !== '') {
             console.log(selectedText);
-            saveNewCarrier(selectedText);
+            //saveNewCarrier(selectedText);
+            if (!selectedCarriersUpdate.includes(selectedText)) {
+                selectedCarriersUpdate.push(selectedText);  // Agregar al arreglo solo si no existe
+                console.log(selectedCarriersUpdate);  // Mostrar el arreglo con todos los drivers seleccionados
+                saveNewCarrier(selectedText);
+            }
         }
     });
 
@@ -190,6 +234,7 @@ $(document).ready(function () {
 $(document).ready(function () {
     var carrierRoute = $('#inputlocation').data('url');
     var newlyCreatedCarrierId = null; // Variable para almacenar el ID del carrier recién creado
+    var selectedLocations = []; // Arreglo para almacenar todos los drivers seleccionados
 
     function loadLocations() {
         $('#inputlocation').select2({
@@ -222,6 +267,23 @@ $(document).ready(function () {
 
     loadLocations();
 
+    $.ajax({
+        url: '/locations-emptytrailerAjax',  // Ruta que manejará la carga de los drivers existentes
+        type: 'GET',
+        dataType: 'json',
+        success: function (data) {
+            data.forEach(function (carrier) {
+                if (!selectedLocations.includes(carrier.CoName)) {
+                    selectedLocations.push(carrier.CoName); // Agregar al arreglo si no está ya
+                }
+            });
+            console.log("Locarions Registro cargados desde la base de datos:", selectedLocations);
+        },
+        error: function (xhr, status, error) {
+            console.error('Error al cargar los Locations Registro existentes:', error);
+        }
+    });
+
     // Actualizar la lista cuando se haga clic en el select
     $('#inputlocation').on('click', function () {
         loadLocations();
@@ -235,7 +297,12 @@ $(document).ready(function () {
         // Si no es el nuevo carrier, lo procesamos
         if (selectedText  !== newlyCreatedCarrierId &&  selectedText.trim() !== '') {
             console.log(selectedText);
-            saveNewCarrier(selectedText);
+            //saveNewCarrier(selectedText);
+            if (!selectedLocations.includes(selectedText)) {
+                selectedLocations.push(selectedText);  // Agregar al arreglo solo si no existe
+                console.log(selectedLocations);  // Mostrar el arreglo con todos los drivers seleccionados
+                saveNewCarrier(selectedText);
+            }
         }
     });
 
@@ -283,6 +350,7 @@ $(document).ready(function () {
 $(document).ready(function () {
     var carrierRoute = $('#updateinputlocation').data('url');
     var newlyCreatedCarrierId = null; // Variable para almacenar el ID del carrier recién creado
+    var selectedLocationsUpdate = []; // Arreglo para almacenar todos los drivers seleccionados
 
     function loadLocationsUpdate() {
         $('#updateinputlocation').select2({
@@ -315,6 +383,23 @@ $(document).ready(function () {
 
     loadLocationsUpdate();
 
+    $.ajax({
+        url: '/locations-emptytrailerAjax',  // Ruta que manejará la carga de los drivers existentes
+        type: 'GET',
+        dataType: 'json',
+        success: function (data) {
+            data.forEach(function (carrier) {
+                if (!selectedLocationsUpdate.includes(carrier.CoName)) {
+                    selectedLocationsUpdate.push(carrier.CoName); // Agregar al arreglo si no está ya
+                }
+            });
+            console.log("Locations Update cargados desde la base de datos:", selectedLocationsUpdate);
+        },
+        error: function (xhr, status, error) {
+            console.error('Error al cargar los Locations Update existentes:', error);
+        }
+    });
+
     // Actualizar la lista cuando se haga clic en el select
     $('#updateinputlocation').on('click', function () {
         loadLocationsUpdate();
@@ -328,7 +413,12 @@ $(document).ready(function () {
         // Si no es el nuevo carrier, lo procesamos
         if (selectedText  !== newlyCreatedCarrierId &&  selectedText.trim() !== '') {
             console.log(selectedText);
-            saveNewLocation(selectedText);
+            //saveNewLocation(selectedText);
+            if (!selectedLocationsUpdate.includes(selectedText)) {
+                selectedLocationsUpdate.push(selectedText);  // Agregar al arreglo solo si no existe
+                console.log(selectedLocationsUpdate);  // Mostrar el arreglo con todos los drivers seleccionados
+                saveNewLocation(selectedText);
+            }
         }
     });
 
