@@ -509,8 +509,8 @@ class ShipmentController extends Controller
             });
 
         // Filtros generales (searchemptytrailergeneral)
-        if ($request->has('search')) {
-            $search = $request->input('search');
+        if ($request->has('searchwh')) {
+            $search = $request->input('searchwh');
             //$formattedDate = null;
             $formattedDateTime = null;
             //$formattedDate = \DateTime::createFromFormat('m/d/Y', $search);
@@ -524,9 +524,9 @@ class ShipmentController extends Controller
                     $q->where('gntc_description', 'like', "%$search%");
                 })
                 //->orWhereNull('shipmenttype')
-                ->orWhere('secondary_shipment_id','like',"%$search%")
+                //->orWhere('secondary_shipment_id','like',"%$search%")
                 //->orWhereNull('secondary_shipment_id')
-                ->orWhere('id_trailer','like',"%$search%")
+                //->orWhere('id_trailer','like',"%$search%")
                 //->orWhereNull('id_trailer')
 
                 ->orWhere('etd', 'like', $formattedDateTime)
@@ -534,10 +534,10 @@ class ShipmentController extends Controller
 
                 ->orWhere('units','like',"%$search%")
                 //->orWhereNull('units')
-                ->orWhere('pallets', 'like', "%$search%")
+                ->orWhere('pallets', 'like', "%$search%");
                 //->orWhereNull('pallets')
 
-                ->orWhere('driver_assigned_date', 'like', $formattedDateTime)
+                /*->orWhere('driver_assigned_date', 'like', $formattedDateTime)
                 ->orWhereNull('driver_assigned_date')
                 ->orWhere('pick_up_date', 'like', $formattedDateTime)
                 ->orWhereNull('pick_up_date')
@@ -558,7 +558,7 @@ class ShipmentController extends Controller
 
                 ->orWhere('billing_id','like',"%$search%")
                 //->orWhereNull('billing_id')
-                ->orWhere('device_number','like',"%$search%");
+                ->orWhere('device_number','like',"%$search%");*/
                 //->orWhereNull('device_number');
             });
         }
