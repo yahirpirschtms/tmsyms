@@ -130,7 +130,7 @@ public function update(Request $request)
         // Validar los datos enviados
         $validated = $request->validate([
             'updateinputpktrailer' => 'required', // pk_trailer
-            'updateinputidtrailer' => 'required|unique:empty_trailer,trailer_num',
+            //'updateinputidtrailer' => 'required|unique:empty_trailer,trailer_num',
             'updateinputdateofstatus' => 'required|date', // status
             'updateinputpalletsontrailer' => 'required|numeric|min:1', // pallets_on_trailer
             'updateinputpalletsonfloor' => 'required|numeric|min:1', // pallets_on_floor
@@ -139,8 +139,8 @@ public function update(Request $request)
             'updateinputlocation' => 'required', // location
             'updateinputdatein' => 'required|date', // date_in
         ], [
-            'updateinputidtrailer.required' => 'ID Trailer is required.',
-            'updateinputidtrailer.unique' => 'The trailer number has already been taken.',
+            //'updateinputidtrailer.required' => 'ID Trailer is required.',
+            //'updateinputidtrailer.unique' => 'The trailer number has already been taken.',
             'updateinputdateofstatus.required' => 'Status date is required.',
             'updateinputdateofstatus.date' => 'The status date field must be a valid date.',
             'updateinputcarrier.required' => 'Carrier is required.',
@@ -161,7 +161,7 @@ public function update(Request $request)
 
         // Mapear los datos del formulario a los nombres de las columnas
         $dataToUpdate = [
-            'trailer_num' => $validated['updateinputidtrailer'],
+            //'trailer_num' => $validated['updateinputidtrailer'],
             'status' => Carbon::createFromFormat('m/d/Y', $validated['updateinputdateofstatus'])->format('Y-m-d'),
             'pallets_on_trailer' => $validated['updateinputpalletsontrailer'],
             'pallets_on_floor' => $validated['updateinputpalletsonfloor'],
