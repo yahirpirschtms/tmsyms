@@ -1432,7 +1432,7 @@ $(document).ready(function() {
 
     // Función de validación en tiempo real
     const formFields = [
-        'updateinputidtrailer',
+        //'updateinputidtrailer',
         'updateinputdateofstatus',
         'updateinputpalletsontrailer',
         'updateinputpalletsonfloor',

@@ -1365,7 +1365,7 @@ LoadCurrentStatus();
                     }).then((result) => {
                         if (result.isConfirmed) {
                             // Redirige directamente a la URL de tu vista
-                            window.location.href = '/home';
+                            window.location.href = '/whapptapproval';
                         }
                     });
                     //$('#closenewtrailerregister').click();
