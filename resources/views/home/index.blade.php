@@ -541,11 +541,9 @@
                                 <input type="hidden" id="updateinputpktrailer" name="updateinputpktrailer">
                                             <div class="mb-3">
                                                 <label for="updateinputidtrailer" class="form-label">ID Trailer</label>
-<<<<<<< HEAD
-                                                <input type="text" disabled class="form-control" id="updateinputidtrailer" name="updateinputidtrailer" value="{{ old('updateinputidtrailer') }}">
-=======
+
                                                 <input disabled type="text" class="form-control" id="updateinputidtrailer" name="updateinputidtrailer" value="{{ old('updateinputidtrailer') }}">
->>>>>>> a690ff291518f777e105c82b831655ab6a0d58db
+
                                                 <div class="invalid-feedback" id="error-updateinputidtrailer"></div>
                                             </div>
 
