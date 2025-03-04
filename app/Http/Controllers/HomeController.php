@@ -136,7 +136,7 @@ public function update(Request $request)
             'updateinputpalletsonfloor' => 'required|numeric|min:1', // pallets_on_floor
             'updateinputcarrier' => 'required', // carrier
             'updateinputavailabilityindicator' => 'nullable|exists:generic_catalogs,gnct_id', // gnct_id_availability_indicator
-            'updateinputlocation' => 'required', // location
+            'updateinputlocation' => 'nullable', // location
             'updateinputdatein' => 'required|date', // date_in
         ], [
             //'updateinputidtrailer.required' => 'ID Trailer is required.',
@@ -145,7 +145,7 @@ public function update(Request $request)
             'updateinputdateofstatus.date' => 'The status date field must be a valid date.',
             'updateinputcarrier.required' => 'Carrier is required.',
             //'updateinputcarrier.exists' => 'Carrier selected is not valid.',
-            'updateinputlocation.required' => 'Location is required.',
+            //'updateinputlocation.required' => 'Location is required.',
             //'updateinputlocation.exists' => 'Location selected is not valid.',
             'updateinputdatein.required' => 'Date In is required.',
             'updateinputpalletsontrailer.numeric' => 'Pallets on trailer must be an integer',
@@ -167,7 +167,7 @@ public function update(Request $request)
             'pallets_on_floor' => $validated['updateinputpalletsonfloor'],
             'carrier' => $validated['updateinputcarrier'],
             'gnct_id_availability_indicator' => $validated['updateinputavailabilityindicator'],
-            'location' => $validated['updateinputlocation'],
+            //'location' => $validated['updateinputlocation'],
             'date_in' => Carbon::createFromFormat('m/d/Y H:i:s', $validated['updateinputdatein'])->format('Y-m-d H:i:s'),
         ];
 
@@ -225,7 +225,7 @@ public function update(Request $request)
             'inputpalletsonfloor' => 'required|numeric|min:1',
             'inputcarrier' => 'required',
             'inputavailabilityindicator' => 'nullable|exists:generic_catalogs,gnct_id',
-            'inputlocation' => 'required',
+            'inputlocation' => 'nullable',
             'inputdatein' => 'required|date',
             'inputdateout' => 'nullable',
             'inputtransactiondate' => 'nullable',
@@ -249,7 +249,7 @@ public function update(Request $request)
             //'inputavailabilityindicator.required' => 'Availability Indicator is required.',
             //'inputavailabilityindicator.integer' => 'Availability Indicator must be an integer.',
             'inputavailabilityindicator.exists' => 'Availability Indicator selected is not valid.',
-            'inputlocation.required' => 'Location is required.',
+            //'inputlocation.required' => 'Location is required.',
             //'inputlocation.string' => 'Location must be a text string.',
             //'inputlocation.exists' => 'Location selected is not valid.',
             'inputdatein.required' => 'Date In is required.',
@@ -293,8 +293,7 @@ public function update(Request $request)
     //Funcion actualizar tabla con los filtros o al refresh
     public function getEmptyTrailers(Request $request){
                 $query = EmptyTrailer::with(['availabilityIndicator', 'locations', 'carriers'])
-                ->whereNull('availability')
-                ->orWhere('availability', '');                
+                ->whereNull('availability');                
                 
                 // Filtros generales (searchemptytrailergeneral)
                 if ($request->has('search')) {
@@ -355,11 +354,30 @@ public function update(Request $request)
                 $q->where('carrier', $request->input('carrier'));
             });
         }
+
+        // Filtro para múltiples carriers seleccionadas
+        if ($request->has('carrierscheckbox') && $request->input('carrierscheckbox') != '') {
+            $carrierscheck = explode(',', $request->input('carrierscheckbox')); // Convierte la cadena en un array
+
+            $query->whereHas('carriers', function($q) use ($carrierscheck) {
+                $q->whereIn('carrier', $carrierscheck); // Filtra por cualquier ubicación en el array
+            });
+        }
+
         if ($request->has('gnct_id_availability_indicator') && $request->input('gnct_id_availability_indicator') != '') {
             $query->whereHas('availabilityIndicator', function($q) use ($request) {
                 $q->where('gnct_id', $request->input('gnct_id_availability_indicator'));
             });
         }
+        // Filtro para múltiples carriers seleccionadas
+        if ($request->has('indicators') && $request->input('indicators') != '') {
+            $indicatorscheck = explode(',', $request->input('indicators')); // Convierte la cadena en un array
+
+            $query->whereHas('availabilityIndicator', function($q) use ($indicatorscheck) {
+                $q->whereIn('gnct_id', $indicatorscheck); // Filtra por cualquier ubicación en el array
+            });
+        }
+
         if ($request->has('location') && $request->input('location') != '') {
             $query->whereHas('locations', function($q) use ($request) {
                 $q->where('location', 'like', "%{$request->input('location')}%");
@@ -379,6 +397,15 @@ public function update(Request $request)
                 $startDate,
                 $endDate
             ]);
+        }
+
+        // Filtro para múltiples ubicaciones seleccionadas
+        if ($request->has('locations') && $request->input('locations') != '') {
+            $locations = explode(',', $request->input('locations')); // Convierte la cadena en un array
+
+            $query->whereHas('locations', function($q) use ($locations) {
+                $q->whereIn('location', $locations); // Filtra por cualquier ubicación en el array
+            });
         }
 
         // Filtro de fechas para date_out
@@ -409,5 +436,7 @@ public function update(Request $request)
         // Devolver los datos en formato JSON
         return response()->json($emptyTrailers);
     }
+
+    
 
 }

@@ -1,5 +1,105 @@
-//Busqueda de Driver en un nuevo registro
+
 $(document).ready(function () {
+    //Funcion para buscar el shipmenttype en la pantalla de empty trailer update
+    function loadShipmentType() {
+        var availabilityRoute = $('#inputshipmentshipmenttype').data('url');
+          $.ajax({
+              url: availabilityRoute,
+              method: 'GET',
+              success: function (data) {
+                  let select = $('#inputshipmentshipmenttype');
+                  let selectedValue = select.val();
+                  //let selectedValue = "{{ old('inputavailabilityindicator') }}"; // Recupera el valor previo
+                  select.empty(); // Limpia el select eliminando todas las opciones
+                  //select.append('<option selected disabled hidden></option>'); // Opción inicial
+
+                  if (data.length === 0) {
+                      select.append('<option disabled>No options available</option>');
+                  } else {
+                      data.forEach(item => {
+                          select.append(`<option value="${item.gnct_id}">${item.gntc_description}</option>`);
+                      });
+                  }
+
+                  if (selectedValue) {
+                      select.val(selectedValue); // Restaura el valor anterior
+                  }
+              },
+              error: function (xhr, status, error) {
+                  console.error('Error fetching data Shipment Types:', error);
+              }
+          });
+    }
+
+    //$('#inputshipmentshipmenttype').on('focus', loadShipmentType);
+    loadShipmentType();
+
+    //carga de los current status
+    function LoadCurrentStatus() {
+        var locationsRoute = $('#inputshipmentcurrentstatus').data('url');
+        $.ajax({
+            url: locationsRoute,
+            type: 'GET',
+            success: function (data) {
+                let select = $('#inputshipmentcurrentstatus');
+                let currentValue = select.val(); // Valor actual seleccionado por el usuario
+                let initialValue = select.attr('value'); // Valor inicial definido en el HTML
+        
+                // Si no hay valor actual (por ejemplo, al cargar por primera vez), usa el inicial
+                let selectedValue = currentValue || initialValue;
+        
+                select.empty(); // Limpia el contenido del select
+        
+                // Agrega la opción deshabilitada y oculta solo si no hay valor seleccionado
+                if (!selectedValue) {
+                    select.append('<option selected disabled hidden></option>');
+                }
+        
+                if (data.length === 0) {
+                    select.append('<option disabled>No options available</option>');
+                } else {
+                    let prealertedFound = false;
+                    let driverAssignedFound = false;
+                    
+                    // Añadir las opciones al select
+                    data.forEach(item => {
+                        select.append(`<option value="${item.gnct_id}">${item.gntc_description}</option>`);
+                        
+                        // Verificar si la opción "Prealerted" está entre las opciones
+                        if (item.gntc_description === 'Prealerted' && !prealertedFound) {
+                            prealertedFound = true;
+                        }
+                        
+                        // Verificar si la opción "Driver Assigned" está entre las opciones
+                        if (item.gntc_description === 'Driver Assigned' && !driverAssignedFound) {
+                            driverAssignedFound = true;
+                        }
+                    });
+        
+                    // Si "Driver Assigned" está disponible y el segundo select tiene un valor
+                    let driverValue = $('#inputshipmentdriver').val();
+                    if (driverValue) {
+                        if (driverAssignedFound) {
+                            select.val(data.find(item => item.gntc_description === 'Driver Assigned').gnct_id);
+                        }
+                    } else if (prealertedFound) {
+                        // Si no hay conductor asignado, seleccionamos "Prealerted" por defecto
+                        select.val(data.find(item => item.gntc_description === 'Prealerted').gnct_id);
+                    }
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching data locations:', error);
+            }
+        });
+    }
+    
+    // Ejecutar la función al enfocar el select y al cargar la página
+    $('#inputshipmentcurrentstatus').on('focus', LoadCurrentStatus);
+    $('#inputshipmentdriver').on('change', LoadCurrentStatus);
+    LoadCurrentStatus();
+
+    //Busqueda de Driver en un nuevo registro
     var carrierRoute = $('#inputshipmentdriver').data('url');
     var newlyCreatedCarrierId = null; // Variable para almacenar el ID del carrier recién creado
     var selectedDrivers = []; // Arreglo para almacenar todos los drivers seleccionados
@@ -53,9 +153,9 @@ $(document).ready(function () {
     });
 
     // Actualizar la lista cuando se haga clic en el select
-    $('#inputshipmentdriver').on('click', function () {
+    /*$('#inputshipmentdriver').on('click', function () {
         loadDriversAjax();
-    });
+    });*/
 
     // Cuando el usuario seleccione o ingrese un nuevo valor
     $('#inputshipmentdriver').on('change', function () {
@@ -112,6 +212,125 @@ $(document).ready(function () {
             }
         });
     }
+
+    $("#inputshipmentstmid").on("input", function () {
+        let idService = $(this).val().trim(); // Obtiene el valor del input y quita espacios
+
+        if (idService.length > 6) { // Solo ejecuta si tiene más de 6 caracteres
+            $.ajax({
+                url: "/get-service", // Ruta a tu controlador en Laravel
+                method: "GET",
+                data: { id_service: idService },
+                dataType: "json",
+                success: function (response) {
+                    if (response.success) {
+                        if(response.from !== null && response.from_id !== null){
+                            $("#inputorigin").val(response.from); // Asigna el valor de "from" al input
+                            $("#inputoriginn").val(response.from_id);
+                            $('#inputorigin, #inputshipmentstmid').removeClass('is-invalid');
+                            $('#inputorigin, #inputshipmentstmid').next('.invalid-feedback').text('');
+                            loadLanes();
+                        }else{
+                            $("#inputorigin").val(""); // Borra el valor si no se encontró
+                            $("#inputoriginn").val(""); // Borra el valor si no se encontró
+                            $('#inputorigin').addClass('is-invalid');
+                            $('#inputorigin').next('.invalid-feedback').text('Origin is required.');
+                            $("#inputshipmentstmid").addClass('is-invalid');
+                            $("#inputshipmentstmid").next('.invalid-feedback').text('ID STM has no origin.');
+                            $("#ln_code").val(""); // Borra el valor si no se encontró
+                        }
+                        if(response.to !== null && response.to_id !== null){
+                            $("#inputshipmentdestination").val(response.to);
+                            $("#inputshipmentdestinationn").val(response.to_id);
+                            $('#inputshipmentdestination, #inputshipmentstmid').removeClass('is-invalid');
+                            $('#inputshipmentdestination, #inputshipmentstmid').next('.invalid-feedback').text('');
+                        }else{
+                            $("#inputshipmentdestination").val(""); // Borra el valor si no se encontró
+                            $("#inputshipmentdestinationn").val(""); // Borra el valor si no se encontró
+                            $('#inputshipmentdestination').addClass('is-invalid');
+                            $('#inputshipmentdestination').next('.invalid-feedback').text('Destination is required.');
+                            $("#inputshipmentstmid").addClass('is-invalid');
+                            $("#inputshipmentstmid").next('.invalid-feedback').text('ID STM has no destination.');
+                        }
+                        if(response.from === null && response.from_id === null && response.to === null && response.to_id === null){
+                            $("#inputorigin").val(""); // Borra el valor si no se encontró
+                            $("#inputoriginn").val(""); // Borra el valor si no se encontró
+                            $('#inputorigin').addClass('is-invalid');
+                            $('#inputorigin').next('.invalid-feedback').text('Origin is required.');
+                            $("#ln_code").val(""); // Borra el valor si no se encontró
+                            $("#inputshipmentdestination").val(""); // Borra el valor si no se encontró
+                            $("#inputshipmentdestinationn").val(""); // Borra el valor si no se encontró
+                            $('#inputshipmentdestination').addClass('is-invalid');
+                            $('#inputshipmentdestination').next('.invalid-feedback').text('Destination is required.');
+                            $("#inputshipmentstmid").addClass('is-invalid');
+                            $("#inputshipmentstmid").next('.invalid-feedback').text('ID STM has no origin or destination.');
+                            
+                        }
+                    } else {
+                        let inputorigin = $("#inputorigin").val().trim();
+                        let inputshipmentdestination = $("#inputshipmentdestination").val().trim();
+                        let inputoriginn = $("#inputoriginn").val().trim();
+                        let inputshipmentdestinationn = $("#inputshipmentdestinationn").val().trim();
+                            $("#inputorigin").val(""); // Borra el valor si no se encontró
+                            $("#inputshipmentdestination").val(""); // Borra el valor si no se encontró
+                            $("#inputoriginn").val(""); // Borra el valor si no se encontró
+                            $("#inputshipmentdestinationn").val(""); // Borra el valor si no se encontró
+                            $("#ln_code").val(""); // Borra el valor si no se encontró
+
+                            if($('#inputshipmentstmid').val().trim().length === 0){
+                                $("#inputshipmentstmid").addClass('is-invalid');
+                                $("#inputshipmentstmid").next('.invalid-feedback').text('ID STM is required.');
+                            }else{
+                                $("#inputshipmentstmid").addClass('is-invalid');
+                                $("#inputshipmentstmid").next('.invalid-feedback').text('ID STM doesnt exists.');
+                            }
+                            
+                            if ($('#inputshipmentdestination').val().trim().length === 0) {
+                                $('#inputshipmentdestination').addClass('is-invalid');
+                                $('#inputshipmentdestination').next('.invalid-feedback').text('Destination is required.');
+                            }
+                            if ($('#inputorigin').val().trim().length === 0) {
+                                $('#inputorigin').addClass('is-invalid');
+                                $('#inputorigin').next('.invalid-feedback').text('Origin is required.');
+                            }
+                        
+                    }
+                },
+                error: function () {
+                    console.log("Error en la petición AJAX");
+                }
+            });
+        }else{
+            $("#inputorigin").val(""); // Borra el valor si no se encontró
+            $("#inputoriginn").val(""); // Borra el valor si no se encontró
+            $("#inputshipmentdestination").val(""); // Borra el valor si no se encontró
+            $("#inputshipmentdestinationn").val(""); // Borra el valor si no se encontró
+            $("#ln_code").val(""); // Borra el valor si no se encontró
+        }
+    });
+
+    function loadLanes(){
+        let idorigin = $("#inputorigin").val(); // Obtiene el valor del input y quita espacios
+        let idoriginn = $("#inputoriginn").val().trim();
+            $.ajax({
+                url: "/get-lanestrafficworkflowstart", // Ruta a tu controlador en Laravel
+                method: "GET",
+                data: { id_companie: idorigin },
+                dataType: "json",
+                success: function (response) {
+                    if (response.success) {
+                        $("#ln_code").val(response.ln_code); // Asigna el valor de "from" al input
+                    } else {
+                        $("#ln_code").val(""); // Asigna el valor de "from" al input
+                    }
+                },
+                error: function () {
+                    console.log("Error en la petición AJAX");
+                }
+            });
+        
+    }
+
 });
 
 //Cargar Carries en la pantalla de registro de shipments
@@ -203,9 +422,9 @@ $(document).ready(function () {
     }
 
     // Actualizar la lista cuando se haga clic en el select
-    $('#inputshipmentcarrier').on('click', function () {
+    /*$('#inputshipmentcarrier').on('click', function () {
         loadCarriersShipment();
-    });
+    });*/
 
     // Cuando el usuario seleccione o ingrese un nuevo valor
     $('#inputshipmentcarrier').on('change', function () {
@@ -247,6 +466,7 @@ $(document).ready(function () {
 
                 // Marcar el nuevo ID para evitar que se haga otra solicitud
                 newlyCreatedCarrierId = response.newCarrier.CoName;
+                loadCarriersShipment();
 
                 // Cuando el nuevo carrier sea creado, aseguramos que no se haga más AJAX para este carrier
                 $('#inputshipmentcarrier').on('select2:select', function (e) {
@@ -266,7 +486,7 @@ $(document).ready(function () {
 
 //Cargar Origins en la pantalla de registro de shipments
 $(document).ready(function () {
-    var selectedOrigins = []; // Arreglo para almacenar todos los origins seleccionados
+    /*var selectedOrigins = []; // Arreglo para almacenar todos los origins seleccionados
     $.ajax({
         url: 'locations-emptytrailerAjax',  // Ruta que manejará la carga de los drivers existentes
         type: 'GET',
@@ -413,7 +633,7 @@ $(document).ready(function () {
                 console.error('Error al guardar el carrier', error);
             }
         });
-    }
+    }*/
 });
 
 //Cargar TrailerOwners en la pantalla de registro de shipments
@@ -472,7 +692,7 @@ $(document).ready(function () {
         $('#inputshipmenttrailer').select2({
             placeholder: 'Select or enter a New Trailer Owner',
             allowClear: true,
-            tags: true, // Permite agregar nuevas opciones
+            tags: false, // Permite agregar nuevas opciones
             ajax: {
                 url: carrierRoute,
                 dataType: 'json',
@@ -506,9 +726,9 @@ $(document).ready(function () {
     }
 
     // Actualizar la lista cuando se haga clic en el select
-    $('#inputshipmenttrailer').on('click', function () {
+    /*$('#inputshipmenttrailer').on('click', function () {
         loadTrailerOwnersShipment();
-    });
+    });*/
 
     // Cuando el usuario seleccione o ingrese un nuevo valor
     $('#inputshipmenttrailer').on('change', function () {
@@ -550,6 +770,7 @@ $(document).ready(function () {
 
                 // Marcar el nuevo ID para evitar que se haga otra solicitud
                 newlyCreatedCarrierId = response.newCarrier.CoName;
+                loadTrailerOwnersShipment();
 
                 // Cuando el nuevo carrier sea creado, aseguramos que no se haga más AJAX para este carrier
                 $('#inputshipmenttrailer').on('select2:select', function (e) {
@@ -569,7 +790,7 @@ $(document).ready(function () {
 
 //Cargar destinations 
 $(document).ready(function () {
-    $('#inputshipmentdestination').select2({
+    /*$('#inputshipmentdestination').select2({
         placeholder: "Select a destination",
         //allowClear: true,
         ajax: {
@@ -592,7 +813,7 @@ $(document).ready(function () {
             cache: true
         },
         minimumInputLength: 0 // Mínimo de caracteres antes de buscar
-    });
+    });*/
 });
 
 
@@ -921,41 +1142,6 @@ $(document).ready(function() {
     loadDestinations();*/
     
 
-    //Funcion para buscar el shipmenttype en la pantalla de empty trailer update
-    function loadShipmentType() {
-        var availabilityRoute = $('#inputshipmentshipmenttype').data('url');
-          $.ajax({
-              url: availabilityRoute,
-              method: 'GET',
-              success: function (data) {
-                  let select = $('#inputshipmentshipmenttype');
-                  let selectedValue = select.val();
-                  //let selectedValue = "{{ old('inputavailabilityindicator') }}"; // Recupera el valor previo
-                  select.empty(); // Limpia el select eliminando todas las opciones
-                  //select.append('<option selected disabled hidden></option>'); // Opción inicial
-
-                  if (data.length === 0) {
-                      select.append('<option disabled>No options available</option>');
-                  } else {
-                      data.forEach(item => {
-                          select.append(`<option value="${item.gnct_id}">${item.gntc_description}</option>`);
-                      });
-                  }
-
-                  if (selectedValue) {
-                      select.val(selectedValue); // Restaura el valor anterior
-                  }
-              },
-              error: function (xhr, status, error) {
-                  console.error('Error fetching data Shipment Types:', error);
-              }
-          });
-    }
-
-    // Cargar datos al enfocarse y al cargar la página update 
-    $('#inputshipmentshipmenttype').on('focus', loadShipmentType);
-    loadShipmentType();
-
     //Funcion para buscar los Drivers
     /*function LoadDrivers() {
         let selectedCarrierId = $('#inputshipmentcarrier').val(); // Obtener el ID seleccionado
@@ -1051,75 +1237,7 @@ $(document).ready(function() {
         });
     }*/
     
-    // Funcion para buscar las Destinations en la pantalla de shipments
-function LoadCurrentStatus() {
-    var locationsRoute = $('#inputshipmentcurrentstatus').data('url');
-    $.ajax({
-        url: locationsRoute,
-        type: 'GET',
-        success: function (data) {
-            let select = $('#inputshipmentcurrentstatus');
-            let currentValue = select.val(); // Valor actual seleccionado por el usuario
-            let initialValue = select.attr('value'); // Valor inicial definido en el HTML
-    
-            // Si no hay valor actual (por ejemplo, al cargar por primera vez), usa el inicial
-            let selectedValue = currentValue || initialValue;
-    
-            select.empty(); // Limpia el contenido del select
-    
-            // Agrega la opción deshabilitada y oculta solo si no hay valor seleccionado
-            if (!selectedValue) {
-                select.append('<option selected disabled hidden></option>');
-            }
-    
-            if (data.length === 0) {
-                select.append('<option disabled>No options available</option>');
-            } else {
-                let prealertedFound = false;
-                let driverAssignedFound = false;
-                
-                // Añadir las opciones al select
-                data.forEach(item => {
-                    select.append(`<option value="${item.gnct_id}">${item.gntc_description}</option>`);
-                    
-                    // Verificar si la opción "Prealerted" está entre las opciones
-                    if (item.gntc_description === 'Prealerted' && !prealertedFound) {
-                        prealertedFound = true;
-                    }
-                    
-                    // Verificar si la opción "Driver Assigned" está entre las opciones
-                    if (item.gntc_description === 'Driver Assigned' && !driverAssignedFound) {
-                        driverAssignedFound = true;
-                    }
-                });
-    
-                // Si "Driver Assigned" está disponible y el segundo select tiene un valor
-                let driverValue = $('#inputshipmentdriver').val();
-                if (driverValue) {
-                    if (driverAssignedFound) {
-                        select.val(data.find(item => item.gntc_description === 'Driver Assigned').gnct_id);
-                    }
-                } else if (prealertedFound) {
-                    // Si no hay conductor asignado, seleccionamos "Prealerted" por defecto
-                    select.val(data.find(item => item.gntc_description === 'Prealerted').gnct_id);
-                }
-            }
-        },
-        error: function (xhr, status, error) {
-            console.error('Error fetching data locations:', error);
-        }
-    });
-}
 
-// Ejecutar la función al enfocar el select y al cargar la página
-$('#inputshipmentcurrentstatus').on('focus', LoadCurrentStatus);
-$('#inputshipmentdriver').on('change', LoadCurrentStatus);
-LoadCurrentStatus();
-
-    // Ejecutar la función al enfocar el select y al cargar la página
-    $('#inputshipmentcurrentstatus').on('focus', LoadCurrentStatus);
-    LoadCurrentStatus();
-    
     //Funcion para buscar las Carriers en la pantalla de shipments
     /*function LoadSTMID() {
         var locationsRoute = $('#inputshipmentstmid').data('url');

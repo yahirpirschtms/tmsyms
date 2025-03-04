@@ -40,6 +40,10 @@ Route::get('/home', [HomeController::class, 'index'])->name('emptytrailer');
 
 Route::get('/shipments', [ShipmentController::class, 'allshipmentsshow'])->name('all-shipments');
 
+Route::get('/get-service', [ShipmentController::class, 'getService'])->name('information-shipment');
+
+Route::get('/get-lanestrafficworkflowstart', [ShipmentController::class, 'getLanesTrafficWorkflowStart']);
+
 //Rutas nutrir selects para la pantalla de empty trailer
 Route::get('/availability-indicators', [GenericCatalogController::class, 'getAvailabilityIndicators'])->name('availabilityindicators-emptytrailer');
 

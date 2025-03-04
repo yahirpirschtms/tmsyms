@@ -12,6 +12,9 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
+
 
 class ShipmentController extends Controller
 {
@@ -295,7 +298,7 @@ class ShipmentController extends Controller
                 $fail('Pallets must have a valid value.');
             }
             if (!is_int($valuee)) {
-                $fail('Pallets must be an integerguviybuohijpkl.');
+                $fail('Pallets must be an integer.');
             }
             if ($request->input('inputshipmentsunits') !== null && $value > $request->input('inputshipmentsunits')) {
                 $fail('The number of pallets cannot be greater than the number of shipment units.');
@@ -303,9 +306,12 @@ class ShipmentController extends Controller
         },
     ],
             'inputshipmentsecurityseals' => 'nullable',
+            'inputshipmentsecurityseals2' => 'nullable',
             'inputshipmentnotes' => 'nullable',
             'inputshipmentoverhaulid' => 'nullable',
             'inputshipmentdevicenumber' => 'nullable',
+            'tracker2' => 'nullable',
+            'tracker3' => 'nullable',
             'inputshipmentcurrentstatus' => 'required|exists:generic_catalogs,gnct_id'
         ], [
             'inputidtrailer.required'=>'ID Trailer is required',
@@ -399,11 +405,15 @@ class ShipmentController extends Controller
             'etd' => $estimateddateofdeparture,
             'units' => $request->inputshipmentsunits,
             'pallets' => $request->inputpallets,
-            'security_seals' => $request->inputshipmentsecurityseals,
+            'seal1' => $request->inputshipmentsecurityseals,
+            'seal2' => $request->inputshipmentsecurityseals2,
             'notes' => $request->inputshipmentnotes,
-            'overhaul_id' => $request->inputshipmentoverhaulid,
-            'device_number' => $request->inputshipmentdevicenumber,
+            'security_company_id' => $request->inputshipmentoverhaulid,
+            'tracker1' => $request->inputshipmentdevicenumber,
+            'tracker2' => $request->tracker2,
+            'tracker3' => $request->tracker3,
             'gnct_id_current_status' => $request->inputshipmentcurrentstatus,
+            'lane' => $request->ln_code,
 
             // Asignar la fecha y hora actual solo si el parámetro `inputshipmentdriver` no está vacío
             'driver_assigned_date' => $request->inputshipmentdriver ? $currentDateTime : null,
@@ -452,6 +462,7 @@ class ShipmentController extends Controller
             'units' => 'required|min:1|integer',
             //'etd' => 'required',
             'wh_auth_date' => 'required',
+            'door_number' => 'nullable',
         ], [
             //'id_trailer.required' => 'ID Trailer is required.',
             //'trailer_num.string' => 'El campo ID Trailer debe ser una cadena de texto.',
@@ -518,9 +529,13 @@ class ShipmentController extends Controller
 
             //$finalstatus = $date->format('Y-m-d');
             $query->where(function($q) use ($search, $formattedDateTime) {
-                $q->where('stm_id', 'like', "%$search%")
+                $fields = ['stm_id', 'units', 'pallets'];
+                foreach ($fields as $field) {
+                    $q->orWhere($field, 'like', "%$search%");
+                }
+                //$q->where('stm_id', 'like', "%$search%")
                 //->orWhereNull('stm_id')
-                ->orWhereHas('shipmenttype', function($q) use ($search) {
+                $q->orWhereHas('shipmenttype', function($q) use ($search) {
                     $q->where('gntc_description', 'like', "%$search%");
                 })
                 //->orWhereNull('shipmenttype')
@@ -529,12 +544,12 @@ class ShipmentController extends Controller
                 //->orWhere('id_trailer','like',"%$search%")
                 //->orWhereNull('id_trailer')
 
-                ->orWhere('etd', 'like', $formattedDateTime)
+                ->orWhere('etd', 'like', $formattedDateTime);
                 //->orWhereNull('etd')
 
-                ->orWhere('units','like',"%$search%")
+                //->orWhere('units','like',"%$search%")
                 //->orWhereNull('units')
-                ->orWhere('pallets', 'like', "%$search%");
+                //->orWhere('pallets', 'like', "%$search%");
                 //->orWhereNull('pallets')
 
                 /*->orWhere('driver_assigned_date', 'like', $formattedDateTime)
@@ -568,9 +583,17 @@ class ShipmentController extends Controller
         if ($request->has('stm_id') && $request->input('stm_id') != '') {
             $query->where('stm_id', 'like', "%{$request->input('stm_id')}%");
         }
-        if ($request->has('gnct_id_shipment_type') && $request->input('gnct_id_shipment_type') != '') {
+        /*if ($request->has('gnct_id_shipment_type') && $request->input('gnct_id_shipment_type') != '') {
             $query->whereHas('shipmenttype', function($q) use ($request) {
                 $q->where('gnct_id', $request->input('gnct_id_shipment_type'));
+            });
+        }*/
+        // Filtro para múltiples ubicaciones seleccionadas
+        if ($request->has('shipment_types') && $request->input('shipment_types') != '') {
+            $ship = explode(',', $request->input('shipment_types')); // Convierte la cadena en un array
+
+            $query->whereHas('shipmenttype', function($q) use ($ship) {
+                $q->whereIn('gnct_id', $ship); // Filtra por cualquier ubicación en el array
             });
         }
         if ($request->has('secondary_shipment_id') && $request->input('secondary_shipment_id') != '') {
@@ -693,5 +716,83 @@ class ShipmentController extends Controller
         // Devolver los datos en formato JSON
         return response()->json($shipments);
     }
+
+    /*public function getService(Request $request)
+    {
+        $id_service = $request->id_service;
+        
+        $service = Cache::remember("service_{$id_service}", 60, function () use ($id_service) {
+            return DB::table('services')
+                ->where('id_service', $id_service)
+                ->select('from', 'to')
+                ->first();
+        });
+
+        if ($service) {
+            return response()->json([
+                'success' => true,
+                'from' => $service->from,
+                'to' => $service->to
+            ]);
+        } else {
+            return response()->json(['success' => false]);
+        }
+    }*/
+
+    public function getService(Request $request)
+{
+    $id_service = $request->id_service;
+
+    // Cachear la consulta de 'services'
+    $service = Cache::remember("service_{$id_service}", 60, function () use ($id_service) {
+        return DB::table('services')
+            ->where('id_service', $id_service)
+            ->select('from', 'to')
+            ->first();
+    });
+
+    if (!$service) {
+        return response()->json(['success' => false, 'message' => 'Service not found']);
+    }
+
+    // Buscar en 'companies' los valores de 'CoName' y 'pk_company' con los IDs obtenidos
+    $fromCompany = DB::table('companies')
+        ->where('CoName', $service->from)
+        ->select('CoName', 'pk_company')
+        ->first();
+
+    $toCompany = DB::table('companies')
+        ->where('CoName', $service->to)
+        ->select('CoName', 'pk_company')
+        ->first();
+
+    return response()->json([
+        'success' => true,
+        'from' => $fromCompany ? $fromCompany->CoName : null,
+        'from_id' => $fromCompany ? $fromCompany->pk_company : null,
+        'to' => $toCompany ? $toCompany->CoName : null,
+        'to_id' => $toCompany ? $toCompany->pk_company : null
+    ]);
+}
+
+    public function getLanesTrafficWorkflowStart(Request $request){
+        $id_companie = $request->id_companie;
+
+        // Usamos Cache para almacenar resultados y evitar consultas repetidas
+        $laneCode = DB::table('lanes')
+                ->where('ln_origin', $id_companie)
+                ->select("ln_code")
+                ->first();
+
+        if ($laneCode) {
+            return response()->json([
+                'success' => true,
+                'ln_code' => $laneCode ? $laneCode->ln_code :null
+            ]);
+        } else {
+            return response()->json(['success' => false]);
+        }
+    }
+
 
 }
