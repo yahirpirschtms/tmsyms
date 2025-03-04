@@ -42,10 +42,14 @@ class Shipments extends Model
         'etd',
         'units',
         'pallets',
-        'security_seals',
+        'seal1',
+        'seal2',
+        'door_number',
         'notes',
-        'overhaul_id',
-        'device_number',
+        'security_company_id',
+        'tracker1',
+        'tracker2',
+        'tracker3',
         'secondary_shipment_id',
         'driver_assigned_date',
         'pick_up_date',
@@ -58,7 +62,11 @@ class Shipments extends Model
         'wh_auth_date',
         'offloading_time',
         'billing_id',
-        'billing_date'
+        'billing_date',
+        'dock_door_date',
+        'removed_trackers',
+        'lane',
+        
     ];
 
     protected static function boot(){

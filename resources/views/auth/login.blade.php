@@ -4,7 +4,7 @@
     <div class="login-container">
         <div class="header">
             <img class="w-50" src="{!! asset('/icons/tms_logo1.png')!!}" alt="Logo">
-            <div class="title text-white fw-bolder">YMS</div>
+            <div class="title text-white fw-bolder">YMST</div>
         </div>
         <div class="mt-3">
             <h2 class="fs-2 fw-bolder" style="color:rgb(15, 34, 56);">Login</h2>

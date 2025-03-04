@@ -48,12 +48,176 @@ document.addEventListener('DOMContentLoaded', function () {
         return new bootstrap.Tooltip(tooltipTriggerEl)
     })
 });
+
+$(document).ready(function () {
+    function loadShypmentTypesFilterCheckbox() { 
+        //console.log("sikeeeee")
+        var locationsRoute = $('#multiCollapseapplyshipmenttypefiltercheckbox').data('url');
+        $.ajax({
+            url: locationsRoute,
+            type: 'GET',
+            success: function (data) {
+                let container = $('#ShipmentTypeCheckboxContainer');
+                container.empty();  // Limpiar cualquier contenido previo
+    
+                if (data.length === 0) {
+                    container.append('<p>No options available</p>');
+                } else {
+                    data.forEach(item => {
+                        // Crear un checkbox por cada ubicación
+                        container.append(`
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="${item.gnct_id}" id="shipmenttypecheckbox${item.gnct_id}">
+                                <label class="form-check-label" for="shipmenttypecheckbox${item.gnct_id}">
+                                    ${item.gntc_description}
+                                </label>
+                            </div>
+                        `);
+                    });
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching data ShipTypes:', error);
+            }
+        });
+    }
+    
+    // Ejecutar la función cuando el panel de filtros se haya expandido
+    /*$('#closeapplyshipmenttypefiltercheckbox').one('click', function () {
+        loadShypmentTypesFilterCheckbox();
+    });*/
+    loadShypmentTypesFilterCheckbox();
+
+    // Obtenemos los elementos
+    const updatetab = document.getElementById("refreshwhetapprovaltable");
+    const $checkboxContainer = $("#ShipmentTypeCheckboxContainer");
+    const $filterDiv = $("#emptytrailerfilterdivshipmenttypecheckbox");
+    const $inputPk = $("#emptytrailerfilterinputshipmenttypecheckboxpk");
+    const $inputLocation = $("#emptytrailerfilterinputshipmenttypecheckbox");
+    const $applyButton = $("#applyshipmenttypefiltercheckbox");
+    const $closeButton = $("#closeapplyshipmenttypefiltercheckbox");
+    const $offcanvas = $("#offcanvasaddmorefilters");
+    const $clearButton = $("#emptytrailerfilterbuttonshipmenttypecheckbox");
+
+    // Variable que guarda los elementos que abrirán el offcanvas
+    const openOffcanvasElements = $("#emptytrailerfilterinputshipmenttypecheckbox, #emptytrailerfilterbtnshipmenttypecheckbox");
+
+    // Escuchamos el cambio de checkboxes
+    $checkboxContainer.on("change", "input[type='checkbox']", function () {
+        const anyChecked = $checkboxContainer.find("input[type='checkbox']:checked").length > 0;
+        $closeButton.prop("disabled", anyChecked);
+    });
+
+    // Escuchamos el click del botón Apply
+    $applyButton.on("click", function () {
+        let selectedLocations = [];
+        let selectedIDs = [];
+
+        // Recorrer todos los checkboxes seleccionados
+        $checkboxContainer.find("input[type='checkbox']:checked").each(function () {
+            selectedIDs.push($(this).val());  // Guardar el ID (pk_company)
+            selectedLocations.push($(this).next("label").text().trim()); // Guardar el nombre (CoName)
+        });
+
+        if (selectedLocations.length > 0) {
+            $filterDiv.show(); // Mostrar el div
+            $inputPk.val(selectedIDs.join(",")); // Guardar IDs
+            $inputLocation.val(selectedLocations.join(", ")); // Guardar nombres
+            updatetab.click();
+        } else {
+            $filterDiv.hide();
+            $inputPk.val("");
+            $inputLocation.val("");
+            $closeButton.click();
+            updatetab.click();
+        }
+    });
+
+    // Escuchamos el clic en el botón Close
+    $closeButton.on("click", function () {
+        if (!$filterDiv.is(":visible")) return;
+
+        // Limpiar los inputs si hay datos seleccionados
+        if ($inputLocation.val() !== "" || $inputPk.val() !== "") {
+            $inputLocation.val("");
+            $inputPk.val("");
+            //updatetab.click();
+        }
+
+        // Ocultar el div si está visible
+        $filterDiv.hide();
+        updatetab.click();
+    });
+
+    // Escuchar clic en los elementos que abrirán el offcanvas
+    openOffcanvasElements.on("click", function () {
+        if ($filterDiv.is(":visible")) {
+            $offcanvas.offcanvas("show"); // Abrir el offcanvas
+        }
+    });
+
+    // Escuchar clic en el botón de limpiar (vaciar inputs y ocultar el div)
+    $clearButton.on("click", function () {
+        if ($filterDiv.is(":visible") && ($inputLocation.val() !== "" || $inputPk.val() !== "")) {
+            // Limpiar los inputs y desmarcar los checkboxes
+            $inputLocation.val("");
+            $inputPk.val("");
+            $checkboxContainer.find("input[type='checkbox']").prop("checked", false);
+            $filterDiv.hide();
+            $closeButton.prop("disabled", false);
+            $closeButton.click();
+            updatetab.click();
+        }
+    });
+
+});
     
     function updateShipmentWHETATable() {
         // Obtener los valores de los filtros
+
+        const params = new URLSearchParams();
+
+        function addParam(key, value) {
+            if (value && value.trim() !== '') {  // Solo agregar si tiene un valor
+                params.set(key, value);
+            }
+        }
+
+        // Aplicar la función solo a los valores que no estén vacíos
+        addParam('searchwh', document.getElementById('searchemptytrailergeneralwh').value);
+        addParam('gnct_id_shipment_type', document.getElementById('emptytrailerfilterinputshipmenttypepk').value);
+        addParam('stm_id', document.getElementById('emptytrailerfilterinputidstm').value);
+        addParam('secondary_shipment_id', document.getElementById('emptytrailerfilterinputsecondaryid').value);
+        addParam('id_trailer', document.getElementById('emptytrailerfilterinputidtrailerwh').value);
+        addParam('etd_start', document.getElementById('emptytrailerfilterinputstartsdd').value);
+        addParam('etd_end', document.getElementById('emptytrailerfilterinputendsdd').value);
+        addParam('units', document.getElementById('emptytrailerfilterinputunits').value);
+        addParam('pallets', document.getElementById('emptytrailerfilterinputpallets').value);
+        addParam('driver_assigned_date_start', document.getElementById('emptytrailerfilterinputstartdriverassigneddate').value);
+        addParam('driver_assigned_date_end', document.getElementById('emptytrailerfilterinputenddriverassigneddate').value);
+        addParam('pick_up_date_start', document.getElementById('emptytrailerfilterinputstartpud').value);
+        addParam('pick_up_date_end', document.getElementById('emptytrailerfilterinputendpud').value);
+        addParam('billing_id', document.getElementById('emptytrailerfilterinputbillingid').value);
+        addParam('device_number', document.getElementById('emptytrailerfilterinputdevicenumber').value);
+
+        // Agregar shipment types seleccionados
+        let selectedShipmentTypes = [];
+        $('#ShipmentTypeCheckboxContainer input[type="checkbox"]:checked').each(function () {
+            selectedShipmentTypes.push($(this).val());
+        });
+        if (selectedShipmentTypes.length > 0) {
+            params.set('shipment_types', selectedShipmentTypes.join(','));
+        }
+
+        if (!params.toString()) {
+            params.set('searchwh', ''); // Parámetro ficticio
+        }
+
+        // Construir la URL optimizada
+        const url = new URL(document.getElementById('refreshwhetapprovaltable').getAttribute('data-url'));
+        url.search = params.toString();
         
-        const searchwh = document.getElementById('searchemptytrailergeneralwh').value;
-        //console.log(searchwh);
+        /*const searchwh = document.getElementById('searchemptytrailergeneralwh').value;
         const shipmenttypewh = document.getElementById('emptytrailerfilterinputshipmenttypepk').value;
         const idstmwh = document.getElementById('emptytrailerfilterinputidstm').value;
         const secondaryshipmentwh = document.getElementById('emptytrailerfilterinputsecondaryid').value;
@@ -80,6 +244,13 @@ document.addEventListener('DOMContentLoaded', function () {
         const dobend = document.getElementById('emptytrailerfilterinputenddob').value;
         const biwh = document.getElementById('emptytrailerfilterinputbillingid').value;
         const dnwh = document.getElementById('emptytrailerfilterinputdevicenumber').value;
+
+        let selectedShipmentTypes = [];
+        $('#ShipmentTypeCheckboxContainer input[type="checkbox"]:checked').each(function () {
+            selectedShipmentTypes.push($(this).val()); // Agrega el ID de la ubicación
+        });
+
+        const shypmenttypes = selectedShipmentTypes.join(','); // Convertir array en string separado por comas
         
         // Construir la URL con los parámetros de filtro
         const url = new URL(document.getElementById('refreshwhetapprovaltable').getAttribute('data-url'));
@@ -88,6 +259,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Agregar los filtros a los parámetros de la URL
         params.set('searchwh', searchwh);
         params.set('gnct_id_shipment_type', shipmenttypewh);
+        params.set('shipment_types', shypmenttypes);
         params.set('stm_id', idstmwh);
         params.set('secondary_shipment_id', secondaryshipmentwh);
         params.set('id_trailer', idtrailerwh);
@@ -114,7 +286,7 @@ document.addEventListener('DOMContentLoaded', function () {
         params.set('billing_id', biwh);
         params.set('device_number', dnwh);
 
-        url.search = params.toString();
+        url.search = params.toString();*/
         //console.log(url);
         fetch(url)
             .then(response => response.json())
@@ -206,9 +378,16 @@ document.addEventListener('DOMContentLoaded', function () {
         input.addEventListener('input', updateShipmentWHETATable);
     });
 
+    let debounceTimer;
+
+    function debounceUpdate() {
+        clearTimeout(debounceTimer); // Cancela el temporizador anterior
+        debounceTimer = setTimeout(updateShipmentWHETATable, 1000); // Espera 3 segundos antes de ejecutar la función
+    }
+
     const filterGeneralInputs = document.querySelectorAll('#searchemptytrailergeneralwh');
     filterGeneralInputs.forEach(input => {
-        input.addEventListener('input', updateShipmentWHETATable);
+        input.addEventListener('input', debounceUpdate);
     });
 
     // Actualización automática cada 5 minutos (300,000 ms)
@@ -483,6 +662,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     units: document.getElementById("whetainputunits").value,
                     //etd: document.getElementById("whetainputedt").value,
                     wh_auth_date: document.getElementById("whetainputapprovedeta").value,
+                    door_number: document.getElementById("whetainputapproveddoornumber").value,
                 };
 
                 fetch(urlwhetaapproval, {
@@ -590,7 +770,7 @@ document.addEventListener('DOMContentLoaded', function () {
             $(divSelector).hide();
             $(closeButtonSelector).prop('disabled', false); // Habilita el botón
             $(applyButtonSelector).click(); // Simula clic en Apply
-            updatetab.click();
+            //updatetab.click();
         }
     
         // Función genérica para abrir el offcanvas y enfocar el input
@@ -604,8 +784,11 @@ document.addEventListener('DOMContentLoaded', function () {
         function handleCloseCollapseButton(inputSelector, divSelector, inputFilterSelector) {
             if (!$(inputSelector).val()) {
                 $(inputFilterSelector).val(''); // Limpia el input asociado al filtro
+                if ($(divSelector).is(":visible")) {
+                    updatetab.click();
+                } 
                 $(divSelector).hide(); // Oculta el div del filtro
-                updatetab.click();
+               
             }
         }
 
@@ -792,7 +975,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Cargar datos al enfocarse y al cargar la página filters
     $('#inputapplyshipmenttypefilter').on('focus', loadShipmentTypeFilter);
     $(document).ready(function () {
-        loadShipmentTypeFilter();
+        //loadShipmentTypeFilter();
     });
 
     //Filtros de select Shipment Type
@@ -902,7 +1085,7 @@ document.addEventListener('DOMContentLoaded', function () {
     $(document).ready(function () {
         const updatetab = document.getElementById("refreshwhetapprovaltable");
         // Función para manejar el estado de los botones (habilitar/deshabilitar)
-        function toggleDateRangeButtons(startInputSelector, endInputSelector, closeButtonSelector, applyButtonSelector) {
+        function toggleDateRangeButtons(startInputSelector, endInputSelector, closeButtonSelector, applyButtonSelector, divSelector) {
             if ($(startInputSelector).val() || $(endInputSelector).val()) {
                 $(closeButtonSelector).prop('disabled', true); // Habilita el botón Collapse
             } else {
@@ -912,7 +1095,9 @@ document.addEventListener('DOMContentLoaded', function () {
             // Deshabilita el botón Apply hasta que ambos inputs estén llenos
             if ($(startInputSelector).val() && $(endInputSelector).val()) {
                 $(applyButtonSelector).prop('disabled', false); // Habilita el botón Apply
-            } else {
+            } else if(!$(startInputSelector).val() && !$(endInputSelector).val() && $(divSelector).is(":visible")) {
+                $(applyButtonSelector).prop('disabled', false); // Deshabilita el botón Apply
+            }else{
                 $(applyButtonSelector).prop('disabled', true); // Deshabilita el botón Apply
             }
         }
@@ -941,7 +1126,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 $(closeButtonSelector).click(); // Simula un clic en Collapse
                 updatetab.click();
             }
-            toggleDateRangeButtons(startInputSelector, endInputSelector, closeButtonSelector, applyButtonSelector);
+            toggleDateRangeButtons(startInputSelector, endInputSelector, closeButtonSelector, applyButtonSelector, divSelector);
         }
     
         // Función para limpiar el filtro (botón X)
@@ -956,12 +1141,15 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     
         // Función para manejar clics en botones de cerrar Collapse
-        function handleCloseDateRangeCollapse(startInputSelector, endInputSelector, divSelector, startFilterInputSelector, endFilterInputSelector) {
+        function handleCloseDateRangeCollapse(startInputSelector, endInputSelector, divSelector, startFilterInputSelector, endFilterInputSelector, applyButtonSelector) {
             if (!$(startInputSelector).val() && !$(endInputSelector).val()) {
                 $(startFilterInputSelector).val(''); // Limpia el Start Date del filtro
                 $(endFilterInputSelector).val(''); // Limpia el End Date del filtro
+                if ($(divSelector).is(":visible")) {
+                    updatetab.click();
+                    $(applyButtonSelector).prop('disabled', true); // Deshabilita el botón Apply
+                } 
                 $(divSelector).hide(); // Oculta el div del filtro
-                updatetab.click();
             }
         }
     
@@ -1009,7 +1197,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 '#inputapplysddenfilter', // End Date input en el offcanvas
                 '#emptytrailerfiltersdd', // Div del filtro
                 '#emptytrailerfilterinputstartsdd', // Start Date input en el filtro
-                '#emptytrailerfilterinputendsdd' // End Date input en el filtro
+                '#emptytrailerfilterinputendsdd', // End Date input en el filtro
+                '#applysddfilter'
             );
         });
     
@@ -1050,7 +1239,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 '#inputapplydadenfilter', // End Date input en el offcanvas
                 '#emptytrailerfilterdivdriverassigneddate', // Div del filtro
                 '#emptytrailerfilterinputstartdriverassigneddate', // Start Date input en el filtro
-                '#emptytrailerfilterinputenddriverassigneddate' // End Date input en el filtro
+                '#emptytrailerfilterinputenddriverassigneddate', // End Date input en el filtro
+                '#applydadfilter'
             );
         });
     
@@ -1091,7 +1281,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 '#inputapplypudenfilter', // End Date input en el offcanvas
                 '#emptytrailerfilterdivpud', // Div del filtro
                 '#emptytrailerfilterinputstartpud', // Start Date input en el filtro
-                '#emptytrailerfilterinputendpud' // End Date input en el filtro
+                '#emptytrailerfilterinputendpud', // End Date input en el filtro
+                '#applypudfilter'
             );
         });
 
@@ -1132,7 +1323,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 '#inputapplyitdenfilter', // End Date input en el offcanvas
                 '#emptytrailerfilterdivitd', // Div del filtro
                 '#emptytrailerfilterinputstartitd', // Start Date input en el filtro
-                '#emptytrailerfilterinputenditd' // End Date input en el filtro
+                '#emptytrailerfilterinputenditd', // End Date input en el filtro
+                '#applyitdfilter'
             );
         });
 
@@ -1173,7 +1365,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 '#inputapplydrdenfilter', // End Date input en el offcanvas
                 '#emptytrailerfilterdivdrd', // Div del filtro
                 '#emptytrailerfilterinputstartdrd', // Start Date input en el filtro
-                '#emptytrailerfilterinputenddrd' // End Date input en el filtro
+                '#emptytrailerfilterinputenddrd', // End Date input en el filtro
+                '#applydrdfilter'
             );
         });
 
@@ -1214,7 +1407,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 '#inputapplysydenfilter', // End Date input en el offcanvas
                 '#emptytrailerfilterdivsyd', // Div del filtro
                 '#emptytrailerfilterinputstartsyd', // Start Date input en el filtro
-                '#emptytrailerfilterinputendsyd' // End Date input en el filtro
+                '#emptytrailerfilterinputendsyd', // End Date input en el filtro
+                '#applysydfilter'
             );
         });
 
@@ -1255,7 +1449,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 '#inputapplyaedenfilter', // End Date input en el offcanvas
                 '#emptytrailerfilterdivaed', // Div del filtro
                 '#emptytrailerfilterinputstartaed', // Start Date input en el filtro
-                '#emptytrailerfilterinputendaed' // End Date input en el filtro
+                '#emptytrailerfilterinputendaed', // End Date input en el filtro
+                '#applyaedfilter'
             );
         });
 
@@ -1296,7 +1491,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 '#inputapplyoltenfilter', // End Date input en el offcanvas
                 '#emptytrailerfilterdivolt', // Div del filtro
                 '#emptytrailerfilterinputstartolt', // Start Date input en el filtro
-                '#emptytrailerfilterinputendolt' // End Date input en el filtro
+                '#emptytrailerfilterinputendolt', // End Date input en el filtro
+                '#applyoltfilter'
             );
         });
 
@@ -1337,54 +1533,55 @@ document.addEventListener('DOMContentLoaded', function () {
                 '#inputapplydobenfilter', // End Date input en el offcanvas
                 '#emptytrailerfilterdivdob', // Div del filtro
                 '#emptytrailerfilterinputstartdob', // Start Date input en el filtro
-                '#emptytrailerfilterinputenddob' // End Date input en el filtro
+                '#emptytrailerfilterinputenddob', // End Date input en el filtro
+                '#applydobfilter'
             );
         });
     
         // Detectar cambios en los inputs de las fechas para habilitar o deshabilitar botones
         $('#inputapplysddstfilter, #inputapplysddenfilter').on('input', function () {
-            toggleDateRangeButtons('#inputapplysddstfilter', '#inputapplysddenfilter', '#closeapplysddfilter', '#applysddfilter');
+            toggleDateRangeButtons('#inputapplysddstfilter', '#inputapplysddenfilter', '#closeapplysddfilter', '#applysddfilter', '#emptytrailerfiltersdd');
         });
     
         $('#inputapplydadstfilter, #inputapplydadenfilter').on('input', function () {
-            toggleDateRangeButtons('#inputapplydadstfilter', '#inputapplydadenfilter', '#closeapplydadfilter', '#applydadfilter');
+            toggleDateRangeButtons('#inputapplydadstfilter', '#inputapplydadenfilter', '#closeapplydadfilter', '#applydadfilter', '#emptytrailerfilterdivdriverassigneddate');
         });
     
         $('#inputapplypudstfilter, #inputapplypudenfilter').on('input', function () {
-            toggleDateRangeButtons('#inputapplypudstfilter', '#inputapplypudenfilter', '#closeapplypudfilter', '#applypudfilter');
+            toggleDateRangeButtons('#inputapplypudstfilter', '#inputapplypudenfilter', '#closeapplypudfilter', '#applypudfilter', '#emptytrailerfilterdivpud');
         });
         $('#inputapplyitdstfilter, #inputapplyitdenfilter').on('input', function () {
-            toggleDateRangeButtons('#inputapplyitdstfilter', '#inputapplyitdenfilter', '#closeapplyitdfilter', '#applyitdfilter');
+            toggleDateRangeButtons('#inputapplyitdstfilter', '#inputapplyitdenfilter', '#closeapplyitdfilter', '#applyitdfilter', '#emptytrailerfilterdivitd');
         });
     
         $('#inputapplydrdstfilter, #inputapplydrdenfilter').on('input', function () {
-            toggleDateRangeButtons('#inputapplydrdstfilter', '#inputapplydrdenfilter', '#closeapplydrdfilter', '#applydrdfilter');
+            toggleDateRangeButtons('#inputapplydrdstfilter', '#inputapplydrdenfilter', '#closeapplydrdfilter', '#applydrdfilter', '#emptytrailerfilterdivdrd');
         });
         $('#inputapplysydstfilter, #inputapplysydenfilter').on('input', function () {
-            toggleDateRangeButtons('#inputapplysydstfilter', '#inputapplysydenfilter', '#closeapplysydfilter', '#applysydfilter');
+            toggleDateRangeButtons('#inputapplysydstfilter', '#inputapplysydenfilter', '#closeapplysydfilter', '#applysydfilter', '#emptytrailerfilterdivsyd');
         });
     
         $('#inputapplyaedstfilter, #inputapplyaedenfilter').on('input', function () {
-            toggleDateRangeButtons('#inputapplyaedstfilter', '#inputapplyaedenfilter', '#closeapplyaedfilter', '#applyaedfilter');
+            toggleDateRangeButtons('#inputapplyaedstfilter', '#inputapplyaedenfilter', '#closeapplyaedfilter', '#applyaedfilter', '#emptytrailerfilterdivaed');
         });
         $('#inputapplyoltstfilter, #inputapplyoltenfilter').on('input', function () {
-            toggleDateRangeButtons('#inputapplyoltstfilter', '#inputapplyoltenfilter', '#closeapplyoltfilter', '#applyoltfilter');
+            toggleDateRangeButtons('#inputapplyoltstfilter', '#inputapplyoltenfilter', '#closeapplyoltfilter', '#applyoltfilter', '#emptytrailerfilterdivolt');
         });
     
         $('#inputapplydobstfilter, #inputapplydobenfilter').on('input', function () {
-            toggleDateRangeButtons('#inputapplydobstfilter', '#inputapplydobenfilter', '#closeapplydobfilter', '#applydobfilter');
+            toggleDateRangeButtons('#inputapplydobstfilter', '#inputapplydobenfilter', '#closeapplydobfilter', '#applydobfilter', '#emptytrailerfilterdivdob');
         });
     
         // Llamada inicial para verificar los botones
-        toggleDateRangeButtons('#inputapplysddstfilter', '#inputapplysddenfilter', '#closeapplysddfilter', '#applysddfilter');
-        toggleDateRangeButtons('#inputapplydadstfilter', '#inputapplydadenfilter', '#closeapplydadfilter', '#applydadfilter');
-        toggleDateRangeButtons('#inputapplypudstfilter', '#inputapplypudenfilter', '#closeapplypudfilter', '#applypudfilter');
-        toggleDateRangeButtons('#inputapplyitdstfilter', '#inputapplyitdenfilter', '#closeapplyitdfilter', '#applyitdfilter');
-        toggleDateRangeButtons('#inputapplydrdstfilter', '#inputapplydrdenfilter', '#closeapplydrdfilter', '#applydrdfilter');
-        toggleDateRangeButtons('#inputapplysydstfilter', '#inputapplysydenfilter', '#closeapplysydfilter', '#applysydfilter');
-        toggleDateRangeButtons('#inputapplyaedstfilter', '#inputapplyaedenfilter', '#closeapplyaedfilter', '#applyaedfilter');
-        toggleDateRangeButtons('#inputapplyoltstfilter', '#inputapplyoltenfilter', '#closeapplyoltfilter', '#applyoltfilter');
-        toggleDateRangeButtons('#inputapplydobstfilter', '#inputapplydobenfilter', '#closeapplydobfilter', '#applydobfilter');
+        toggleDateRangeButtons('#inputapplysddstfilter', '#inputapplysddenfilter', '#closeapplysddfilter', '#applysddfilter', '#emptytrailerfiltersdd');
+        toggleDateRangeButtons('#inputapplydadstfilter', '#inputapplydadenfilter', '#closeapplydadfilter', '#applydadfilter', '#emptytrailerfilterdivdriverassigneddate');
+        toggleDateRangeButtons('#inputapplypudstfilter', '#inputapplypudenfilter', '#closeapplypudfilter', '#applypudfilter', '#emptytrailerfilterdivpud');
+        toggleDateRangeButtons('#inputapplyitdstfilter', '#inputapplyitdenfilter', '#closeapplyitdfilter', '#applyitdfilter', '#emptytrailerfilterdivitd');
+        toggleDateRangeButtons('#inputapplydrdstfilter', '#inputapplydrdenfilter', '#closeapplydrdfilter', '#applydrdfilter', '#emptytrailerfilterdivdrd');
+        toggleDateRangeButtons('#inputapplysydstfilter', '#inputapplysydenfilter', '#closeapplysydfilter', '#applysydfilter', '#emptytrailerfilterdivsyd');
+        toggleDateRangeButtons('#inputapplyaedstfilter', '#inputapplyaedenfilter', '#closeapplyaedfilter', '#applyaedfilter', '#emptytrailerfilterdivaed');
+        toggleDateRangeButtons('#inputapplyoltstfilter', '#inputapplyoltenfilter', '#closeapplyoltfilter', '#applyoltfilter', '#emptytrailerfilterdivolt');
+        toggleDateRangeButtons('#inputapplydobstfilter', '#inputapplydobenfilter', '#closeapplydobfilter', '#applydobfilter', '#emptytrailerfilterdivdob');
     });
     /*
     //Guardar los valores de los filtros para recargas de la pagina

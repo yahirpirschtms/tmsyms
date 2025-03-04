@@ -1,7 +1,322 @@
-//Busqueda de carries en un nuevo registro
 $(document).ready(function () {
+    //Esto es para los checkbotons de los filtros
+    function setupCheckboxFilter(
+        containerId, applyBtnId, closeBtnId, inputPkId, inputTextId,
+        filterDivId, clearBtnId, updateBtnId, offcanvasElements
+    ) {
+        const updatetab = document.getElementById(updateBtnId);
+        const $checkboxContainer = $(containerId);
+        const $filterDiv = $(filterDivId);
+        const $inputPk = $(inputPkId);
+        const $inputText = $(inputTextId);
+        const $applyButton = $(applyBtnId);
+        const $closeButton = $(closeBtnId);
+        const $offcanvas = $("#offcanvasaddmorefilters");
+        const $clearButton = $(clearBtnId);
+        const $offcanvasElements = $(offcanvasElements);
+
+        // Detecta cambios en los checkboxes
+        $checkboxContainer.on("change", "input[type='checkbox']", function () {
+            const anyChecked = $checkboxContainer.find("input[type='checkbox']:checked").length > 0;
+            $closeButton.prop("disabled", anyChecked);
+        });
+
+        // Botón Apply: recoge los valores seleccionados
+        $applyButton.on("click", function () {
+            let selectedValues = [];
+            let selectedIDs = [];
+
+            $checkboxContainer.find("input[type='checkbox']:checked").each(function () {
+                selectedIDs.push($(this).val());  // Guarda el ID
+                selectedValues.push($(this).next("label").text().trim()); // Guarda el nombre
+            });
+
+            if (selectedValues.length > 0) {
+                $filterDiv.show();
+                $inputPk.val(selectedIDs.join(",")); // IDs separados por coma
+                $inputText.val(selectedValues.join(", ")); // Nombres separados por coma
+                updatetab.click();
+            } else {
+                $filterDiv.hide();
+                $inputPk.val("");
+                $inputText.val("");
+                $closeButton.click();
+                updatetab.click();
+            }
+        });
+
+        // Botón Close
+        $closeButton.on("click", function () {
+            if (!$filterDiv.is(":visible")) return;
+
+            if ($inputText.val() !== "" || $inputPk.val() !== "") {
+                $inputText.val("");
+                $inputPk.val("");
+                //updatetab.click();
+            }
+
+            $filterDiv.hide();
+            updatetab.click();
+        });
+
+        // Abrir el offcanvas al hacer clic en el input
+        $offcanvasElements.on("click", function () {
+            if ($filterDiv.is(":visible")) {
+                $offcanvas.offcanvas("show");
+            }
+        });
+
+        // Botón de limpiar
+        $clearButton.on("click", function () {
+            if ($filterDiv.is(":visible") && ($inputText.val() !== "" || $inputPk.val() !== "")) {
+                $inputText.val("");
+                $inputPk.val("");
+                $checkboxContainer.find("input[type='checkbox']").prop("checked", false);
+                $filterDiv.hide();
+                $closeButton.prop("disabled", false);
+                $closeButton.click();
+                updatetab.click();
+            }
+        });
+    }
+
+    // Inicializamos la función para cada set de checkboxes
+    setupCheckboxFilter(
+        "#AvailabilityIndicatorCheckboxContainer",
+        "#applyaifiltercheckbox",
+        "#closeapplyaifiltercheckbox",
+        "#emptytrailerfilterinputavailabilityindicatorcheckboxpk",
+        "#emptytrailerfilterinputavailabilityindicatorcheckbox",
+        "#emptytrailerfilterdivavailabilityindicatorcheckbox",
+        "#emptytrailerfilterbuttonavailabilityindicatorcheckbox",
+        "refreshemptytrailertable",
+        "#emptytrailerfilterinputavailabilityindicatorcheckbox, #emptytrailerfilterbtnavailabilityindicatorcheckbox"
+    );
+
+    setupCheckboxFilter(
+        "#CarrierCheckboxContainer",
+        "#applycarrierfiltercheckbox",
+        "#closeapplycarrierfiltercheckbox",
+        "#emptytrailerfilterinputcarriercheckboxpk",
+        "#emptytrailerfilterinputcarriercheckbox",
+        "#emptytrailerfilterdivcarriercheckbox",
+        "#emptytrailerfilterbuttoncarriercheckbox",
+        "refreshemptytrailertable",
+        "#emptytrailerfilterinputcarriercheckbox, #emptytrailerfilterbtncarriercheckbox"
+    );
+});
+
+//Esto es para los checkbotons de los filtros
+$(document).ready(function () {
+    
+    // Obtenemos los elementos
+    const updatetab = document.getElementById("refreshemptytrailertable");
+    const $checkboxContainer = $("#locationCheckboxContainer");
+    const $filterDiv = $("#emptytrailerfilterdivlocationcheckbox");
+    const $inputPk = $("#emptytrailerfilterinputlocationcheckboxpk");
+    const $inputLocation = $("#emptytrailerfilterinputlocationcheckbox");
+    const $applyButton = $("#applylocationfiltercheckbox");
+    const $closeButton = $("#closeapplylocationfiltercheckbox");
+    const $offcanvas = $("#offcanvasaddmorefilters");
+    const $clearButton = $("#emptytrailerfilterbuttonlocationcheckbox");
+
+    // Variable que guarda los elementos que abrirán el offcanvas
+    const openOffcanvasElements = $("#emptytrailerfilterinputlocationcheckbox, #emptytrailerfilterbtnlocationcheckbox");
+
+    // Escuchamos el cambio de checkboxes
+    $checkboxContainer.on("change", "input[type='checkbox']", function () {
+        const anyChecked = $checkboxContainer.find("input[type='checkbox']:checked").length > 0;
+        $closeButton.prop("disabled", anyChecked);
+    });
+
+    // Escuchamos el click del botón Apply
+    $applyButton.on("click", function () {
+        let selectedLocations = [];
+        let selectedIDs = [];
+
+        // Recorrer todos los checkboxes seleccionados
+        $checkboxContainer.find("input[type='checkbox']:checked").each(function () {
+            selectedIDs.push($(this).val());  // Guardar el ID (pk_company)
+            selectedLocations.push($(this).next("label").text().trim()); // Guardar el nombre (CoName)
+        });
+
+        if (selectedLocations.length > 0) {
+            $filterDiv.show(); // Mostrar el div
+            $inputPk.val(selectedIDs.join(",")); // Guardar IDs
+            $inputLocation.val(selectedLocations.join(", ")); // Guardar nombres
+            updatetab.click();
+        } else {
+            $filterDiv.hide();
+            $inputPk.val("");
+            $inputLocation.val("");
+            $closeButton.click();
+            updatetab.click();
+        }
+    });
+
+    // Escuchamos el clic en el botón Close
+    $closeButton.on("click", function () {
+        if (!$filterDiv.is(":visible")) return;
+
+        // Limpiar los inputs si hay datos seleccionados
+        if ($inputLocation.val() !== "" || $inputPk.val() !== "") {
+            $inputLocation.val("");
+            $inputPk.val("");
+            updatetab.click();
+        }
+
+        // Ocultar el div si está visible
+        $filterDiv.hide();
+        updatetab.click();
+    });
+
+    // Escuchar clic en los elementos que abrirán el offcanvas
+    openOffcanvasElements.on("click", function () {
+        if ($filterDiv.is(":visible")) {
+            $offcanvas.offcanvas("show"); // Abrir el offcanvas
+        }
+    });
+
+    // Escuchar clic en el botón de limpiar (vaciar inputs y ocultar el div)
+    $clearButton.on("click", function () {
+        if ($filterDiv.is(":visible") && ($inputLocation.val() !== "" || $inputPk.val() !== "")) {
+            // Limpiar los inputs y desmarcar los checkboxes
+            $inputLocation.val("");
+            $inputPk.val("");
+            $checkboxContainer.find("input[type='checkbox']").prop("checked", false);
+            $filterDiv.hide();
+            $closeButton.prop("disabled", false);
+            $closeButton.click();
+            updatetab.click();
+        }
+    });
+
+});
+
+$(document).ready(function () {
+    //Cargar los Carriers en los filtros de los checkbox
+    function loadAvailabilityIndicatorsFilterCheckbox() { 
+        //console.log("sikeeeee")
+        var locationsRoute = $('#multiCollapseapplyaifiltercheckbox').data('url');
+        $.ajax({
+            url: locationsRoute,
+            type: 'GET',
+            success: function (data) {
+                let container = $('#AvailabilityIndicatorCheckboxContainer');
+                container.empty();  // Limpiar cualquier contenido previo
+    
+                if (data.length === 0) {
+                    container.append('<p>No options available</p>');
+                } else {
+                    data.forEach(item => {
+                        // Crear un checkbox por cada ubicación
+                        container.append(`
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="${item.gnct_id}" id="availabilityIndicators${item.gnct_id}">
+                                <label class="form-check-label" for="availabilityIndicators${item.gnct_id}">
+                                    ${item.gntc_description}
+                                </label>
+                            </div>
+                        `);
+                    });
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching data Availability Indicators:', error);
+            }
+        });
+    }
+    
+    // Ejecutar la función cuando el panel de filtros se haya expandido
+    $('#addmorefiltersemptytrailer').one('click', function () {
+        loadAvailabilityIndicatorsFilterCheckbox();
+        loadCarriersFilterCheckbox();
+    });
+    //loadAvailabilityIndicatorsFilterCheckbox();
+
+    //Cargar los Carriers en los filtros de los checkbox
+    function loadCarriersFilterCheckbox() { 
+        //console.log("sikeeeee")
+        var locationsRoute = $('#multiCollapseapplycarrierfiltercheckbox').data('url');
+        $.ajax({
+            url: locationsRoute,
+            type: 'GET',
+            success: function (data) {
+                let container = $('#CarrierCheckboxContainer');
+                container.empty();  // Limpiar cualquier contenido previo
+    
+                if (data.length === 0) {
+                    container.append('<p>No options available</p>');
+                } else {
+                    data.forEach(item => {
+                        // Crear un checkbox por cada ubicación
+                        container.append(`
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="${item.pk_company}" id="carriers${item.pk_company}">
+                                <label class="form-check-label" for="carriers${item.pk_company}">
+                                    ${item.CoName}
+                                </label>
+                            </div>
+                        `);
+                    });
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching data Carriers:', error);
+            }
+        });
+    }
+    
+    // Ejecutar la función cuando el panel de filtros se haya expandido
+    /*$('#closeapplycarrierfiltercheckbox').on('click', function () {
+        loadCarriersFilterCheckbox();
+    });*/
+    //loadCarriersFilterCheckbox();
+
+    //Cargar los Locations en los filtros de los checkbox
+    function loadLocationsFilterCheckbox() { 
+        //console.log("sikeeeee")
+        var locationsRoute = $('#multiCollapseapplylocationfiltercheckbox').data('url');
+        $.ajax({
+            url: locationsRoute,
+            type: 'GET',
+            success: function (data) {
+                let container = $('#locationCheckboxContainer');
+                container.empty();  // Limpiar cualquier contenido previo
+    
+                if (data.length === 0) {
+                    container.append('<p>No options available</p>');
+                } else {
+                    data.forEach(item => {
+                        // Crear un checkbox por cada ubicación
+                        container.append(`
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="${item.pk_company}" id="location${item.pk_company}">
+                                <label class="form-check-label" for="location${item.pk_company}">
+                                    ${item.CoName}
+                                </label>
+                            </div>
+                        `);
+                    });
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching data locations:', error);
+            }
+        });
+    }
+    
+    // Ejecutar la función cuando el panel de filtros se haya expandido
+    $('#closeapplylocationfiltercheckbox').on('click', function () {
+        loadLocationsFilterCheckbox();
+    });
+    //loadLocationsFilterCheckbox();
+
+
+    //Busqueda de carries en un nuevo registro
     var carrierRoute = $('#inputcarrier').data('url');
     var newlyCreatedCarrierId = null; // Variable para almacenar el ID del carrier recién creado
+    var selectedCarriers = [];
 
     function loadCarriers() {
         $('#inputcarrier').select2({
@@ -51,9 +366,9 @@ $(document).ready(function () {
     });
 
     // Actualizar la lista cuando se haga clic en el select
-    $('#inputcarrier').on('click', function () {
+    /*$('#inputcarrier').one('click', function () {
         loadCarriers();
-    });
+    });*/
 
     // Cuando el usuario seleccione o ingrese un nuevo valor
     $('#inputcarrier').on('change', function () {
@@ -104,18 +419,18 @@ $(document).ready(function () {
                         newlyCreatedCarrierId = null;  // Restablecer el ID del carrier creado
                     }
                 });
+                loadCarriersFilterCheckbox();
             },
             error: function (xhr, status, error) {
                 console.error('Error al guardar el carrier', error);
             }
         });
     }
-});
 
-//Busqueda de carries en el update 
-$(document).ready(function () {
-    var carrierRoute = $('#updateinputcarrier').data('url');
-    var newlyCreatedCarrierId = null; // Variable para almacenar el ID del carrier recién creado
+
+
+    var carrierRouteUpdate = $('#updateinputcarrier').data('url');
+    var newlyCreatedCarrierIdUpdate = null; // Variable para almacenar el ID del carrier recién creado
     var selectedCarriersUpdate = []; // Arreglo para almacenar todos los drivers seleccionados
 
     function loadCarriersUpdate() {
@@ -125,9 +440,9 @@ $(document).ready(function () {
             tags: true, // Permite agregar nuevas opciones
             dropdownParent: $('#updatenewtrailerempty'),
             ajax: {
-                url: carrierRoute,
+                url: carrierRouteUpdate,
                 dataType: 'json',
-                delay: 250,
+                delay: 450,
                 data: function (params) {
                     return {
                         search: params.term || '' // Si no hay texto, envía un string vacío
@@ -147,9 +462,9 @@ $(document).ready(function () {
         });
     }
 
-    loadCarriersUpdate();
+    //loadCarriersUpdate();
 
-    $.ajax({
+    /*$.ajax({
         url: '/carrier-emptytrailerAjax',  // Ruta que manejará la carga de los drivers existentes
         type: 'GET',
         dataType: 'json',
@@ -164,12 +479,13 @@ $(document).ready(function () {
         error: function (xhr, status, error) {
             console.error('Error al cargar los Carriers Update existentes:', error);
         }
-    });
+    });*/
 
     // Actualizar la lista cuando se haga clic en el select
-    $('#updateinputcarrier').on('click', function () {
+    /*$('#updateinputcarrier').on('click', function () {
         loadCarriersUpdate();
-    });
+    });*/
+    //$('#updateemptytrailer').one('click', loadCarriersUpdate);
 
     // Cuando el usuario seleccione o ingrese un nuevo valor
     $('#updateinputcarrier').on('change', function () {
@@ -177,19 +493,19 @@ $(document).ready(function () {
         var selectedText = selectedOption ? selectedOption.text : ''; // Obtener el texto (nombre) de la opción seleccionada
 
         // Si no es el nuevo carrier, lo procesamos
-        if (selectedText  !== newlyCreatedCarrierId &&  selectedText.trim() !== '') {
+        if (selectedText  !== newlyCreatedCarrierIdUpdate &&  selectedText.trim() !== '') {
             console.log(selectedText);
             //saveNewCarrier(selectedText);
             if (!selectedCarriersUpdate.includes(selectedText)) {
                 selectedCarriersUpdate.push(selectedText);  // Agregar al arreglo solo si no existe
                 console.log(selectedCarriersUpdate);  // Mostrar el arreglo con todos los drivers seleccionados
-                saveNewCarrier(selectedText);
+                saveNewCarrierUpdate(selectedText);
             }
         }
     });
 
     // Guardar un nuevo carrier en la base de datos
-    function saveNewCarrier(carrierName) {
+    function saveNewCarrierUpdate(carrierName) {
         $.ajax({
             url: '/save-new-carrier',  // Ruta que manejará el backend
             type: 'POST',
@@ -210,22 +526,99 @@ $(document).ready(function () {
                 $('#updateinputcarrier').val(response.newCarrier.pk_company).trigger('change');
 
                 // Marcar el nuevo ID para evitar que se haga otra solicitud
-                newlyCreatedCarrierId = response.newCarrier.CoName;
+                newlyCreatedCarrierIdUpdate = response.newCarrier.CoName;
 
                 // Cuando el nuevo carrier sea creado, aseguramos que no se haga más AJAX para este carrier
                 $('#updateinputcarrier').on('select2:select', function (e) {
                     var selectedId = e.params.data.id;
-                    if (selectedId === newlyCreatedCarrierId) {
+                    if (selectedId === newlyCreatedCarrierIdUpdate) {
                         // Evitar que se reenvíe la solicitud para el nuevo carrier
-                        newlyCreatedCarrierId = null;  // Restablecer el ID del carrier creado
+                        newlyCreatedCarrierIdUpdate = null;  // Restablecer el ID del carrier creado
                     }
                 });
+                loadCarriersFilterCheckbox();
             },
             error: function (xhr, status, error) {
                 console.error('Error al guardar el carrier', error);
             }
         });
     }
+
+
+        //Funcion para buscar el availability indicator en la pantalla de empty trailer update
+        function loadAvailabilityIndicatorupdate() {
+            var availabilityRoute = $('#updateinputavailabilityindicator').data('url');
+              $.ajax({
+                  url: availabilityRoute,
+                  method: 'GET',
+                  success: function (data) {
+                      let select = $('#updateinputavailabilityindicator');
+                      let selectedValue = select.val();
+                      //let selectedValue = "{{ old('inputavailabilityindicator') }}"; // Recupera el valor previo
+                      select.empty(); // Limpia el select eliminando todas las opciones
+                      //select.append('<option selected disabled hidden></option>'); // Opción inicial
+    
+                      if (data.length === 0) {
+                          select.append('<option disabled>No options available</option>');
+                      } else {
+                            select.append('<option value="">Choose an option</option>');
+                            data.forEach(item => {
+                                select.append(`<option value="${item.gnct_id}">${item.gntc_description}</option>`);
+                            });
+                      }
+    
+                      if (selectedValue) {
+                          select.val(selectedValue); // Restaura el valor anterior
+                      }
+                  },
+                  error: function (xhr, status, error) {
+                      console.error('Error fetching data Availability Indicators:', error);
+                  }
+              });
+        }
+    
+        // Cargar datos al enfocarse y al cargar la página update 
+        $(document).one('click', '.clickable-row', function () {
+            loadAvailabilityIndicatorupdate();
+            loadCarriersUpdate();
+        });
+        
+
+        //Funcion para buscar el availability indicator en la pantalla de empty trailer update
+        function loadAvailabilityIndicator() {
+            var availabilityRoute = $('#inputavailabilityindicator').data('url');
+              $.ajax({
+                  url: availabilityRoute,
+                  method: 'GET',
+                  success: function (data) {
+                      let select = $('#inputavailabilityindicator');
+                      let selectedValue = select.val();
+                      //let selectedValue = "{{ old('inputavailabilityindicator') }}"; // Recupera el valor previo
+                      select.empty(); // Limpia el select eliminando todas las opciones
+                      //select.append('<option selected disabled hidden></option>'); // Opción inicial
+    
+                      if (data.length === 0) {
+                          select.append('<option disabled>No options available</option>');
+                      } else {
+                            select.append('<option value="">Choose an option</option>');
+                            data.forEach(item => {
+                                select.append(`<option value="${item.gnct_id}">${item.gntc_description}</option>`);
+                            });
+                      }
+    
+                      if (selectedValue) {
+                          select.val(selectedValue); // Restaura el valor anterior
+                      }
+                  },
+                  error: function (xhr, status, error) {
+                      console.error('Error fetching data Availability Indicators:', error);
+                  }
+              });
+        }
+    
+        // Cargar datos al enfocarse y al cargar la página update 
+        $('#addnewemptytrailer').one('click', loadAvailabilityIndicator);
+        //loadAvailabilityIndicator();
 });
 
 
@@ -240,12 +633,12 @@ $(document).ready(function () {
         $('#inputlocation').select2({
             placeholder: 'Select or enter a New Location',
             //allowClear: true,
-            tags: true, // Permite agregar nuevas opciones
+            //tags: true, // Permite agregar nuevas opciones
             dropdownParent: $('#newtrailerempty'),
             ajax: {
                 url: carrierRoute,
                 dataType: 'json',
-                delay: 250,
+                delay: 450,
                 data: function (params) {
                     return {
                         search: params.term || '' // Si no hay texto, envía un string vacío
@@ -265,9 +658,11 @@ $(document).ready(function () {
         });
     }
 
-    loadLocations();
-
-    $.ajax({
+    //Esta funcion solo carga los locations al cargar la pagina
+    //loadLocations();
+    
+    //Esta funcion lo que hace es guardar los locations ya existentes para que al comprar el nuevo sepa si ya existe o no
+    /*$.ajax({
         url: '/locations-emptytrailerAjax',  // Ruta que manejará la carga de los drivers existentes
         type: 'GET',
         dataType: 'json',
@@ -282,7 +677,7 @@ $(document).ready(function () {
         error: function (xhr, status, error) {
             console.error('Error al cargar los Locations Registro existentes:', error);
         }
-    });
+    });*/
 
     // Actualizar la lista cuando se haga clic en el select
     $('#inputlocation').on('click', function () {
@@ -290,7 +685,7 @@ $(document).ready(function () {
     });
 
     // Cuando el usuario seleccione o ingrese un nuevo valor
-    $('#inputlocation').on('change', function () {
+    /*$('#inputlocation').on('change', function () {
         var selectedOption = $(this).select2('data')[0]; // Obtener la opción seleccionada
         var selectedText = selectedOption ? selectedOption.text : ''; // Obtener el texto (nombre) de la opción seleccionada
 
@@ -304,7 +699,7 @@ $(document).ready(function () {
                 saveNewCarrier(selectedText);
             }
         }
-    });
+    });*/
 
     // Guardar un nuevo carrier en la base de datos
     function saveNewCarrier(carrierName) {
@@ -356,12 +751,12 @@ $(document).ready(function () {
         $('#updateinputlocation').select2({
             placeholder: 'Select or enter a New Carrier',
             //allowClear: true,
-            tags: true, // Permite agregar nuevas opciones
+            //tags: true, // Permite agregar nuevas opciones
             dropdownParent: $('#updatenewtrailerempty'),
             ajax: {
                 url: carrierRoute,
                 dataType: 'json',
-                delay: 250,
+                delay: 450,
                 data: function (params) {
                     return {
                         search: params.term || '' // Si no hay texto, envía un string vacío
@@ -381,9 +776,9 @@ $(document).ready(function () {
         });
     }
 
-    loadLocationsUpdate();
+    //loadLocationsUpdate();
 
-    $.ajax({
+    /*$.ajax({
         url: '/locations-emptytrailerAjax',  // Ruta que manejará la carga de los drivers existentes
         type: 'GET',
         dataType: 'json',
@@ -398,7 +793,7 @@ $(document).ready(function () {
         error: function (xhr, status, error) {
             console.error('Error al cargar los Locations Update existentes:', error);
         }
-    });
+    });*/
 
     // Actualizar la lista cuando se haga clic en el select
     $('#updateinputlocation').on('click', function () {
@@ -406,7 +801,7 @@ $(document).ready(function () {
     });
 
     // Cuando el usuario seleccione o ingrese un nuevo valor
-    $('#updateinputlocation').on('change', function () {
+    /*$('#updateinputlocation').on('change', function () {
         var selectedOption = $(this).select2('data')[0]; // Obtener la opción seleccionada
         var selectedText = selectedOption ? selectedOption.text : ''; // Obtener el texto (nombre) de la opción seleccionada
 
@@ -420,7 +815,7 @@ $(document).ready(function () {
                 saveNewLocation(selectedText);
             }
         }
-    });
+    });*/
 
     // Guardar un nuevo carrier en la base de datos
     function saveNewLocation(carrierName) {
@@ -695,80 +1090,6 @@ $(document).ready(function() {
     /*$('#inputlocation').on('focus', loadLocations);
     loadLocations();*/
 
-
-
-
-    //Funcion para buscar el availability indicator en la pantalla de empty trailer update
-    function loadAvailabilityIndicatorupdate() {
-        var availabilityRoute = $('#updateinputavailabilityindicator').data('url');
-          $.ajax({
-              url: availabilityRoute,
-              method: 'GET',
-              success: function (data) {
-                  let select = $('#updateinputavailabilityindicator');
-                  let selectedValue = select.val();
-                  //let selectedValue = "{{ old('inputavailabilityindicator') }}"; // Recupera el valor previo
-                  select.empty(); // Limpia el select eliminando todas las opciones
-                  //select.append('<option selected disabled hidden></option>'); // Opción inicial
-
-                  if (data.length === 0) {
-                      select.append('<option disabled>No options available</option>');
-                  } else {
-                        select.append('<option value="">Choose an option</option>');
-                        data.forEach(item => {
-                            select.append(`<option value="${item.gnct_id}">${item.gntc_description}</option>`);
-                        });
-                  }
-
-                  if (selectedValue) {
-                      select.val(selectedValue); // Restaura el valor anterior
-                  }
-              },
-              error: function (xhr, status, error) {
-                  console.error('Error fetching data Availability Indicators:', error);
-              }
-          });
-    }
-
-    // Cargar datos al enfocarse y al cargar la página update 
-    $('#updateinputavailabilityindicator').on('focus', loadAvailabilityIndicatorupdate);
-    loadAvailabilityIndicatorupdate();
-
-    //Funcion para buscar el availability indicator en la pantalla de empty trailer update
-    function loadAvailabilityIndicator() {
-        var availabilityRoute = $('#inputavailabilityindicator').data('url');
-          $.ajax({
-              url: availabilityRoute,
-              method: 'GET',
-              success: function (data) {
-                  let select = $('#inputavailabilityindicator');
-                  let selectedValue = select.val();
-                  //let selectedValue = "{{ old('inputavailabilityindicator') }}"; // Recupera el valor previo
-                  select.empty(); // Limpia el select eliminando todas las opciones
-                  //select.append('<option selected disabled hidden></option>'); // Opción inicial
-
-                  if (data.length === 0) {
-                      select.append('<option disabled>No options available</option>');
-                  } else {
-                        select.append('<option value="">Choose an option</option>');
-                        data.forEach(item => {
-                            select.append(`<option value="${item.gnct_id}">${item.gntc_description}</option>`);
-                        });
-                  }
-
-                  if (selectedValue) {
-                      select.val(selectedValue); // Restaura el valor anterior
-                  }
-              },
-              error: function (xhr, status, error) {
-                  console.error('Error fetching data Availability Indicators:', error);
-              }
-          });
-    }
-
-    // Cargar datos al enfocarse y al cargar la página update 
-    $('#inputavailabilityindicator').on('focus', loadAvailabilityIndicator);
-    loadAvailabilityIndicator();
   });
 
     //Crear nuevo trailer 
@@ -871,10 +1192,10 @@ $(document).ready(function() {
                 errorContainer.text('Availability Indicator is required.');
             }*/
     
-            if (fieldName === 'inputlocation' && field.val().trim().length === 0) {
+            /*if (fieldName === 'inputlocation' && field.val().trim().length === 0) {
                 field.addClass('is-invalid');
                 errorContainer.text('Location is required.');
-            }
+            }*/
     
             // Validación simple para las fechas (solo obligatorio)
             if (fieldName === 'inputdatein' && field.val().trim().length === 0) {
@@ -961,6 +1282,13 @@ $(document).ready(function() {
     
     function updateTrailerTable() {
         // Obtener los valores de los filtros
+        // Función para agregar parámetros solo si tienen valor
+        function addParam(key, value) {
+            if (value && value.trim() !== '') {  // Solo agregar si tiene un valor
+                params.set(key, value);
+            }
+        }
+
         const search = document.getElementById('searchemptytrailergeneral').value;
         const trailerNum = document.getElementById('emptytrailerfilterinputidtrailer').value;
         const statusStart = document.getElementById('emptytrailerfilterinputdateofstartstatus').value;
@@ -978,11 +1306,51 @@ $(document).ready(function() {
         //const transactionDateStart = document.getElementById('emptytrailerfilterinputstarttransactiondate').value;
         //const transactionDateEnd = document.getElementById('emptytrailerfilterinputendtransactiondate').value;
         
+        // Obtener todas las ubicaciones seleccionadas (checkboxes marcados)
+        let selectedLocationsCheckbox = [];
+        $('#locationCheckboxContainer input[type="checkbox"]:checked').each(function () {
+            selectedLocationsCheckbox.push($(this).val()); // Agrega el ID de la ubicación
+        });
+
+        const locations = selectedLocationsCheckbox.join(','); // Convertir array en string separado por comas
+
+        let selectedCarriesCheckbox = [];
+        $('#CarrierCheckboxContainer input[type="checkbox"]:checked').each(function () {
+            selectedCarriesCheckbox.push($(this).val()); // Agrega el ID de la ubicación
+        });
+
+        const carriers = selectedCarriesCheckbox.join(','); // Convertir array en string separado por comas
+
+        let selectedAvailabilityIndicatorCheckbox = [];
+        $('#AvailabilityIndicatorCheckboxContainer input[type="checkbox"]:checked').each(function () {
+            selectedAvailabilityIndicatorCheckbox.push($(this).val()); // Agrega el ID de la ubicación
+        });
+
+        const indicators = selectedAvailabilityIndicatorCheckbox.join(','); // Convertir array en string separado por comas
+        
         // Construir la URL con los parámetros de filtro
         const url = new URL(document.getElementById('refreshemptytrailertable').getAttribute('data-url'));
         const params = new URLSearchParams(url.search);
     
-        // Agregar los filtros a los parámetros de la URL
+        // Agregar solo los parámetros que tienen valor
+        addParam('search', search);
+        addParam('trailer_num', trailerNum);
+        addParam('status_start', statusStart);
+        addParam('status_end', statusEnd);
+        addParam('pallets_on_trailer', palletsOnTrailer);
+        addParam('pallets_on_floor', palletsOnFloor);
+        addParam('carrier', carrier);
+        addParam('gnct_id_availability_indicator', availabilityIndicator);
+        addParam('location', location);
+        addParam('username', username);
+        addParam('date_in_start', dateInStart);
+        addParam('date_in_end', dateInEnd);
+
+        // Agregar los filtros de checkboxes (si están seleccionados)
+        if (locations) params.set('locations', locations);
+        if (carriers) params.set('carrierscheckbox', carriers);
+        if (indicators) params.set('indicators', indicators);
+        /*// Agregar los filtros a los parámetros de la URL
         params.set('search', search);
         params.set('trailer_num', trailerNum);
         params.set('status_start', statusStart);
@@ -990,11 +1358,14 @@ $(document).ready(function() {
         params.set('pallets_on_trailer', palletsOnTrailer);
         params.set('pallets_on_floor', palletsOnFloor);
         params.set('carrier', carrier);
+        params.set('carrierscheckbox', carriers);
         params.set('gnct_id_availability_indicator', availabilityIndicator);
+        params.set('indicators', indicators);
         params.set('location', location);
+        params.set('locations', locations);
         params.set('username', username);
         params.set('date_in_start', dateInStart);
-        params.set('date_in_end', dateInEnd);
+        params.set('date_in_end', dateInEnd);*/
         //params.set('date_out_start', dateOutStart);
         //params.set('date_out_end', dateOutEnd);
         //params.set('transaction_date_start', transactionDateStart);
@@ -1017,7 +1388,7 @@ $(document).ready(function() {
     
                 data.forEach(trailer => {
                     const row = `
-                        <tr id="trailer-${trailer.pk_trailer}" class="clickable-row" 
+                        <tr id="trailer-${trailer.pk_trailer}" class="clickable-row " 
                             data-bs-toggle="offcanvas" 
                             data-bs-target="#emptytrailer" 
                             aria-controls="emptytrailer" 
@@ -1028,7 +1399,7 @@ $(document).ready(function() {
                             <td>${trailer.pallets_on_floor ?? ''}</td>
                             <td>${trailer.carriers?.CoName ?? ''}</td>
                             <td>${trailer.availability_indicator?.gntc_description ?? ''}</td>
-                            <td>${trailer.locations?.CoName ?? ''}</td>
+                            <!--<td>${trailer.locations?.CoName ?? ''}</td>-->
                             <td>${trailer.date_in ?? '' }</td>
                             <!-- <td>${trailer.date_out ?? '' }</td> -->
                             <!-- <td>${trailer.transaction_date ?? '' }</td> -->
@@ -1054,7 +1425,7 @@ $(document).ready(function() {
                             document.getElementById("offcanvas-pallets-on-floor").textContent = trailer.pallets_on_floor;
                             document.getElementById("offcanvas-carrier").textContent = trailer.carriers && trailer.carriers.CoName ? trailer.carriers.CoName : '';
                             document.getElementById("offcanvas-availability").textContent = trailer.availability_indicator && trailer.availability_indicator.gntc_description ? trailer.availability_indicator.gntc_description : '';
-                            document.getElementById("offcanvas-location").textContent = trailer.locations && trailer.locations.CoName ? trailer.locations.CoName : '';
+                            //document.getElementById("offcanvas-location").textContent = trailer.locations && trailer.locations.CoName ? trailer.locations.CoName : '';
                             document.getElementById("offcanvas-date-in").textContent = trailer.date_in;
                             //document.getElementById("offcanvas-date-out").textContent = trailer.date_out;
                             //document.getElementById("offcanvas-transaction-date").textContent = trailer.transaction_date;
@@ -1081,11 +1452,18 @@ $(document).ready(function() {
         input.addEventListener('input', updateTrailerTable);
     });
 
+    let debounceTimer;
+
+    function debounceUpdate() {
+        clearTimeout(debounceTimer); // Cancela el temporizador anterior
+        debounceTimer = setTimeout(updateTrailerTable, 1000); // Espera 3 segundos antes de ejecutar la función
+    }
+
     const filterGeneralInputs = document.querySelectorAll('#searchemptytrailergeneral');
     filterGeneralInputs.forEach(input => {
-        input.addEventListener('input', updateTrailerTable);
+        input.addEventListener('input', debounceUpdate);
     });
-    
+
     // Actualización automática cada 5 minutos (300,000 ms)
     setInterval(updateTrailerTable, 5000000);
     
@@ -1172,7 +1550,7 @@ $(document).ready(function() {
                       document.getElementById("offcanvas-pallets-on-floor").textContent = trailer.pallets_on_floor;
                       document.getElementById("offcanvas-carrier").textContent = trailer.carriers && trailer.carriers.CoName ? trailer.carriers.CoName : '';
                       document.getElementById("offcanvas-availability").textContent = trailer.availability_indicator && trailer.availability_indicator.gntc_description ? trailer.availability_indicator.gntc_description : '';
-                      document.getElementById("offcanvas-location").textContent = trailer.locations && trailer.locations.CoName ? trailer.locations.CoName : '';
+                      //document.getElementById("offcanvas-location").textContent = trailer.locations && trailer.locations.CoName ? trailer.locations.CoName : '';
                       document.getElementById("offcanvas-date-in").textContent = trailer.date_in;
                       //document.getElementById("offcanvas-date-out").textContent = trailer.date_out;
                       //document.getElementById("offcanvas-transaction-date").textContent = trailer.transaction_date;
@@ -1352,7 +1730,7 @@ $(document).ready(function() {
 
         }*/
         // Crear promesas para las dos solicitudes AJAX
-        let locationPromise = new Promise((resolve, reject) => {
+        /*let locationPromise = new Promise((resolve, reject) => {
             if (trailer.location) {
                 $.ajax({
                     url: 'locations-emptytrailerAjax', // Cambia esta URL si es necesario
@@ -1373,7 +1751,7 @@ $(document).ready(function() {
             } else {
                 resolve(); // Resolver inmediatamente si no hay ubicación
             }
-        });
+        });*/
 
         let carrierPromise = new Promise((resolve, reject) => {
             if (trailer.carrier) {
@@ -1399,7 +1777,7 @@ $(document).ready(function() {
         });
 
         // Esperar a que ambas promesas se resuelvan antes de mostrar el offcanvas
-        Promise.all([locationPromise, carrierPromise])
+        Promise.all([/*locationPromise*/, carrierPromise])
             .then(() => {
                 const updateCanvas = new bootstrap.Offcanvas(document.getElementById('updatenewtrailerempty'));
                 updateCanvas.show(); // Mostrar el offcanvas cuando ambas solicitudes terminen
@@ -1438,7 +1816,7 @@ $(document).ready(function() {
         'updateinputpalletsonfloor',
         'updateinputcarrier',
         //'updateinputavailabilityindicator',
-        'updateinputlocation',
+        //'updateinputlocation',
         'updateinputdatein',
         //'updateinputdateout',
         //'updateinputtransactiondate',
@@ -1642,7 +2020,7 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
                 updateinputpalletsonfloor: document.getElementById("updateinputpalletsonfloor").value,
                 updateinputcarrier: document.getElementById("updateinputcarrier").value,
                 updateinputavailabilityindicator: document.getElementById("updateinputavailabilityindicator").value,
-                updateinputlocation: document.getElementById("updateinputlocation").value,
+                //updateinputlocation: document.getElementById("updateinputlocation").value,
                 updateinputdatein: document.getElementById("updateinputdatein").value,
                 updateinputusername: document.getElementById("updateinputusername").value,
             };
@@ -1769,7 +2147,7 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
         const palletsonfloor = document.getElementById("offcanvas-pallets-on-floor").textContent;
         const carrier = document.getElementById("pk_carrier").textContent;
         const availability = document.getElementById("pk_availability").textContent;
-        const location = document.getElementById("pk_location").textContent;
+        //const location = document.getElementById("pk_location").textContent;
         const datein = document.getElementById("offcanvas-date-in").textContent;
         //const dateout = document.getElementById("offcanvas-date-out").textContent;
         //const transaction = document.getElementById("offcanvas-transaction-date").textContent;
@@ -1783,11 +2161,11 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
         &palletsonfloor=${encodeURIComponent(palletsonfloor)}
         &carrier=${encodeURIComponent(carrier)}
         &availability=${encodeURIComponent(availability)}
-        &location=${encodeURIComponent(location)}
         &datein=${encodeURIComponent(datein)}
         &username=${encodeURIComponent(username)}`;
 
         /*
+        &location=${encodeURIComponent(location)}
         &dateout=${encodeURIComponent(dateout)}
         &transaction=${encodeURIComponent(transaction)}
         &username=${encodeURIComponent(username)}`;
@@ -1914,7 +2292,7 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
             $(divSelector).hide();
             $(closeButtonSelector).prop('disabled', false); // Habilita el botón
             $(applyButtonSelector).click(); // Simula clic en Apply
-            updatetab.click();
+            //updatetab.click();
         }
     
         // Función genérica para abrir el offcanvas y enfocar el input
@@ -1928,8 +2306,10 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
         function handleCloseCollapseButton(inputSelector, divSelector, inputFilterSelector) {
             if (!$(inputSelector).val()) {
                 $(inputFilterSelector).val(''); // Limpia el input asociado al filtro
+                if ($(divSelector).is(":visible")) {
+                    updatetab.click();
+                }
                 $(divSelector).hide(); // Oculta el div del filtro
-                updatetab.click();
             }
         }
     
@@ -2022,7 +2402,7 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
     $(document).ready(function () {
         const updatetab = document.getElementById("refreshemptytrailertable");
         // Función para manejar el estado de los botones (habilitar/deshabilitar)
-        function toggleDateRangeButtons(startInputSelector, endInputSelector, closeButtonSelector, applyButtonSelector) {
+        function toggleDateRangeButtons(startInputSelector, endInputSelector, closeButtonSelector, applyButtonSelector, divSelector) {
             if ($(startInputSelector).val() || $(endInputSelector).val()) {
                 $(closeButtonSelector).prop('disabled', true); // Habilita el botón Collapse
             } else {
@@ -2032,7 +2412,9 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
             // Deshabilita el botón Apply hasta que ambos inputs estén llenos
             if ($(startInputSelector).val() && $(endInputSelector).val()) {
                 $(applyButtonSelector).prop('disabled', false); // Habilita el botón Apply
-            } else {
+            } else if(!$(startInputSelector).val() && !$(endInputSelector).val() && $(divSelector).is(":visible")) {
+                $(applyButtonSelector).prop('disabled', false); // Deshabilita el botón Apply
+            }else{
                 $(applyButtonSelector).prop('disabled', true); // Deshabilita el botón Apply
             }
         }
@@ -2060,7 +2442,7 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
                 $(closeButtonSelector).click(); // Simula un clic en Collapse
                 updatetab.click();
             }
-            toggleDateRangeButtons(startInputSelector, endInputSelector, closeButtonSelector, applyButtonSelector);
+            toggleDateRangeButtons(startInputSelector, endInputSelector, closeButtonSelector, applyButtonSelector, divSelector);
         }
     
         // Función para limpiar el filtro (botón X)
@@ -2075,12 +2457,15 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
         }
     
         // Función para manejar clics en botones de cerrar Collapse
-        function handleCloseDateRangeCollapse(startInputSelector, endInputSelector, divSelector, startFilterInputSelector, endFilterInputSelector) {
+        function handleCloseDateRangeCollapse(startInputSelector, endInputSelector, divSelector, startFilterInputSelector, endFilterInputSelector, applyButtonSelector) {
             if (!$(startInputSelector).val() && !$(endInputSelector).val()) {
                 $(startFilterInputSelector).val(''); // Limpia el Start Date del filtro
                 $(endFilterInputSelector).val(''); // Limpia el End Date del filtro
+                if ($(divSelector).is(":visible")) {
+                    updatetab.click();
+                    $(applyButtonSelector).prop('disabled', true); // Deshabilita el botón Apply
+                } 
                 $(divSelector).hide(); // Oculta el div del filtro
-                updatetab.click();
             }
         }
     
@@ -2128,18 +2513,19 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
                 '#inputapplystatusedfilter', // End Date input en el offcanvas
                 '#emptytrailerfilterdivdateofstatus', // Div del filtro
                 '#emptytrailerfilterinputdateofstartstatus', // Start Date input en el filtro
-                '#emptytrailerfilterinputdateofendstatus' // End Date input en el filtro
+                '#emptytrailerfilterinputdateofendstatus', // End Date input en el filtro
+                '#applystatusfilter'
             );
         });
     
     
         // Llamada inicial para verificar los botones
-        toggleDateRangeButtons('#inputapplystatusstfilter', '#inputapplystatusedfilter', '#closeapplystatusfilter', '#applystatusfilter');
+        toggleDateRangeButtons('#inputapplystatusstfilter', '#inputapplystatusedfilter', '#closeapplystatusfilter', '#applystatusfilter', '#emptytrailerfilterdivdateofstatus');
 
         // ------------------ Verificación de los inputs ------------------
         // Detecta cambios en los inputs del Offcanvas para habilitar o deshabilitar el botón de Collapse
         $('#inputapplystatusstfilter, #inputapplystatusedfilter').on('input', function () {
-            toggleDateRangeButtons('#inputapplystatusstfilter', '#inputapplystatusedfilter', '#closeapplystatusfilter', '#applystatusfilter');
+            toggleDateRangeButtons('#inputapplystatusstfilter', '#inputapplystatusedfilter', '#closeapplystatusfilter', '#applystatusfilter', '#emptytrailerfilterdivdateofstatus');
         });
     });
 
@@ -2147,7 +2533,7 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
     $(document).ready(function () {
         const updatetab = document.getElementById("refreshemptytrailertable");
         // Función para manejar el estado de los botones (habilitar/deshabilitar)
-        function toggleDateRangeButtons(startInputSelector, endInputSelector, closeButtonSelector, applyButtonSelector) {
+        function toggleDateRangeButtons(startInputSelector, endInputSelector, closeButtonSelector, applyButtonSelector, divSelector) {
             if ($(startInputSelector).val() || $(endInputSelector).val()) {
                 $(closeButtonSelector).prop('disabled', true); // Habilita el botón Collapse
             } else {
@@ -2157,7 +2543,9 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
             // Deshabilita el botón Apply hasta que ambos inputs estén llenos
             if ($(startInputSelector).val() && $(endInputSelector).val()) {
                 $(applyButtonSelector).prop('disabled', false); // Habilita el botón Apply
-            } else {
+            } else if(!$(startInputSelector).val() && !$(endInputSelector).val() && $(divSelector).is(":visible")) {
+                $(applyButtonSelector).prop('disabled', false); // Deshabilita el botón Apply
+            }else{
                 $(applyButtonSelector).prop('disabled', true); // Deshabilita el botón Apply
             }
         }
@@ -2186,7 +2574,7 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
                 $(closeButtonSelector).click(); // Simula un clic en Collapse
                 updatetab.click();
             }
-            toggleDateRangeButtons(startInputSelector, endInputSelector, closeButtonSelector, applyButtonSelector);
+            toggleDateRangeButtons(startInputSelector, endInputSelector, closeButtonSelector, applyButtonSelector, divSelector);
         }
     
         // Función para limpiar el filtro (botón X)
@@ -2201,12 +2589,15 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
         }
     
         // Función para manejar clics en botones de cerrar Collapse
-        function handleCloseDateRangeCollapse(startInputSelector, endInputSelector, divSelector, startFilterInputSelector, endFilterInputSelector) {
+        function handleCloseDateRangeCollapse(startInputSelector, endInputSelector, divSelector, startFilterInputSelector, endFilterInputSelector, applyButtonSelector) {
             if (!$(startInputSelector).val() && !$(endInputSelector).val()) {
                 $(startFilterInputSelector).val(''); // Limpia el Start Date del filtro
                 $(endFilterInputSelector).val(''); // Limpia el End Date del filtro
+                if ($(divSelector).is(":visible")) {
+                    updatetab.click();
+                    $(applyButtonSelector).prop('disabled', true); // Deshabilita el botón Apply
+                } 
                 $(divSelector).hide(); // Oculta el div del filtro
-                updatetab.click();
             }
         }
     
@@ -2254,7 +2645,8 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
                 '#inputapplydienfilter', // End Date input en el offcanvas
                 '#emptytrailerfilterdivdatein', // Div del filtro
                 '#emptytrailerfilterinputstartdatein', // Start Date input en el filtro
-                '#emptytrailerfilterinputenddatein' // End Date input en el filtro
+                '#emptytrailerfilterinputenddatein', // End Date input en el filtro
+                '#applydifilter'
             );
         });
     
@@ -2342,7 +2734,7 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
     
         // Detectar cambios en los inputs de las fechas para habilitar o deshabilitar botones
         $('#inputapplydistfilter, #inputapplydienfilter').on('input', function () {
-            toggleDateRangeButtons('#inputapplydistfilter', '#inputapplydienfilter', '#closeapplydifilter', '#applydifilter');
+            toggleDateRangeButtons('#inputapplydistfilter', '#inputapplydienfilter', '#closeapplydifilter', '#applydifilter', '#emptytrailerfilterdivdatein');
         });
     
         /*$('#inputapplydostfilter, #inputapplydoedfilter').on('input', function () {
@@ -2354,7 +2746,7 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
         });*/
     
         // Llamada inicial para verificar los botones
-        toggleDateRangeButtons('#inputapplydistfilter', '#inputapplydienfilter', '#closeapplydifilter', '#applydifilter');
+        toggleDateRangeButtons('#inputapplydistfilter', '#inputapplydienfilter', '#closeapplydifilter', '#applydifilter', '#emptytrailerfilterdivdatein');
         //toggleDateRangeButtons('#inputapplydostfilter', '#inputapplydoedfilter', '#closeapplydofilter', '#applydofilter');
         //toggleDateRangeButtons('#inputapplytdstfilter', '#inputapplytdedfilter', '#closeapplytdfilter', '#applytdfilter');
     });
@@ -2395,7 +2787,8 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
 
     //Ejecutar la funcion al picarle al select en los filtros
     $('#inputapplycarrierfilter').on('focus', loadCarriersFilter);
-    loadCarriersFilter();
+    //Hacer esta peticios para cargar los carriers de los filtros al cargar la pagina ralentiza su operacion 
+    //loadCarriersFilter();
 
     //Funcion para buscar las locations en la pantalla de empty trailer en los filtros
     function loadLocationsFilter() {
@@ -2431,7 +2824,8 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
 
     //Ejecurtar la funcion al picarle al boton en los filtros
     $('#inputapplylocationfilter').on('focus', loadLocationsFilter);
-    loadLocationsFilter();
+    //Hacer esta peticios para cargar los locations de los filtros al cargar la pagina ralentiza su operacion 
+    //loadLocationsFilter();
 
     //Funcion para buscar el availability indicator en la pantalla de empty trailer update en el filtro
     function loadAvailabilityIndicatorFilter() {
@@ -2464,10 +2858,17 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
               }
           });
     }
+    /*$('#addmorefiltersemptytrailer').one('click', function() {
+        loadAvailabilityIndicatorFilter();
+        loadLocationsFilter();
+        loadCarriersFilter();
+    });*/
+    
 
     // Cargar datos al enfocarse y al cargar la página filters
     $('#inputapplyaifilter').on('focus', loadAvailabilityIndicatorFilter);
-    loadAvailabilityIndicatorFilter();
+    //Hacer esta peticios para cargar los availability indicators de los filtros al cargar la pagina ralentiza su operacion 
+    //loadAvailabilityIndicatorFilter();
 
     //Filtros de selects
     //jhgbwvefqvrjrhegwvfeqcwdfevwgrbehtrnjymrnthegvwfeqcvwgrbet

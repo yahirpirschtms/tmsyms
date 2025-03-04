@@ -54,6 +54,15 @@
                     </div>
                 </div>
 
+                <div class="col-auto" id="emptytrailerfilterdivshipmenttypecheckbox" style="display:none">
+                    <div style="background-color:rgb(13, 82, 200); border-radius:0.5rem; width:fit-content; display:flex; flex-wrap:nowrap" class="input-group mb-3 me-2">
+                        <btn id="emptytrailerfilterbtnshipmenttypecheckbox" style="background-color: unset; color:white; white-space:nowrap; align-content:center; font-size: small;" class="ms-2 me-2">Shipment Type:</btn>
+                        <input id="emptytrailerfilterinputshipmenttypecheckbox" name="emptytrailerfilterinputshipmenttypecheckbox" value="" style="border:unset; width:fit-content;  color:white; background-color:rgb(13, 82, 200); font-size: small; text-align:center" type="text" class="">
+                        <input type="text" style="display:none" name="emptytrailerfilterinputshipmenttypecheckboxpk" id="emptytrailerfilterinputshipmenttypecheckboxpk" value="">
+                        <button id="emptytrailerfilterbuttonshipmenttypecheckbox" style="border:unset; background-color:rgb(13, 82, 200); color:white; font-size: small;" class="btn">X</button>
+                    </div>
+                </div>
+
                 <div class="col-auto" id="emptytrailerfilterdividstm" style="display:none">
                     <div style="background-color:rgb(13, 82, 200); border-radius:0.5rem; width:fit-content; display:flex; flex-wrap:nowrap" class="mb-3 me-2">
                         <btn id="emptytrailerfilterbtnidstm" style="background-color: unset; color:white; white-space:nowrap; align-content:center; font-size: small;" class="ms-2 me-2">ID STM:</btn>
@@ -245,7 +254,7 @@
                 </div>
                 <div class="offcanvas-body">
                     
-                    <div>
+                    <div style="display:none">
                         <button class="btn btn-primary w-100 mb-2" id="closeapplyshipmenttypefilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapseapplyshipmenttypefilter" aria-expanded="false" aria-controls="multiCollapseapplyshipmenttypefilter">Shipment Type</button>
                         <div class="row mb-2">
                             <div class="col">
@@ -258,7 +267,19 @@
                             </div>
                         </div>
                     </div>
-
+                    <div>
+                        <button class="btn btn-primary w-100 mb-2" id="closeapplyshipmenttypefiltercheckbox" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapseapplyshipmenttypefiltercheckbox" aria-expanded="false" aria-controls="multiCollapseapplyshipmenttypefiltercheckbox">Shipment Type</button>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="collapse multi-collapse" id="multiCollapseapplyshipmenttypefiltercheckbox" data-url="{{ route('shipmenttypes-shipment') }}">
+                                    <div id="ShipmentTypeCheckboxContainer">
+                                        <!-- Los checkboxes se generarán aquí dinámicamente -->
+                                    </div>
+                                    <button class="btn btn-primary mt-2 filterapplycheckbox" type="button" id="applyshipmenttypefiltercheckbox">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <div>
                         <button class="btn btn-primary w-100 mb-2" id="closeapplyidstmfilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapseapplyidstmfilter" aria-expanded="false" aria-controls="multiCollapseapplyidstmfilter">ID STM</button>
@@ -572,6 +593,12 @@
                                             <div class="mb-3 ">
                                                 <label for="whetainputapprovedeta" class="form-label ">Approved ETA Datetime</label>
                                                 <input type="text" class="form-control datetimepicker" id="whetainputapprovedeta" name="whetainputapprovedeta" value="{{ old('updateinputdateout') }}" placeholder="MM/DD/YYYY - H/M/S">
+                                                <div class="invalid-feedback" id="error-whetainputapprovedeta"></div>
+                                            </div>
+
+                                            <div class="mb-3 ">
+                                                <label for="whetainputapproveddoornumber" class="form-label ">Door Number</label>
+                                                <input type="text" class="form-control" id="whetainputapproveddoornumber" name="whetainputapproveddoornumber" value="" placeholder="">
                                                 <div class="invalid-feedback" id="error-whetainputapprovedeta"></div>
                                             </div>
      
