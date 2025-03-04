@@ -254,7 +254,7 @@
                             <td>{{ $shipment->company->CoName ?? 'Not available' }}</td>
                             <td>{{ $shipment->driver->drivername ?? 'Not available' }}</td>
                             <td>{{ $shipment->truck ?? 'Not available' }}</td>
-                            <td>{{ $shipment->etd ? \Carbon\Carbon::parse($shipment->etd)->format('m/d/Y ') : 'Not available' }}</td>
+                            <td>{{ $shipment->etd ? \Carbon\Carbon::parse($shipment->etd)->format('m/d/Y H:i:s') : 'Not available' }}</td>
                             <td>{{ $shipment->units ?? 'Not available' }}</td>
                             <td>{{ $shipment->pallets ?? 'Not available' }}</td>
                             <td>{{ $shipment->security_seals ?? 'Not available' }}</td>
