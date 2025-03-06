@@ -164,6 +164,13 @@
                     <div class="invalid-feedback"></div>
                 </div>
 
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="inputshipmentchecktrackers" name="inputshipmentchecktrackers">
+                    <label class="form-check-label" for="inputshipmentchecktrackers">
+                        Trackers
+                    </label>
+                </div>
+
                 <div class="mb-3">
                     <label for="inputshipmentdevicenumber" class="form-label ">Tracker One</label>
                     <input type="text" class="form-control" id="inputshipmentdevicenumber" name="inputshipmentdevicenumber">

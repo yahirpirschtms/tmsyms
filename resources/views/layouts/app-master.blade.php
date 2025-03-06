@@ -329,8 +329,13 @@
 }
 /* Eliminar el borde negro del campo de búsqueda cuando está enfocado */
 .select2-container--default .select2-search__field:focus {
-    border-color: transparent;  /* Eliminar el borde */
-    box-shadow: none;            /* Eliminar cualquier sombra aplicada */
+    border-color: transparent !important;   /* Eliminar el borde */
+    box-shadow: none !important;        /* Eliminar cualquier sombra aplicada */
+    border: 
+}
+.select2-container--default .select2-search--dropdown .select2-search__field {
+    /*border: 1px !important; */
+    /*border-color: #dee2e6 !important;*/
 }
 .select2-container--default .select2-selection--single .select2-selection__clear {
     right: 15px; /* Mueve la "X" más a la izquierda */
