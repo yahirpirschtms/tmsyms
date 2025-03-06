@@ -515,7 +515,7 @@
                                                     <h6 class="alert alert-danger">{{  $message  }}</h6>
                                                 @enderror
                                             </div>
-                                            <div class="mb-3 ">
+                                            <div class="mb-3">
                                                 <label for="inputcarrier" class="form-label ">Carrier</label>
                                                 <select class="form-control searchcarrier" aria-label="Default select example"  id="inputcarrier" name="inputcarrier" value="{{ old('inputcarrier') }}" data-url="{{ route('carrier-emptytrailerAjax') }}">
                                                     <option selected disabled hidden></option>

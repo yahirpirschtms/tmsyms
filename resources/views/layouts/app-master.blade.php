@@ -187,8 +187,17 @@
       .is-valid {
       border-color: #198754;
       }
+      .select2.is-invalid .select2-selection {
+        border-color: red !important;
+        box-shadow: 0 0 5px rgba(255, 0, 0, 0.5) !important;  /* Sombra roja */
+      }
+      .select2-selection.is-invalid {
+          border-color: red !important;
+          box-shadow: 0 0 5px rgba(255, 0, 0, 0.5) !important;  /* Sombra roja */
+      }
       .is-invalid {
-          border-color: #dc3545;
+        border-color: red !important;
+        box-shadow: 0 0 5px rgba(255, 0, 0, 0.5) !important;  /* Sombra roja */
       }
       .invalid-feedback {
           color: #dc3545;
