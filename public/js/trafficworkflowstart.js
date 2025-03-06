@@ -1648,72 +1648,112 @@ $(document).ready(function() {
         // Cuando el formulario se envía (al hacer clic en Save)
         $('#createnewshipmentform').submit(function(e) {
             e.preventDefault(); // Evita el envío del formulario
-    
-            const saveButton = $('#saveButtonShipment');
-            const url = saveButton.data('url'); // URL para la petición AJAX
-            let formData = new FormData(this);
 
-            // Obtener todos los inputs de trackers dinámicos y agregarlos individualmente a formData
-            $('.trackers-container input').each(function(index, input) {
-                formData.append(`tracker${index + 1}`, $(input).val()); // Se envía como tracker1, tracker2, etc.
-            });
-    
-            $.ajax({
-                url: url,
-                type: 'POST',
-                data: formData,
-                contentType: false,
-                processData: false,
-                success: function(response) {
-                    // Si la respuesta es exitosa, mostrar el mensaje de éxito
-                    Swal.fire({
-                        icon: 'success',
-                        title: '¡Succes!',
-                        text: 'Shipment created successfully.',
-                        confirmButtonText: 'Ok'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            // Redirige directamente a la URL de tu vista
-                            //window.location.href = '/whapptapproval';
-
-                            // Restablece el formulario
-                            $('#createnewshipmentform')[0].reset();
-
-                            // También puedes eliminar cualquier clase de validación de error si es necesario
-                            $('input, select').removeClass('is-invalid');
-                            $('.invalid-feedback').text('');
-
-                            $('#inputshipmentcarrier, #inputshipmentdriver, #inputshipmenttrailer').val(null).trigger('change');
-
-                        }
-                    });
-                    //$('#closenewtrailerregister').click();
-                    //$('#refreshemptytrailertable').click();
-                },
-                error: function(xhr, status, error) {
-                    // Limpia los errores anteriores
-                    $('input, select').removeClass('is-invalid');
-                    $('.invalid-feedback').text('');
-                    
-                    // Manejo de errores con SweetAlert2
-                    let errors = xhr.responseJSON.errors;
-                    for (let field in errors) {
-                        const inputField = $('#' + field);
-                        const errorContainer = inputField.next('.invalid-feedback');
-                        
-                        inputField.addClass('is-invalid');  // Marca el campo con error
-                        errorContainer.text(errors[field][0]); // Muestra el error correspondiente
-                    }
-    
-                    // Si hubo un error en el servidor, muestra una alerta
-                    Swal.fire({
-                        icon: 'error',
-                        title: '¡Error!',
-                        text: 'There was a problem adding the shipment. Please try again.',
-                        confirmButtonText: 'Ok'
-                    });
+            let hasTracker = false;
+            $('.trackers-container input').each(function() {
+                if ($(this).val().trim().length > 0) {
+                    hasTracker = true; // Si al menos uno tiene valor, marcar como verdadero
                 }
             });
+
+             // Si no hay trackers
+            if (!hasTracker) {
+                // Mostrar alerta de SweetAlert para confirmar si realmente no tiene tracker
+                Swal.fire({
+                    title: 'Shipment Trackers',
+                    text: "The shipment does not have a tracker?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'No'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Si responde que sí, se ejecuta el guardado del shipment
+                        sendShipmentForm();  // Función que realiza el envío del formulario
+                    } else {
+                        // Si responde que no, se regresa al formulario sin guardar
+                        // No hacer nada, el formulario no se enviará
+                    }
+                });
+            } else {
+                // Si hay trackers, continuar con el envío
+                sendShipmentForm(); // Función que realiza el envío del formulario
+            }
+            function sendShipmentForm() {
+
+                const saveButton = $('#saveButtonShipment');
+                const url = saveButton.data('url'); // URL para la petición AJAX
+                //let formData = new FormData(this);
+                let formData = new FormData($('#createnewshipmentform')[0]);
+
+                // Obtener todos los inputs de trackers dinámicos y agregarlos individualmente a formData
+                $('.trackers-container input').each(function(index, input) {
+                    formData.append(`tracker${index + 1}`, $(input).val()); // Se envía como tracker1, tracker2, etc.
+                });
+        
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        // Si la respuesta es exitosa, mostrar el mensaje de éxito
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Succes!',
+                            text: 'Shipment created successfully.',
+                            confirmButtonText: 'Ok'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Redirige directamente a la URL de tu vista
+                                //window.location.href = '/whapptapproval';
+
+                                // Restablece el formulario
+                                $('#createnewshipmentform')[0].reset();
+
+                                // También puedes eliminar cualquier clase de validación de error si es necesario
+                                $('input, select').removeClass('is-invalid');
+                                $('.invalid-feedback').text('');
+
+                                $('#inputshipmentcarrier, #inputshipmentdriver, #inputshipmenttrailer').val(null).trigger('change');
+
+                                // Elimina los inputs de trackers añadidos dinámicamente
+                                $('.trackers-container').empty();  // Elimina todo el contenido dentro de .trackers-container
+                                // Resetear el contador de trackers
+                                trackerCount = 0;
+                                // Habilitar nuevamente el botón "Add Tracker" si no hay trackers
+                                $('#addtrackers').prop('disabled', false);
+                            }
+                        });
+                        //$('#closenewtrailerregister').click();
+                        //$('#refreshemptytrailertable').click();
+                    },
+                    error: function(xhr, status, error) {
+                        // Limpia los errores anteriores
+                        $('input, select').removeClass('is-invalid');
+                        $('.invalid-feedback').text('');
+                        
+                        // Manejo de errores con SweetAlert2
+                        let errors = xhr.responseJSON.errors;
+                        for (let field in errors) {
+                            const inputField = $('#' + field);
+                            const errorContainer = inputField.next('.invalid-feedback');
+                            
+                            inputField.addClass('is-invalid');  // Marca el campo con error
+                            errorContainer.text(errors[field][0]); // Muestra el error correspondiente
+                        }
+        
+                        // Si hubo un error en el servidor, muestra una alerta
+                        Swal.fire({
+                            icon: 'error',
+                            title: '¡Error!',
+                            text: 'There was a problem adding the shipment. Please try again.',
+                            confirmButtonText: 'Ok'
+                        });
+                    }
+                });
+            }
         });
     });
 
