@@ -66,6 +66,7 @@ class Shipments extends Model
         'dock_door_date',
         'removed_trackers',
         'lane',
+        'have_trackers',
         
     ];
 

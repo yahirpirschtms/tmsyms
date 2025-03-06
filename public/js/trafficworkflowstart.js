@@ -1411,8 +1411,69 @@ $(document).ready(function() {
 
     //Crear nuevo Shipment
     $(document).ready(function() {
+        let trackerCount = 0; // Contador de trackers visibles
+
+        // Template HTML para los inputs con IDs diferenciados
+        const trackerTemplate = (trackerNumber) => {
+            return `
+                <div class="mb-3 tracker-container" id="tracker-container-${trackerNumber}">
+                    <label for="tracker${trackerNumber}" class="form-label">Shipment Tracker ${trackerNumber}</label>
+                    <input type="text" class="form-control" id="tracker${trackerNumber}" name="tracker${trackerNumber}">
+                    <div class="invalid-feedback"></div>
+                </div>
+            `;
+        };
+
+        // Añadir un tracker
+        $('#addtrackers').on('click', function() {
+            if (trackerCount < 3) {
+                trackerCount++; // Incrementar el contador
+                $('.trackers-container').append(trackerTemplate(trackerCount));
+
+                // Si ya se han mostrado 3, deshabilitar el botón "Add Tracker"
+                if (trackerCount === 3) {
+                    $('#addtrackers').prop('disabled', true);
+                }
+
+                // Habilitar el botón "Remove Tracker" cuando haya al menos un tracker visible
+                if (trackerCount > 0) {
+                    $('#removetrackers').prop('disabled', false);
+                }
+            }
+        });
+
+        // Eliminar un tracker y limpiar su contenido
+        $('#removetrackers').on('click', function() {
+            if (trackerCount > 0) {
+                // Obtener el input del último tracker antes de eliminarlo
+                const inputField = $('#tracker' + trackerCount);
+                
+                // Limpiar el valor del input
+                inputField.val('');
+
+                // Remover clases de error si las tenía
+                inputField.removeClass('is-invalid');
+                inputField.next('.invalid-feedback').text('');
+
+                // Eliminar el contenedor del tracker
+                $('#tracker-container-' + trackerCount).remove();
+
+                trackerCount--; // Decrementar el contador
+            }
+
+            // Habilitar el botón "Add Tracker" si se ocultaron todos los inputs
+            if (trackerCount < 3) {
+                $('#addtrackers').prop('disabled', false);
+            }
+
+            // Deshabilitar el botón "Remove Tracker" si no hay trackers visibles
+            if (trackerCount === 0) {
+                $('#removetrackers').prop('disabled', true);
+            }
+        });
+
         // Validación en vivo cuando el usuario interactúa con los campos
-        $('input, select').on('input change', function() {
+        $('#createnewshipmentform').on('input change', 'input, select', function() {
             const field = $(this);
             const fieldName = field.attr('name');
             const errorContainer = field.next('.invalid-feedback');
@@ -1570,18 +1631,18 @@ $(document).ready(function() {
                     errorContainer.text('The number of pallets cannot be greater than the number of shipment units.');
                 }
             }
-            /*if (fieldName === 'inputshipmentsecurityseals' && field.val().trim().length === 0) {
+            if (fieldName === 'tracker1' && field.val().trim().length === 0) {
                 field.addClass('is-invalid');
-                errorContainer.text('Security seals are required.');
-            }*/
-            /*if (fieldName === 'inputshipmentdevicenumber' && field.val().trim().length === 0) {
+                errorContainer.text('Tracker one is required.');
+            }
+            if (fieldName === 'tracker2' && field.val().trim().length === 0) {
                 field.addClass('is-invalid');
-                errorContainer.text('Device number is required.');
-            }*/
-            /*if (fieldName === 'inputshipmentoverhaulid' && field.val().trim().length === 0) {
+                errorContainer.text('Tracker two is required.');
+            }
+            if (fieldName === 'tracker3' && field.val().trim().length === 0) {
                 field.addClass('is-invalid');
-                errorContainer.text('Overhaul ID is required.');
-            }*/
+                errorContainer.text('Tracker three is required.');
+            }
         });
     
         // Cuando el formulario se envía (al hacer clic en Save)
@@ -1591,6 +1652,11 @@ $(document).ready(function() {
             const saveButton = $('#saveButtonShipment');
             const url = saveButton.data('url'); // URL para la petición AJAX
             let formData = new FormData(this);
+
+            // Obtener todos los inputs de trackers dinámicos y agregarlos individualmente a formData
+            $('.trackers-container input').each(function(index, input) {
+                formData.append(`tracker${index + 1}`, $(input).val()); // Se envía como tracker1, tracker2, etc.
+            });
     
             $.ajax({
                 url: url,

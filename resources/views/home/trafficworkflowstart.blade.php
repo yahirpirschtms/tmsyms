@@ -164,30 +164,38 @@
                     <div class="invalid-feedback"></div>
                 </div>
 
-                <div class="form-check mb-3">
-                    <input class="form-check-input" type="checkbox" id="inputshipmentchecktrackers" name="inputshipmentchecktrackers">
-                    <label class="form-check-label" for="inputshipmentchecktrackers">
-                        Trackers
-                    </label>
+                <div class="mb-3 d-flex">
+                    <div class="p-2 pe-0 flex-grow-1">
+                        <label class="form-label ">Shipment trackers</label>
+                    </div>
+                    <div class="p-2">
+                        <button type="button" class="btn btn-primary" id="addtrackers">Add Tracker <i class="fa-solid fa-plus"></i></button>
+                    </div>
+                    <div class="p-2">
+                        <button type="button" class="btn btn-danger" id="removetrackers">Remove Tracker <i class="fa-solid fa-minus"></i></button>
+                    </div>
                 </div>
 
-                <div class="mb-3">
+                <!-- Estos divs se agregarán dinámicamente -->
+                <div class="trackers-container"></div>
+
+                <!--<div class="mb-3 tracker-input" id="tracker1" style="display:none">
                     <label for="inputshipmentdevicenumber" class="form-label ">Tracker One</label>
                     <input type="text" class="form-control" id="inputshipmentdevicenumber" name="inputshipmentdevicenumber">
                     <div class="invalid-feedback"></div>
                 </div>
 
-                <div class="mb-3">
+                <div class="mb-3 tracker-input" id="tracker2" style="display:none">
                     <label for="tracker2" class="form-label ">Tracker Two</label>
                     <input type="text" class="form-control" id="tracker2" name="tracker2">
                     <div class="invalid-feedback"></div>
                 </div>
 
-                <div class="mb-3">
+                <div class="mb-3 tracker-input" id="tracker3" style="display:none">
                     <label for="tracker3" class="form-label ">Tracker Three</label>
                     <input type="text" class="form-control" id="tracker3" name="tracker3">
                     <div class="invalid-feedback"></div>
-                </div>
+                </div>-->
 
                 <div class="mb-3">
                     <label for="inputshipmentnotes" class="form-label ">Notes</label>

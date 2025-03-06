@@ -287,6 +287,10 @@ class ShipmentController extends Controller
             'inputshipmentdriver' => 'nullable',
             'inputshipmentetd' => 'required|date',
             'inputshipmentsunits' => 'required|min:1|integer',
+            // Validación condicional de los trackers
+            'tracker1' => 'nullable|required_if:tracker1,!=,null', // Si tracker1 tiene valor, debe ser requerido
+            'tracker2' => 'nullable|required_if:tracker2,!=,null', // Lo mismo para tracker2
+            'tracker3' => 'nullable|required_if:tracker3,!=,null', // Lo mismo para tracker3
             'inputpallets' => [
         '', 
         'required', 
@@ -309,9 +313,9 @@ class ShipmentController extends Controller
             'inputshipmentsecurityseals2' => 'nullable',
             'inputshipmentnotes' => 'nullable',
             'inputshipmentoverhaulid' => 'nullable',
-            'inputshipmentdevicenumber' => 'nullable',
-            'tracker2' => 'nullable',
-            'tracker3' => 'nullable',
+            //'inputshipmentdevicenumber' => 'nullable',
+            //'tracker2' => 'nullable',
+            //'tracker3' => 'nullable',
             'inputshipmentcurrentstatus' => 'required|exists:generic_catalogs,gnct_id'
         ], [
             'inputidtrailer.required'=>'ID Trailer is required',
@@ -342,6 +346,11 @@ class ShipmentController extends Controller
             'inputpallets.required' => 'Pallets are required',
             'inputpallets.integer' => 'Pallets must be an integer',
             'inputpallets.min' => 'Pallets must have a valid value',
+
+            // Mensajes personalizados para los trackers
+            'tracker1.required_if' => 'Tracker one is required.',
+            'tracker2.required_if' => 'Tracker two is required.',
+            'tracker3.required_if' => 'Tracker three is required.',
         ]);
 
         // Convertir las fechas al formato 'm/d/Y'
@@ -387,6 +396,16 @@ class ShipmentController extends Controller
         // Obtener la fecha y hora actual
         $currentDateTime = now(); // Usa `now()` para obtener la fecha y hora actuales en Laravel
 
+        // Verificar si alguno de los trackers tiene valor
+        $haveTrackers = ($request->has('tracker1') && !empty($request->input('tracker1'))) ||
+        ($request->has('tracker2') && !empty($request->input('tracker2'))) ||
+        ($request->has('tracker3') && !empty($request->input('tracker3'))) ? 'Yes' : 'No';
+
+        // Asignar los valores de los trackers, o null si no se enviaron
+        $tracker1 = $request->input('tracker1') ?: null;
+        $tracker2 = $request->input('tracker2') ?: null;
+        $tracker3 = $request->input('tracker3') ?: null;
+
         // Crear un nuevo registro
         Shipments::create([
             //'pk_trailer' => $request->inputidtrailer,
@@ -409,14 +428,16 @@ class ShipmentController extends Controller
             'seal2' => $request->inputshipmentsecurityseals2,
             'notes' => $request->inputshipmentnotes,
             'security_company_id' => $request->inputshipmentoverhaulid,
-            'tracker1' => $request->inputshipmentdevicenumber,
-            'tracker2' => $request->tracker2,
-            'tracker3' => $request->tracker3,
+            'tracker1' => $tracker1,
+            'tracker2' => $tracker2,
+            'tracker3' => $tracker3,
             'gnct_id_current_status' => $request->inputshipmentcurrentstatus,
             'lane' => $request->ln_code,
 
             // Asignar la fecha y hora actual solo si el parámetro `inputshipmentdriver` no está vacío
             'driver_assigned_date' => $request->inputshipmentdriver ? $currentDateTime : null,
+            // Guardar el valor para have_trackers
+            'have_trackers' => $haveTrackers,
 
         ]);
 
