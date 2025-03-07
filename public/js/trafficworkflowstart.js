@@ -1712,11 +1712,7 @@ $(document).ready(function() {
                                 // Restablece el formulario
                                 $('#createnewshipmentform')[0].reset();
 
-                                // También puedes eliminar cualquier clase de validación de error si es necesario
-                                $('input, select').removeClass('is-invalid');
-                                $('.invalid-feedback').text('');
-
-                                $('#inputshipmentcarrier, #inputshipmentdriver, #inputshipmenttrailer').val(null).trigger('change');
+                                $('#inputshipmentcarrier, #inputshipmentdriver, #inputshipmenttrailer, #inputpallets, #inputidtrailer').val(null).trigger('change');
 
                                 // Elimina los inputs de trackers añadidos dinámicamente
                                 $('.trackers-container').empty();  // Elimina todo el contenido dentro de .trackers-container
@@ -1724,6 +1720,10 @@ $(document).ready(function() {
                                 trackerCount = 0;
                                 // Habilitar nuevamente el botón "Add Tracker" si no hay trackers
                                 $('#addtrackers').prop('disabled', false);
+
+                                // También puedes eliminar cualquier clase de validación de error si es necesario
+                                $('input, select').removeClass('is-invalid');
+                                $('.invalid-feedback').text('');
                             }
                         });
                         //$('#closenewtrailerregister').click();
