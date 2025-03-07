@@ -1,3 +1,4 @@
+var selectedCarriersUpdate = [];
 $(document).ready(function () {
     //Esto es para los checkbotons de los filtros
     function setupCheckboxFilter(
@@ -317,8 +318,59 @@ $(document).ready(function () {
     var carrierRoute = $('#inputcarrier').data('url');
     var newlyCreatedCarrierId = null; // Variable para almacenar el ID del carrier recién creado
     var selectedCarriers = [];
+    var isCarriersLoaded = false; // Bandera para controlar la carga
 
-    function loadCarriers() {
+    loadCarriersOnce();
+
+    function loadCarriersOnce() {
+        if (isCarriersLoaded) return; // Evita cargar dos veces
+    
+        $.ajax({
+            url:'/carrier-emptytrailerAjax',
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                var carriersData = data.map(item => ({
+                    id: item.pk_company,
+                    text: item.CoName
+                }));
+                data.forEach(function (carrier) {
+                    if (!selectedCarriers.includes(carrier.CoName)) {
+                        selectedCarriers.push(carrier.CoName); // Agregar al arreglo si no está ya
+                    }
+                });
+                selectedCarriersUpdate = [...selectedCarriers]; 
+                console.log("Carriers cargados desde la base de datos:", selectedCarriers);
+                console.log("Carriers copiados a selectedCarriersUpdate:", selectedCarriersUpdate);
+    
+                // Inicializar Select2 sin AJAX
+                $('#inputcarrier').select2({
+                    placeholder: 'Select or enter a New Carrier',
+                    allowClear: true,
+                    tags: true, // Permite agregar nuevas opciones
+                    data: carriersData, // Pasar los datos directamente
+                    dropdownParent: $('#newtrailerempty'),
+                    minimumInputLength: 0
+                });
+
+                $('#updateinputcarrier').select2({
+                    placeholder: 'Select or enter a New Carrier',
+                    allowClear: true,
+                    tags: true, // Permite agregar nuevas opciones
+                    data: carriersData, // Pasar los datos directamente
+                    dropdownParent: $('#updatenewtrailerempty'),
+                    minimumInputLength: 0
+                });
+    
+                isCarriersLoaded = true; // Marcar como cargado
+            },
+            error: function (xhr, status, error) {
+                console.error('Error al cargar los carriers:', error);
+            }
+        });
+    }
+
+    /*function loadCarriers() {
         $('#inputcarrier').select2({
             placeholder: 'Select or enter a New Carrier',
             //allowClear: true,
@@ -345,9 +397,9 @@ $(document).ready(function () {
             },
             minimumInputLength: 0
         });
-    }
+    }*/
 
-    loadCarriers();
+    /*loadCarriers();
     $.ajax({
         url: '/carrier-emptytrailerAjax',  // Ruta que manejará la carga de los drivers existentes
         type: 'GET',
@@ -363,7 +415,7 @@ $(document).ready(function () {
         error: function (xhr, status, error) {
             console.error('Error al cargar los Carriers Registro existentes:', error);
         }
-    });
+    });*/
 
     // Actualizar la lista cuando se haga clic en el select
     /*$('#inputcarrier').one('click', function () {
@@ -379,9 +431,15 @@ $(document).ready(function () {
         if (selectedText  !== newlyCreatedCarrierId &&  selectedText.trim() !== '') {
             console.log(selectedText);
             //saveNewCarrier(selectedText);
-            if (!selectedCarriers.includes(selectedText)) {
-                selectedCarriers.push(selectedText);  // Agregar al arreglo solo si no existe
-                console.log(selectedCarriers);  // Mostrar el arreglo con todos los drivers seleccionados
+            if (!selectedCarriers.includes(selectedText) || !selectedCarriersUpdate.includes(selectedText)) {
+                if(!selectedCarriers.includes(selectedText)){
+                    selectedCarriers.push(selectedText);  // Agregar al arreglo solo si no existe
+                    console.log(selectedCarriers);  // Mostrar el arreglo con todos los drivers seleccionados
+                }
+                if(!selectedCarriersUpdate.includes(selectedText)){
+                    selectedCarriersUpdate.push(selectedText);  // Agregar al arreglo solo si no existe
+                    console.log(selectedCarriersUpdate);  // Mostrar el arreglo con todos los drivers seleccionados
+                }
                 saveNewCarrier(selectedText);
             }
         }
@@ -399,13 +457,15 @@ $(document).ready(function () {
             success: function (response) {
                 console.log(response);
 
-                // Crear una nueva opción para el select2 con el nuevo carrier
-                var newOption = new Option(response.newCarrier.CoName, response.newCarrier.pk_company, true, true);
+                // Crear una nueva opción para cada select2
+                var newOption1 = new Option(response.newCarrier.CoName, response.newCarrier.pk_company, true, true);
+                var newOption2 = new Option(response.newCarrier.CoName, response.newCarrier.pk_company, true, true);
 
-                // Agregar la nueva opción al select2
-                $('#inputcarrier').append(newOption).trigger('change');
-
-                // Seleccionar el nuevo carrier automáticamente
+                // Agregar la opción a ambos select2 sin eliminarla del otro
+                $('#updateinputcarrier').append(newOption1).trigger('change');
+                $('#inputcarrier').append(newOption2).trigger('change');
+                
+                // Seleccionar automáticamente el nuevo carrier
                 $('#inputcarrier').val(response.newCarrier.pk_company).trigger('change');
 
                 // Marcar el nuevo ID para evitar que se haga otra solicitud
@@ -431,9 +491,9 @@ $(document).ready(function () {
 
     var carrierRouteUpdate = $('#updateinputcarrier').data('url');
     var newlyCreatedCarrierIdUpdate = null; // Variable para almacenar el ID del carrier recién creado
-    var selectedCarriersUpdate = []; // Arreglo para almacenar todos los drivers seleccionados
+    //var selectedCarriersUpdate = []; // Arreglo para almacenar todos los drivers seleccionados
 
-    function loadCarriersUpdate() {
+    /*function loadCarriersUpdate() {
         $('#updateinputcarrier').select2({
             placeholder: 'Select or enter a New Carrier',
             //allowClear: true,
@@ -460,7 +520,7 @@ $(document).ready(function () {
             },
             minimumInputLength: 0
         });
-    }
+    }*/
 
     //loadCarriersUpdate();
 
@@ -496,9 +556,20 @@ $(document).ready(function () {
         if (selectedText  !== newlyCreatedCarrierIdUpdate &&  selectedText.trim() !== '') {
             console.log(selectedText);
             //saveNewCarrier(selectedText);
-            if (!selectedCarriersUpdate.includes(selectedText)) {
+            /*if (!selectedCarriersUpdate.includes(selectedText)) {
                 selectedCarriersUpdate.push(selectedText);  // Agregar al arreglo solo si no existe
                 console.log(selectedCarriersUpdate);  // Mostrar el arreglo con todos los drivers seleccionados
+                saveNewCarrierUpdate(selectedText);
+            }*/
+            if (!selectedCarriers.includes(selectedText) || !selectedCarriersUpdate.includes(selectedText)) {
+                if(!selectedCarriers.includes(selectedText)){
+                    selectedCarriers.push(selectedText);  // Agregar al arreglo solo si no existe
+                    console.log(selectedCarriers);  // Mostrar el arreglo con todos los drivers seleccionados
+                }
+                if(!selectedCarriersUpdate.includes(selectedText)){
+                    selectedCarriersUpdate.push(selectedText);  // Agregar al arreglo solo si no existe
+                    console.log(selectedCarriersUpdate);  // Mostrar el arreglo con todos los drivers seleccionados
+                }
                 saveNewCarrierUpdate(selectedText);
             }
         }
@@ -515,14 +586,15 @@ $(document).ready(function () {
             },
             success: function (response) {
                 console.log(response);
+                // Crear una nueva opción para cada select2 (evita que se mueva de un select a otro)
+                var newOption1 = new Option(response.newCarrier.CoName, response.newCarrier.pk_company, true, true);
+                var newOption2 = new Option(response.newCarrier.CoName, response.newCarrier.pk_company, true, true);
 
-                // Crear una nueva opción para el select2 con el nuevo carrier
-                var newOption = new Option(response.newCarrier.CoName, response.newCarrier.pk_company, true, true);
+                // Agregar la opción a ambos select2
+                $('#updateinputcarrier').append(newOption1).trigger('change');
+                $('#inputcarrier').append(newOption2).trigger('change');
 
-                // Agregar la nueva opción al select2
-                $('#updateinputcarrier').append(newOption).trigger('change');
-
-                // Seleccionar el nuevo carrier automáticamente
+                // Seleccionar automáticamente el nuevo carrier en ambos select2
                 $('#updateinputcarrier').val(response.newCarrier.pk_company).trigger('change');
 
                 // Marcar el nuevo ID para evitar que se haga otra solicitud
@@ -580,7 +652,7 @@ $(document).ready(function () {
         // Cargar datos al enfocarse y al cargar la página update 
         $(document).one('click', '.clickable-row', function () {
             loadAvailabilityIndicatorupdate();
-            loadCarriersUpdate();
+            //loadCarriersUpdate();
         });
         
 
@@ -618,7 +690,17 @@ $(document).ready(function () {
     
         // Cargar datos al enfocarse y al cargar la página update 
         $('#addnewemptytrailer').one('click', loadAvailabilityIndicator);
-        //loadAvailabilityIndicator();
+        
+        $('#addnewemptytrailer').on('click', function () {
+            $('#inputcarrier').val(null).trigger('change'); // Restablecer el select2
+
+            // Quitar clases de error
+            $('#inputcarrier').removeClass('is-invalid'); 
+            $('#inputcarrier').next('.select2-container').find('.select2-selection').removeClass('is-invalid');
+
+            // Borrar mensaje de error
+            $('#inputcarrier').parent().find('.invalid-feedback').text('');
+        });
 });
 
 
@@ -1094,12 +1176,38 @@ $(document).ready(function() {
 
     //Crear nuevo trailer 
     $(document).ready(function() {
+        // Evento cuando se borra la selección con la "X"
+        $('#inputcarrier').on('select2:clear', function() {
+            const field = $(this);
+            const errorContainer = field.parent().find('.invalid-feedback');
+
+            field.addClass('is-invalid'); // Agregar borde rojo
+            field.next('.select2-container').find('.select2-selection').addClass('is-invalid');
+            errorContainer.text('Carrier is required.'); // Mostrar mensaje de error
+        });
+
+        // Si selecciona un valor válido, eliminar error
+        $('#inputcarrier').on('select2:select', function() {
+            const field = $(this);
+            const errorContainer = field.parent().find('.invalid-feedback');
+
+            field.removeClass('is-invalid'); // Quitar borde rojo
+            field.next('.select2-container').find('.select2-selection').removeClass('is-invalid');
+            errorContainer.text(''); // Borrar mensaje de error
+        });
+
         // Validación en vivo cuando el usuario interactúa con los campos
         $('input, select').on('input change', function() {
             const field = $(this);
             const fieldName = field.attr('name');
-            const errorContainer = field.next('.invalid-feedback');
-    
+            let errorContainer = field.next('.invalid-feedback');
+
+            // Si es un select2, busca el contenedor adecuado
+            /*if (field.hasClass('searchcarrier')) {
+                errorContainer = field.parent().find('.invalid-feedback');
+            }*/
+
+
             // Elimina las clases de error al interactuar con el campo
             field.removeClass('is-invalid');
             errorContainer.text(''); // Borra el mensaje de error
@@ -1181,11 +1289,21 @@ $(document).ready(function() {
                         errorContainer.text('');
                     }
                 }
-    
-            if (fieldName === 'inputcarrier' && field.val().trim().length === 0) {
+            // Validación específica para #inputcarrier
+            /*if (fieldName === 'inputcarrier' && (!field.val() || field.val().trim().length === 0)) {
+                field.addClass('is-invalid');
+                field.next('.select2-container').find('.select2-selection').addClass('is-invalid');
+                errorContainer.text('Carrier is required.');
+            } else {
+                field.removeClass('is-invalid');
+                field.next('.select2-container').find('.select2-selection').removeClass('is-invalid');
+                errorContainer.text('');
+            }*/
+                
+            /*if (fieldName === 'inputcarrier' && field.val().trim().length === 0) {
                 field.addClass('is-invalid');
                 errorContainer.text('Carrier is required.');
-            }
+            }*/
     
             /*if (fieldName === 'inputavailabilityindicator' && field.val().trim().length === 0) {
                 field.addClass('is-invalid');
@@ -1247,6 +1365,8 @@ $(document).ready(function() {
                     // Limpia los errores anteriores
                     $('input, select').removeClass('is-invalid');
                     $('.invalid-feedback').text(''); // Vaciar mensajes de error
+                    $('.select2-selection').removeClass('is-invalid'); // También eliminar la clase del contenedor de select2
+
         
                     let errors = xhr.responseJSON.errors;
         
@@ -1257,6 +1377,16 @@ $(document).ready(function() {
         
                             // Verifica que exista el div de error; si no, lo crea
                             let errorContainer = inputField.next('.invalid-feedback');
+                            console.log(errorContainer)
+                            // Verifica si el campo es un select2 (utiliza el id del campo)
+        if (inputField.hasClass('select2-hidden-accessible') || inputField.is('select')) {
+            // Si es un select2, buscamos su contenedor
+            const select2Container = inputField.next('.select2-container').find('.select2-selection');
+
+            // Agregamos la clase is-invalid al contenedor de select2
+            select2Container.addClass('is-invalid');
+            errorContainer = inputField.parent().find('.invalid-feedback');
+        }
                             if (!errorContainer.length) {
                                 errorContainer = $('<div>').addClass('invalid-feedback').insertAfter(inputField);
                             }
@@ -1264,6 +1394,7 @@ $(document).ready(function() {
                             // Marca el input y muestra el error
                             inputField.addClass('is-invalid');
                             errorContainer.text(errors[field][0]);
+
                         }
                     }
         
@@ -1519,10 +1650,10 @@ $(document).ready(function() {
 
             // Resetear Select2 manualmente
             $('#inputcarrier').val(null).trigger('change');  // Restablecer el valor del select
-            $('#inputcarrier').select2("destroy").select2(); // Reiniciar select2
+            //$('#inputcarrier').select2("destroy").select2(); // Reiniciar select2
 
-            $('#inputlocation').val(null).trigger('change');  // Restablecer el valor del select
-            $('#inputlocation').select2("destroy").select2(); // Reiniciar select2
+            //$('#inputlocation').val(null).trigger('change');  // Restablecer el valor del select
+            //$('#inputlocation').select2("destroy").select2(); // Reiniciar select2
         });
   });
   
@@ -1755,24 +1886,30 @@ $(document).ready(function() {
 
         let carrierPromise = new Promise((resolve, reject) => {
             if (trailer.carrier) {
-                $.ajax({
-                    url: 'carrier-emptytrailerAjax', // Cambia esta URL si es necesario
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function (data) {
-                        let carrier = data.find(item => item.pk_company == trailer.carrier);
-                        if (carrier) {
-                            let newOption = new Option(carrier.CoName, carrier.pk_company, true, true);
-                            $('#updateinputcarrier').append(newOption).trigger('change');
-                        }
-                        resolve(); // Resolver la promesa cuando termine esta solicitud
-                    },
-                    error: function (xhr, status, error) {
-                        reject('Error al cargar los carriers: ' + error); // Rechazar si hay error
-                    }
-                });
+                let carrier = selectedCarriersUpdate.find(item => item === trailer.carrier);
+                // Si el carrier está en la lista, solo se selecciona automáticamente
+                $('#updateinputcarrier').val(trailer.carrier).trigger('change');
+                resolve();
+                //$.ajax({
+                //    url: 'carrier-emptytrailerAjax', // Cambia esta URL si es necesario
+                //    type: 'GET',
+                //    dataType: 'json',
+                //    success: function (data) {
+                //        let carrier = data.find(item => item.pk_company == trailer.carrier);
+                //        if (carrier) {
+                //            let newOption = new Option(carrier.CoName, carrier.pk_company, true, true);
+                //            $('#updateinputcarrier').append(newOption).trigger('change');
+                //        }
+                //        resolve(); // Resolver la promesa cuando termine esta solicitud
+                //    },
+                //    error: function (xhr, status, error) {
+                //        reject('Error al cargar los carriers: ' + error); // Rechazar si hay error
+                //    }
+                //});
             } else {
-                resolve(); // Resolver inmediatamente si no hay carrier
+                $('#updateinputcarrier').val(null).trigger('change');
+                //console
+                //resolve(); // Resolver inmediatamente si no hay carrier
             }
         });
 
@@ -1827,23 +1964,36 @@ $(document).ready(function() {
     formFields.forEach(fieldId => {
         const field = document.getElementById(fieldId);
         const errorElement = document.getElementById(`error-${fieldId}`);
+        const isSelect2 = $(field).hasClass("searchcarrier"); // Detecta si es un select2
 
-        // Validación en tiempo real: keyup y blur
-        field.addEventListener('keyup', function () {
-            validateField(field, errorElement);
-        });
-
-        field.addEventListener('blur', function () {
-            validateField(field, errorElement);
-        });
+        if (isSelect2) {
+            // Para select2, usa 'change'
+            $(field).on('change', function () {
+                validateField(field, errorElement, isSelect2);
+            });
+        } else {
+            // Para inputs normales, usa keyup y blur
+            field.addEventListener('keyup', function () {
+                validateField(field, errorElement, isSelect2);
+            });
+    
+            field.addEventListener('blur', function () {
+                validateField(field, errorElement, isSelect2);
+            });
+        }
     });
 
     // Función común para validar cada campo
-    function validateField(field, errorElement) {
+    function validateField(field, errorElement, isSelect2) {
         // Validar si el campo está vacío
         if (field.value.trim() === '') {
             field.classList.add('is-invalid');
             errorElement.textContent = 'This field is required'; // Mensaje de error
+
+            // Si es select2, aplica la clase al contenedor correcto
+            if (isSelect2) {
+                $(field).next('.select2-container').find('.select2-selection').addClass("is-invalid");
+            }
         }
         // Validar si el campo es un número entero para los campos 'updateinputpalletsonfloor' y 'updateinputpalletsontrailer'
         else if ((field.id === 'updateinputpalletsonfloor' || field.id === 'updateinputpalletsontrailer')) {
@@ -1861,6 +2011,10 @@ $(document).ready(function() {
         else {
             field.classList.remove('is-invalid');
             errorElement.textContent = ''; // Limpiar el mensaje de error
+
+            if (isSelect2) {
+                $(field).next('.select2-container').find('.select2-selection').removeClass("is-invalid");
+            }
         }
     }
 
@@ -1962,12 +2116,18 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
     formFields.forEach(fieldId => {
         const field = document.getElementById(fieldId);
         const errorElement = document.getElementById(`error-${fieldId}`);
+        const isSelect2 = $(field).hasClass("searchcarrier"); // Detecta si es un select2
 
         // Validar el campo
         if (field.value.trim() === '') {
             valid = false;
             field.classList.add('is-invalid');
             errorElement.textContent = 'This field is required';
+
+            // Si es un select2, aplica la clase al contenedor
+            if (isSelect2) {
+                $(field).siblings(".select2").find(".select2-selection").addClass("is-invalid");
+            }
         }        
         else if ((field.id === 'updateinputpalletsonfloor' || field.id === 'updateinputpalletsontrailer')) {
             const value = field.value.trim();
@@ -1984,6 +2144,11 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
         else {
             field.classList.remove('is-invalid');
             errorElement.textContent = '';
+
+            // Si es un select2, elimina la clase del contenedor
+            if (isSelect2) {
+                $(field).siblings(".select2").find(".select2-selection").removeClass("is-invalid");
+            }
         }
     });
 
@@ -2056,10 +2221,16 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
                             const errorMessages = error.errors[field]; // Los mensajes de error
                             const errorElement = document.getElementById(`error-${fieldId}`);
                             const fieldElement = document.getElementById(fieldId);
+                            const isSelect2 = $(fieldElement).hasClass("searchcarrier"); // Detecta si es select2
                 
                             if (fieldElement) {
                                 fieldElement.classList.add('is-invalid'); // Marca el campo como inválido
                                 errorElement.textContent = errorMessages.join(', '); // Muestra el error en el campo
+
+                                // Si es un select2, aplica la clase a la interfaz de select2
+                                if (isSelect2) {
+                                    $(fieldElement).next('.select2-container').find('.select2-selection').addClass("is-invalid");
+                                }
                             }
                         });
                     } else {

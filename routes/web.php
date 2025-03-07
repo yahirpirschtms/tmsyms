@@ -58,6 +58,8 @@ Route::get('/carrier-emptytrailerAjax', [CompaniesController::class, 'getCarrier
 
 Route::get('/trailerowner-emptytrailerAjax', [CompaniesController::class, 'getTrailerOwnersAjax'])->name('trailerowner-emptytrailerAjax');
 
+Route::get('/doornumberwheta-whetaapproval', [GenericCatalogController::class, 'getDoorNumberWHETAAjax'])->name('doornumberwheta-whetaapproval');
+
 Route::get('/drivers-shipment', [DriversController::class, 'getDriversAjax'])->name('drivers-shipment');
 
 //Agregar un nuevo carrier en la pantalla empty trailer
@@ -71,6 +73,9 @@ Route::post('/save-new-trailerowner', [CompaniesController::class, 'saveNewTrail
 
 //Agregar un nuevo driver en la pantalla empty trailer
 Route::post('/save-new-driver', [DriversController::class, 'saveNewDriver']);
+
+//Agregar un nuevo door Number en la pantalla WH ETA Approval
+Route::post('/save-new-doornumberwheta', [GenericCatalogController::class, 'saveNewDoorNumberWHETA']);
 
 //Ruta actualizacion de Tabla EmptyTrailer con boton refresh o automaticamente
 Route::get('/emptytrailer/data', [HomeController::class, 'getEmptyTrailers'])->name('emptytrailer.data');

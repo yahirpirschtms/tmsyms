@@ -50,6 +50,105 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 $(document).ready(function () {
+    //Busqueda de carries en un nuevo registro
+    var doorNumberRoutewhetaURL = $('#whetainputapproveddoornumber').data('url');
+    var newlyCreatedDoorNumberIdwheta = null; // Variable para almacenar el ID del carrier recién creado
+    var selectedDoorNumberswheta = [];
+    var isDoorNumberLoadedwheta = false; // Bandera para controlar la carga
+
+    loadDoorNumberWHETAOnce();
+
+    function loadDoorNumberWHETAOnce() {
+        if (isDoorNumberLoadedwheta) return; // Evita cargar dos veces
+    
+        $.ajax({
+            url: doorNumberRoutewhetaURL,
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                var doorNumbersData = data.map(item => ({
+                    id: item.gnct_id,
+                    text: item.gntc_value
+                }));
+                data.forEach(function (doornumber) {
+                    if (!selectedDoorNumberswheta.includes(doornumber.gntc_value)) {
+                        selectedDoorNumberswheta.push(doornumber.gntc_value); // Agregar al arreglo si no está ya
+                    }
+                });
+                console.log("Door Numbers cargados desde la base de datos:", selectedDoorNumberswheta);
+
+                $('#whetainputapproveddoornumber').select2({
+                    placeholder: 'Select a Door Number',
+                    allowClear: true,
+                    tags: false, // Permite agregar nuevas opciones
+                    data: doorNumbersData, // Pasar los datos directamente
+                    dropdownParent: $('#whetaapprovaloffcanvas'),
+                    minimumInputLength: 0
+                });
+    
+                isDoorNumberLoadedwheta = true; // Marcar como cargado
+            },
+            error: function (xhr, status, error) {
+                console.error('Error al cargar los Door Numbers:', error);
+            }
+        });
+    }
+
+    $('#whetainputapproveddoornumber').on('change', function () {
+        var selectedOptionDoorNumberWHETA = $(this).select2('data')[0]; // Obtener la opción seleccionada
+        var selectedTextDoorNumberWHETA = selectedOptionDoorNumberWHETA ? selectedOptionDoorNumberWHETA.text : ''; // Obtener el texto (nombre) de la opción seleccionada
+        
+        // Si no es el nuevo Door Number, lo procesamos
+        if (selectedTextDoorNumberWHETA !== newlyCreatedDoorNumberIdwheta &&  selectedTextDoorNumberWHETA.trim() !== '') {
+            console.log(selectedTextDoorNumberWHETA);
+            if (!selectedDoorNumberswheta.includes(selectedTextDoorNumberWHETA)) {
+                selectedDoorNumberswheta.push(selectedTextDoorNumberWHETA);  // Agregar al arreglo solo si no existe
+                console.log(selectedDoorNumberswheta);  // Mostrar el arreglo con todos los drivers seleccionados
+                saveNewDoorNumberWHETA(selectedTextDoorNumberWHETA);
+            }
+        }
+    });
+
+    // Guardar un nuevo carrier en la base de datos
+    function saveNewDoorNumberWHETA(doorNumberWHETA) {
+        $.ajax({
+            url: '/save-new-doornumberwheta',  // Ruta que manejará el backend
+            type: 'POST',
+            data: {
+                doorNumberWHETA: doorNumberWHETA,
+                _token: $('meta[name="csrf-token"]').attr('content')  // Asegúrate de incluir el CSRF token
+            },
+            success: function (response) {
+                console.log(response);
+
+                // Crear una nueva opción para el select2 con el nuevo carrier
+                var newOption = new Option(response.newDoorNumberWHETA.gntc_value, response.newDoorNumberWHETA.gnct_id, true, true);
+
+                // Agregar la nueva opción al select2
+                $('#whetainputapproveddoornumber').append(newOption).trigger('change');
+
+                // Seleccionar el nuevo carrier automáticamente
+                $('#whetainputapproveddoornumber').val(response.newDoorNumberWHETA.gnct_id).trigger('change');
+
+                // Marcar el nuevo ID para evitar que se haga otra solicitud
+                newlyCreatedDoorNumberIdwheta = response.newDoorNumberWHETA.gntc_value;
+                //loadTrailerOwnersShipment();
+
+                // Cuando el nuevo carrier sea creado, aseguramos que no se haga más AJAX para este carrier
+                $('#whetainputapproveddoornumber').on('select2:select', function (e) {
+                    var selectedId = e.params.data.id;
+                    if (selectedId === newlyCreatedDoorNumberIdwheta) {
+                        // Evitar que se reenvíe la solicitud para el nuevo carrier
+                        newlyCreatedDoorNumberIdwheta = null;  // Restablecer el ID del carrier creado
+                    }
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error('Error al guardar el Door Number', error);
+            }
+        });
+    }
+
     function loadShypmentTypesFilterCheckbox() { 
         //console.log("sikeeeee")
         var locationsRoute = $('#multiCollapseapplyshipmenttypefiltercheckbox').data('url');
@@ -525,29 +624,43 @@ $(document).ready(function () {
         'whetainputunits',
         //'whetainputedt',
         'whetainputapprovedeta',
+        'whetainputapproveddoornumber',
     ];
 
     // Validación de cada campo
     formFields.forEach(fieldId => {
         const field = document.getElementById(fieldId);
         const errorElement = document.getElementById(`error-${fieldId}`);
+        const isSelect2 = $(field).hasClass("searchdoornumberwheta"); // Detecta si es un select2
 
-        // Validación en tiempo real: keyup y blur
-        field.addEventListener('keyup', function () {
-            validateField(field, errorElement);
-        });
-
-        field.addEventListener('blur', function () {
-            validateField(field, errorElement);
-        });
+        if (isSelect2) {
+            // Para select2, usa 'change'
+            $(field).on('change', function () {
+                validateField(field, errorElement, isSelect2);
+            });
+        } else {
+            // Para inputs normales, usa keyup y blur
+            field.addEventListener('keyup', function () {
+                validateField(field, errorElement, isSelect2);
+            });
+    
+            field.addEventListener('blur', function () {
+                validateField(field, errorElement, isSelect2);
+            });
+        }
     });
 
     // Función común para validar cada campo
-    function validateField(field, errorElement) {
+    function validateField(field, errorElement, isSelect2) {
         // Validar si el campo está vacío
         if (field.value.trim() === '') {
             field.classList.add('is-invalid');
             errorElement.textContent = 'This field is required'; // Mensaje de error
+
+            // Si es select2, aplica la clase al contenedor correcto
+            if (isSelect2) {
+                $(field).next('.select2-container').find('.select2-selection').addClass("is-invalid");
+            }
         }
             // Validar si el campo es un número entero y mayor que 0
            else if ((field.id === 'whetainputpallets' || field.id === 'whetainputunits')) {
@@ -578,6 +691,10 @@ $(document).ready(function () {
         else {
             field.classList.remove('is-invalid');
             errorElement.textContent = ''; // Limpiar el mensaje de error
+
+            if (isSelect2) {
+                $(field).next('.select2-container').find('.select2-selection').removeClass("is-invalid");
+            }
         }
     }
 
@@ -589,12 +706,18 @@ $(document).ready(function () {
         formFields.forEach(fieldId => {
             const field = document.getElementById(fieldId);
             const errorElement = document.getElementById(`error-${fieldId}`);
+            const isSelect2 = $(field).hasClass("searchdoornumberwheta"); // Detecta si es un select2
 
             // Validar el campo
             if (field.value.trim() === '') {
                 valid = false;
                 field.classList.add('is-invalid');
                 errorElement.textContent = 'This field is required';
+
+                // Si es un select2, aplica la clase al contenedor
+                if (isSelect2) {
+                    $(field).siblings(".select2").find(".select2-selection").addClass("is-invalid");
+                }
             }
             // Validar si el campo es un número entero y mayor que 0
             else if ((field.id === 'whetainputpallets' || field.id === 'whetainputunits')) {
@@ -625,6 +748,11 @@ $(document).ready(function () {
             else {
                 field.classList.remove('is-invalid');
                 errorElement.textContent = '';
+
+                // Si es un select2, elimina la clase del contenedor
+                if (isSelect2) {
+                    $(field).siblings(".select2").find(".select2-selection").removeClass("is-invalid");
+                }
             }
         });
 
@@ -658,11 +786,11 @@ $(document).ready(function () {
                     pk_shipment: document.getElementById("whetainputpkshipment").value,
                     //id_trailer: document.getElementById("whaetainputidtrailer").value,
                     //stm_id: document.getElementById("whetainputidstm").value,
-                    pallets: document.getElementById("whetainputpallets").value,
-                    units: document.getElementById("whetainputunits").value,
+                    whetainputpallets: document.getElementById("whetainputpallets").value,
+                    whetainputunits: document.getElementById("whetainputunits").value,
                     //etd: document.getElementById("whetainputedt").value,
-                    wh_auth_date: document.getElementById("whetainputapprovedeta").value,
-                    door_number: document.getElementById("whetainputapproveddoornumber").value,
+                    whetainputapprovedeta: document.getElementById("whetainputapprovedeta").value,
+                    whetainputapproveddoornumber: document.getElementById("whetainputapproveddoornumber").value,
                 };
 
                 fetch(urlwhetaapproval, {
@@ -673,7 +801,7 @@ $(document).ready(function () {
                     },
                     body: JSON.stringify(data),
                 })
-                    .then((response) => {
+                    /*.then((response) => {
                         if (response.ok) {
                             Swal.fire("Saved!", "The changes were saved successfully.", "success");
                             closewhetaapprovalbutton.click();
@@ -684,9 +812,46 @@ $(document).ready(function () {
                                 throw new Error(data.message || "Error saving changes.");
                             });
                         }
+                    })*/
+                    .then((response) => {
+                        if (!response.ok) {
+                            return response.json().then((errorData) => {
+                                throw errorData;
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then((data) => {
+                        Swal.fire("Saved!", data.message, "success");
+                        //Swal.fire("Saved!", "The changes were saved successfully.", "success");
+                        closewhetaapprovalbutton.click();
+                        closeoffcanvaswhetaapprovaldetails.click();
+                        refreshButtonUpdate.click();
                     })
                     .catch((error) => {
-                        Swal.fire("Error", error.message, "error");
+                        console.log(error); // Muestra el error
+                        if (error.errors) {
+                            Object.keys(error.errors).forEach(field => {
+                                const fieldId = field; 
+                                const errorMessages = error.errors[field]; // Los mensajes de error
+                                const errorElement = document.getElementById(`error-${fieldId}`);
+                                const fieldElement = document.getElementById(fieldId);
+                                const isSelect2 = $(fieldElement).hasClass("searchdoornumberwheta"); // Detecta si es select2
+                    
+                                if (fieldElement) {
+                                    fieldElement.classList.add('is-invalid'); // Marca el campo como inválido
+                                    errorElement.textContent = errorMessages.join(', '); // Muestra el error en el campo
+
+                                    // Si es un select2, aplica la clase a la interfaz de select2
+                                    if (isSelect2) {
+                                        $(fieldElement).next('.select2-container').find('.select2-selection').addClass("is-invalid");
+                                    }
+                                }
+                            });
+                        } else {
+                            Swal.fire("Error", error.message || "An unknown error occurred", "error");
+                        }
+                        //Swal.fire("Error", error.message, "error");
                     });
             }
         });
