@@ -474,58 +474,96 @@ class ShipmentController extends Controller
 
     //Funcion actualizar EmptyTrailers
     public function whetaapproval(Request $request){
-        // Validar los datos
-        $validated = $request->validate([
-            'pk_shipment' => 'required',
-            //'id_trailer' => 'required',
-            //'stm_id' =>  'nullable',
-            'pallets' => 'required|min:1|integer',
-            'units' => 'required|min:1|integer',
-            //'etd' => 'required',
-            'wh_auth_date' => 'required',
-            'door_number' => 'nullable',
-        ], [
-            //'id_trailer.required' => 'ID Trailer is required.',
-            //'trailer_num.string' => 'El campo ID Trailer debe ser una cadena de texto.',
-            //'trailer_num.max' => 'El campo ID Trailer no puede exceder los 50 caracteres.',
-            //'stm_id.required' => 'La fecha de estatus es obligatoria.',
-            //'stm_id.date' => 'El campo de fecha de estatus debe ser una fecha válida.',
-            'pallets.required' => 'Pallets are required.',
-            //'pallets_on_trailer.string' => 'El campo Pallets on Trailer debe ser una cadena de texto.',
-            //'pallets_on_trailer.max' => 'El campo Pallets on Trailer no puede exceder los 50 caracteres.',
-            //'pallets_on_floor.required' => 'El campo Pallets on Floor es obligatorio.',
-            'units.required' => 'Units are rquired.',
-            //'carrier.string' => 'El campo Carrier debe ser una cadena de texto.',
-            //'carrier.max' => 'El campo Carrier no puede exceder los 50 caracteres.',
-            //'etd.required' => 'ETD is required.',
+        try {
+            // Validar los datos
+            $validated = $request->validate([
+                'pk_shipment' => 'required',
+                //'id_trailer' => 'required',
+                //'stm_id' =>  'nullable',
+                //'pallets' => 'required|min:1|integer',
+                //'units' => 'required|min:1|integer',
+                'whetainputunits' => 'required|min:1|integer',
+                'whetainputpallets' => [
+                    '', 
+                    'required', 
+                    'min:1', // No puede ser nulo ni 0
+                    function ($attribute, $value, $fail) use ($request) {
+                        // Mensaje personalizado si no es un número entero
+                        $valuee = intval($value); // Asegurarse de que el valor es un entero
+                        if($value < 1){
+                            $fail('Pallets must have a valid value.');
+                        }
+                        if (!is_int($valuee)) {
+                            $fail('Pallets must be an integer.');
+                        }
+                        if ($request->input('whetainputunits') !== null && $value > $request->input('whetainputunits')) {
+                            $fail('The number of pallets cannot be greater than the number of shipment units.');
+                        }
+                    },
+                ],
+                //'etd' => 'required',
+                //'wh_auth_date' => 'required',
+                //'door_number' => 'required',
+                'whetainputapprovedeta' => 'required|date',
+                'whetainputapproveddoornumber' => 'required',
+            ], [
+                //'id_trailer.required' => 'ID Trailer is required.',
+                //'trailer_num.string' => 'El campo ID Trailer debe ser una cadena de texto.',
+                //'trailer_num.max' => 'El campo ID Trailer no puede exceder los 50 caracteres.',
+                //'stm_id.required' => 'La fecha de estatus es obligatoria.',
+                //'stm_id.date' => 'El campo de fecha de estatus debe ser una fecha válida.',
+                //'whetainputpallets.required' => 'Pallets are required.',
+                //'pallets_on_trailer.string' => 'El campo Pallets on Trailer debe ser una cadena de texto.',
+                //'pallets_on_trailer.max' => 'El campo Pallets on Trailer no puede exceder los 50 caracteres.',
+                //'pallets_on_floor.required' => 'El campo Pallets on Floor es obligatorio.',
+                'whetainputunits.required' => 'Units are rquired.',
+                'whetainputunits.min' => 'Units must have a valid value.',
+                'whetainputunits.integer' => 'Units must be an integer',
+                //'carrier.max' => 'El campo Carrier no puede exceder los 50 caracteres.',
+                //'etd.required' => 'ETD is required.',
+                'whetainputapproveddoornumber.required' => 'Door number is required',
+                'whetainputapprovedeta.required' => 'WH Auth Date is required.',
+                'whetainputapprovedeta.date' => 'The WH Auth Date must be a valid date..',
+            ]);
 
-            'wh_auth_date.required' => 'WH Auth Date is required.',
-        ]);
+            // Buscar el trailer
+            $shipment = Shipments::findOrFail($validated['pk_shipment']);
 
-        // Buscar el trailer
-        $shipment = Shipments::findOrFail($validated['pk_shipment']);
+            // Convertir las fechas al formato adecuado
+            /*$validated['status'] = $validated['status']
+                ? Carbon::createFromFormat('m/d/Y', $validated['status'])->format('Y-m-d')
+                : null;*/
+            /*$validated['etd'] = $validated['etd']
+                ? Carbon::createFromFormat('m/d/Y H:i:s', $validated['etd'])->format('Y-m-d H:i:s')
+                : null;*/
+            /*$validated['wh_auth_date'] = $validated['wh_auth_date']
+                ? Carbon::createFromFormat('m/d/Y H:i:s', $validated['wh_auth_date'])->format('Y-m-d H:i:s')
+                : null;*/
+            /*$validated['transaction_date'] = $validated['transaction_date']
+                ? Carbon::createFromFormat('m/d/Y H:i:s', $validated['transaction_date'])->format('Y-m-d H:i:s')
+                : null;*/
 
-        // Convertir las fechas al formato adecuado
-        /*$validated['status'] = $validated['status']
-            ? Carbon::createFromFormat('m/d/Y', $validated['status'])->format('Y-m-d')
-            : null;*/
-        /*$validated['etd'] = $validated['etd']
-            ? Carbon::createFromFormat('m/d/Y H:i:s', $validated['etd'])->format('Y-m-d H:i:s')
-            : null;*/
-        $validated['wh_auth_date'] = $validated['wh_auth_date']
-            ? Carbon::createFromFormat('m/d/Y H:i:s', $validated['wh_auth_date'])->format('Y-m-d H:i:s')
-            : null;
-        /*$validated['transaction_date'] = $validated['transaction_date']
-            ? Carbon::createFromFormat('m/d/Y H:i:s', $validated['transaction_date'])->format('Y-m-d H:i:s')
-            : null;*/
+                // Log para depuración
+                //Log::info('Received data:', $validated);
 
-            // Log para depuración
-        Log::info('Received data:', $validated);
+                $dataToUpdate = [
+                    'pallets' => $validated['whetainputpallets'],
+                    'units' => $validated['whetainputunits'],
+                    'door_number' => $validated['whetainputapproveddoornumber'],
+                    'wh_auth_date' => Carbon::createFromFormat('m/d/Y H:i:s', $validated['whetainputapprovedeta'])->format('Y-m-d H:i:s'),
+                ];
 
-        // Actualizar los campos
-        $shipment->update($validated);
+            // Actualizar los campos
+            $shipment->update($dataToUpdate);
 
-        return response()->json(['message' => 'Successfully WH ETA Approval saved succesfully'], 200);
+            return response()->json(['message' => 'WH ETA Approval saved succesfully'], 200);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Devolver errores de validación como JSON
+            return response()->json(['errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'An unexpected error occurred.'], 500);
+        }
     }
 
     public function getShipmentswh(Request $request){

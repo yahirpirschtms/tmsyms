@@ -596,11 +596,19 @@
                                                 <div class="invalid-feedback" id="error-whetainputapprovedeta"></div>
                                             </div>
 
-                                            <div class="mb-3 ">
+                                            <div class="mb-3">
+                                                <label for="whetainputapproveddoornumber" class="form-label ">Door Number</label>
+                                                <select class="form-control searchdoornumberwheta" aria-label="Default select example"  id="whetainputapproveddoornumber" name="whetainputapproveddoornumber" value="{{ old('whetainputapproveddoornumber') }}" data-url="{{ route('doornumberwheta-whetaapproval') }}">
+                                                    <option selected disabled hidden></option>
+                                                </select>
+                                                <div class="invalid-feedback" id="error-whetainputapproveddoornumber"></div>
+                                            </div>
+
+                                            <!--<div class="mb-3 ">
                                                 <label for="whetainputapproveddoornumber" class="form-label ">Door Number</label>
                                                 <input type="text" class="form-control" id="whetainputapproveddoornumber" name="whetainputapproveddoornumber" value="" placeholder="">
                                                 <div class="invalid-feedback" id="error-whetainputapprovedeta"></div>
-                                            </div>
+                                            </div>-->
      
                                 <button type="button" class="btn btn-primary" id="whetaapprovalbuttonsave" data-url="{{ route('shipment.whetaapproval') }}">Update</button>
                             </form>   
