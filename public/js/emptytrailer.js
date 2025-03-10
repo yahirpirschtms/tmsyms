@@ -1990,9 +1990,18 @@ $(document).ready(function() {
             field.classList.add('is-invalid');
             errorElement.textContent = 'This field is required'; // Mensaje de error
 
-            // Si es select2, aplica la clase al contenedor correcto
+            /// Si es un select2, aplica la clase al contenedor
             if (isSelect2) {
-                $(field).next('.select2-container').find('.select2-selection').addClass("is-invalid");
+                $(field).siblings(".select2").find(".select2-selection").addClass("is-invalid");
+                errorElement.textContent = 'Carrier is required.';
+            }else if(field.id === 'updateinputpalletsonfloor'){
+                errorElement.textContent = 'Pallets on floor are required.';
+            }else if(field.id === 'updateinputpalletsontrailer'){
+                errorElement.textContent = 'Pallets on trailer are required.';
+            }else if(field.id === 'updateinputdateofstatus'){
+                errorElement.textContent = 'Status date is required.';
+            }else if(field.id === 'updateinputdatein'){
+                errorElement.textContent = 'Date In is required.';
             }
         }
         // Validar si el campo es un número entero para los campos 'updateinputpalletsonfloor' y 'updateinputpalletsontrailer'
@@ -2127,6 +2136,15 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
             // Si es un select2, aplica la clase al contenedor
             if (isSelect2) {
                 $(field).siblings(".select2").find(".select2-selection").addClass("is-invalid");
+                errorElement.textContent = 'Carrier is required.';
+            }else if(field.id === 'updateinputpalletsonfloor'){
+                errorElement.textContent = 'Pallets on floor are required.';
+            }else if(field.id === 'updateinputpalletsontrailer'){
+                errorElement.textContent = 'Pallets on trailer are required.';
+            }else if(field.id === 'updateinputdateofstatus'){
+                errorElement.textContent = 'Status date is required.';
+            }else if(field.id === 'updateinputdatein'){
+                errorElement.textContent = 'Date In is required.';
             }
         }        
         else if ((field.id === 'updateinputpalletsonfloor' || field.id === 'updateinputpalletsontrailer')) {

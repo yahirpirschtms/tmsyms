@@ -148,12 +148,12 @@ public function update(Request $request)
             //'updateinputlocation.required' => 'Location is required.',
             //'updateinputlocation.exists' => 'Location selected is not valid.',
             'updateinputdatein.required' => 'Date In is required.',
-            'updateinputpalletsontrailer.numeric' => 'Pallets on trailer must be an integer',
-            'updateinputpalletsonfloor.numeric' => 'Pallets on floor must be an integer',
-            'updateinputpalletsontrailer.required' => 'Pallets on trailer is required',
-            'updateinputpalletsonfloor.required' => 'Pallets on floor is required',
-            'updateinputpalletsontrailer.min' => 'Pallets on trailer must have a valid value',
-            'updateinputpalletsonfloor.min' => 'Pallets on floor must have a valid value',
+            'updateinputpalletsontrailer.numeric' => 'Pallets on trailer must be an integer.',
+            'updateinputpalletsonfloor.numeric' => 'Pallets on floor must be an integer.',
+            'updateinputpalletsontrailer.required' => 'Pallets on trailer are required.',
+            'updateinputpalletsonfloor.required' => 'Pallets on floor are required.',
+            'updateinputpalletsontrailer.min' => 'Pallets on trailer must have a valid value.',
+            'updateinputpalletsonfloor.min' => 'Pallets on floor must have a valid value.',
         ]);
 
         // Buscar el trailer
