@@ -523,7 +523,7 @@ class ShipmentController extends Controller
                 //'etd.required' => 'ETD is required.',
                 'whetainputapproveddoornumber.required' => 'Door number is required',
                 'whetainputapprovedeta.required' => 'WH Auth Date is required.',
-                'whetainputapprovedeta.date' => 'The WH Auth Date must be a valid date..',
+                'whetainputapprovedeta.date' => 'The WH Auth Date must be a valid date.',
             ]);
 
             // Buscar el trailer

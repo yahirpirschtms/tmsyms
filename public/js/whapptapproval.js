@@ -658,9 +658,20 @@ $(document).ready(function () {
             errorElement.textContent = 'This field is required'; // Mensaje de error
 
             // Si es select2, aplica la clase al contenedor correcto
-            if (isSelect2) {
+            /*if (isSelect2) {
                 $(field).next('.select2-container').find('.select2-selection').addClass("is-invalid");
-            }
+            }*/
+                if((field.id === 'whetainputapprovedeta'))errorElement.textContent = 'WH Auth Date is required.';
+
+                if((field.id === 'whetainputunits'))errorElement.textContent = 'Units are required.';
+
+                if((field.id === 'whetainputpallets'))errorElement.textContent = 'Pallets are required.';
+
+                // Si es un select2, aplica la clase al contenedor
+                if (isSelect2) {
+                    $(field).siblings(".select2").find(".select2-selection").addClass("is-invalid");
+                    errorElement.textContent = 'Door number is required';
+                }
         }
             // Validar si el campo es un número entero y mayor que 0
            else if ((field.id === 'whetainputpallets' || field.id === 'whetainputunits')) {
@@ -713,10 +724,17 @@ $(document).ready(function () {
                 valid = false;
                 field.classList.add('is-invalid');
                 errorElement.textContent = 'This field is required';
+                
+                if((field.id === 'whetainputapprovedeta'))errorElement.textContent = 'WH Auth Date is required.';
+
+                if((field.id === 'whetainputunits'))errorElement.textContent = 'Units are required.';
+
+                if((field.id === 'whetainputpallets'))errorElement.textContent = 'Pallets are required.';
 
                 // Si es un select2, aplica la clase al contenedor
                 if (isSelect2) {
                     $(field).siblings(".select2").find(".select2-selection").addClass("is-invalid");
+                    errorElement.textContent = 'Door number is required';
                 }
             }
             // Validar si el campo es un número entero y mayor que 0
