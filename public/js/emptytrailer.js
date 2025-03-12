@@ -195,6 +195,7 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
+    //$('#table_empty_trailers').DataTable();
     //Cargar los Carriers en los filtros de los checkbox
     function loadAvailabilityIndicatorsFilterCheckbox() { 
         //console.log("sikeeeee")

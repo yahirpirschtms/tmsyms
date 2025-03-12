@@ -62,6 +62,8 @@ Route::get('/doornumberwheta-whetaapproval', [GenericCatalogController::class, '
 
 Route::get('/drivers-shipment', [DriversController::class, 'getDriversAjax'])->name('drivers-shipment');
 
+Route::get('/securitycompany-shipment', [GenericCatalogController::class, 'getSecurityCompaniesAjax'])->name('securitycompany-shipment');
+
 //Agregar un nuevo carrier en la pantalla empty trailer
 Route::post('/save-new-carrier', [CompaniesController::class, 'saveNewCarrier']);
 

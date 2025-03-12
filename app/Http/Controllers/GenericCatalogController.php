@@ -116,4 +116,16 @@ class GenericCatalogController extends Controller
 
         return response()->json($data);
     }
+
+    public function getSecurityCompaniesAjax(Request $request){
+        $query = GenericCatalog::where('gntc_group', 'SEC_COMPANY');
+    
+        if ($request->has('search') && !empty($request->search)) {
+            $query->where('gntc_value', 'like', '%' . $request->search . '%');
+        }
+    
+        $securitycompanies = $query->select('gnct_id', 'gntc_value')->get();
+    
+        return response()->json($securitycompanies);
+    }
 }

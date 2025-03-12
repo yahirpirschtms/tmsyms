@@ -21,6 +21,12 @@
     <!--Flatpickr para fechas en inputs-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <!-- Estilo de DataTables -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <!-- JS de DataTables -->
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.3.0/css/responsive.dataTables.min.css">
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/responsive/2.3.0/js/dataTables.responsive.min.js"></script>
     <link rel="icon" type="image/png" href="{!! asset('/icons/tms_logo.jpg')!!}">
     @vite([
         'resources/sass/app.scss',
@@ -28,6 +34,10 @@
         ])
 
     <style>
+      .dataTables_filter {
+          display: none;
+      }
+
       .gradient-text {
         background: linear-gradient(135deg, #1e4877, rgb(13, 82, 200));
         -webkit-background-clip: text;
