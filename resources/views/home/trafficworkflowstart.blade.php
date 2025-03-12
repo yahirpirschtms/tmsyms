@@ -209,6 +209,14 @@
                     <div class="invalid-feedback"></div>
                 </div>
 
+                <div class="mb-3">
+                    <label for="inputshipmentsecuritycompany" class="form-label ">Security Company</label>
+                    <select class="form-select searchsecuritycompany" aria-label="Default select example"  id="inputshipmentsecuritycompany" name="inputshipmentsecuritycompany" data-url="{{ url('securitycompany-shipment') }}">
+                    <option selected disabled hidden></option>    
+                    </select>
+                    <div class="invalid-feedback"></div>
+                </div>
+
 
             <button type="submit" class="btn btn-primary" id="saveButtonShipment" data-url="{{ route('shipment.store') }}">Save</button>
 
