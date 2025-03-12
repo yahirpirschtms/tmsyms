@@ -174,7 +174,15 @@ public function update(Request $request)
         // Actualizar el trailer
         $trailer->update($dataToUpdate);
 
-        return response()->json(['message' => 'Successfully updated trailer'], 200);
+        // Obtener todos los trailers actualizados o todos los trailers
+        $trailers = EmptyTrailer::with(['availabilityIndicator', 'locations', 'carriers'])
+        ->whereNull('availability')
+        ->get();
+        
+        return response()->json([
+            'message' => 'Successfully updated trailer',
+            'trailers' => $trailers,  // Devuelve todos los registros
+        ], 200);
 
     } catch (\Illuminate\Validation\ValidationException $e) {
         // Devolver errores de validación como JSON
@@ -198,7 +206,15 @@ public function update(Request $request)
         // Eliminar el tráiler
         $trailer->delete();
 
-        return response()->json(['message' => 'Trailer successfully removed'], 200);
+       // return response()->json(['message' => 'Trailer successfully removed'], 200);
+       $trailers = EmptyTrailer::with(['availabilityIndicator', 'locations', 'carriers'])
+        ->whereNull('availability')
+        ->get();
+
+        return response()->json([
+            'message' => 'Trailer successfully removed.',
+            'trailers' => $trailers,// O puedes filtrar solo los necesarios
+        ], 200);
     }
 
     //Funcion entrar a la app
@@ -285,16 +301,25 @@ public function update(Request $request)
             'transaction_date' => $request->inputtransactiondate,
             'username' => $request->inputusername,
         ]);
+
+        $trailers = EmptyTrailer::with(['availabilityIndicator', 'locations', 'carriers'])
+        ->whereNull('availability')
+        ->get();
+
+        return response()->json([
+            'message' => 'Trailer successfully added.',
+            'trailers' => $trailers,// O puedes filtrar solo los necesarios
+        ], 200);
     
         // Redirigir con mensaje de éxito
-        return redirect()->route('emptytrailer')->with('success', 'Trailer successfully added!');
+        //return redirect()->route('emptytrailer')->with('success', 'Trailer successfully added!');
     }
     
     //Funcion actualizar tabla con los filtros o al refresh
     public function getEmptyTrailers(Request $request){
                 $query = EmptyTrailer::with(['availabilityIndicator', 'locations', 'carriers'])
                 ->whereNull('availability');                
-                
+/*                
                 // Filtros generales (searchemptytrailergeneral)
                 if ($request->has('search')) {
                     $search = $request->input('search');
@@ -407,7 +432,7 @@ public function update(Request $request)
                 $q->whereIn('location', $locations); // Filtra por cualquier ubicación en el array
             });
         }
-
+*/
         // Filtro de fechas para date_out
         /*if ($request->has('date_out_start') && $request->has('date_out_end') &&
             $request->input('date_out_start') != '' && $request->input('date_out_end') != '') {

@@ -1,5 +1,49 @@
+var table;  // Declara la variable de la tabla fuera de cualquier document.ready
+
 var selectedCarriersUpdate = [];
 $(document).ready(function () {
+    // Verifica si la tabla ya ha sido inicializada antes de inicializarla
+    if (!$.fn.dataTable.isDataTable('#table_empty_trailers')) {
+        table = $('#table_empty_trailers').DataTable({
+            paging: false,  // Desactiva la paginación
+            searching: true, // Mantiene la búsqueda activada
+            info: false,     // Oculta la información
+            lengthChange: false // Desactiva el cambio de cantidad de registros
+        });
+    } else {
+        // Si la tabla ya está inicializada, se puede actualizar la configuración
+        table.page.len(-1).draw();  // Muestra todos los registros sin paginación
+    }
+    
+    function applycarriers(){
+        var filterValues = $('#emptytrailerfilterinputcarriercheckbox').val()
+        .split(',')
+        .map(value => value.trim()) // Elimina espacios extra
+        .filter(value => value !== '') // Elimina valores vacíos
+        .join('|'); // Convierte la lista en una regex separada por "|"
+
+        if (filterValues) {
+            table.column(4).search(filterValues, true, false).draw(); // Busca con regex
+        } else {
+            table.column(4).search('').draw(); // Limpia el filtro si está vacío
+        }
+    }
+
+    function applyindicators(){
+        var filterValues = $('#emptytrailerfilterinputavailabilityindicatorcheckbox').val()
+        .split(',')
+        .map(value => value.trim()) // Elimina espacios extra
+        .filter(value => value !== '') // Elimina valores vacíos
+        .map(value => `^${value}$`) // Agrega los delimitadores ^ y $ para coincidencia exacta
+        .join('|'); // Convierte la lista en una regex separada por "|"
+
+        if (filterValues) {
+            table.column(5).search(filterValues, true, false).draw(); // Busca con regex
+        } else {
+            table.column(5).search('').draw(); // Limpia el filtro si está vacío
+        }
+    }
+
     //Esto es para los checkbotons de los filtros
     function setupCheckboxFilter(
         containerId, applyBtnId, closeBtnId, inputPkId, inputTextId,
@@ -36,13 +80,19 @@ $(document).ready(function () {
                 $filterDiv.show();
                 $inputPk.val(selectedIDs.join(",")); // IDs separados por coma
                 $inputText.val(selectedValues.join(", ")); // Nombres separados por coma
-                updatetab.click();
+                //debe de ir descomentado
+                //updatetab.click();
+                applycarriers();
+                applyindicators();
             } else {
                 $filterDiv.hide();
                 $inputPk.val("");
                 $inputText.val("");
                 $closeButton.click();
-                updatetab.click();
+                //debe de ir descomentado
+                //updatetab.click();
+                applycarriers();
+                applyindicators();
             }
         });
 
@@ -54,10 +104,14 @@ $(document).ready(function () {
                 $inputText.val("");
                 $inputPk.val("");
                 //updatetab.click();
+                applycarriers();
+                applyindicators();
             }
-
+            applycarriers();
+            applyindicators();
             $filterDiv.hide();
-            updatetab.click();
+            //debe de ir descomentado
+            //updatetab.click();
         });
 
         // Abrir el offcanvas al hacer clic en el input
@@ -76,7 +130,10 @@ $(document).ready(function () {
                 $filterDiv.hide();
                 $closeButton.prop("disabled", false);
                 $closeButton.click();
-                updatetab.click();
+                applycarriers();
+                applyindicators();
+                //debe de ir descomentado
+                //updatetab.click();
             }
         });
     }
@@ -195,7 +252,6 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
-    //$('#table_empty_trailers').DataTable();
     //Cargar los Carriers en los filtros de los checkbox
     function loadAvailabilityIndicatorsFilterCheckbox() { 
         //console.log("sikeeeee")
@@ -655,7 +711,10 @@ $(document).ready(function () {
             loadAvailabilityIndicatorupdate();
             //loadCarriersUpdate();
         });
-        
+
+
+        // Cargar datos al enfocarse y al cargar la página update 
+        $('#refreshemptytrailertable').on('click', loadAvailabilityIndicatorupdate);
 
         //Funcion para buscar el availability indicator en la pantalla de empty trailer update
         function loadAvailabilityIndicator() {
@@ -1177,6 +1236,7 @@ $(document).ready(function() {
 
     //Crear nuevo trailer 
     $(document).ready(function() {
+        
         // Evento cuando se borra la selección con la "X"
         $('#inputcarrier').on('select2:clear', function() {
             const field = $(this);
@@ -1359,8 +1419,69 @@ $(document).ready(function() {
                         text: 'Trailer successfully added.',
                         confirmButtonText: 'Ok'
                     });
+                    trailersData = {};
+                    table.clear();
+                    updateTrailerTableWithData(response.trailers);
                     $('#closenewtrailerregister').click();
-                    $('#refreshemptytrailertable').click();
+                    //$('#refreshemptytrailertable').click();
+
+                    function updateTrailerTableWithData(trailers) {
+                        //const tbody = $('#emptyTrailerTableBody');
+                        //tbody.empty(); // Limpiar la tabla antes de agregar nuevas filas
+                    
+                        trailers.forEach(trailer => {
+                            // Guardar los datos actualizados en trailersData
+                            trailersData[trailer.pk_trailer] = trailer;
+                            // Agregar los datos a la tabla sin atributos
+                            const rowNode = table.row.add([
+                                trailer.trailer_num ?? '',
+                                trailer.status ?? '',
+                                trailer.pallets_on_trailer ?? '',
+                                trailer.pallets_on_floor ?? '',
+                                trailer.carriers?.CoName ?? '',
+                                trailer.availability_indicator && trailer.availability_indicator.gntc_description ? trailer.availability_indicator.gntc_description : '',
+                                trailer.date_in ?? '',
+                                trailer.username ?? ''
+                            ]).node(); // Esto devuelve el nodo de la fila agregada
+                    
+                            // Ahora añadimos los atributos a la fila
+                            $(rowNode).attr({
+                                'id': `trailer-${trailer.pk_trailer}`,
+                                'class': 'clickable-row',
+                                'data-bs-toggle': 'offcanvas',
+                                'data-bs-target': '#emptytrailer',
+                                'aria-controls': 'emptytrailer',
+                                'data-id': trailer.pk_trailer
+                            });
+                        });
+                        // Redibujar la tabla con los nuevos datos
+                        table.draw();
+
+
+                        // Asignar eventos correctamente incluso tras filtros
+                        $(document).off("click", ".clickable-row").on("click", ".clickable-row", function () {
+                            const id = $(this).data("id");
+                            const trailer = trailersData[id];
+
+                            if (trailer) {
+                                document.getElementById("pk_trailer").textContent = trailer.pk_trailer;
+                                document.getElementById("offcanvas-id").textContent = trailer.trailer_num;
+                                document.getElementById("offcanvas-status").textContent = trailer.status;
+                                document.getElementById("offcanvas-pallets-on-trailer").textContent = trailer.pallets_on_trailer;
+                                document.getElementById("offcanvas-pallets-on-floor").textContent = trailer.pallets_on_floor;
+                                document.getElementById("offcanvas-carrier").textContent = trailer.carriers?.CoName ?? '';
+                                document.getElementById("offcanvas-availability").textContent = trailer.availability_indicator && trailer.availability_indicator.gntc_description ? trailer.availability_indicator.gntc_description : '';
+                                document.getElementById("offcanvas-date-in").textContent = trailer.date_in;
+                                document.getElementById("offcanvas-username").textContent = trailer.username;
+                                document.getElementById("pk_availability").textContent = trailer.availability_indicator && trailer.availability_indicator.gnct_id ? trailer.availability_indicator.gnct_id : '';
+                                document.getElementById("pk_location").textContent = trailer.locations?.pk_company ?? '';
+                                document.getElementById("pk_carrier").textContent = trailer.carriers?.pk_company ?? '';
+                            } else {
+                                console.error(`No data found for trailer ID ${id}`);
+                            }
+                        });
+                    }
+                    
                 },
                 error: function(xhr, status, error) {
                     // Limpia los errores anteriores
@@ -1380,14 +1501,14 @@ $(document).ready(function() {
                             let errorContainer = inputField.next('.invalid-feedback');
                             console.log(errorContainer)
                             // Verifica si el campo es un select2 (utiliza el id del campo)
-        if (inputField.hasClass('select2-hidden-accessible') || inputField.is('select')) {
-            // Si es un select2, buscamos su contenedor
-            const select2Container = inputField.next('.select2-container').find('.select2-selection');
+                            if (inputField.hasClass('select2-hidden-accessible') || inputField.is('select')) {
+                                // Si es un select2, buscamos su contenedor
+                                const select2Container = inputField.next('.select2-container').find('.select2-selection');
 
-            // Agregamos la clase is-invalid al contenedor de select2
-            select2Container.addClass('is-invalid');
-            errorContainer = inputField.parent().find('.invalid-feedback');
-        }
+                                // Agregamos la clase is-invalid al contenedor de select2
+                                select2Container.addClass('is-invalid');
+                                errorContainer = inputField.parent().find('.invalid-feedback');
+                            }
                             if (!errorContainer.length) {
                                 errorContainer = $('<div>').addClass('invalid-feedback').insertAfter(inputField);
                             }
@@ -1411,7 +1532,18 @@ $(document).ready(function() {
         });
         
     });
-    
+    // Verifica si la tabla ya ha sido inicializada antes de inicializarla
+    if (!$.fn.dataTable.isDataTable('#table_empty_trailers')) {
+        table = $('#table_empty_trailers').DataTable({
+            paging: false,  // Desactiva la paginación
+            searching: true, // Mantiene la búsqueda activada
+            info: false,     // Oculta la información
+            lengthChange: false // Desactiva el cambio de cantidad de registros
+        });
+    } else {
+        // Si la tabla ya está inicializada, se puede actualizar la configuración
+        table.page.len(-1).draw();  // Muestra todos los registros sin paginación
+    }
     function updateTrailerTable() {
         // Obtener los valores de los filtros
         // Función para agregar parámetros solo si tienen valor
@@ -1515,7 +1647,7 @@ $(document).ready(function() {
                     return acc;
                 }, {});
                 // Actualizar la tabla con los datos filtrados
-                const tbody = document.getElementById('emptyTrailerTableBody');
+                /*const tbody = document.getElementById('emptyTrailerTableBody');
                 tbody.innerHTML = ''; // Limpiar la tabla antes de agregar nuevas filas
     
                 data.forEach(trailer => {
@@ -1539,15 +1671,19 @@ $(document).ready(function() {
                         </tr>
                     `;
                     tbody.innerHTML += row;
-                });
+                });*/
 
                 // Vuelve a agregar los listeners de clic después de actualizar la tabla
-                const rows = document.querySelectorAll(".clickable-row");
+                /*const rows = document.querySelectorAll(".clickable-row");
                 rows.forEach(row => {
                     row.addEventListener("click", function () {
                         const id = this.getAttribute("data-id");
-                        const trailer = trailersData[id]; // Busca los datos del tráiler
+                        const trailer = trailersData[id]; // Busca los datos del tráiler*/
                         //console.log(trailer);
+                        table.draw();
+                $(document).off("click", ".clickable-row").on("click", ".clickable-row", function () {
+                    const id = $(this).data("id");
+                    const trailer = trailersData[id]; 
                         if (trailer) {
                             // Asigna los datos al offcanvas
                             document.getElementById("pk_trailer").textContent = trailer.pk_trailer;
@@ -1568,9 +1704,10 @@ $(document).ready(function() {
                         } else {
                             console.error(`No data found for trailer ID ${id}`);
                         }
-                    });
+                    //});
                 });
 
+                
             })
             .catch(error => console.error('Error:', error));
     }
@@ -1591,9 +1728,13 @@ $(document).ready(function() {
         debounceTimer = setTimeout(updateTrailerTable, 1000); // Espera 3 segundos antes de ejecutar la función
     }
 
-    const filterGeneralInputs = document.querySelectorAll('#searchemptytrailergeneral');
+    /*const filterGeneralInputs = document.querySelectorAll('#searchemptytrailergeneral');
     filterGeneralInputs.forEach(input => {
         input.addEventListener('input', debounceUpdate);
+    });*/
+    // Filtros de cada columna
+    $('#searchemptytrailergeneral').on('input', function() {
+        table.search(this.value).draw(); // Busca en todas las columnas
     });
 
     // Actualización automática cada 5 minutos (300,000 ms)
@@ -1736,11 +1877,11 @@ $(document).ready(function() {
                       })
                       .then((data) => {
                           // Eliminar el tráiler de trailersData
-                          delete trailersData[trailerId]; // Elimina el tráiler de trailersData
+                          /*delete trailersData[trailerId]; // Elimina el tráiler de trailersData
                           //console.log(trailersData)
                           // Eliminar el tráiler de la tabla solo si la eliminación fue exitosa
                           const row = document.querySelector(`#trailer-${trailerId}`);
-                          if (row) row.remove();
+                          if (row) row.remove();*/
 
                           // Mostrar alerta de éxito
                           Swal.fire({
@@ -1749,8 +1890,65 @@ $(document).ready(function() {
                               icon: 'success',
                               confirmButtonText: 'OK',
                           }).then(() => {
-                              // Simular el clic en el botón de cerrar el offcanvas
-                              closeButton.click();
+                
+                            trailersData = {};
+                            table.clear();
+                            
+                            // Añadir las filas nuevas
+                            data.trailers.forEach(trailer => {
+                                // Guardar los datos actualizados en trailersData
+                                trailersData[trailer.pk_trailer] = trailer;
+                                // Agregar los datos a la tabla sin atributos
+                                const rowNode = table.row.add([
+                                    trailer.trailer_num ?? '',
+                                    trailer.status ?? '',
+                                    trailer.pallets_on_trailer ?? '',
+                                    trailer.pallets_on_floor ?? '',
+                                    trailer.carriers?.CoName ?? '',
+                                    trailer.availability_indicator && trailer.availability_indicator.gntc_description ? trailer.availability_indicator.gntc_description : '',
+                                    trailer.date_in ?? '',
+                                    trailer.username ?? ''
+                                ]).node(); // Esto devuelve el nodo de la fila agregada
+
+                                // Ahora añadimos los atributos a la fila
+                                $(rowNode).attr({
+                                    'id': `trailer-${trailer.pk_trailer}`,
+                                    'class': 'clickable-row',
+                                    'data-bs-toggle': 'offcanvas',
+                                    'data-bs-target': '#emptytrailer',
+                                    'aria-controls': 'emptytrailer',
+                                    'data-id': trailer.pk_trailer
+                                });
+                            });
+                            // Asignar eventos correctamente incluso tras filtros
+                            $(document).off("click", ".clickable-row").on("click", ".clickable-row", function () {
+                                const id = $(this).data("id");
+                                const trailer = trailersData[id];
+
+                                if (trailer) {
+                                    document.getElementById("pk_trailer").textContent = trailer.pk_trailer;
+                                    document.getElementById("offcanvas-id").textContent = trailer.trailer_num;
+                                    document.getElementById("offcanvas-status").textContent = trailer.status;
+                                    document.getElementById("offcanvas-pallets-on-trailer").textContent = trailer.pallets_on_trailer;
+                                    document.getElementById("offcanvas-pallets-on-floor").textContent = trailer.pallets_on_floor;
+                                    document.getElementById("offcanvas-carrier").textContent = trailer.carriers?.CoName ?? '';
+                                    document.getElementById("offcanvas-availability").textContent = trailer.availability_indicator && trailer.availability_indicator.gntc_description ? trailer.availability_indicator.gntc_description : '';
+                                    document.getElementById("offcanvas-date-in").textContent = trailer.date_in;
+                                    document.getElementById("offcanvas-username").textContent = trailer.username;
+                                    document.getElementById("pk_availability").textContent = trailer.availability_indicator && trailer.availability_indicator.gnct_id ? trailer.availability_indicator.gnct_id : '';
+                                    document.getElementById("pk_location").textContent = trailer.locations?.pk_company ?? '';
+                                    document.getElementById("pk_carrier").textContent = trailer.carriers?.pk_company ?? '';
+                                } else {
+                                    console.error(`No data found for trailer ID ${id}`);
+                                }
+                            });
+
+
+                            // Redibujar la tabla con los nuevos datos
+                            table.draw();
+
+                            // Simular el clic en el botón de cerrar el offcanvas
+                            closeButton.click();
                           });
                       })
                       .catch((error) => {
@@ -2228,9 +2426,68 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
                 })
                 .then((data) => {
                     Swal.fire("Saved!", data.message, "success");
+                    // Limpiar las filas actuales
+
+                    // Limpiar el objeto trailersData antes de actualizar
+                    trailersData = {};
+
+                    table.clear();
+                    // Añadir las filas nuevas
+                    data.trailers.forEach(trailer => {
+                        // Guardar los datos actualizados en trailersData
+                        trailersData[trailer.pk_trailer] = trailer;
+                        // Agregar los datos a la tabla sin atributos
+                        const rowNode = table.row.add([
+                            trailer.trailer_num ?? '',
+                            trailer.status ?? '',
+                            trailer.pallets_on_trailer ?? '',
+                            trailer.pallets_on_floor ?? '',
+                            trailer.carriers?.CoName ?? '',
+                            trailer.availability_indicator && trailer.availability_indicator.gntc_description ? trailer.availability_indicator.gntc_description : '',
+                            trailer.date_in ?? '',
+                            trailer.username ?? ''
+                        ]).node(); // Esto devuelve el nodo de la fila agregada
+
+                        // Ahora añadimos los atributos a la fila
+                        $(rowNode).attr({
+                            'id': `trailer-${trailer.pk_trailer}`,
+                            'class': 'clickable-row',
+                            'data-bs-toggle': 'offcanvas',
+                            'data-bs-target': '#emptytrailer',
+                            'aria-controls': 'emptytrailer',
+                            'data-id': trailer.pk_trailer
+                        });
+                    });
+
+                    // Redibujar la tabla con los nuevos datos
+                    table.draw();
+                    // Asignar eventos correctamente incluso tras filtros
+                    $(document).off("click", ".clickable-row").on("click", ".clickable-row", function () {
+                        const id = $(this).data("id");
+                        const trailer = trailersData[id];
+
+                        if (trailer) {
+                            document.getElementById("pk_trailer").textContent = trailer.pk_trailer;
+                            document.getElementById("offcanvas-id").textContent = trailer.trailer_num;
+                            document.getElementById("offcanvas-status").textContent = trailer.status;
+                            document.getElementById("offcanvas-pallets-on-trailer").textContent = trailer.pallets_on_trailer;
+                            document.getElementById("offcanvas-pallets-on-floor").textContent = trailer.pallets_on_floor;
+                            document.getElementById("offcanvas-carrier").textContent = trailer.carriers?.CoName ?? '';
+                            document.getElementById("offcanvas-availability").textContent = trailer.availability_indicator && trailer.availability_indicator.gntc_description ? trailer.availability_indicator.gntc_description : '';
+                            document.getElementById("offcanvas-date-in").textContent = trailer.date_in;
+                            document.getElementById("offcanvas-username").textContent = trailer.username;
+                            document.getElementById("pk_availability").textContent = trailer.availability_indicator && trailer.availability_indicator.gnct_id ? trailer.availability_indicator.gnct_id : '';
+                            document.getElementById("pk_location").textContent = trailer.locations?.pk_company ?? '';
+                            document.getElementById("pk_carrier").textContent = trailer.carriers?.pk_company ?? '';
+                        } else {
+                            console.error(`No data found for trailer ID ${id}`);
+                        }
+                    });
+
                     document.getElementById('closeupdatemptytrailerbutton').click();
-                    document.getElementById('refreshemptytrailertable').click();
+                    //document.getElementById('refreshemptytrailertable').click();
                     document.getElementById('closeoffcanvastrailersdetails').click();
+                    //$('#table_empty_trailers').DataTable().ajax.reload(); 
                 })
                 .catch((error) => {
                     console.log(error); // Muestra el error
@@ -2441,7 +2698,18 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
     
     //Manejo de filtros de inputs simples
     $(document).ready(function () {
-
+        // Verifica si la tabla ya ha sido inicializada antes de inicializarla
+    if (!$.fn.dataTable.isDataTable('#table_empty_trailers')) {
+        table = $('#table_empty_trailers').DataTable({
+            paging: false,  // Desactiva la paginación
+            searching: true, // Mantiene la búsqueda activada
+            info: false,     // Oculta la información
+            lengthChange: false // Desactiva el cambio de cantidad de registros
+        });
+    } else {
+        // Si la tabla ya está inicializada, se puede actualizar la configuración
+        table.page.len(-1).draw();  // Muestra todos los registros sin paginación
+    }
         const updatetab = document.getElementById("refreshemptytrailertable");
         // Función genérica para habilitar o deshabilitar botones
         function toggleApplyButton(inputSelector, buttonSelector) {
@@ -2460,19 +2728,36 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
                 // Si el div del filtro ya está visible, actualiza el valor
                 if ($(divSelector).is(':visible')) {
                     $(inputFilterSelector).val(inputValue);
-                    updatetab.click();
+                    //este update su debe ir descomentado
+                    //updatetab.click();
+                    table.column(0).search($('#emptytrailerfilterinputidtrailer').val()).draw();
+                    table.column(2).search($('#emptytrailerfilterinputpalletsontrailer').val()).draw();
+                    table.column(3).search($('#emptytrailerfilterinputpalletsonfloor').val()).draw();
+                    table.column(7).search($('#emptytrailerfilterinputusername').val()).draw();
+
                 } else {
                     // Si el div no está visible, muestra el div y coloca el valor
                     $(inputFilterSelector).val(inputValue);
                     $(divSelector).show();
-                    updatetab.click();
+                    table.column(0).search($('#emptytrailerfilterinputidtrailer').val()).draw();
+                    table.column(2).search($('#emptytrailerfilterinputpalletsontrailer').val()).draw();
+                    table.column(3).search($('#emptytrailerfilterinputpalletsonfloor').val()).draw();
+                    table.column(7).search($('#emptytrailerfilterinputusername').val()).draw();
+                    //este update si debe ir descomentado
+                    //updatetab.click();
                 }
             } else {
                 // Si el campo está vacío, vacía el input del filtro y oculta el div
                 $(inputFilterSelector).val('');
+                table.column(0).search($('#emptytrailerfilterinputidtrailer').val()).draw();
+                table.column(2).search($('#emptytrailerfilterinputpalletsontrailer').val()).draw();
+                table.column(3).search($('#emptytrailerfilterinputpalletsonfloor').val()).draw();
+                table.column(7).search($('#emptytrailerfilterinputusername').val()).draw();
                 $(divSelector).hide();
                 $(closeButtonSelector).click(); // Simula un clic en Collapse
-                updatetab.click();
+                //este update si debe ir descomentado
+                //updatetab.click();
+                
             }
         }
     
@@ -2482,6 +2767,7 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
             $(divSelector).hide();
             $(closeButtonSelector).prop('disabled', false); // Habilita el botón
             $(applyButtonSelector).click(); // Simula clic en Apply
+            //Este update no debe ir descomentado
             //updatetab.click();
         }
     
@@ -2497,7 +2783,12 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
             if (!$(inputSelector).val()) {
                 $(inputFilterSelector).val(''); // Limpia el input asociado al filtro
                 if ($(divSelector).is(":visible")) {
-                    updatetab.click();
+                    //Este update si debe ir descomentado
+                    //updatetab.click();
+                    table.column(0).search($('#emptytrailerfilterinputidtrailer').val()).draw();
+                    table.column(2).search($('#emptytrailerfilterinputpalletsontrailer').val()).draw();
+                    table.column(3).search($('#emptytrailerfilterinputpalletsonfloor').val()).draw();
+                    table.column(7).search($('#emptytrailerfilterinputusername').val()).draw();
                 }
                 $(divSelector).hide(); // Oculta el div del filtro
             }
@@ -2590,6 +2881,50 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
 
     //Manejo mejorado de Date of Status
     $(document).ready(function () {
+        // Verifica si la tabla ya ha sido inicializada antes de inicializarla
+    if (!$.fn.dataTable.isDataTable('#table_empty_trailers')) {
+        table = $('#table_empty_trailers').DataTable({
+            paging: false,  // Desactiva la paginación
+            searching: true, // Mantiene la búsqueda activada
+            info: false,     // Oculta la información
+            lengthChange: false // Desactiva el cambio de cantidad de registros
+        });
+    } else {
+        // Si la tabla ya está inicializada, se puede actualizar la configuración
+        table.page.len(-1).draw();  // Muestra todos los registros sin paginación
+    }
+        // Filtro de rango de fechas en la columna 1 y 6
+        $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+            // **Filtro 1**: Manejo de "Date of Status" (columna 1)
+            var startDateStatus = $('#emptytrailerfilterinputdateofstartstatus').val();
+            var endDateStatus = $('#emptytrailerfilterinputdateofendstatus').val();
+            var dateColumnIndexStatus = 1;
+            var rowDateStatus = data[dateColumnIndexStatus] || "";
+
+            // **Filtro 2**: Manejo de "Date In" (columna 6)
+            var startDateIn = $('#emptytrailerfilterinputstartdatein').val();
+            var endDateIn = $('#emptytrailerfilterinputenddatein').val();
+            var dateColumnIndexIn = 6;
+            var rowDateIn = data[dateColumnIndexIn] || "";
+
+            // Usa flatpickr para parsear correctamente las fechas
+            var rowDateStatusObj = rowDateStatus ? flatpickr.parseDate(rowDateStatus, "d/m/Y H:i:s") : null;
+            var startDateStatusObj = startDateStatus ? flatpickr.parseDate(startDateStatus, "d/m/Y H:i:s") : null;
+            var endDateStatusObj = endDateStatus ? flatpickr.parseDate(endDateStatus, "d/m/Y H:i:s") : null;
+
+            var rowDateInObj = new Date(rowDateIn);
+            var startDateInObj = startDateIn ? new Date(startDateIn) : null;
+            var endDateInObj = endDateIn ? new Date(endDateIn) : null;
+
+            // **Lógica de filtrado**
+            var statusMatch = (!startDateStatusObj || rowDateStatusObj >= startDateStatusObj) &&
+                            (!endDateStatusObj || rowDateStatusObj <= endDateStatusObj);
+            
+            var inMatch = (!startDateInObj || rowDateInObj >= startDateInObj) &&
+                        (!endDateInObj || rowDateInObj <= endDateInObj);
+
+            return statusMatch && inMatch; // Ambas condiciones deben cumplirse
+        });
         const updatetab = document.getElementById("refreshemptytrailertable");
         // Función para manejar el estado de los botones (habilitar/deshabilitar)
         function toggleDateRangeButtons(startInputSelector, endInputSelector, closeButtonSelector, applyButtonSelector, divSelector) {
@@ -2618,19 +2953,25 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
                 if ($(divSelector).is(':visible')) {
                     $(startFilterInputSelector).val(startDate); // Actualiza el input del filtro con el Start Date
                     $(endFilterInputSelector).val(endDate); // Actualiza el input del filtro con el End Date
-                    updatetab.click();
+                    //Este update si debe ir descomentado
+                    //updatetab.click();
+                    table.draw(); // Redibuja la tabla con el nuevo filtro
                 } else {
                     $(startFilterInputSelector).val(startDate);
                     $(endFilterInputSelector).val(endDate);
                     $(divSelector).show(); // Muestra el div del filtro
-                    updatetab.click();
+                    //Este update si debe ir descomentado
+                    //updatetab.click();
+                    table.draw(); // Redibuja la tabla con el nuevo filtro
                 }
             } else {
                 $(startFilterInputSelector).val(''); // Limpia el input del Start Date asociado al filtro
                 $(endFilterInputSelector).val(''); // Limpia el input del End Date asociado al filtro
+                table.draw(); // Redibuja la tabla con el nuevo filtro
                 $(divSelector).hide(); // Oculta el div del filtro
                 $(closeButtonSelector).click(); // Simula un clic en Collapse
-                updatetab.click();
+                //Este update si debe ir descomentado
+                //updatetab.click();
             }
             toggleDateRangeButtons(startInputSelector, endInputSelector, closeButtonSelector, applyButtonSelector, divSelector);
         }
@@ -2639,11 +2980,15 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
         function clearDateRangeFilter(divSelector, startInputSelector, endInputSelector, applyButtonSelector, closeButtonSelector) {
             $(startInputSelector).val(''); // Limpia el input del Start Date
             $(endInputSelector).val(''); // Limpia el input del End Date
+            //table.draw(); // Redibuja la tabla con el nuevo filtro
+            $(applyButtonSelector).click();
             $(divSelector).hide(); // Oculta el div del filtro
             $(closeButtonSelector).prop('disabled', false); // Habilita el botón
             $(closeButtonSelector).click();
             $(applyButtonSelector).prop('disabled', true); // Deshabilita el botón Apply
-            updatetab.click();
+            //Este update si debe ir descomentado
+            //updatetab.click();
+            
         }
     
         // Función para manejar clics en botones de cerrar Collapse
@@ -2652,7 +2997,9 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
                 $(startFilterInputSelector).val(''); // Limpia el Start Date del filtro
                 $(endFilterInputSelector).val(''); // Limpia el End Date del filtro
                 if ($(divSelector).is(":visible")) {
-                    updatetab.click();
+                    //Este update si debe ir descomentado
+                    //updatetab.click();
+                    table.draw(); // Redibuja la tabla con el nuevo filtro
                     $(applyButtonSelector).prop('disabled', true); // Deshabilita el botón Apply
                 } 
                 $(divSelector).hide(); // Oculta el div del filtro
@@ -2721,6 +3068,51 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
 
     //Manejo Filtro de fechas datetime 
     $(document).ready(function () {
+        // Verifica si la tabla ya ha sido inicializada antes de inicializarla
+    if (!$.fn.dataTable.isDataTable('#table_empty_trailers')) {
+        table = $('#table_empty_trailers').DataTable({
+            paging: false,  // Desactiva la paginación
+            searching: true, // Mantiene la búsqueda activada
+            info: false,     // Oculta la información
+            lengthChange: false // Desactiva el cambio de cantidad de registros
+        });
+    } else {
+        // Si la tabla ya está inicializada, se puede actualizar la configuración
+        table.page.len(-1).draw();  // Muestra todos los registros sin paginación
+    }
+        // Filtro de rango de fechas en la columna 1 y 6
+        $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+            // **Filtro 1**: Manejo de "Date of Status" (columna 1)
+            var startDateStatus = $('#emptytrailerfilterinputdateofstartstatus').val();
+            var endDateStatus = $('#emptytrailerfilterinputdateofendstatus').val();
+            var dateColumnIndexStatus = 1;
+            var rowDateStatus = data[dateColumnIndexStatus] || "";
+
+            // **Filtro 2**: Manejo de "Date In" (columna 6)
+            var startDateIn = $('#emptytrailerfilterinputstartdatein').val();
+            var endDateIn = $('#emptytrailerfilterinputenddatein').val();
+            var dateColumnIndexIn = 6;
+            var rowDateIn = data[dateColumnIndexIn] || "";
+
+            // Usa flatpickr para parsear correctamente las fechas
+            var rowDateStatusObj = rowDateStatus ? flatpickr.parseDate(rowDateStatus, "d/m/Y H:i:s") : null;
+            var startDateStatusObj = startDateStatus ? flatpickr.parseDate(startDateStatus, "d/m/Y H:i:s") : null;
+            var endDateStatusObj = endDateStatus ? flatpickr.parseDate(endDateStatus, "d/m/Y H:i:s") : null;
+
+            var rowDateInObj = new Date(rowDateIn);
+            var startDateInObj = startDateIn ? new Date(startDateIn) : null;
+            var endDateInObj = endDateIn ? new Date(endDateIn) : null;
+
+            // **Lógica de filtrado**
+            var statusMatch = (!startDateStatusObj || rowDateStatusObj >= startDateStatusObj) &&
+                            (!endDateStatusObj || rowDateStatusObj <= endDateStatusObj);
+            
+            var inMatch = (!startDateInObj || rowDateInObj >= startDateInObj) &&
+                        (!endDateInObj || rowDateInObj <= endDateInObj);
+
+            return statusMatch && inMatch; // Ambas condiciones deben cumplirse
+        });
+
         const updatetab = document.getElementById("refreshemptytrailertable");
         // Función para manejar el estado de los botones (habilitar/deshabilitar)
         function toggleDateRangeButtons(startInputSelector, endInputSelector, closeButtonSelector, applyButtonSelector, divSelector) {
@@ -2750,19 +3142,25 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
                     // Actualiza los inputs del filtro con los valores de fecha seleccionados
                     $(startFilterInputSelector).val(startDate); // Actualiza el Start Date en el div de filtros
                     $(endFilterInputSelector).val(endDate); // Actualiza el End Date en el div de filtros
-                    updatetab.click();
+                    //Este update si debe ir descomentado
+                    //updatetab.click();
+                    table.draw(); // Redibuja la tabla con el nuevo filtro
                 } else {
                     $(startFilterInputSelector).val(startDate); // Actualiza el Start Date en el div de filtros
                     $(endFilterInputSelector).val(endDate); // Actualiza el End Date en el div de filtros
                     $(divSelector).show(); // Muestra el div del filtro
-                    updatetab.click();
+                    //Este update si debe ir descomentado
+                    //updatetab.click();
+                    table.draw(); // Redibuja la tabla con el nuevo filtro
                 }
             } else {
                 $(startFilterInputSelector).val(''); // Limpia el input del Start Date asociado al filtro
                 $(endFilterInputSelector).val(''); // Limpia el input del End Date asociado al filtro
+                table.draw(); // Redibuja la tabla con el nuevo filtro
                 $(divSelector).hide(); // Oculta el div del filtro
                 $(closeButtonSelector).click(); // Simula un clic en Collapse
-                updatetab.click();
+                //Este update si debe ir descomentado
+                //updatetab.click();
             }
             toggleDateRangeButtons(startInputSelector, endInputSelector, closeButtonSelector, applyButtonSelector, divSelector);
         }
@@ -2771,11 +3169,14 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
         function clearDateRangeFilter(divSelector, startInputSelector, endInputSelector, applyButtonSelector, closeButtonSelector) {
             $(startInputSelector).val(''); // Limpia el input del Start Date
             $(endInputSelector).val(''); // Limpia el input del End Date
+            //table.draw(); // Redibuja la tabla con el nuevo filtro
+            $(applyButtonSelector).click();
             $(divSelector).hide(); // Oculta el div del filtro
             $(closeButtonSelector).prop('disabled', false); // Habilita el botón Collapse
             $(closeButtonSelector).click(); // Simula un clic en Collapse
             $(applyButtonSelector).prop('disabled', true); // Deshabilita el botón Apply
-            updatetab.click();
+            //Este update si debe ir descomentado
+            //updatetab.click();
         }
     
         // Función para manejar clics en botones de cerrar Collapse
@@ -2784,7 +3185,9 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
                 $(startFilterInputSelector).val(''); // Limpia el Start Date del filtro
                 $(endFilterInputSelector).val(''); // Limpia el End Date del filtro
                 if ($(divSelector).is(":visible")) {
-                    updatetab.click();
+                    //Este update si debe ir descomentado
+                    //updatetab.click();
+                    table.draw(); // Redibuja la tabla con el nuevo filtro
                     $(applyButtonSelector).prop('disabled', true); // Deshabilita el botón Apply
                 } 
                 $(divSelector).hide(); // Oculta el div del filtro
