@@ -100,6 +100,49 @@ $(document).ready(function () {
     LoadCurrentStatus();
 
     //Busqueda de Driver en un nuevo registro
+    var selectedsecuritycompanies = []; // Arreglo para almacenar todos los drivers seleccionados
+
+    var isSecurityCompaniesLoaded = false; // Bandera para controlar la carga
+
+    loadSecurityCompaniesOnce();
+    
+    function loadSecurityCompaniesOnce() {
+        if (isSecurityCompaniesLoaded) return; // Evita cargar dos veces
+    
+        $.ajax({
+            url:'/securitycompany-shipment', 
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                var securityCompaniesData = data.map(item => ({
+                    id: item.gnct_id,
+                    text: item.gntc_value
+                }));
+                data.forEach(function (securitycompanies) {
+                    if (!selectedsecuritycompanies.includes(securitycompanies.gntc_value)) {
+                        selectedsecuritycompanies.push(securitycompanies.gntc_value); // Agregar al arreglo si no está ya
+                    }
+                });
+                console.log("Security Companies cargados desde la base de datos:", selectedsecuritycompanies);
+    
+                // Inicializar Select2 sin AJAX
+                $('#inputshipmentsecuritycompany').select2({
+                    placeholder: 'Select a Security Company',
+                    allowClear: true,
+                    tags: false, // Permite agregar nuevas opciones
+                    data: securityCompaniesData, // Pasar los datos directamente
+                    minimumInputLength: 0
+                });
+    
+                isSecurityCompaniesLoaded = true; // Marcar como cargado
+            },
+            error: function (xhr, status, error) {
+                console.error('Error al cargar las Security Companies:', error);
+            }
+        });
+    }
+
+    //Busqueda de Driver en un nuevo registro
     var carrierRoute = $('#inputshipmentdriver').data('url');
     var newlyCreatedCarrierId = null; // Variable para almacenar el ID del carrier recién creado
     var selectedDrivers = []; // Arreglo para almacenar todos los drivers seleccionados
@@ -1411,6 +1454,27 @@ $(document).ready(function() {
 
     //Crear nuevo Shipment
     $(document).ready(function() {
+
+        // Evento cuando se borra la selección con la "X"
+        $('#inputshipmentsecuritycompany').on('select2:clear', function() {
+            const field = $(this);
+            const errorContainer = field.parent().find('.invalid-feedback');
+
+            field.addClass('is-invalid'); // Agregar borde rojo
+            field.next('.select2-container').find('.select2-selection').addClass('is-invalid');
+            errorContainer.text('Security Company is required.'); // Mostrar mensaje de error
+        });
+
+        // Si selecciona un valor válido, eliminar error
+        $('#inputshipmentsecuritycompany').on('select2:select', function() {
+            const field = $(this);
+            const errorContainer = field.parent().find('.invalid-feedback');
+
+            field.removeClass('is-invalid'); // Quitar borde rojo
+            field.next('.select2-container').find('.select2-selection').removeClass('is-invalid');
+            errorContainer.text(''); // Borrar mensaje de error
+        });
+
         let trackerCount = 0; // Contador de trackers visibles
 
         // Template HTML para los inputs con IDs diferenciados
@@ -1712,7 +1776,7 @@ $(document).ready(function() {
                                 // Restablece el formulario
                                 $('#createnewshipmentform')[0].reset();
 
-                                $('#inputshipmentcarrier, #inputshipmentdriver, #inputshipmenttrailer, #inputpallets, #inputidtrailer').val(null).trigger('change');
+                                $('#inputshipmentcarrier, #inputshipmentdriver, #inputshipmenttrailer, #inputpallets, #inputidtrailer, #inputshipmentsecuritycompany').val(null).trigger('change');
 
                                 // Elimina los inputs de trackers añadidos dinámicamente
                                 $('.trackers-container').empty();  // Elimina todo el contenido dentro de .trackers-container
@@ -1724,6 +1788,7 @@ $(document).ready(function() {
                                 // También puedes eliminar cualquier clase de validación de error si es necesario
                                 $('input, select').removeClass('is-invalid');
                                 $('.invalid-feedback').text('');
+                                $('.select2-selection').removeClass('is-invalid'); // También eliminar la clase del contenedor de select2
                             }
                         });
                         //$('#closenewtrailerregister').click();
@@ -1733,14 +1798,25 @@ $(document).ready(function() {
                         // Limpia los errores anteriores
                         $('input, select').removeClass('is-invalid');
                         $('.invalid-feedback').text('');
+                        $('.select2-selection').removeClass('is-invalid'); // También eliminar la clase del contenedor de select2
                         
                         // Manejo de errores con SweetAlert2
                         let errors = xhr.responseJSON.errors;
                         for (let field in errors) {
+                            const fieldId = field;
+                            const inputFieldselect = $('#' + field); // Convierte el ID en un objeto jQuery
+                            const errorContainerselectsecuritycompany = inputFieldselect.parent().find('.invalid-feedback'); 
                             const inputField = $('#' + field);
                             const errorContainer = inputField.next('.invalid-feedback');
+                            const fieldElement = document.getElementById(fieldId);
+                            const isSelect2 = $(fieldElement).hasClass("searchsecuritycompany"); 
                             
                             inputField.addClass('is-invalid');  // Marca el campo con error
+                            // Si es un select2, aplica la clase a la interfaz de select2
+                            if (isSelect2) {
+                                $(fieldElement).next('.select2-container').find('.select2-selection').addClass("is-invalid");
+                                errorContainerselectsecuritycompany.text('Security Company is required.'); // Mostrar mensaje de error
+                            }
                             errorContainer.text(errors[field][0]); // Muestra el error correspondiente
                         }
         
