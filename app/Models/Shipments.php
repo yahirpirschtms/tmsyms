@@ -67,6 +67,7 @@ class Shipments extends Model
         'removed_trackers',
         'lane',
         'have_trackers',
+        'security_company'
         
     ];
 
