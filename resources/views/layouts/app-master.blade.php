@@ -217,6 +217,12 @@
           font-size: 0.875em;
           color: #dc3545;
       }
+      /*.select2-search__field:focus {
+          outline: none !important;
+          box-shadow: none !important;
+          border-color: transparent !important;
+      }*/
+
 
       /* Eliminar bordes de la tabla y las celdas */
   .table_style {

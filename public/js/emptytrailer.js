@@ -402,18 +402,18 @@ $(document).ready(function () {
     
                 // Inicializar Select2 sin AJAX
                 $('#inputcarrier').select2({
-                    placeholder: 'Select or enter a New Carrier',
+                    placeholder: 'Select a Carrier',
                     allowClear: true,
-                    tags: true, // Permite agregar nuevas opciones
+                    tags: false, // Permite agregar nuevas opciones
                     data: carriersData, // Pasar los datos directamente
                     dropdownParent: $('#newtrailerempty'),
                     minimumInputLength: 0
                 });
 
                 $('#updateinputcarrier').select2({
-                    placeholder: 'Select or enter a New Carrier',
+                    placeholder: 'Select a Carrier',
                     allowClear: true,
-                    tags: true, // Permite agregar nuevas opciones
+                    tags: false, // Permite agregar nuevas opciones
                     data: carriersData, // Pasar los datos directamente
                     dropdownParent: $('#updatenewtrailerempty'),
                     minimumInputLength: 0
@@ -1298,7 +1298,7 @@ $(document).ready(function() {
                     const value = field.val().trim(); // Obtener el valor del campo
                 
                     // Verificar si el campo está vacío
-                    if (value.length === 0) {
+                    /*if (value.length === 0) {
                         field.addClass('is-invalid');
                         errorContainer.text('Pallets On Trailer are required.');
                     }
@@ -1306,9 +1306,9 @@ $(document).ready(function() {
                     else if (parseFloat(value) === 0 || parseFloat(value) <= 0) {
                         field.addClass('is-invalid');
                         errorContainer.text('Pallets On Trailer must have a valid value.');
-                    }
+                    }*/
                     // Verificar si el valor es una letra (no un número)
-                    else if (isNaN(value)) {
+                    if (isNaN(value)) {
                         field.addClass('is-invalid');
                         errorContainer.text('The value must be an integer.');
                     }
@@ -1331,7 +1331,7 @@ $(document).ready(function() {
                     const value = field.val().trim(); // Obtener el valor del campo
                 
                     // Verificar si el campo está vacío
-                    if (value.length === 0) {
+                    /*if (value.length === 0) {
                         field.addClass('is-invalid');
                         errorContainer.text('Pallets On Floor are required.');
                     }
@@ -1341,7 +1341,7 @@ $(document).ready(function() {
                         errorContainer.text('Pallets On Floor must have a valid value.');
                     }
                     // Verificar si el valor es una letra (no un número)
-                    else if (isNaN(value)) {
+                    else*/ if (isNaN(value)) {
                         field.addClass('is-invalid');
                         errorContainer.text('The value must be an integer.');
                     }
@@ -2186,19 +2186,22 @@ $(document).ready(function() {
     function validateField(field, errorElement, isSelect2) {
         // Validar si el campo está vacío
         if (field.value.trim() === '') {
-            field.classList.add('is-invalid');
-            errorElement.textContent = 'This field is required'; // Mensaje de error
+            //field.classList.add('is-invalid');
+            //errorElement.textContent = 'This field is required'; // Mensaje de error
 
             /// Si es un select2, aplica la clase al contenedor
             if (isSelect2) {
                 $(field).siblings(".select2").find(".select2-selection").addClass("is-invalid");
+                field.classList.add('is-invalid');
                 errorElement.textContent = 'Carrier is required.';
-            }else if(field.id === 'updateinputpalletsonfloor'){
+            }/*else if(field.id === 'updateinputpalletsonfloor'){
                 errorElement.textContent = 'Pallets on floor are required.';
             }else if(field.id === 'updateinputpalletsontrailer'){
                 errorElement.textContent = 'Pallets on trailer are required.';
-            }else if(field.id === 'updateinputdateofstatus'){
+            }*/else if(field.id === 'updateinputdateofstatus'){
+                field.classList.add('is-invalid');
                 errorElement.textContent = 'Status date is required.';
+                field.classList.add('is-invalid');
             }else if(field.id === 'updateinputdatein'){
                 errorElement.textContent = 'Date In is required.';
             }
@@ -2211,10 +2214,10 @@ $(document).ready(function() {
                 field.classList.add('is-invalid');
                 errorElement.textContent = 'This field must be an integer.'; // Mensaje de error
             }
-            else if (value <= 0) {
+            /*else if (value <= 0) {
                 field.classList.add('is-invalid');
                 errorElement.textContent = 'This field must have a valid value.'; // Mensaje de error
-            }
+            }*/
         }
         else {
             field.classList.remove('is-invalid');
@@ -2327,26 +2330,29 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
         const isSelect2 = $(field).hasClass("searchcarrier"); // Detecta si es un select2
 
         // Validar el campo
-        if (field.value.trim() === '') {
+        if (field.value.trim() === '' && field.id !== 'updateinputpalletsonfloor' && field.id !== 'updateinputpalletsontrailer') {
             valid = false;
-            field.classList.add('is-invalid');
-            errorElement.textContent = 'This field is required';
+            //field.classList.add('is-invalid');
+            //errorElement.textContent = 'This field is required';
 
             // Si es un select2, aplica la clase al contenedor
             if (isSelect2) {
                 $(field).siblings(".select2").find(".select2-selection").addClass("is-invalid");
+                field.classList.add('is-invalid');
                 errorElement.textContent = 'Carrier is required.';
-            }else if(field.id === 'updateinputpalletsonfloor'){
+            }/*else if(field.id === 'updateinputpalletsonfloor'){
                 errorElement.textContent = 'Pallets on floor are required.';
             }else if(field.id === 'updateinputpalletsontrailer'){
                 errorElement.textContent = 'Pallets on trailer are required.';
-            }else if(field.id === 'updateinputdateofstatus'){
+            }*/else if(field.id === 'updateinputdateofstatus'){
+                field.classList.add('is-invalid');
                 errorElement.textContent = 'Status date is required.';
             }else if(field.id === 'updateinputdatein'){
+                field.classList.add('is-invalid');
                 errorElement.textContent = 'Date In is required.';
             }
         }        
-        else if ((field.id === 'updateinputpalletsonfloor' || field.id === 'updateinputpalletsontrailer')) {
+        /*else if ((field.id === 'updateinputpalletsonfloor' || field.id === 'updateinputpalletsontrailer')) {
             const value = field.value.trim();
 
             if (isNaN(value) || !Number.isInteger(parseFloat(value))) {
@@ -2357,7 +2363,7 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
                 field.classList.add('is-invalid');
                 errorElement.textContent = 'This field must have a valid value.'; // Mensaje de error
             }
-        }
+        }*/
         else {
             field.classList.remove('is-invalid');
             errorElement.textContent = '';

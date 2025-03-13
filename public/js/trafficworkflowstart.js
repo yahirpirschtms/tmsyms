@@ -496,9 +496,9 @@ $(document).ready(function () {
     
                 // Inicializar Select2 sin AJAX
                 $('#inputshipmentcarrier').select2({
-                    placeholder: 'Select or enter a New Carrier',
+                    placeholder: 'Select a Carrier',
                     allowClear: true,
-                    tags: true, // Permite agregar nuevas opciones
+                    tags: false, // Permite agregar nuevas opciones
                     data: carriersData, // Pasar los datos directamente
                     minimumInputLength: 0
                 });
@@ -839,9 +839,9 @@ $(document).ready(function () {
     
                 // Inicializar Select2 sin AJAX
                 $('#inputshipmenttrailer').select2({
-                    placeholder: 'Select or enter a New Trailer Owner',
+                    placeholder: 'Select a Trailer Owner',
                     allowClear: true,
-                    tags: true, // Permite agregar nuevas opciones
+                    tags: false, // Permite agregar nuevas opciones
                     data: trailerOwnersData, // Pasar los datos directamente
                     minimumInputLength: 0
                 });

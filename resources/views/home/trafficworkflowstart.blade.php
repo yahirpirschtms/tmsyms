@@ -135,7 +135,7 @@
                </div>
 
                 <div class="mb-3">
-                    <label for="inputshipmentetd" class="form-label ">Estimated date of departure</label>
+                    <label for="inputshipmentetd" class="form-label ">Estimated date of delivery (ETD)</label>
                     <input type="text" class="form-control datetimepicker" id="inputshipmentetd" name="inputshipmentetd" placeholder="MM/DD/YYYY - H/M/S">
                     <div class="invalid-feedback"></div>
                 </div>

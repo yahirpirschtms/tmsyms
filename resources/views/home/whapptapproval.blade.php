@@ -35,7 +35,7 @@
                 <button type="button" style="color: white;" class="btn me-2 btn-success" id="exportfile" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Export File">
                     <i class="fa-solid fa-file-export"></i>
                 </button>
-                <button type="button" style="color: white;" class="btn me-2 btn-primary" id="refreshwhetapprovaltable" data-url="{{ route('shipmentwh.data') }}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Refresh Table">
+                <button type="button" style="color: white;" class="btn me-2 btn-primary" id="refreshwhetapprovaltable" data-url="{{ route('shipmentwh.data') }}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Refresh Data">
                     <i class="fa-solid fa-arrows-rotate"></i>
                 </button>
                 <button class="btn" id="addmorefiltersemptytrailer" style="color: white;background-color:orange;" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasaddmorefilters" aria-controls="offcanvasaddmorefilters">

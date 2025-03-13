@@ -132,8 +132,8 @@ public function update(Request $request)
             'updateinputpktrailer' => 'required', // pk_trailer
             //'updateinputidtrailer' => 'required|unique:empty_trailer,trailer_num',
             'updateinputdateofstatus' => 'required|date', // status
-            'updateinputpalletsontrailer' => 'required|numeric|min:1', // pallets_on_trailer
-            'updateinputpalletsonfloor' => 'required|numeric|min:1', // pallets_on_floor
+            'updateinputpalletsontrailer' => 'nullable|numeric', // pallets_on_trailer
+            'updateinputpalletsonfloor' => 'nullable|numeric', // pallets_on_floor
             'updateinputcarrier' => 'required', // carrier
             'updateinputavailabilityindicator' => 'nullable|exists:generic_catalogs,gnct_id', // gnct_id_availability_indicator
             'updateinputlocation' => 'nullable', // location
@@ -150,10 +150,10 @@ public function update(Request $request)
             'updateinputdatein.required' => 'Date In is required.',
             'updateinputpalletsontrailer.numeric' => 'Pallets on trailer must be an integer.',
             'updateinputpalletsonfloor.numeric' => 'Pallets on floor must be an integer.',
-            'updateinputpalletsontrailer.required' => 'Pallets on trailer are required.',
-            'updateinputpalletsonfloor.required' => 'Pallets on floor are required.',
-            'updateinputpalletsontrailer.min' => 'Pallets on trailer must have a valid value.',
-            'updateinputpalletsonfloor.min' => 'Pallets on floor must have a valid value.',
+            //'updateinputpalletsontrailer.required' => 'Pallets on trailer are required.',
+            //'updateinputpalletsonfloor.required' => 'Pallets on floor are required.',
+            //'updateinputpalletsontrailer.min' => 'Pallets on trailer must have a valid value.',
+            //'updateinputpalletsonfloor.min' => 'Pallets on floor must have a valid value.',
         ]);
 
         // Buscar el trailer
@@ -237,8 +237,8 @@ public function update(Request $request)
 
             'inputidtrailer' => 'required|unique:empty_trailer,trailer_num',
             'inputdateofstatus' => 'required|date',
-            'inputpalletsontrailer' => 'required|numeric|min:1',
-            'inputpalletsonfloor' => 'required|numeric|min:1',
+            'inputpalletsontrailer' => 'nullable|numeric',
+            'inputpalletsonfloor' => 'nullable|numeric',
             'inputcarrier' => 'required',
             'inputavailabilityindicator' => 'nullable|exists:generic_catalogs,gnct_id',
             'inputlocation' => 'nullable',
@@ -253,12 +253,12 @@ public function update(Request $request)
             //'inputidtrailer.max' => 'The Trailer ID field cannot exceed 50 characters.',
             'inputdateofstatus.required' => 'Status date is required.',
             'inputdateofstatus.date' => 'The status date field must be a valid date.',
-            'inputpalletsontrailer.required' => 'Pallets on trailer are required.',
+            //'inputpalletsontrailer.required' => 'Pallets on trailer are required.',
             //'inputpalletsontrailer.string' => 'The Pallets on Trailer field must be a text string.',
-            'inputpalletsontrailer.min' => 'The Pallets On Trailer must have a valid value.',
-            'inputpalletsonfloor.required' => 'Pallets on floor are required.',
+            //'inputpalletsontrailer.min' => 'The Pallets On Trailer must have a valid value.',
+            //'inputpalletsonfloor.required' => 'Pallets on floor are required.',
             //'inputpalletsonfloor.string' => 'The Pallets on Floor field must be a text string.',
-            'inputpalletsonfloor.min' => 'The Pallets On Floor must have a valid value.',
+            //'inputpalletsonfloor.min' => 'The Pallets On Floor must have a valid value.',
             'inputcarrier.required' => 'Carrier is required.',
             //'inputcarrier.exists' => 'Carrier selected is not valid.',
             //'inputcarrier.max' => 'The Carrier field cannot exceed 50 characters.',
