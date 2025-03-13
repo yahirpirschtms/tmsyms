@@ -287,6 +287,7 @@ class ShipmentController extends Controller
             'inputshipmentdriver' => 'nullable',
             'inputshipmentetd' => 'required|date',
             'inputshipmentsunits' => 'required|min:1|integer',
+            'inputshipmentsecuritycompany' => 'required',
             // Validación condicional de los trackers
             'tracker1' => 'nullable|required_if:tracker1,!=,null', // Si tracker1 tiene valor, debe ser requerido
             'tracker2' => 'nullable|required_if:tracker2,!=,null', // Lo mismo para tracker2
@@ -340,6 +341,7 @@ class ShipmentController extends Controller
             'inputshipmentetd.date' => 'Estimated date of departure format is invalid',
             'inputshipmentcurrentstatus.required' => 'Current Status is required',
             'inputshipmentcurrentstatus.exists' => 'Current Status doesnt exists',
+            'inputshipmentsecuritycompany.required' => 'Security Company is required',
             'inputshipmentsunits.required' => 'Unist are required',
             'inputshipmentsunits.integer' => 'Units must be an integer',
             'inputshipmentsunits.min' => 'Units must have a valid value',
@@ -433,6 +435,7 @@ class ShipmentController extends Controller
             'tracker3' => $tracker3,
             'gnct_id_current_status' => $request->inputshipmentcurrentstatus,
             'lane' => $request->ln_code,
+            'security_company' => $request->inputshipmentsecuritycompany,
 
             // Asignar la fecha y hora actual solo si el parámetro `inputshipmentdriver` no está vacío
             'driver_assigned_date' => $request->inputshipmentdriver ? $currentDateTime : null,
@@ -556,7 +559,21 @@ class ShipmentController extends Controller
             // Actualizar los campos
             $shipment->update($dataToUpdate);
 
-            return response()->json(['message' => 'WH ETA Approval saved succesfully'], 200);
+            // return response()->json(['message' => 'Trailer successfully removed'], 200);
+            $shipments = Shipments::with(['shipmenttype', 'currentstatus', 'origin', 'destinations', 'carrier', 'emptytrailer', 'services', 'driverowner', 'drivers'])
+            ->whereNull('wh_auth_date')
+            ->whereHas('destinations', function ($query) {
+                $query->join('facilities', 'companies.CoName', '=', 'facilities.fac_name')
+                      ->where('facilities.fac_auth', 1);
+            })
+            ->get();
+
+            //return response()->json(['message' => 'WH ETA Approval saved succesfully'], 200);
+
+            return response()->json([
+                'message' => 'WH ETA Approval saved succesfully.',
+                'shipments' => $shipments,// O puedes filtrar solo los necesarios
+            ], 200);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             // Devolver errores de validación como JSON
@@ -579,7 +596,7 @@ class ShipmentController extends Controller
             });
 
         // Filtros generales (searchemptytrailergeneral)
-        if ($request->has('searchwh')) {
+        /*esto se quitaif ($request->has('searchwh')) {
             $search = $request->input('searchwh');
             //$formattedDate = null;
             $formattedDateTime = null;
@@ -603,7 +620,7 @@ class ShipmentController extends Controller
                 //->orWhere('id_trailer','like',"%$search%")
                 //->orWhereNull('id_trailer')
 
-                ->orWhere('etd', 'like', $formattedDateTime);
+                ->orWhere('etd', 'like', $formattedDateTime);esto se quita*/
                 //->orWhereNull('etd')
 
                 //->orWhere('units','like',"%$search%")
@@ -634,21 +651,21 @@ class ShipmentController extends Controller
                 //->orWhereNull('billing_id')
                 ->orWhere('device_number','like',"%$search%");*/
                 //->orWhereNull('device_number');
-            });
-        }
+        /*esto se quita    });
+        }*/
 
 
         //Filtros específicos de parámetros (inputs de filtros aplicados)
-        if ($request->has('stm_id') && $request->input('stm_id') != '') {
+       /*este si va if ($request->has('stm_id') && $request->input('stm_id') != '') {
             $query->where('stm_id', 'like', "%{$request->input('stm_id')}%");
-        }
+        }*/
         /*if ($request->has('gnct_id_shipment_type') && $request->input('gnct_id_shipment_type') != '') {
             $query->whereHas('shipmenttype', function($q) use ($request) {
                 $q->where('gnct_id', $request->input('gnct_id_shipment_type'));
             });
         }*/
         // Filtro para múltiples ubicaciones seleccionadas
-        if ($request->has('shipment_types') && $request->input('shipment_types') != '') {
+        /*estos si van if ($request->has('shipment_types') && $request->input('shipment_types') != '') {
             $ship = explode(',', $request->input('shipment_types')); // Convierte la cadena en un array
 
             $query->whereHas('shipmenttype', function($q) use ($ship) {
@@ -766,7 +783,7 @@ class ShipmentController extends Controller
         }
         if ($request->has('device_number') && $request->input('device_number') != '') {
             $query->where('device_number', 'like', "%{$request->input('device_number')}%");
-        }
+        }*/
 
 
         // Obtener los trailers con los filtros aplicados

@@ -1,3 +1,5 @@
+var tablewhetaapproval;  // Declara la variable de la tabla fuera de cualquier document.ready
+
 
 document.getElementById('exportfile').addEventListener('click', function () {
     // Obtén la tabla con el id "table_wh_eta_approval_shipments"
@@ -149,6 +151,55 @@ $(document).ready(function () {
         });
     }
 
+        // Verifica si la tabla ya ha sido inicializada antes de inicializarla
+        if (!$.fn.dataTable.isDataTable('#table_wh_eta_approval_shipments')) {
+            tablewhetaapproval = $('#table_wh_eta_approval_shipments').DataTable({
+                paging: false,  // Desactiva la paginación
+                searching: true, // Mantiene la búsqueda activada
+                info: false,     // Oculta la información
+                lengthChange: false, // Desactiva el cambio de cantidad de registros
+                columnDefs: [{ targets: [5,6,7,8,9,10,11,12,13,14,15,16,17,18], searchable: true, visible: false }], // Oculta la columna 5
+                //responsive: true,  // Habilita la responsividad de la tabla
+                autoWidth: false,  // Permite que las celdas se ajusten al contenido
+                //fixedColumns: { leftColumns: 2 }, // Fija las dos primeras columnas (ajusta según tus necesidades)
+            });
+        } else {
+            tablewhetaapproval = $('#table_wh_eta_approval_shipments').DataTable();
+            tablewhetaapproval.page.len(-1).draw();  // Muestra todos los registros sin paginación
+        }
+    
+        // Aplica el filtro en la columna "Shipment Type" (columna 0)
+        function applyshipmenttypes() {
+            var filterValues = $('#emptytrailerfilterinputshipmenttypecheckbox').val()
+                .split(',')
+                .map(value => value.trim()) // Elimina espacios extra
+                .filter(value => value !== '') // Elimina valores vacíos
+                .join('|'); // Convierte la lista en una regex separada por "|"
+    
+            if (filterValues) {
+                tablewhetaapproval.column(0).search(filterValues, true, false).draw(); // Busca con regex
+            } else {
+                tablewhetaapproval.column(0).search('').draw(); // Limpia el filtro si está vacío
+            }
+        }
+    
+        // Aplica el filtro general a todas las columnas
+        $('#searchemptytrailergeneralwh').on('input', function() {
+            tablewhetaapproval.search(this.value).draw();
+        });
+    
+        // Aplica el filtro solo a la columna 5 (incluso si está oculta)
+        $('#column5').on('input', function() {
+            let columnIndex = tablewhetaapproval.column(':contains("secondary shipment id")').index();
+            console.log('Columna 5 encontrada en índice:', columnIndex);
+    
+            if (columnIndex !== undefined) {
+                tablewhetaapproval.column(columnIndex).search(this.value).draw();
+            } else {
+                console.error("No se encontró la columna 5 en la tabla.");
+            }
+        });
+
     function loadShypmentTypesFilterCheckbox() { 
         //console.log("sikeeeee")
         var locationsRoute = $('#multiCollapseapplyshipmenttypefiltercheckbox').data('url');
@@ -222,13 +273,17 @@ $(document).ready(function () {
             $filterDiv.show(); // Mostrar el div
             $inputPk.val(selectedIDs.join(",")); // Guardar IDs
             $inputLocation.val(selectedLocations.join(", ")); // Guardar nombres
-            updatetab.click();
+            //Este debe ir descomentado
+            //updatetab.click();
+            applyshipmenttypes();
         } else {
             $filterDiv.hide();
             $inputPk.val("");
             $inputLocation.val("");
             $closeButton.click();
-            updatetab.click();
+            //Este debe de ir descomentado
+            //updatetab.click();
+            applyshipmenttypes();
         }
     });
 
@@ -241,11 +296,14 @@ $(document).ready(function () {
             $inputLocation.val("");
             $inputPk.val("");
             //updatetab.click();
+            applyshipmenttypes();
         }
 
+        applyshipmenttypes();
         // Ocultar el div si está visible
         $filterDiv.hide();
-        updatetab.click();
+        //debe de ir descomentado
+        // updatetab.click();
     });
 
     // Escuchar clic en los elementos que abrirán el offcanvas
@@ -265,7 +323,9 @@ $(document).ready(function () {
             $filterDiv.hide();
             $closeButton.prop("disabled", false);
             $closeButton.click();
-            updatetab.click();
+            applyshipmenttypes();
+            //debe de ir descomentado
+            // updatetab.click();
         }
     });
 
@@ -397,7 +457,7 @@ $(document).ready(function () {
                     return acc;
                 }, {});
                 // Actualizar la tabla con los datos filtrados
-                const tbody = document.getElementById('shipmentWHTableBody');
+               /* const tbody = document.getElementById('shipmentWHTableBody');
                 tbody.innerHTML = ''; // Limpiar la tabla antes de agregar nuevas filas
 
                 data.forEach(shipment => {
@@ -415,10 +475,45 @@ $(document).ready(function () {
                         </tr>
                     `;
                     tbody.innerHTML += row;
+                });*/
+                tablewhetaapproval.draw();
+                $(document).off("click", ".clickable-row").on("click", ".clickable-row", function () {
+                    const id = $(this).data("id");
+                    const shipment = shipmentsData[id];
+                
+                    if (shipment) {
+                        // Cambiar el título del canvas concatenando el número del envío
+                        const titleElement = document.getElementById('shipmentwhapptapprovaldetailstitle');
+                        const originalTitle = titleElement.dataset.originalTitle || titleElement.textContent; // Guardar el título original
+                        titleElement.dataset.originalTitle = originalTitle; // Almacenar en un atributo de datos personalizados
+                        if (shipment.stm_id !== null) {
+                            titleElement.textContent = `${originalTitle} - ${shipment.stm_id}`;
+                        }
+                
+                        // Asignamos los datos al offcanvas
+                        document.getElementById("offcanvasdetails-pk_shipment").textContent = shipment.pk_shipment;
+                        document.getElementById("offcanvasdetails-id_trailer").textContent = shipment.id_trailer;
+                        document.getElementById("offcanvasdetails-stm_id").textContent = shipment.stm_id;
+                        document.getElementById("offcanvasdetails-etd").textContent = shipment.etd;
+                        document.getElementById("offcanvasdetails-units").textContent = shipment.units;
+                        document.getElementById("offcanvasdetails-pallets").textContent = shipment.pallets;
+                        document.getElementById("offcanvasdetails-driver_assigned_date").textContent = shipment.driver_assigned_date;
+                        document.getElementById("offcanvasdetails-intransit_date").textContent = shipment.intransit_date;
+                        document.getElementById("offcanvasdetails-gnct_id_shipment_type").textContent = shipment.shipmenttype && shipment.shipmenttype.gntc_description ? shipment.shipmenttype.gntc_description : 'N/A';
+                        document.getElementById("offcanvasdetails-pick_up_date").textContent = shipment.pick_up_date;
+                
+                    } else {
+                        console.error(`No data found for shipment ID ${id}`);
+                    }
+                
+                    // Restaurar el título al cerrar el canvas
+                    document.getElementById('shipmentwhapptapprovaldetails').addEventListener('hidden.bs.offcanvas', function () {
+                        titleElement.textContent = originalTitle; // Restaurar el título original
+                    });
                 });
 
                 // Vuelve a agregar los listeners de clic después de actualizar la tabla
-                const rows = document.querySelectorAll(".clickable-row");
+                /*const rows = document.querySelectorAll(".clickable-row");
                 rows.forEach(row => {
                     row.addEventListener("click", function () {
                         const id = this.getAttribute("data-id");
@@ -463,7 +558,7 @@ $(document).ready(function () {
                             titleElement.textContent = originalTitle; // Restaurar el título original
                         }); 
                     });
-                });
+                });*/
 
             })
             .catch(error => console.error('Error:', error));
@@ -477,7 +572,7 @@ $(document).ready(function () {
         input.addEventListener('input', updateShipmentWHETATable);
     });
 
-    let debounceTimer;
+    /*let debounceTimer;
 
     function debounceUpdate() {
         clearTimeout(debounceTimer); // Cancela el temporizador anterior
@@ -487,11 +582,12 @@ $(document).ready(function () {
     const filterGeneralInputs = document.querySelectorAll('#searchemptytrailergeneralwh');
     filterGeneralInputs.forEach(input => {
         input.addEventListener('input', debounceUpdate);
-    });
+    });*/
+    
 
     // Actualización automática cada 5 minutos (300,000 ms)
     setInterval(updateShipmentWHETATable, 5000000);
-    
+
     //Formato de fechas
     $(document).ready(function() {
     
@@ -841,10 +937,87 @@ $(document).ready(function () {
                     })
                     .then((data) => {
                         Swal.fire("Saved!", data.message, "success");
+                        shipmentsData = {};
+
+                        tablewhetaapproval.clear();
+
+                        data.shipments.forEach(shipment => {
+                            // Guardar los datos actualizados en trailersData
+                            shipmentsData[shipment.pk_shipment] = shipment;
+                            // Agregar los datos a la tabla sin atributos
+                            const rowNode = tablewhetaapproval.row.add([
+                                shipment.shipmenttype?.gntc_description ?? '',  // Shipment Type
+                                shipment.stm_id ?? '',                        // STM ID
+                                shipment.etd ?? '',                           // Suggested Delivery Date
+                                shipment.units ?? '',                         // Units
+                                shipment.pallets ?? '',                       // Pallets
+                                shipment.secondary_shipment_id ?? '',         // secondary shipment id
+                                shipment.id_trailer ?? '',                    // trailer id
+                                shipment.billing_id ?? '',                    // billing id
+                                shipment.tracker1 ?? '',                      // tracker1
+                                shipment.tracker2 ?? '',                      // tracker2
+                                shipment.tracker3 ?? '',                      // tracker3
+                                shipment.driver_assigned_date ?? '',          // driver assigned date
+                                shipment.pick_up_date ?? '',                  // picked up date
+                                shipment.intransit_date ?? '',                // in transit date
+                                shipment.delivered_date ?? '',                // delivery/received date
+                                shipment.secured_yarddate ?? '',              // secured yard date
+                                shipment.wh_auth_date ?? '',                  // approved eta date
+                                shipment.billing_date ?? '',                  // date of billing
+                                shipment.offloading_time ?? ''
+                            ]).node(); // Esto devuelve el nodo de la fila agregada
+    
+                            // Ahora añadimos los atributos a la fila
+                            $(rowNode).attr({
+                                'id': `trailer-${shipment.pk_shipment}`,
+                                'class': 'clickable-row',
+                                'data-bs-toggle': 'offcanvas',
+                                'data-bs-target': '#shipmentwhapptapprovaldetails',
+                                'aria-controls': 'shipmentwhapptapprovaldetails',
+                                'data-id': shipment.pk_shipment
+                            });
+                        });
+
+                        tablewhetaapproval.draw();
+
+                        $(document).off("click", ".clickable-row").on("click", ".clickable-row", function () {
+                            const id = $(this).data("id");
+                            const shipment = shipmentsData[id];
+                        
+                            if (shipment) {
+                                // Cambiar el título del canvas concatenando el número del envío
+                                const titleElement = document.getElementById('shipmentwhapptapprovaldetailstitle');
+                                const originalTitle = titleElement.dataset.originalTitle || titleElement.textContent; // Guardar el título original
+                                titleElement.dataset.originalTitle = originalTitle; // Almacenar en un atributo de datos personalizados
+                                if (shipment.stm_id !== null) {
+                                    titleElement.textContent = `${originalTitle} - ${shipment.stm_id}`;
+                                }
+                        
+                                // Asignamos los datos al offcanvas
+                                document.getElementById("offcanvasdetails-pk_shipment").textContent = shipment.pk_shipment;
+                                document.getElementById("offcanvasdetails-id_trailer").textContent = shipment.id_trailer;
+                                document.getElementById("offcanvasdetails-stm_id").textContent = shipment.stm_id;
+                                document.getElementById("offcanvasdetails-etd").textContent = shipment.etd;
+                                document.getElementById("offcanvasdetails-units").textContent = shipment.units;
+                                document.getElementById("offcanvasdetails-pallets").textContent = shipment.pallets;
+                                document.getElementById("offcanvasdetails-driver_assigned_date").textContent = shipment.driver_assigned_date;
+                                document.getElementById("offcanvasdetails-intransit_date").textContent = shipment.intransit_date;
+                                document.getElementById("offcanvasdetails-gnct_id_shipment_type").textContent = shipment.shipmenttype && shipment.shipmenttype.gntc_description ? shipment.shipmenttype.gntc_description : 'N/A';
+                                document.getElementById("offcanvasdetails-pick_up_date").textContent = shipment.pick_up_date;
+                        
+                            } else {
+                                console.error(`No data found for shipment ID ${id}`);
+                            }
+                        
+                            // Restaurar el título al cerrar el canvas
+                            document.getElementById('shipmentwhapptapprovaldetails').addEventListener('hidden.bs.offcanvas', function () {
+                                titleElement.textContent = originalTitle; // Restaurar el título original
+                            });
+                        });
                         //Swal.fire("Saved!", "The changes were saved successfully.", "success");
                         closewhetaapprovalbutton.click();
                         closeoffcanvaswhetaapprovaldetails.click();
-                        refreshButtonUpdate.click();
+                        //refreshButtonUpdate.click();
                     })
                     .catch((error) => {
                         console.log(error); // Muestra el error
@@ -913,6 +1086,32 @@ $(document).ready(function () {
     //Manejo de filtros de inputs simples
     $(document).ready(function () {
 
+        // Verifica si la tabla ya ha sido inicializada antes de inicializarla
+        if (!$.fn.dataTable.isDataTable('#table_wh_eta_approval_shipments')) {
+            tablewhetaapproval = $('#table_wh_eta_approval_shipments').DataTable({
+                paging: false,  // Desactiva la paginación
+                searching: true, // Mantiene la búsqueda activada
+                info: false,     // Oculta la información
+                lengthChange: false, // Desactiva el cambio de cantidad de registros
+                columnDefs: [{ targets: [5,6,7,8,9,10,11,12,13,14,15,16,17,18], searchable: true, visible: false }], // Oculta la columna 5
+                //responsive: true,  // Habilita la responsividad de la tabla
+                autoWidth: false,  // Permite que las celdas se ajusten al contenido
+                //fixedColumns: { leftColumns: 2 }, // Fija las dos primeras columnas (ajusta según tus necesidades)
+            });
+        } else {
+            tablewhetaapproval = $('#table_wh_eta_approval_shipments').DataTable();
+            tablewhetaapproval.page.len(-1).draw();  // Muestra todos los registros sin paginación
+        }
+
+        /*let columnIndex = tablewhetaapproval.column(':contains("secondary shipment id")').index();
+            console.log('Columna 5 encontrada en índice:', columnIndex);
+    
+            if (columnIndex !== undefined) {
+                tablewhetaapproval.column(columnIndex).search(this.value).draw();
+            } else {
+                console.error("No se encontró la columna 5 en la tabla.");
+            }*/
+
         const updatetab = document.getElementById("refreshwhetapprovaltable");
         // Función genérica para habilitar o deshabilitar botones
         function toggleApplyButton(inputSelector, buttonSelector) {
@@ -931,25 +1130,68 @@ $(document).ready(function () {
                 // Si el div del filtro ya está visible, actualiza el valor
                 if ($(divSelector).is(':visible')) {
                     $(inputFilterSelector).val(inputValue);
-                    updatetab.click();
+                    //Este debe ir descomentado
+                    //updatetab.click();
+                    tablewhetaapproval.column(1).search($('#emptytrailerfilterinputidstm').val()).draw();
+                    tablewhetaapproval.column(3).search($('#emptytrailerfilterinputunits').val()).draw();
+                    tablewhetaapproval.column(4).search($('#emptytrailerfilterinputpallets').val()).draw();
+                    
+                    tablewhetaapproval.column(5).search($('#emptytrailerfilterinputsecondaryid').val()).draw();
+                    tablewhetaapproval.column(6).search($('#emptytrailerfilterinputidtrailerwh').val()).draw();
+                    tablewhetaapproval.column(7).search($('#emptytrailerfilterinputbillingid').val()).draw();
+                    tablewhetaapproval.column(8).search($('#emptytrailerfilterinputdevicenumber').val()).draw();
+                    tablewhetaapproval.column(9).search($('#emptytrailerfilterinputdevicenumber1').val()).draw();
+                    tablewhetaapproval.column(10).search($('#emptytrailerfilterinputdevicenumber2').val()).draw();
                 } else {
                     // Si el div no está visible, muestra el div y coloca el valor
                     $(inputFilterSelector).val(inputValue);
                     $(divSelector).show();
-                    updatetab.click();
+                    //Este debe de ir descomentado
+                    //updatetab.click();
+                    tablewhetaapproval.column(1).search($('#emptytrailerfilterinputidstm').val()).draw();
+                    tablewhetaapproval.column(3).search($('#emptytrailerfilterinputunits').val()).draw();
+                    tablewhetaapproval.column(4).search($('#emptytrailerfilterinputpallets').val()).draw();
+
+                    tablewhetaapproval.column(5).search($('#emptytrailerfilterinputsecondaryid').val()).draw();
+                    tablewhetaapproval.column(6).search($('#emptytrailerfilterinputidtrailerwh').val()).draw();
+                    tablewhetaapproval.column(7).search($('#emptytrailerfilterinputbillingid').val()).draw();
+                    tablewhetaapproval.column(8).search($('#emptytrailerfilterinputdevicenumber').val()).draw();
+                    tablewhetaapproval.column(9).search($('#emptytrailerfilterinputdevicenumber1').val()).draw();
+                    tablewhetaapproval.column(10).search($('#emptytrailerfilterinputdevicenumber2').val()).draw();
                 }
             } else {
                 // Si el campo está vacío, vacía el input del filtro y oculta el div
                 $(inputFilterSelector).val('');
+                tablewhetaapproval.column(1).search($('#emptytrailerfilterinputidstm').val()).draw();
+                tablewhetaapproval.column(3).search($('#emptytrailerfilterinputunits').val()).draw();
+                tablewhetaapproval.column(4).search($('#emptytrailerfilterinputpallets').val()).draw();
+
+                tablewhetaapproval.column(5).search($('#emptytrailerfilterinputsecondaryid').val()).draw();
+                tablewhetaapproval.column(6).search($('#emptytrailerfilterinputidtrailerwh').val()).draw();
+                tablewhetaapproval.column(7).search($('#emptytrailerfilterinputbillingid').val()).draw();
+                tablewhetaapproval.column(8).search($('#emptytrailerfilterinputdevicenumber').val()).draw();
+                tablewhetaapproval.column(9).search($('#emptytrailerfilterinputdevicenumber1').val()).draw();
+                tablewhetaapproval.column(10).search($('#emptytrailerfilterinputdevicenumber2').val()).draw();
                 $(divSelector).hide();
                 $(closeButtonSelector).click(); // Simula un clic en Collapse
-                updatetab.click();
+                //Este debe ir descomentado
+                //updatetab.click();
             }
         }
     
         // Función genérica para manejar clics en botones X
         function handleClearButton(divSelector, inputSelector, applyButtonSelector, closeButtonSelector) {
             $(inputSelector).val('');
+            tablewhetaapproval.column(1).search($('#emptytrailerfilterinputidstm').val()).draw();
+            tablewhetaapproval.column(3).search($('#emptytrailerfilterinputunits').val()).draw();
+            tablewhetaapproval.column(4).search($('#emptytrailerfilterinputpallets').val()).draw();
+
+            tablewhetaapproval.column(5).search($('#emptytrailerfilterinputsecondaryid').val()).draw();
+            tablewhetaapproval.column(6).search($('#emptytrailerfilterinputidtrailerwh').val()).draw();
+            tablewhetaapproval.column(7).search($('#emptytrailerfilterinputbillingid').val()).draw();
+            tablewhetaapproval.column(8).search($('#emptytrailerfilterinputdevicenumber').val()).draw();
+            tablewhetaapproval.column(9).search($('#emptytrailerfilterinputdevicenumber1').val()).draw();
+            tablewhetaapproval.column(10).search($('#emptytrailerfilterinputdevicenumber2').val()).draw();
             $(divSelector).hide();
             $(closeButtonSelector).prop('disabled', false); // Habilita el botón
             $(applyButtonSelector).click(); // Simula clic en Apply
@@ -968,7 +1210,18 @@ $(document).ready(function () {
             if (!$(inputSelector).val()) {
                 $(inputFilterSelector).val(''); // Limpia el input asociado al filtro
                 if ($(divSelector).is(":visible")) {
-                    updatetab.click();
+                    //Debe de ir descomentar
+                    //updatetab.click();
+                    tablewhetaapproval.column(1).search($('#emptytrailerfilterinputidstm').val()).draw();
+                    tablewhetaapproval.column(3).search($('#emptytrailerfilterinputunits').val()).draw();
+                    tablewhetaapproval.column(4).search($('#emptytrailerfilterinputpallets').val()).draw();
+
+                    tablewhetaapproval.column(5).search($('#emptytrailerfilterinputsecondaryid').val()).draw();
+                    tablewhetaapproval.column(6).search($('#emptytrailerfilterinputidtrailerwh').val()).draw();
+                    tablewhetaapproval.column(7).search($('#emptytrailerfilterinputbillingid').val()).draw();
+                    tablewhetaapproval.column(8).search($('#emptytrailerfilterinputdevicenumber').val()).draw();
+                    tablewhetaapproval.column(9).search($('#emptytrailerfilterinputdevicenumber1').val()).draw();
+                    tablewhetaapproval.column(10).search($('#emptytrailerfilterinputdevicenumber2').val()).draw();
                 } 
                 $(divSelector).hide(); // Oculta el div del filtro
                
@@ -1101,7 +1354,7 @@ $(document).ready(function () {
             handleCloseCollapseButton('#inputbillingidfilter', '#emptytrailerfilterdivbillingid', '#emptytrailerfilterinputbillingid');
         });
 
-        // Device Number
+        // tracker 1
         $('#inputdevicenumberfilter').on('input', function () {
             toggleApplyButton('#inputdevicenumberfilter', '#closeapplydevicenumberfilter');
         });
@@ -1120,6 +1373,50 @@ $(document).ready(function () {
         
         $('#closeapplydevicenumberfilter').on('click', function () {
             handleCloseCollapseButton('#inputdevicenumberfilter', '#emptytrailerfilterdivdevicenumber', '#emptytrailerfilterinputdevicenumber');
+        });
+
+
+        // tracker 2
+        $('#inputdevicenumberfilter1').on('input', function () {
+            toggleApplyButton('#inputdevicenumberfilter1', '#closeapplydevicenumberfilter1');
+        });
+    
+        $('#applydevicenumberfilter1').on('click', function () {
+            handleApplyButton('#inputdevicenumberfilter1', '#emptytrailerfilterdivdevicenumber1', '#emptytrailerfilterinputdevicenumber1', '#closeapplydevicenumberfilter1');
+        });
+    
+        $('#emptytrailerfilterbuttondevicenumber1').on('click', function () {
+            handleClearButton('#emptytrailerfilterdivdevicenumber1', '#inputdevicenumberfilter1', '#applydevicenumberfilter1', '#closeapplydevicenumberfilter1');
+        });
+    
+        $('#emptytrailerfilterbtndevicenumber1, #emptytrailerfilterinputdevicenumber1').on('click', function () {
+            handleFilterButtonClick('offcanvasaddmorefilters', '#inputdevicenumberfilter1');
+        });
+        
+        $('#closeapplydevicenumberfilter1').on('click', function () {
+            handleCloseCollapseButton('#inputdevicenumberfilter1', '#emptytrailerfilterdivdevicenumber1', '#emptytrailerfilterinputdevicenumber1');
+        });
+
+
+        // tracker3
+        $('#inputdevicenumberfilter2').on('input', function () {
+            toggleApplyButton('#inputdevicenumberfilter2', '#closeapplydevicenumberfilter2');
+        });
+    
+        $('#applydevicenumberfilter2').on('click', function () {
+            handleApplyButton('#inputdevicenumberfilter2', '#emptytrailerfilterdivdevicenumber2', '#emptytrailerfilterinputdevicenumber2', '#closeapplydevicenumberfilter2');
+        });
+    
+        $('#emptytrailerfilterbuttondevicenumber2').on('click', function () {
+            handleClearButton('#emptytrailerfilterdivdevicenumber2', '#inputdevicenumberfilter2', '#applydevicenumberfilter2', '#closeapplydevicenumberfilter2');
+        });
+    
+        $('#emptytrailerfilterbtndevicenumber2, #emptytrailerfilterinputdevicenumber2').on('click', function () {
+            handleFilterButtonClick('offcanvasaddmorefilters', '#inputdevicenumberfilter2');
+        });
+        
+        $('#closeapplydevicenumberfilter2').on('click', function () {
+            handleCloseCollapseButton('#inputdevicenumberfilter2', '#emptytrailerfilterdivdevicenumber2', '#emptytrailerfilterinputdevicenumber2');
         });
     });
 
@@ -1266,6 +1563,139 @@ $(document).ready(function () {
 
     //Manejo Filtro de fechas datetime 
     $(document).ready(function () {
+        // Verifica si la tabla ya ha sido inicializada antes de inicializarla
+        if (!$.fn.dataTable.isDataTable('#table_wh_eta_approval_shipments')) {
+            tablewhetaapproval = $('#table_wh_eta_approval_shipments').DataTable({
+                paging: false,  // Desactiva la paginación
+                searching: true, // Mantiene la búsqueda activada
+                info: false,     // Oculta la información
+                lengthChange: false, // Desactiva el cambio de cantidad de registros
+                columnDefs: [{ targets: [5,6,7,8,9,10,11,12,13,14,15,16,17,18], searchable: true, visible: false }], // Oculta la columna 5
+                //responsive: true,  // Habilita la responsividad de la tabla
+                autoWidth: false,  // Permite que las celdas se ajusten al contenido
+                //fixedColumns: { leftColumns: 2 }, // Fija las dos primeras columnas (ajusta según tus necesidades)
+            });
+        } else {
+            tablewhetaapproval = $('#table_wh_eta_approval_shipments').DataTable();
+            tablewhetaapproval.page.len(-1).draw();  // Muestra todos los registros sin paginación
+        }
+
+        $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+            var startDateStatus = $('#emptytrailerfilterinputstartsdd').val();
+            var endDateStatus = $('#emptytrailerfilterinputendsdd').val();
+            var dateColumnIndexStatus = 2;
+            var rowDateStatus = data[dateColumnIndexStatus] || "";
+
+            // Usa flatpickr para parsear correctamente las fechas
+            var rowDateStatusObj = rowDateStatus ? flatpickr.parseDate(rowDateStatus, "d/m/Y H:i:s") : null;
+            var startDateStatusObj = startDateStatus ? flatpickr.parseDate(startDateStatus, "d/m/Y H:i:s") : null;
+            var endDateStatusObj = endDateStatus ? flatpickr.parseDate(endDateStatus, "d/m/Y H:i:s") : null;
+
+            // **Lógica de filtrado**
+            var statusMatch = (!startDateStatusObj || rowDateStatusObj >= startDateStatusObj) &&
+                            (!endDateStatusObj || rowDateStatusObj <= endDateStatusObj);
+
+            // **Filtro Driver Assigned Date**
+            var startDateDriverAssigned = $('#emptytrailerfilterinputstartdriverassigneddate').val();
+            var endDateDriverAssigned = $('#emptytrailerfilterinputenddriverassigneddate').val();
+            var rowDateDriverAssigned = data[11] || "";
+
+            var rowDateDriverAssignedObj = rowDateDriverAssigned ? flatpickr.parseDate(rowDateDriverAssigned, "d/m/Y H:i:s") : null;
+            var startDateDriverAssignedObj = startDateDriverAssigned ? flatpickr.parseDate(startDateDriverAssigned, "d/m/Y H:i:s") : null;
+            var endDateDriverAssignedObj = endDateDriverAssigned ? flatpickr.parseDate(endDateDriverAssigned, "d/m/Y H:i:s") : null;
+
+            var driverAssignedMatch = (!startDateDriverAssignedObj || rowDateDriverAssignedObj >= startDateDriverAssignedObj) &&
+                                    (!endDateDriverAssignedObj || rowDateDriverAssignedObj <= endDateDriverAssignedObj);
+
+            // **Filtro PUD**
+            var startDatePUD = $('#emptytrailerfilterinputstartpud').val();
+            var endDatePUD = $('#emptytrailerfilterinputendpud').val();
+            var rowDatePUD = data[12] || "";
+
+            var rowDatePUDObj = rowDatePUD ? flatpickr.parseDate(rowDatePUD, "d/m/Y H:i:s") : null;
+            var startDatePUDObj = startDatePUD ? flatpickr.parseDate(startDatePUD, "d/m/Y H:i:s") : null;
+            var endDatePUDObj = endDatePUD ? flatpickr.parseDate(endDatePUD, "d/m/Y H:i:s") : null;
+
+            var PUDMatch = (!startDatePUDObj || rowDatePUDObj >= startDatePUDObj) &&
+                        (!endDatePUDObj || rowDatePUDObj <= endDatePUDObj);
+
+            // **Filtro ITD**
+            var startDateITD = $('#emptytrailerfilterinputstartitd').val();
+            var endDateITD = $('#emptytrailerfilterinputenditd').val();
+            var rowDateITD = data[13] || "";
+
+            var rowDateITDObj = rowDateITD ? flatpickr.parseDate(rowDateITD, "d/m/Y H:i:s") : null;
+            var startDateITDObj = startDateITD ? flatpickr.parseDate(startDateITD, "d/m/Y H:i:s") : null;
+            var endDateITDObj = endDateITD ? flatpickr.parseDate(endDateITD, "d/m/Y H:i:s") : null;
+
+            var ITDMatch = (!startDateITDObj || rowDateITDObj >= startDateITDObj) &&
+                        (!endDateITDObj || rowDateITDObj <= endDateITDObj);
+
+            // **Filtro DRD**
+            var startDateDRD = $('#emptytrailerfilterinputstartdrd').val();
+            var endDateDRD = $('#emptytrailerfilterinputenddrd').val();
+            var rowDateDRD = data[14] || "";
+
+            var rowDateDRDObj = rowDateDRD ? flatpickr.parseDate(rowDateDRD, "d/m/Y H:i:s") : null;
+            var startDateDRDObj = startDateDRD ? flatpickr.parseDate(startDateDRD, "d/m/Y H:i:s") : null;
+            var endDateDRDObj = endDateDRD ? flatpickr.parseDate(endDateDRD, "d/m/Y H:i:s") : null;
+
+            var DRDMatch = (!startDateDRDObj || rowDateDRDObj >= startDateDRDObj) &&
+                        (!endDateDRDObj || rowDateDRDObj <= endDateDRDObj);
+
+            // **Filtro SYD**
+            var startDateSYD = $('#emptytrailerfilterinputstartsyd').val();
+            var endDateSYD = $('#emptytrailerfilterinputendsyd').val();
+            var rowDateSYD = data[15] || "";
+
+            var rowDateSYDObj = rowDateSYD ? flatpickr.parseDate(rowDateSYD, "d/m/Y H:i:s") : null;
+            var startDateSYDObj = startDateSYD ? flatpickr.parseDate(startDateSYD, "d/m/Y H:i:s") : null;
+            var endDateSYDObj = endDateSYD ? flatpickr.parseDate(endDateSYD, "d/m/Y H:i:s") : null;
+
+            var SYDMatch = (!startDateSYDObj || rowDateSYDObj >= startDateSYDObj) &&
+                        (!endDateSYDObj || rowDateSYDObj <= endDateSYDObj);
+
+            // **Filtro AED**
+            var startDateAED = $('#emptytrailerfilterinputstartaed').val();
+            var endDateAED = $('#emptytrailerfilterinputendaed').val();
+            var rowDateAED = data[16] || "";
+
+            var rowDateAEDObj = rowDateAED ? flatpickr.parseDate(rowDateAED, "d/m/Y H:i:s") : null;
+            var startDateAEDObj = startDateAED ? flatpickr.parseDate(startDateAED, "d/m/Y H:i:s") : null;
+            var endDateAEDObj = endDateAED ? flatpickr.parseDate(endDateAED, "d/m/Y H:i:s") : null;
+
+            var AEDMatch = (!startDateAEDObj || rowDateAEDObj >= startDateAEDObj) &&
+                        (!endDateAEDObj || rowDateAEDObj <= endDateAEDObj);
+
+            // **Filtro DOB**
+            var startDateDOB = $('#emptytrailerfilterinputstartdob').val();
+            var endDateDOB = $('#emptytrailerfilterinputenddob').val();
+            var rowDateDOB = data[17] || "";
+
+            var rowDateDOBObj = rowDateDOB ? flatpickr.parseDate(rowDateDOB, "d/m/Y H:i:s") : null;
+            var startDateDOBObj = startDateDOB ? flatpickr.parseDate(startDateDOB, "d/m/Y H:i:s") : null;
+            var endDateDOBObj = endDateDOB ? flatpickr.parseDate(endDateDOB, "d/m/Y H:i:s") : null;
+
+            var DOBMatch = (!startDateDOBObj || rowDateDOBObj >= startDateDOBObj) &&
+                        (!endDateDOBObj || rowDateDOBObj <= endDateDOBObj);
+
+            // **Filtro para emptytrailerfilterinputstartolt y emptytrailerfilterinputendolt**
+            var startTimeOLT = $('#emptytrailerfilterinputstartolt').val();
+            var endTimeOLT = $('#emptytrailerfilterinputendolt').val();
+            var rowTimeOLT = data[18] || "";  // Asume que la columna 5 contiene el valor de tiempo para OLT
+
+            // Convierte las fechas de tipo string en objetos Date
+            var rowTimeOLTObj = rowTimeOLT ? new Date("1970-01-01T" + rowTimeOLT + "Z") : null;
+            var startTimeOLTObj = startTimeOLT ? new Date("1970-01-01T" + startTimeOLT + "Z") : null;
+            var endTimeOLTObj = endTimeOLT ? new Date("1970-01-01T" + endTimeOLT + "Z") : null;
+
+            var oltMatch = (!startTimeOLTObj || rowTimeOLTObj >= startTimeOLTObj) &&
+                        (!endTimeOLTObj || rowTimeOLTObj <= endTimeOLTObj);
+
+
+            return statusMatch && oltMatch && driverAssignedMatch && PUDMatch && ITDMatch && DRDMatch && SYDMatch && AEDMatch && DOBMatch;
+        });
+
         const updatetab = document.getElementById("refreshwhetapprovaltable");
         // Función para manejar el estado de los botones (habilitar/deshabilitar)
         function toggleDateRangeButtons(startInputSelector, endInputSelector, closeButtonSelector, applyButtonSelector, divSelector) {
@@ -1295,19 +1725,25 @@ $(document).ready(function () {
                     // Actualiza los inputs del filtro con los valores de fecha seleccionados
                     $(startFilterInputSelector).val(startDate); // Actualiza el Start Date en el div de filtros
                     $(endFilterInputSelector).val(endDate); // Actualiza el End Date en el div de filtros
-                    updatetab.click();
+                    //Debe ir descomentado
+                    //updatetab.click();
+                    tablewhetaapproval.draw();
                 } else {
                     $(startFilterInputSelector).val(startDate); // Actualiza el Start Date en el div de filtros
                     $(endFilterInputSelector).val(endDate); // Actualiza el End Date en el div de filtros
                     $(divSelector).show(); // Muestra el div del filtro
-                    updatetab.click();
+                    //debe ir descomentado
+                    //updatetab.click();
+                    tablewhetaapproval.draw();
                 }
             } else {
                 $(startFilterInputSelector).val(''); // Limpia el input del Start Date asociado al filtro
                 $(endFilterInputSelector).val(''); // Limpia el input del End Date asociado al filtro
+                tablewhetaapproval.draw();
                 $(divSelector).hide(); // Oculta el div del filtro
                 $(closeButtonSelector).click(); // Simula un clic en Collapse
-                updatetab.click();
+                //Deberia ir descomentado
+                //updatetab.click();
             }
             toggleDateRangeButtons(startInputSelector, endInputSelector, closeButtonSelector, applyButtonSelector, divSelector);
         }
@@ -1320,7 +1756,9 @@ $(document).ready(function () {
             $(closeButtonSelector).prop('disabled', false); // Habilita el botón Collapse
             $(closeButtonSelector).click(); // Simula un clic en Collapse
             $(applyButtonSelector).prop('disabled', true); // Deshabilita el botón Apply
-            updatetab.click();
+            //Deberia ir descomentado
+            //updatetab.click();
+            tablewhetaapproval.draw();
         }
     
         // Función para manejar clics en botones de cerrar Collapse
@@ -1329,7 +1767,9 @@ $(document).ready(function () {
                 $(startFilterInputSelector).val(''); // Limpia el Start Date del filtro
                 $(endFilterInputSelector).val(''); // Limpia el End Date del filtro
                 if ($(divSelector).is(":visible")) {
-                    updatetab.click();
+                    //Deberia ir descomentado
+                    //updatetab.click();
+                    tablewhetaapproval.draw();
                     $(applyButtonSelector).prop('disabled', true); // Deshabilita el botón Apply
                 } 
                 $(divSelector).hide(); // Oculta el div del filtro
