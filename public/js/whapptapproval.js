@@ -1,7 +1,7 @@
 var tablewhetaapproval;  // Declara la variable de la tabla fuera de cualquier document.ready
 
 
-document.getElementById('exportfile').addEventListener('click', function () {
+/*document.getElementById('exportfile').addEventListener('click', function () {
     // Obtén la tabla con el id "table_wh_eta_approval_shipments"
     var table = document.getElementById('table_wh_eta_approval_shipments');
     
@@ -41,7 +41,62 @@ document.getElementById('exportfile').addEventListener('click', function () {
 
     // Exporta el archivo Excel con el nombre apropiado
     XLSX.writeFile(wb, filename);
+});*/
+
+document.getElementById('exportfile').addEventListener('click', async function () {
+    // Obtén la tabla con el id "table_wh_eta_approval_shipments"
+    var table = document.getElementById('table_wh_eta_approval_shipments');
+
+    // Crear un nuevo libro de Excel
+    var wb = new ExcelJS.Workbook();
+    var ws = wb.addWorksheet("WHApptApprovalShipments");
+
+    // Obtener los datos de la tabla
+    var rows = table.rows;
+
+    // Copiar las filas de la tabla a la hoja de trabajo
+    for (var i = 0; i < rows.length; i++) {
+        var row = rows[i];
+        var rowData = [];
+        for (var j = 0; j < row.cells.length; j++) {
+            rowData.push(row.cells[j].innerText); // Obtener el texto de cada celda
+        }
+        ws.addRow(rowData);
+    }
+
+    // Formatear la tercera columna (índice 2) para que sea m/d/yyyy h:mm:ss AM/PM
+    ws.getColumn(3).eachCell(function (cell, rowNumber) {
+        if (rowNumber > 1) { // Evitar el encabezado
+            var date = new Date(cell.value);
+            if (date instanceof Date && !isNaN(date)) {
+                // Establecer el formato de la fecha y hora como m/d/yyyy h:mm:ss AM/PM
+                cell.numFmt = 'm/d/yyyy h:mm:ss AM/PM';
+            }
+        }
+    });
+
+    // Crear un nombre de archivo basado en la fecha y hora actual
+    var now = new Date();
+    var year = now.getFullYear();
+    var month = String(now.getMonth() + 1).padStart(2, '0');
+    var day = String(now.getDate()).padStart(2, '0');
+    var hours = String(now.getHours()).padStart(2, '0');
+    var minutes = String(now.getMinutes()).padStart(2, '0');
+    var seconds = String(now.getSeconds()).padStart(2, '0');
+
+    var formattedDateTime = `${month}${day}${year}_${hours}-${minutes}-${seconds}`;
+    var filename = `WHApptApprovalShipments_${formattedDateTime}.xlsx`;
+
+    // Exportar el archivo Excel
+    wb.xlsx.writeBuffer().then(function (buffer) {
+        var blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        var link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        link.click();
+    });
 });
+
 
 // Inicializar los tooltips solo para los elementos con la clase memingo
 document.addEventListener('DOMContentLoaded', function () {

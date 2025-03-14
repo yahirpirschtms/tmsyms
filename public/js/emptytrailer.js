@@ -1000,6 +1000,73 @@ $(document).ready(function () {
 });
 
 document.getElementById('exportfile').addEventListener('click', function () {
+    var table = document.getElementById('table_empty_trailers');
+    
+    // Crear un nuevo libro de Excel
+    var wb = new ExcelJS.Workbook();
+    var ws = wb.addWorksheet('EmptyTrailers');
+    
+    // Obtener los datos de la tabla
+    var rows = table.rows;
+    
+    // Copiar las filas de la tabla a la hoja de trabajo
+    for (var i = 0; i < rows.length; i++) {
+        var row = rows[i];
+        var rowData = [];
+        for (var j = 0; j < row.cells.length; j++) {
+            rowData.push(row.cells[j].innerText); // Obtener el texto de cada celda
+        }
+        ws.addRow(rowData);
+    }
+
+    // Formatear la columna 2 (índice 1) para que sea m/d/yyyy sin hora
+    ws.getColumn(2).eachCell(function (cell, rowNumber) {
+        if (rowNumber > 1) { // Evitar el encabezado
+            var date = new Date(cell.value);
+            if (date instanceof Date && !isNaN(date)) {
+                // Establecer el formato de la fecha como m/d/yyyy (sin hora)
+                cell.numFmt = 'm/d/yyyy';
+            }
+        }
+    });
+
+    // Formatear las columnas 7, 8, 9 (índices 6, 7, 8) para que sea m/d/yyyy h:mm:ss AM/PM
+    [7, 8, 9].forEach(function (colIndex) {
+        ws.getColumn(colIndex).eachCell(function (cell, rowNumber) {
+            if (rowNumber > 1) { // Evitar el encabezado
+                var date = new Date(cell.value);
+                if (date instanceof Date && !isNaN(date)) {
+                    // Establecer el formato de la fecha y hora como m/d/yyyy h:mm:ss AM/PM
+                    cell.numFmt = 'm/d/yyyy h:mm:ss AM/PM';
+                }
+            }
+        });
+    });
+
+    // Crear un nombre de archivo basado en la fecha y hora actual
+    var now = new Date();
+    var year = now.getFullYear();
+    var month = String(now.getMonth() + 1).padStart(2, '0');
+    var day = String(now.getDate()).padStart(2, '0');
+    var hours = String(now.getHours()).padStart(2, '0');
+    var minutes = String(now.getMinutes()).padStart(2, '0');
+    var seconds = String(now.getSeconds()).padStart(2, '0');
+
+    var formattedDateTime = `${month}${day}${year}_${hours}-${minutes}-${seconds}`;
+    var filename = `EmptyTrailers_${formattedDateTime}.xlsx`;
+
+    // Exportar el archivo Excel
+    wb.xlsx.writeBuffer().then(function (buffer) {
+        var blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        var link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        link.click();
+    });
+});
+
+/*
+document.getElementById('exportfile').addEventListener('click', function () {
     // Obtén la tabla con el id "table_empty_trailers"
     var table = document.getElementById('table_empty_trailers');
     
@@ -1052,7 +1119,7 @@ document.getElementById('exportfile').addEventListener('click', function () {
     // Exporta el archivo Excel
     XLSX.writeFile(wb, filename);
 });
-
+*/
 // Inicializar los tooltips solo para los elementos con la clase memingo
 document.addEventListener('DOMContentLoaded', function () {
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
