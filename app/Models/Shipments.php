@@ -67,7 +67,16 @@ class Shipments extends Model
         'billing_date',
         'offloading_time',
         'billing_id',
-        'billing_date'
+        'billing_date',
+        'lane',
+        'security_company_id',
+        'tracker1',
+        'tracker2',
+        'tracker3',
+        'have_trackers',
+        'security_company',
+        'door_number',
+        'dock_door_date'
     ];
 
 
