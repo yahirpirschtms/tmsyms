@@ -150,8 +150,8 @@
                             <div class="col">
                                 <div class="collapse multi-collapse" id="multiCollapsdestinationfilter">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" value="Miami" id="destinationMiami">
-                                        <label class="form-check-label" for="destinationMiami">Miami</label>
+                                        <input class="form-check-input" type="checkbox" value="TMS Miami" id="destinationMiami">
+                                        <label class="form-check-label" for="destinationMiami">TMS Miami</label>
                                     </div>
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" value="On Time Forwarding" id="destinationOnTimeForwarding">
@@ -641,6 +641,7 @@
                         </div>
 
                         <!-- Filtro por Security Company -->
+                        <!-- Filtro por Security Company -->
                         <div>
                             <button class="btn btn-primary w-100 mb-2" id="closeapplysecuritycompanyfilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapseSecurityCompanyFilter" aria-expanded="false" aria-controls="multiCollapseSecurityCompanyFilter">
                                 Security Company
@@ -648,7 +649,14 @@
                             <div class="row mb-2">
                                 <div class="col">
                                     <div class="collapse multi-collapse" id="multiCollapseSecurityCompanyFilter">
-                                        <input type="text" class="form-control" id="inputapplysecuritycompanyfilter">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="Overhaul" id="securityCompanyOverhaul">
+                                            <label class="form-check-label" for="securityCompanyOverhaul">Overhaul</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="LogRisk" id="securityCompanyLogRisk">
+                                            <label class="form-check-label" for="securityCompanyLogRisk">LogRisk</label>
+                                        </div>
                                         <button class="btn btn-primary mt-2 filterapply" type="button" id="applysecuritycompanyfilter">Apply</button>
                                     </div>
                                 </div>
@@ -718,9 +726,9 @@
                             <td>{{ $shipment->stm_id ?? '' }}</td>
                             <td>{{ $shipment->secondary_shipment_id ?? '' }}</td>
                             <td>{{ $shipment->reference ?? '' }}</td>
-                            <td>{{ $shipment->origin ?? '' }}</td>
+                            <td>{{ $shipment->services->from ?? '' }}</td>
                             <td>{{ $shipment->id_trailer ?? '' }}</td>
-                            <td>{{ $shipment->destination ?? '' }}</td>
+                            <td>{{ $shipment->services->to ?? '' }}</td>
                             <td>{{ $shipment->pre_alerted_datetime ? \Carbon\Carbon::parse($shipment->pre_alerted_datetime)->format('m/d/Y H:i') : '' }}</td>
                             <td>{{ $shipment->company->CoName ?? '' }}</td>
                             <td>{{ $shipment->trailer ?? '' }}</td>
@@ -752,7 +760,7 @@
                             <td>{{ $shipment->tracker2 ?? '' }}</td>
                             <td>{{ $shipment->tracker3 ?? '' }}</td>
                             <td>{{ $shipment->security_company_id ?? '' }}</td>
-                            <td>{{ $shipment->security_company ?? '' }}</td>
+                            <td>{{ $shipment->securityCompany->gntc_description ?? '' }}</td>
                         @endforeach
                     </tbody>
                 </table>
@@ -1488,7 +1496,9 @@ document.addEventListener("DOMContentLoaded", function () {
         applyFilter('inputapplytracker2filter', 'applytracker2filter', 35, 'Tracker 2');
         applyFilter('inputapplytracker3filter', 'applytracker3filter', 36, 'Tracker 3');
         applyFilter('inputapplysecuritycompanyidfilter', 'applysecuritycompanyidfilter', 37, 'Security Company ID');
-        applyFilter('inputapplysecuritycompanyfilter', 'applysecuritycompanyfilter', 38, 'Security Company');
+        applyCheckboxFilter([
+            'securityCompanyOverhaul', 'securityCompanyLogRisk'
+        ], 'applysecuritycompanyfilter', 38, 'Security Company');
 
         applyCheckboxFilter([
             'trailerOwnerNWT', 'trailerOwnerESTrucking', 'trailerOwnerMiamiCargoCorp', 'trailerOwnerDKTransport', 'trailerOwnerEmpty',

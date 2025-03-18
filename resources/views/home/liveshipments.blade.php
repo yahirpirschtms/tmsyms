@@ -247,13 +247,13 @@
                            <!-- Origin -->
                             <div class="mb-3">
                                 <label for="origin-{{ $shipment->stm_id }}" class="form-label">Origin</label>
-                                <input type="text" class="form-control" id="origin-{{ $shipment->stm_id }}" name="origin" value="{{ $shipment->origin }}" readonly>
+                                <input type="text" class="form-control" id="origin-{{ $shipment->stm_id }}" name="origin" value="{{ $shipment->services->from ?? '' }}" readonly>
                             </div>
 
                             <!-- Destination -->
                             <div class="mb-3">
                                 <label for="destination-{{ $shipment->stm_id }}" class="form-label">Destination</label>
-                                <input type="text" class="form-control" id="destination-{{ $shipment->stm_id }}" name="destination" value="{{ $shipment->destination }}" readonly>
+                                <input type="text" class="form-control" id="destination-{{ $shipment->stm_id }}" name="destination" value="{{ $shipment->services->to ?? '' }}" readonly>
                             </div>
 
                             <div class="mb-3">
@@ -456,12 +456,12 @@
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Origin</label>
-                                    <p>{{ $shipment->origin ?? 'Origin not available' }}</p>
+                                    <p>{{ $shipment->services->from ?? 'Origin not available' }}</p>
                                 </div>
 
                                 <div class="mb-3">
                                     <label class="form-label">Destination</label>
-                                    <p>{{ $shipment->destination ?? 'Not available' }}</p>
+                                    <p>{{ $shipment->services->to ?? 'Not available' }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Pre-Alerted Date & Time</label>
