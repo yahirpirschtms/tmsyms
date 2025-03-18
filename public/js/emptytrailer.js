@@ -15,6 +15,7 @@ $(document).ready(function () {
         table.page.len(-1).draw();  // Muestra todos los registros sin paginación
     }
 
+    $('#searchemptytrailergeneral').val(''); // Vaciar el input
     updateTrailerTable(); // Llamar a la función para actualizar la tabla
     
     function applycarriers(){
