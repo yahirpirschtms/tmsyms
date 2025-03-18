@@ -755,6 +755,16 @@ $(document).ready(function () {
             // Restaurar el título al cerrar el canvas
             document.getElementById('whetaapprovaloffcanvas').addEventListener('hidden.bs.offcanvas', function () {
                 titleElement.textContent = originalTitle; // Restaurar el título original
+                $('#whetainputapproveddoornumber').val(null).trigger('change');  // Restablecer el valor del select
+
+                const field = document.getElementById("whetainputapproveddoornumber");
+                const errorElement = document.getElementById("error-whetainputapproveddoornumber");
+
+                if ($(field).hasClass("searchdoornumberwheta")) {
+                        field.classList.remove('is-invalid'); // Remueve la clase en el select
+                        errorElement.textContent = ''; // Limpia el mensaje de error
+                        $(field).next('.select2-container').find('.select2-selection').removeClass("is-invalid"); // Remueve la clase en el contenedor visual
+                }
             });
         } else {
             // Mostrar SweetAlert si no se encuentra el tráiler
