@@ -64,16 +64,10 @@
                     </ul>
                   </li>
 
-                  <!--options Maintenance-->
-                  <!--<li class="nav-item dropdown ">
-                    <a class="nav-link text-light" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                      Maintenance
-                    </a>
-                    <ul class="ms-4 dropdown-menu dropdown-menu-start" style="background-color: #1e4877; border:none">
-                      <li><a class="dropdown-item  text-light" href="#">Maintenance Done</a></li>
-                      <li><a class="dropdown-item  text-light" href="#">Truck Maintenance</a></li>
-                    </ul>
-                  </li>-->
+                  <!--Trailer Status-->
+                  <li class="nav-item ">
+                    <a class="nav-link mx-lg-2 text-light" aria-current="page" href="{{ route('dashboard') }}">Dashboard</a>
+                  </li>
 
                 </ul>
               </div>
