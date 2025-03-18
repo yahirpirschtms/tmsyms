@@ -299,8 +299,8 @@
                                 <label for="driver-{{ $shipment->stm_id }}" class="form-label">Driver</label>
                                 <select class="form-select" id="driver-{{ $shipment->stm_id }}" name="id_driver" data-original="{{ $shipment->id_driver }}">
                                     @foreach ($drivers as $driver)
-                                        <option value="{{ $driver->id_driver }}"
-                                            {{ old('id_driver', $shipment->id_driver) == $driver->id_driver ? 'selected' : '' }}>
+                                        <option value="{{ $driver->pk_driver }}"
+                                            {{ old('id_driver', $shipment->id_driver) == $driver->pk_driver ? 'selected' : '' }}>
                                             {{ $driver->drivername }}
                                         </option>
                                     @endforeach
