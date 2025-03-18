@@ -100,42 +100,131 @@ $(document).ready(function () {
     LoadCurrentStatus();
 
     //Busqueda de Driver en un nuevo registro
+    var selectedsecuritycompanies = []; // Arreglo para almacenar todos los drivers seleccionados
+
+    var isSecurityCompaniesLoaded = false; // Bandera para controlar la carga
+
+    loadSecurityCompaniesOnce();
+    
+    function loadSecurityCompaniesOnce() {
+        if (isSecurityCompaniesLoaded) return; // Evita cargar dos veces
+    
+        $.ajax({
+            url:'/securitycompany-shipment', 
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                var securityCompaniesData = data.map(item => ({
+                    id: item.gnct_id,
+                    text: item.gntc_value
+                }));
+                data.forEach(function (securitycompanies) {
+                    if (!selectedsecuritycompanies.includes(securitycompanies.gntc_value)) {
+                        selectedsecuritycompanies.push(securitycompanies.gntc_value); // Agregar al arreglo si no está ya
+                    }
+                });
+                console.log("Security Companies cargados desde la base de datos:", selectedsecuritycompanies);
+    
+                // Inicializar Select2 sin AJAX
+                $('#inputshipmentsecuritycompany').select2({
+                    placeholder: 'Select a Security Company',
+                    allowClear: true,
+                    tags: false, // Permite agregar nuevas opciones
+                    data: securityCompaniesData, // Pasar los datos directamente
+                    minimumInputLength: 0
+                });
+    
+                isSecurityCompaniesLoaded = true; // Marcar como cargado
+            },
+            error: function (xhr, status, error) {
+                console.error('Error al cargar las Security Companies:', error);
+            }
+        });
+    }
+
+    //Busqueda de Driver en un nuevo registro
     var carrierRoute = $('#inputshipmentdriver').data('url');
     var newlyCreatedCarrierId = null; // Variable para almacenar el ID del carrier recién creado
     var selectedDrivers = []; // Arreglo para almacenar todos los drivers seleccionados
 
-    function loadDriversAjax() {
-        $('#inputshipmentdriver').select2({
-            placeholder: 'Select or enter a New Driver',
-            allowClear: true,
-            tags: true, // Permite agregar nuevas opciones
-            //dropdownParent: $('#newtrailerempty'),
-            ajax: {
-                url: carrierRoute,
-                dataType: 'json',
-                delay: 250,
-                data: function (params) {
-                    return {
-                        search: params.term || '' // Si no hay texto, envía un string vacío
-                    };
-                },
-                processResults: function (data) {
-                    return {
-                        results: data.map(item => ({
-                            id: item.pk_driver,
-                            text: item.drivername
-                        }))
-                    };
-                },
-                cache: true
+    var isDriversLoaded = false; // Bandera para controlar la carga
+
+    loadDriversOnce();
+    
+    function loadDriversOnce() {
+        if (isDriversLoaded) return; // Evita cargar dos veces
+    
+        $.ajax({
+            url:'/drivers-shipment', 
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                var driversData = data.map(driver => ({
+                    id: driver.pk_driver,
+                    text: driver.drivername
+                }));
+                data.forEach(function (driver) {
+                    if (!selectedDrivers.includes(driver.drivername)) {
+                        selectedDrivers.push(driver.drivername); // Agregar al arreglo si no está ya
+                    }
+                });
+                console.log("Drivers cargados desde la base de datos:", selectedDrivers);
+    
+                // Inicializar Select2 sin AJAX
+                $('#inputshipmentdriver').select2({
+                    placeholder: 'Select or enter a New Driver',
+                    allowClear: true,
+                    tags: true, // Permite agregar nuevas opciones
+                    data: driversData, // Pasar los datos directamente
+                    minimumInputLength: 0
+                });
+    
+                isDriversLoaded = true; // Marcar como cargado
             },
-            minimumInputLength: 0
+            error: function (xhr, status, error) {
+                console.error('Error al cargar los drivers:', error);
+            }
         });
     }
+    /*loadDriversAjax();
 
-    loadDriversAjax();
+    function loadDriversAjax() {
+        if (isDriversLoaded) return; // Si ya se ejecutó, salir de la función
+        
+        if (!$('#inputshipmentdriver').hasClass("select2-hidden-accessible")) {
+            console.log("lo vilvio a hacer")
+            $('#inputshipmentdriver').select2({
+                placeholder: 'Select or enter a New Driver',
+                allowClear: true,
+                tags: true, // Permite agregar nuevas opciones
+                //dropdownParent: $('#newtrailerempty'),
+                ajax: {
+                    url: carrierRoute,
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            search: params.term || '' // Si no hay texto, envía un string vacío
+                        };
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data.map(item => ({
+                                id: item.pk_driver,
+                                text: item.drivername
+                            }))
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength:0
+            });    
+        }
+        isDriversLoaded = true; // Marcar como cargado
+    }*/
+
     // Cargar los drivers existentes de la base de datos
-    $.ajax({
+    /*$.ajax({
         url: '/drivers-shipment',  // Ruta que manejará la carga de los drivers existentes
         type: 'GET',
         dataType: 'json',
@@ -150,7 +239,7 @@ $(document).ready(function () {
         error: function (xhr, status, error) {
             console.error('Error al cargar los drivers existentes:', error);
         }
-    });
+    });*/
 
     // Actualizar la lista cuando se haga clic en el select
     /*$('#inputshipmentdriver').on('click', function () {
@@ -336,7 +425,7 @@ $(document).ready(function () {
 //Cargar Carries en la pantalla de registro de shipments
 $(document).ready(function () {
     var selectedCarriers = []; // Arreglo para almacenar todos los carriers seleccionados
-    $.ajax({
+    /*$.ajax({
         url: 'carrier-emptytrailerAjax',  // Ruta que manejará la carga de los drivers existentes
         type: 'GET',
         dataType: 'json',
@@ -351,7 +440,7 @@ $(document).ready(function () {
         error: function (xhr, status, error) {
             console.error('Error al cargar los Carriers existentes:', error);
         }
-    });
+    });*/
 
     var newlyCreatedCarrierId = null; // Asegúrate de que esta variable esté definida al inicio
     var carrierRoute = $('#inputshipmentcarrier').data('url');
@@ -381,8 +470,47 @@ $(document).ready(function () {
             }
         });
     }
+
+    var isCarriersLoaded = false; // Bandera para controlar la carga
     
-    loadCarriersShipment();
+    loadCarriersShipmentOnce();
+
+    function loadCarriersShipmentOnce() {
+        if (isCarriersLoaded) return; // Evita cargar dos veces
+    
+        $.ajax({
+            url:'carrier-emptytrailerAjax',
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                var carriersData = data.map(item => ({
+                    id: item.pk_company,
+                    text: item.CoName
+                }));
+                data.forEach(function (carrier) {
+                    if (!selectedCarriers.includes(carrier.CoName)) {
+                        selectedCarriers.push(carrier.CoName); // Agregar al arreglo si no está ya
+                    }
+                });
+                console.log("Carriers cargados desde la base de datos:", selectedCarriers);
+    
+                // Inicializar Select2 sin AJAX
+                $('#inputshipmentcarrier').select2({
+                    placeholder: 'Select a Carrier',
+                    allowClear: true,
+                    tags: false, // Permite agregar nuevas opciones
+                    data: carriersData, // Pasar los datos directamente
+                    minimumInputLength: 0
+                });
+    
+                isCarriersLoaded = true; // Marcar como cargado
+            },
+            error: function (xhr, status, error) {
+                console.error('Error al cargar los carriers:', error);
+            }
+        });
+    }
+    /*loadCarriersShipment();
 
     function loadCarriersShipment() {
         $('#inputshipmentcarrier').select2({
@@ -419,7 +547,7 @@ $(document).ready(function () {
                 $('#inputshipmentcarrier').val(selectedCarrierId).trigger('change');
             }
         }, 500); // Ajusta el tiempo según lo necesario para asegurar que los datos estén listos
-    }
+    }*/
 
     // Actualizar la lista cuando se haga clic en el select
     /*$('#inputshipmentcarrier').on('click', function () {
@@ -466,7 +594,7 @@ $(document).ready(function () {
 
                 // Marcar el nuevo ID para evitar que se haga otra solicitud
                 newlyCreatedCarrierId = response.newCarrier.CoName;
-                loadCarriersShipment();
+                //loadCarriersShipment();
 
                 // Cuando el nuevo carrier sea creado, aseguramos que no se haga más AJAX para este carrier
                 $('#inputshipmentcarrier').on('select2:select', function (e) {
@@ -639,7 +767,7 @@ $(document).ready(function () {
 //Cargar TrailerOwners en la pantalla de registro de shipments
 $(document).ready(function () {
     var selectedTrailerOwners = []; // Arreglo para almacenar todos los Trailer Owners seleccionados
-    $.ajax({
+    /*$.ajax({
         url: 'trailerowner-emptytrailerAjax',  // Ruta que manejará la carga de los drivers existentes
         type: 'GET',
         dataType: 'json',
@@ -654,7 +782,7 @@ $(document).ready(function () {
         error: function (xhr, status, error) {
             console.error('Error al cargar los Trailer Owners existentes:', error);
         }
-    });
+    });*/
     
     var newlyCreatedCarrierId = null; // Asegúrate de que esta variable esté definida al inicio
     var carrierRoute = $('#inputshipmenttrailer').data('url');
@@ -685,8 +813,48 @@ $(document).ready(function () {
             }
         });
     }
+
+    var isTrailerOwnersLoaded = false; // Bandera para controlar la carga
     
-    loadTrailerOwnersShipment();
+    loadTrailerOwnersShipmentOnce();
+
+    function loadTrailerOwnersShipmentOnce() {
+        if (isTrailerOwnersLoaded) return; // Evita cargar dos veces
+    
+        $.ajax({
+            url:'trailerowner-emptytrailerAjax',
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                var trailerOwnersData = data.map(item => ({
+                    id: item.pk_company,
+                    text: item.CoName
+                }));
+                data.forEach(function (carrier) {
+                    if (!selectedTrailerOwners.includes(carrier.CoName)) {
+                        selectedTrailerOwners.push(carrier.CoName); // Agregar al arreglo si no está ya
+                    }
+                });
+                console.log("Trailer Owners cargados desde la base de datos:", selectedTrailerOwners);
+    
+                // Inicializar Select2 sin AJAX
+                $('#inputshipmenttrailer').select2({
+                    placeholder: 'Select a Trailer Owner',
+                    allowClear: true,
+                    tags: false, // Permite agregar nuevas opciones
+                    data: trailerOwnersData, // Pasar los datos directamente
+                    minimumInputLength: 0
+                });
+    
+                isTrailerOwnersLoaded = true; // Marcar como cargado
+            },
+            error: function (xhr, status, error) {
+                console.error('Error al cargar los TrailerOwners:', error);
+            }
+        });
+    }
+    
+    /*loadTrailerOwnersShipment();
 
     function loadTrailerOwnersShipment() {
         $('#inputshipmenttrailer').select2({
@@ -723,7 +891,7 @@ $(document).ready(function () {
                 $('#inputshipmenttrailer').val(selectedCarrierId).trigger('change');
             }
         }, 500); // Ajusta el tiempo según lo necesario para asegurar que los datos estén listos
-    }
+    }*/
 
     // Actualizar la lista cuando se haga clic en el select
     /*$('#inputshipmenttrailer').on('click', function () {
@@ -770,7 +938,7 @@ $(document).ready(function () {
 
                 // Marcar el nuevo ID para evitar que se haga otra solicitud
                 newlyCreatedCarrierId = response.newCarrier.CoName;
-                loadTrailerOwnersShipment();
+                //loadTrailerOwnersShipment();
 
                 // Cuando el nuevo carrier sea creado, aseguramos que no se haga más AJAX para este carrier
                 $('#inputshipmenttrailer').on('select2:select', function (e) {
@@ -1286,8 +1454,90 @@ $(document).ready(function() {
 
     //Crear nuevo Shipment
     $(document).ready(function() {
+
+        // Evento cuando se borra la selección con la "X"
+        $('#inputshipmentsecuritycompany').on('select2:clear', function() {
+            const field = $(this);
+            const errorContainer = field.parent().find('.invalid-feedback');
+
+            field.addClass('is-invalid'); // Agregar borde rojo
+            field.next('.select2-container').find('.select2-selection').addClass('is-invalid');
+            errorContainer.text('Security Company is required.'); // Mostrar mensaje de error
+        });
+
+        // Si selecciona un valor válido, eliminar error
+        $('#inputshipmentsecuritycompany').on('select2:select', function() {
+            const field = $(this);
+            const errorContainer = field.parent().find('.invalid-feedback');
+
+            field.removeClass('is-invalid'); // Quitar borde rojo
+            field.next('.select2-container').find('.select2-selection').removeClass('is-invalid');
+            errorContainer.text(''); // Borrar mensaje de error
+        });
+
+        let trackerCount = 0; // Contador de trackers visibles
+
+        // Template HTML para los inputs con IDs diferenciados
+        const trackerTemplate = (trackerNumber) => {
+            return `
+                <div class="mb-3 tracker-container" id="tracker-container-${trackerNumber}">
+                    <label for="tracker${trackerNumber}" class="form-label">Shipment Tracker ${trackerNumber}</label>
+                    <input type="text" class="form-control" id="tracker${trackerNumber}" name="tracker${trackerNumber}">
+                    <div class="invalid-feedback"></div>
+                </div>
+            `;
+        };
+
+        // Añadir un tracker
+        $('#addtrackers').on('click', function() {
+            if (trackerCount < 3) {
+                trackerCount++; // Incrementar el contador
+                $('.trackers-container').append(trackerTemplate(trackerCount));
+
+                // Si ya se han mostrado 3, deshabilitar el botón "Add Tracker"
+                if (trackerCount === 3) {
+                    $('#addtrackers').prop('disabled', true);
+                }
+
+                // Habilitar el botón "Remove Tracker" cuando haya al menos un tracker visible
+                if (trackerCount > 0) {
+                    $('#removetrackers').prop('disabled', false);
+                }
+            }
+        });
+
+        // Eliminar un tracker y limpiar su contenido
+        $('#removetrackers').on('click', function() {
+            if (trackerCount > 0) {
+                // Obtener el input del último tracker antes de eliminarlo
+                const inputField = $('#tracker' + trackerCount);
+                
+                // Limpiar el valor del input
+                inputField.val('');
+
+                // Remover clases de error si las tenía
+                inputField.removeClass('is-invalid');
+                inputField.next('.invalid-feedback').text('');
+
+                // Eliminar el contenedor del tracker
+                $('#tracker-container-' + trackerCount).remove();
+
+                trackerCount--; // Decrementar el contador
+            }
+
+            // Habilitar el botón "Add Tracker" si se ocultaron todos los inputs
+            if (trackerCount < 3) {
+                $('#addtrackers').prop('disabled', false);
+            }
+
+            // Deshabilitar el botón "Remove Tracker" si no hay trackers visibles
+            if (trackerCount === 0) {
+                $('#removetrackers').prop('disabled', true);
+            }
+        });
+
         // Validación en vivo cuando el usuario interactúa con los campos
-        $('input, select').on('input change', function() {
+        $('#createnewshipmentform').on('input change', 'input, select', function() {
             const field = $(this);
             const fieldName = field.attr('name');
             const errorContainer = field.next('.invalid-feedback');
@@ -1445,74 +1695,141 @@ $(document).ready(function() {
                     errorContainer.text('The number of pallets cannot be greater than the number of shipment units.');
                 }
             }
-            /*if (fieldName === 'inputshipmentsecurityseals' && field.val().trim().length === 0) {
+            if (fieldName === 'tracker1' && field.val().trim().length === 0) {
                 field.addClass('is-invalid');
-                errorContainer.text('Security seals are required.');
-            }*/
-            /*if (fieldName === 'inputshipmentdevicenumber' && field.val().trim().length === 0) {
+                errorContainer.text('Tracker one is required.');
+            }
+            if (fieldName === 'tracker2' && field.val().trim().length === 0) {
                 field.addClass('is-invalid');
-                errorContainer.text('Device number is required.');
-            }*/
-            /*if (fieldName === 'inputshipmentoverhaulid' && field.val().trim().length === 0) {
+                errorContainer.text('Tracker two is required.');
+            }
+            if (fieldName === 'tracker3' && field.val().trim().length === 0) {
                 field.addClass('is-invalid');
-                errorContainer.text('Overhaul ID is required.');
-            }*/
+                errorContainer.text('Tracker three is required.');
+            }
         });
     
         // Cuando el formulario se envía (al hacer clic en Save)
         $('#createnewshipmentform').submit(function(e) {
             e.preventDefault(); // Evita el envío del formulario
-    
-            const saveButton = $('#saveButtonShipment');
-            const url = saveButton.data('url'); // URL para la petición AJAX
-            let formData = new FormData(this);
-    
-            $.ajax({
-                url: url,
-                type: 'POST',
-                data: formData,
-                contentType: false,
-                processData: false,
-                success: function(response) {
-                    // Si la respuesta es exitosa, mostrar el mensaje de éxito
-                    Swal.fire({
-                        icon: 'success',
-                        title: '¡Succes!',
-                        text: 'Shipment created successfully.',
-                        confirmButtonText: 'Ok'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            // Redirige directamente a la URL de tu vista
-                            window.location.href = '/whapptapproval';
-                        }
-                    });
-                    //$('#closenewtrailerregister').click();
-                    //$('#refreshemptytrailertable').click();
-                },
-                error: function(xhr, status, error) {
-                    // Limpia los errores anteriores
-                    $('input, select').removeClass('is-invalid');
-                    $('.invalid-feedback').text('');
-                    
-                    // Manejo de errores con SweetAlert2
-                    let errors = xhr.responseJSON.errors;
-                    for (let field in errors) {
-                        const inputField = $('#' + field);
-                        const errorContainer = inputField.next('.invalid-feedback');
-                        
-                        inputField.addClass('is-invalid');  // Marca el campo con error
-                        errorContainer.text(errors[field][0]); // Muestra el error correspondiente
-                    }
-    
-                    // Si hubo un error en el servidor, muestra una alerta
-                    Swal.fire({
-                        icon: 'error',
-                        title: '¡Error!',
-                        text: 'There was a problem adding the shipment. Please try again.',
-                        confirmButtonText: 'Ok'
-                    });
+
+            let hasTracker = false;
+            $('.trackers-container input').each(function() {
+                if ($(this).val().trim().length > 0) {
+                    hasTracker = true; // Si al menos uno tiene valor, marcar como verdadero
                 }
             });
+
+             // Si no hay trackers
+            if (!hasTracker) {
+                // Mostrar alerta de SweetAlert para confirmar si realmente no tiene tracker
+                Swal.fire({
+                    title: 'Shipment Trackers',
+                    text: "The shipment does not have a tracker?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'No'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Si responde que sí, se ejecuta el guardado del shipment
+                        sendShipmentForm();  // Función que realiza el envío del formulario
+                    } else {
+                        // Si responde que no, se regresa al formulario sin guardar
+                        // No hacer nada, el formulario no se enviará
+                    }
+                });
+            } else {
+                // Si hay trackers, continuar con el envío
+                sendShipmentForm(); // Función que realiza el envío del formulario
+            }
+            function sendShipmentForm() {
+
+                const saveButton = $('#saveButtonShipment');
+                const url = saveButton.data('url'); // URL para la petición AJAX
+                //let formData = new FormData(this);
+                let formData = new FormData($('#createnewshipmentform')[0]);
+
+                // Obtener todos los inputs de trackers dinámicos y agregarlos individualmente a formData
+                $('.trackers-container input').each(function(index, input) {
+                    formData.append(`tracker${index + 1}`, $(input).val()); // Se envía como tracker1, tracker2, etc.
+                });
+        
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        // Si la respuesta es exitosa, mostrar el mensaje de éxito
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Succes!',
+                            text: 'Shipment created successfully.',
+                            confirmButtonText: 'Ok'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Redirige directamente a la URL de tu vista
+                                //window.location.href = '/whapptapproval';
+
+                                // Restablece el formulario
+                                $('#createnewshipmentform')[0].reset();
+
+                                $('#inputshipmentcarrier, #inputshipmentdriver, #inputshipmenttrailer, #inputpallets, #inputidtrailer, #inputshipmentsecuritycompany').val(null).trigger('change');
+
+                                // Elimina los inputs de trackers añadidos dinámicamente
+                                $('.trackers-container').empty();  // Elimina todo el contenido dentro de .trackers-container
+                                // Resetear el contador de trackers
+                                trackerCount = 0;
+                                // Habilitar nuevamente el botón "Add Tracker" si no hay trackers
+                                $('#addtrackers').prop('disabled', false);
+
+                                // También puedes eliminar cualquier clase de validación de error si es necesario
+                                $('input, select').removeClass('is-invalid');
+                                $('.invalid-feedback').text('');
+                                $('.select2-selection').removeClass('is-invalid'); // También eliminar la clase del contenedor de select2
+                            }
+                        });
+                        //$('#closenewtrailerregister').click();
+                        //$('#refreshemptytrailertable').click();
+                    },
+                    error: function(xhr, status, error) {
+                        // Limpia los errores anteriores
+                        $('input, select').removeClass('is-invalid');
+                        $('.invalid-feedback').text('');
+                        $('.select2-selection').removeClass('is-invalid'); // También eliminar la clase del contenedor de select2
+                        
+                        // Manejo de errores con SweetAlert2
+                        let errors = xhr.responseJSON.errors;
+                        for (let field in errors) {
+                            const fieldId = field;
+                            const inputFieldselect = $('#' + field); // Convierte el ID en un objeto jQuery
+                            const errorContainerselectsecuritycompany = inputFieldselect.parent().find('.invalid-feedback'); 
+                            const inputField = $('#' + field);
+                            const errorContainer = inputField.next('.invalid-feedback');
+                            const fieldElement = document.getElementById(fieldId);
+                            const isSelect2 = $(fieldElement).hasClass("searchsecuritycompany"); 
+                            
+                            inputField.addClass('is-invalid');  // Marca el campo con error
+                            // Si es un select2, aplica la clase a la interfaz de select2
+                            if (isSelect2) {
+                                $(fieldElement).next('.select2-container').find('.select2-selection').addClass("is-invalid");
+                                errorContainerselectsecuritycompany.text('Security Company is required.'); // Mostrar mensaje de error
+                            }
+                            errorContainer.text(errors[field][0]); // Muestra el error correspondiente
+                        }
+        
+                        // Si hubo un error en el servidor, muestra una alerta
+                        Swal.fire({
+                            icon: 'error',
+                            title: '¡Error!',
+                            text: 'There was a problem adding the shipment. Please try again.',
+                            confirmButtonText: 'Ok'
+                        });
+                    }
+                });
+            }
         });
     });
 

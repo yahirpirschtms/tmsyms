@@ -66,6 +66,8 @@ class Shipments extends Model
         'dock_door_date',
         'removed_trackers',
         'lane',
+        'have_trackers',
+        'security_company'
         
     ];
 
@@ -105,7 +107,19 @@ class Shipments extends Model
     }
     public function getetdAttribute($value)
     {
-            return Carbon::parse($value)->format('m/d/Y H:i:s');
+        return $value ? Carbon::parse($value)->format('m/d/Y H:i:s'): null;
+    }
+    public function getSecuredYarddateAttribute($value)
+    {
+        return $value ? Carbon::parse($value)->format('m/d/Y H:i:s'): null;
+    }
+    public function getDeliveredDateAttribute($value)
+    {
+        return $value ? Carbon::parse($value)->format('m/d/Y H:i:s'): null;
+    }
+    public function getBillingDateAttribute($value)
+    {
+        return $value ? Carbon::parse($value)->format('m/d/Y H:i:s'): null;
     }
 
 

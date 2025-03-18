@@ -96,14 +96,14 @@
 
                 <div class="mb-3">
                     <label for="inputidtrailer" class="form-label ">Trailer ID</label>
-                    <input type="text" class="form-control" id="inputidtrailer" name="inputidtrailer"  value="{{ old('inputidtrailer', $from_button == 1 ? $trailerId : '') }}">
+                    <input type="text" class="form-control" id="inputidtrailer" name="inputidtrailer"  value="{{ ( $from_button == 1 ? $trailerId : '') }}">
                     <div class="invalid-feedback"></div>
                     <!--<input type="hidden" name="inputidtrailer" value="{{ old('inputidtrailer', $from_button == 1 ? $trailerId : '') }}">-->
                 </div>
 
                 <div class="mb-3">
                     <label for="inputshipmentcarrier" class="form-label ">Carrier Dropping Trailer</label>
-                    <select class="form-select" aria-label="Default select example"   id="inputshipmentcarrier" name="inputshipmentcarrier" data-carrier="{{ old('inputshipmentcarrier', $from_button == 1 ? $carrier : '') }}" data-url="{{ route('carrier-emptytrailerAjax') }}">
+                    <select class="form-select" aria-label="Default select example"   id="inputshipmentcarrier" name="inputshipmentcarrier" data-carrier="{{$from_button == 1 ? $carrier : '' }}" data-url="{{ route('carrier-emptytrailerAjax') }}">
                     <option selected disabled hidden></option>
                     </select>
                     <div class="invalid-feedback"></div>
@@ -119,7 +119,7 @@
 
                 <div class="mb-3">
                     <label for="inputshipmenttrailer" class="form-label ">Trailer Owner</label>
-                    <select class="form-select" aria-label="Default select example"  id="inputshipmenttrailer" name="inputshipmenttrailer" data-trailerowner="{{ old('inputshipmenttrailer', $from_button == 1 ? $carrier : '') }}" data-url="{{ route('trailerowner-emptytrailerAjax') }}">
+                    <select class="form-select" aria-label="Default select example"  id="inputshipmenttrailer" name="inputshipmenttrailer" data-trailerowner="{{ $from_button == 1 ? $carrier : ''}}" data-url="{{ route('trailerowner-emptytrailerAjax') }}">
                     <option selected disabled hidden></option>
                     </select>
                     <div class="invalid-feedback"></div>
@@ -135,7 +135,7 @@
                </div>
 
                 <div class="mb-3">
-                    <label for="inputshipmentetd" class="form-label ">Estimated date of departure</label>
+                    <label for="inputshipmentetd" class="form-label ">Estimated date of delivery (ETD)</label>
                     <input type="text" class="form-control datetimepicker" id="inputshipmentetd" name="inputshipmentetd" placeholder="MM/DD/YYYY - H/M/S">
                     <div class="invalid-feedback"></div>
                 </div>
@@ -148,7 +148,7 @@
 
                 <div class="mb-3">
                     <label for="inputpallets" class="form-label ">Pallets</label>
-                    <input type="text" class="form-control" id="inputpallets" name="inputpallets" value="{{ old('inputpallets', $from_button == 1 ? $palletsontrailer : '') }}">
+                    <input type="text" class="form-control" id="inputpallets" name="inputpallets" value="{{ ($from_button == 1 ? $palletsontrailer : '') }}">
                     <div class="invalid-feedback"></div>
                 </div>
 
@@ -164,23 +164,38 @@
                     <div class="invalid-feedback"></div>
                 </div>
 
-                <div class="mb-3">
+                <div class="mb-3 d-flex">
+                    <div class="p-2 pe-0 flex-grow-1">
+                        <label class="form-label ">Shipment trackers</label>
+                    </div>
+                    <div class="p-2">
+                        <button type="button" class="btn btn-primary" id="addtrackers">Add Tracker <i class="fa-solid fa-plus"></i></button>
+                    </div>
+                    <div class="p-2">
+                        <button type="button" class="btn btn-danger" id="removetrackers">Remove Tracker <i class="fa-solid fa-minus"></i></button>
+                    </div>
+                </div>
+
+                <!-- Estos divs se agregarán dinámicamente -->
+                <div class="trackers-container"></div>
+
+                <!--<div class="mb-3 tracker-input" id="tracker1" style="display:none">
                     <label for="inputshipmentdevicenumber" class="form-label ">Tracker One</label>
                     <input type="text" class="form-control" id="inputshipmentdevicenumber" name="inputshipmentdevicenumber">
                     <div class="invalid-feedback"></div>
                 </div>
 
-                <div class="mb-3">
+                <div class="mb-3 tracker-input" id="tracker2" style="display:none">
                     <label for="tracker2" class="form-label ">Tracker Two</label>
                     <input type="text" class="form-control" id="tracker2" name="tracker2">
                     <div class="invalid-feedback"></div>
                 </div>
 
-                <div class="mb-3">
+                <div class="mb-3 tracker-input" id="tracker3" style="display:none">
                     <label for="tracker3" class="form-label ">Tracker Three</label>
                     <input type="text" class="form-control" id="tracker3" name="tracker3">
                     <div class="invalid-feedback"></div>
-                </div>
+                </div>-->
 
                 <div class="mb-3">
                     <label for="inputshipmentnotes" class="form-label ">Notes</label>
@@ -191,6 +206,14 @@
                 <div class="mb-3">
                     <label for="inputshipmentoverhaulid" class="form-label ">Security Company ID</label>
                     <input type="text" class="form-control" id="inputshipmentoverhaulid" name="inputshipmentoverhaulid">
+                    <div class="invalid-feedback"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="inputshipmentsecuritycompany" class="form-label ">Security Company</label>
+                    <select class="form-select searchsecuritycompany" aria-label="Default select example"  id="inputshipmentsecuritycompany" name="inputshipmentsecuritycompany" data-url="{{ url('securitycompany-shipment') }}">
+                    <option selected disabled hidden></option>    
+                    </select>
                     <div class="invalid-feedback"></div>
                 </div>
 

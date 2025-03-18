@@ -35,7 +35,7 @@
                 <button type="button" style="color: white;" class="btn me-2 btn-success" id="exportfile" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Export File">
                     <i class="fa-solid fa-file-export"></i>
                 </button>
-                <button type="button" style="color: white;" class="btn me-2 btn-primary" id="refreshwhetapprovaltable" data-url="{{ route('shipmentwh.data') }}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Refresh Table">
+                <button type="button" style="color: white;" class="btn me-2 btn-primary" id="refreshwhetapprovaltable" data-url="{{ route('shipmentwh.data') }}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Refresh Data">
                     <i class="fa-solid fa-arrows-rotate"></i>
                 </button>
                 <button class="btn" id="addmorefiltersemptytrailer" style="color: white;background-color:orange;" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasaddmorefilters" aria-controls="offcanvasaddmorefilters">
@@ -203,9 +203,25 @@
 
                 <div class="col-auto" id="emptytrailerfilterdivdevicenumber" style="display:none">
                     <div style="background-color:rgb(13, 82, 200); border-radius:0.5rem; width:fit-content; display:flex; flex-wrap:nowrap" class="mb-3 me-2">
-                        <btn id="emptytrailerfilterbtndevicenumber" style="background-color: unset; color:white; white-space:nowrap; align-content:center; font-size: small;" class="ms-2 me-2">Device Number:</btn>
+                        <btn id="emptytrailerfilterbtndevicenumber" style="background-color: unset; color:white; white-space:nowrap; align-content:center; font-size: small;" class="ms-2 me-2">Tracker 1:</btn>
                         <input id="emptytrailerfilterinputdevicenumber" name="emptytrailerfilterinputdevicenumber" value="" style="border:unset; width:fit-content;  color:white; background-color:rgb(13, 82, 200); font-size: small;text-align:center" type="text" class="">
                         <button id="emptytrailerfilterbuttondevicenumber" style="border:unset; background-color:rgb(13, 82, 200); color:white; font-size: small;" class="btn">X</button>
+                    </div>
+                </div>
+
+                <div class="col-auto" id="emptytrailerfilterdivdevicenumber1" style="display:none">
+                    <div style="background-color:rgb(13, 82, 200); border-radius:0.5rem; width:fit-content; display:flex; flex-wrap:nowrap" class="mb-3 me-2">
+                        <btn id="emptytrailerfilterbtndevicenumber1" style="background-color: unset; color:white; white-space:nowrap; align-content:center; font-size: small;" class="ms-2 me-2">Tracker 2:</btn>
+                        <input id="emptytrailerfilterinputdevicenumber1" name="emptytrailerfilterinputdevicenumber1" value="" style="border:unset; width:fit-content;  color:white; background-color:rgb(13, 82, 200); font-size: small;text-align:center" type="text" class="">
+                        <button id="emptytrailerfilterbuttondevicenumber1" style="border:unset; background-color:rgb(13, 82, 200); color:white; font-size: small;" class="btn">X</button>
+                    </div>
+                </div>
+
+                <div class="col-auto" id="emptytrailerfilterdivdevicenumber2" style="display:none">
+                    <div style="background-color:rgb(13, 82, 200); border-radius:0.5rem; width:fit-content; display:flex; flex-wrap:nowrap" class="mb-3 me-2">
+                        <btn id="emptytrailerfilterbtndevicenumber2" style="background-color: unset; color:white; white-space:nowrap; align-content:center; font-size: small;" class="ms-2 me-2">Tracker 3:</btn>
+                        <input id="emptytrailerfilterinputdevicenumber2" name="emptytrailerfilterinputdevicenumber2" value="" style="border:unset; width:fit-content;  color:white; background-color:rgb(13, 82, 200); font-size: small;text-align:center" type="text" class="">
+                        <button id="emptytrailerfilterbuttondevicenumber2" style="border:unset; background-color:rgb(13, 82, 200); color:white; font-size: small;" class="btn">X</button>
                     </div>
                 </div>
 
@@ -217,7 +233,7 @@
         <div class="container  mb-4" style="margin-top: 290px;">
 
             <!--Tabla mostrar los Shipments existentes-->
-            <div class="table_style">
+            <div class="table_style table-responsive">
                 <table class="table" id="table_wh_eta_approval_shipments">
                     <thead>
                         <tr>
@@ -226,6 +242,20 @@
                             <th scope="col">Suggested Delivery Date</th>
                             <th scope="col">Units</th>
                             <th scope="col">Pallets</th>
+                            <th class="noscreenwheta">secondary shipment id</th>
+                            <th class="noscreenwheta">trailer id</th>
+                            <th class="noscreenwheta">billing id</th>
+                            <th class="noscreenwheta">tracker1</th>
+                            <th class="noscreenwheta">tracker2</th>
+                            <th class="noscreenwheta">tracker3</th>
+                            <th class="noscreenwheta">driver assigned date</th>
+                            <th class="noscreenwheta">picked up date</th>
+                            <th class="noscreenwheta">in transit date</th>
+                            <th class="noscreenwheta">delivery/received date</th>
+                            <th class="noscreenwheta">secured yard date</th>
+                            <th class="noscreenwheta">approved eta date</th>
+                            <th class="noscreenwheta">date of billing</th>
+                            <th class="noscreenwheta">offloadtime</th>
                         </tr>
                     </thead>
                     <tbody id="shipmentWHTableBody">
@@ -235,11 +265,25 @@
                             data-bs-target="#shipmentwhapptapprovaldetails" 
                             aria-controls="shipmentwhapptapprovaldetails" 
                             data-id="{{ $shipment->pk_shipment }}">
-                            <td>{{ $shipment->shipmenttype->gntc_description ?? 'N/A' }}</td>
+                            <td>{{ $shipment->shipmenttype->gntc_description ?? '' }}</td>
                             <td>{{ $shipment->stm_id }}</td>
                             <td>{{ $shipment->etd }}</td>
                             <td>{{ $shipment->units }}</td>
                             <td>{{ $shipment->pallets }}</td>
+                            <td class="noscreenwheta">{{ $shipment->secondary_shipment_id }}</td>
+                            <td class="noscreenwheta">{{ $shipment->id_trailer }}</td>
+                            <td class="noscreenwheta">{{ $shipment->billing_id }}</td>
+                            <td class="noscreenwheta">{{ $shipment->tracker1 }}</td>
+                            <td class="noscreenwheta">{{ $shipment->tracker2 }}</td>
+                            <td class="noscreenwheta">{{ $shipment->tracker3 }}</td>
+                            <td class="noscreenwheta">{{ $shipment->driver_assigned_date }}</td>
+                            <td class="noscreenwheta">{{ $shipment->pick_up_date }}</td>
+                            <td class="noscreenwheta">{{ $shipment->intransit_date }}</td>
+                            <td class="noscreenwheta">{{ $shipment->delivered_date }}</td>
+                            <td class="noscreenwheta">{{ $shipment->secured_yarddate }}</td>
+                            <td class="noscreenwheta">{{ $shipment->wh_auth_date }}</td>
+                            <td class="noscreenwheta">{{ $shipment->billing_date }}</td>
+                            <td class="noscreenwheta">{{ $shipment->offloading_time }}</td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -502,9 +546,9 @@
                         </div>
                     </div>
 
-
+                    
                     <div>
-                        <button class="btn btn-primary w-100 mb-2" id="closeapplydevicenumberfilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapseapplydevicenumberfilter" aria-expanded="false" aria-controls="multiCollapseapplydevicenumberfilter">Device Number</button>
+                        <button class="btn btn-primary w-100 mb-2" id="closeapplydevicenumberfilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapseapplydevicenumberfilter" aria-expanded="false" aria-controls="multiCollapseapplydevicenumberfilter">Tracker 1</button>
                         <div class="row mb-2">
                             <div class="col">
                                 <div class="collapse multi-collapse" id="multiCollapseapplydevicenumberfilter">
@@ -514,6 +558,32 @@
                             </div>
                         </div>
                     </div>
+
+
+                    <div>
+                        <button class="btn btn-primary w-100 mb-2" id="closeapplydevicenumberfilter1" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapseapplydevicenumberfilter1" aria-expanded="false" aria-controls="multiCollapseapplydevicenumberfilter1">Tracker 2</button>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="collapse multi-collapse" id="multiCollapseapplydevicenumberfilter1">
+                                <input type="text" class="form-control" id="inputdevicenumberfilter1">
+                                <button class="btn btn-primary mt-2 filterapply" type="button" id="applydevicenumberfilter1">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <button class="btn btn-primary w-100 mb-2" id="closeapplydevicenumberfilter2" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapseapplydevicenumberfilter2" aria-expanded="false" aria-controls="multiCollapseapplydevicenumberfilter2">Tracker 3</button>
+                        <div class="row mb-2">
+                            <div class="col">
+                                <div class="collapse multi-collapse" id="multiCollapseapplydevicenumberfilter2">
+                                <input type="text" class="form-control" id="inputdevicenumberfilter2">
+                                <button class="btn btn-primary mt-2 filterapply" type="button" id="applydevicenumberfilter2">Apply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
@@ -596,11 +666,19 @@
                                                 <div class="invalid-feedback" id="error-whetainputapprovedeta"></div>
                                             </div>
 
-                                            <div class="mb-3 ">
+                                            <div class="mb-3">
+                                                <label for="whetainputapproveddoornumber" class="form-label ">Door Number</label>
+                                                <select class="form-control searchdoornumberwheta" aria-label="Default select example"  id="whetainputapproveddoornumber" name="whetainputapproveddoornumber" value="{{ old('whetainputapproveddoornumber') }}" data-url="{{ route('doornumberwheta-whetaapproval') }}">
+                                                    <option selected disabled hidden></option>
+                                                </select>
+                                                <div class="invalid-feedback" id="error-whetainputapproveddoornumber"></div>
+                                            </div>
+
+                                            <!--<div class="mb-3 ">
                                                 <label for="whetainputapproveddoornumber" class="form-label ">Door Number</label>
                                                 <input type="text" class="form-control" id="whetainputapproveddoornumber" name="whetainputapproveddoornumber" value="" placeholder="">
                                                 <div class="invalid-feedback" id="error-whetainputapprovedeta"></div>
-                                            </div>
+                                            </div>-->
      
                                 <button type="button" class="btn btn-primary" id="whetaapprovalbuttonsave" data-url="{{ route('shipment.whetaapproval') }}">Update</button>
                             </form>   

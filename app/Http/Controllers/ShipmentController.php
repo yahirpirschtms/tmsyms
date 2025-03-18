@@ -287,6 +287,11 @@ class ShipmentController extends Controller
             'inputshipmentdriver' => 'nullable',
             'inputshipmentetd' => 'required|date',
             'inputshipmentsunits' => 'required|min:1|integer',
+            'inputshipmentsecuritycompany' => 'required',
+            // Validación condicional de los trackers
+            'tracker1' => 'nullable|required_if:tracker1,!=,null', // Si tracker1 tiene valor, debe ser requerido
+            'tracker2' => 'nullable|required_if:tracker2,!=,null', // Lo mismo para tracker2
+            'tracker3' => 'nullable|required_if:tracker3,!=,null', // Lo mismo para tracker3
             'inputpallets' => [
         '', 
         'required', 
@@ -309,9 +314,9 @@ class ShipmentController extends Controller
             'inputshipmentsecurityseals2' => 'nullable',
             'inputshipmentnotes' => 'nullable',
             'inputshipmentoverhaulid' => 'nullable',
-            'inputshipmentdevicenumber' => 'nullable',
-            'tracker2' => 'nullable',
-            'tracker3' => 'nullable',
+            //'inputshipmentdevicenumber' => 'nullable',
+            //'tracker2' => 'nullable',
+            //'tracker3' => 'nullable',
             'inputshipmentcurrentstatus' => 'required|exists:generic_catalogs,gnct_id'
         ], [
             'inputidtrailer.required'=>'ID Trailer is required',
@@ -336,12 +341,18 @@ class ShipmentController extends Controller
             'inputshipmentetd.date' => 'Estimated date of departure format is invalid',
             'inputshipmentcurrentstatus.required' => 'Current Status is required',
             'inputshipmentcurrentstatus.exists' => 'Current Status doesnt exists',
+            'inputshipmentsecuritycompany.required' => 'Security Company is required',
             'inputshipmentsunits.required' => 'Unist are required',
             'inputshipmentsunits.integer' => 'Units must be an integer',
             'inputshipmentsunits.min' => 'Units must have a valid value',
             'inputpallets.required' => 'Pallets are required',
             'inputpallets.integer' => 'Pallets must be an integer',
             'inputpallets.min' => 'Pallets must have a valid value',
+
+            // Mensajes personalizados para los trackers
+            'tracker1.required_if' => 'Tracker one is required.',
+            'tracker2.required_if' => 'Tracker two is required.',
+            'tracker3.required_if' => 'Tracker three is required.',
         ]);
 
         // Convertir las fechas al formato 'm/d/Y'
@@ -361,7 +372,7 @@ class ShipmentController extends Controller
                 'pallets_on_floor' => null,
                 'carrier' => $request->inputshipmentcarrier,
                 'gnct_id_availability_indicator' => null,
-                'location' => $request->inputorigin,
+                //'location' => $request->inputorigin,
                 'date_in' => now(),
                 'username' => Auth::check() ? Auth::user()->username : 'system',
                 'availability' => 'Used',
@@ -376,7 +387,7 @@ class ShipmentController extends Controller
                 'status' => now(),
                 'pallets_on_trailer' => $request->inputpallets ?? 0,
                 'carrier' => $request->inputshipmentcarrier,
-                'location' => $request->inputorigin,
+                //'location' => $request->inputorigin,
                 'username' => Auth::check() ? Auth::user()->username : 'system',
                 'availability' => 'Used',
                 'date_out' => now(),
@@ -386,6 +397,16 @@ class ShipmentController extends Controller
 
         // Obtener la fecha y hora actual
         $currentDateTime = now(); // Usa `now()` para obtener la fecha y hora actuales en Laravel
+
+        // Verificar si alguno de los trackers tiene valor
+        $haveTrackers = ($request->has('tracker1') && !empty($request->input('tracker1'))) ||
+        ($request->has('tracker2') && !empty($request->input('tracker2'))) ||
+        ($request->has('tracker3') && !empty($request->input('tracker3'))) ? 'Yes' : 'No';
+
+        // Asignar los valores de los trackers, o null si no se enviaron
+        $tracker1 = $request->input('tracker1') ?: null;
+        $tracker2 = $request->input('tracker2') ?: null;
+        $tracker3 = $request->input('tracker3') ?: null;
 
         // Crear un nuevo registro
         Shipments::create([
@@ -409,14 +430,17 @@ class ShipmentController extends Controller
             'seal2' => $request->inputshipmentsecurityseals2,
             'notes' => $request->inputshipmentnotes,
             'security_company_id' => $request->inputshipmentoverhaulid,
-            'tracker1' => $request->inputshipmentdevicenumber,
-            'tracker2' => $request->tracker2,
-            'tracker3' => $request->tracker3,
+            'tracker1' => $tracker1,
+            'tracker2' => $tracker2,
+            'tracker3' => $tracker3,
             'gnct_id_current_status' => $request->inputshipmentcurrentstatus,
             'lane' => $request->ln_code,
+            'security_company' => $request->inputshipmentsecuritycompany,
 
             // Asignar la fecha y hora actual solo si el parámetro `inputshipmentdriver` no está vacío
             'driver_assigned_date' => $request->inputshipmentdriver ? $currentDateTime : null,
+            // Guardar el valor para have_trackers
+            'have_trackers' => $haveTrackers,
 
         ]);
 
@@ -453,58 +477,110 @@ class ShipmentController extends Controller
 
     //Funcion actualizar EmptyTrailers
     public function whetaapproval(Request $request){
-        // Validar los datos
-        $validated = $request->validate([
-            'pk_shipment' => 'required',
-            //'id_trailer' => 'required',
-            //'stm_id' =>  'nullable',
-            'pallets' => 'required|min:1|integer',
-            'units' => 'required|min:1|integer',
-            //'etd' => 'required',
-            'wh_auth_date' => 'required',
-            'door_number' => 'nullable',
-        ], [
-            //'id_trailer.required' => 'ID Trailer is required.',
-            //'trailer_num.string' => 'El campo ID Trailer debe ser una cadena de texto.',
-            //'trailer_num.max' => 'El campo ID Trailer no puede exceder los 50 caracteres.',
-            //'stm_id.required' => 'La fecha de estatus es obligatoria.',
-            //'stm_id.date' => 'El campo de fecha de estatus debe ser una fecha válida.',
-            'pallets.required' => 'Pallets are required.',
-            //'pallets_on_trailer.string' => 'El campo Pallets on Trailer debe ser una cadena de texto.',
-            //'pallets_on_trailer.max' => 'El campo Pallets on Trailer no puede exceder los 50 caracteres.',
-            //'pallets_on_floor.required' => 'El campo Pallets on Floor es obligatorio.',
-            'units.required' => 'Units are rquired.',
-            //'carrier.string' => 'El campo Carrier debe ser una cadena de texto.',
-            //'carrier.max' => 'El campo Carrier no puede exceder los 50 caracteres.',
-            //'etd.required' => 'ETD is required.',
+        try {
+            // Validar los datos
+            $validated = $request->validate([
+                'pk_shipment' => 'required',
+                //'id_trailer' => 'required',
+                //'stm_id' =>  'nullable',
+                //'pallets' => 'required|min:1|integer',
+                //'units' => 'required|min:1|integer',
+                'whetainputunits' => 'required|min:1|integer',
+                'whetainputpallets' => [
+                    '', 
+                    'required', 
+                    'min:1', // No puede ser nulo ni 0
+                    function ($attribute, $value, $fail) use ($request) {
+                        // Mensaje personalizado si no es un número entero
+                        $valuee = intval($value); // Asegurarse de que el valor es un entero
+                        if($value < 1){
+                            $fail('Pallets must have a valid value.');
+                        }
+                        if (!is_int($valuee)) {
+                            $fail('Pallets must be an integer.');
+                        }
+                        if ($request->input('whetainputunits') !== null && $value > $request->input('whetainputunits')) {
+                            $fail('The number of pallets cannot be greater than the number of shipment units.');
+                        }
+                    },
+                ],
+                //'etd' => 'required',
+                //'wh_auth_date' => 'required',
+                //'door_number' => 'required',
+                'whetainputapprovedeta' => 'required|date',
+                'whetainputapproveddoornumber' => 'required',
+            ], [
+                //'id_trailer.required' => 'ID Trailer is required.',
+                //'trailer_num.string' => 'El campo ID Trailer debe ser una cadena de texto.',
+                //'trailer_num.max' => 'El campo ID Trailer no puede exceder los 50 caracteres.',
+                //'stm_id.required' => 'La fecha de estatus es obligatoria.',
+                //'stm_id.date' => 'El campo de fecha de estatus debe ser una fecha válida.',
+                //'whetainputpallets.required' => 'Pallets are required.',
+                //'pallets_on_trailer.string' => 'El campo Pallets on Trailer debe ser una cadena de texto.',
+                //'pallets_on_trailer.max' => 'El campo Pallets on Trailer no puede exceder los 50 caracteres.',
+                //'pallets_on_floor.required' => 'El campo Pallets on Floor es obligatorio.',
+                'whetainputunits.required' => 'Units are rquired.',
+                'whetainputunits.min' => 'Units must have a valid value.',
+                'whetainputunits.integer' => 'Units must be an integer',
+                //'carrier.max' => 'El campo Carrier no puede exceder los 50 caracteres.',
+                //'etd.required' => 'ETD is required.',
+                'whetainputapproveddoornumber.required' => 'Door number is required',
+                'whetainputapprovedeta.required' => 'WH Auth Date is required.',
+                'whetainputapprovedeta.date' => 'The WH Auth Date must be a valid date.',
+            ]);
 
-            'wh_auth_date.required' => 'WH Auth Date is required.',
-        ]);
+            // Buscar el trailer
+            $shipment = Shipments::findOrFail($validated['pk_shipment']);
 
-        // Buscar el trailer
-        $shipment = Shipments::findOrFail($validated['pk_shipment']);
+            // Convertir las fechas al formato adecuado
+            /*$validated['status'] = $validated['status']
+                ? Carbon::createFromFormat('m/d/Y', $validated['status'])->format('Y-m-d')
+                : null;*/
+            /*$validated['etd'] = $validated['etd']
+                ? Carbon::createFromFormat('m/d/Y H:i:s', $validated['etd'])->format('Y-m-d H:i:s')
+                : null;*/
+            /*$validated['wh_auth_date'] = $validated['wh_auth_date']
+                ? Carbon::createFromFormat('m/d/Y H:i:s', $validated['wh_auth_date'])->format('Y-m-d H:i:s')
+                : null;*/
+            /*$validated['transaction_date'] = $validated['transaction_date']
+                ? Carbon::createFromFormat('m/d/Y H:i:s', $validated['transaction_date'])->format('Y-m-d H:i:s')
+                : null;*/
 
-        // Convertir las fechas al formato adecuado
-        /*$validated['status'] = $validated['status']
-            ? Carbon::createFromFormat('m/d/Y', $validated['status'])->format('Y-m-d')
-            : null;*/
-        /*$validated['etd'] = $validated['etd']
-            ? Carbon::createFromFormat('m/d/Y H:i:s', $validated['etd'])->format('Y-m-d H:i:s')
-            : null;*/
-        $validated['wh_auth_date'] = $validated['wh_auth_date']
-            ? Carbon::createFromFormat('m/d/Y H:i:s', $validated['wh_auth_date'])->format('Y-m-d H:i:s')
-            : null;
-        /*$validated['transaction_date'] = $validated['transaction_date']
-            ? Carbon::createFromFormat('m/d/Y H:i:s', $validated['transaction_date'])->format('Y-m-d H:i:s')
-            : null;*/
+                // Log para depuración
+                //Log::info('Received data:', $validated);
 
-            // Log para depuración
-        Log::info('Received data:', $validated);
+                $dataToUpdate = [
+                    'pallets' => $validated['whetainputpallets'],
+                    'units' => $validated['whetainputunits'],
+                    'door_number' => $validated['whetainputapproveddoornumber'],
+                    'wh_auth_date' => Carbon::createFromFormat('m/d/Y H:i:s', $validated['whetainputapprovedeta'])->format('Y-m-d H:i:s'),
+                ];
 
-        // Actualizar los campos
-        $shipment->update($validated);
+            // Actualizar los campos
+            $shipment->update($dataToUpdate);
 
-        return response()->json(['message' => 'Successfully WH ETA Approval saved succesfully'], 200);
+            // return response()->json(['message' => 'Trailer successfully removed'], 200);
+            $shipments = Shipments::with(['shipmenttype', 'currentstatus', 'origin', 'destinations', 'carrier', 'emptytrailer', 'services', 'driverowner', 'drivers'])
+            ->whereNull('wh_auth_date')
+            ->whereHas('destinations', function ($query) {
+                $query->join('facilities', 'companies.CoName', '=', 'facilities.fac_name')
+                      ->where('facilities.fac_auth', 1);
+            })
+            ->get();
+
+            //return response()->json(['message' => 'WH ETA Approval saved succesfully'], 200);
+
+            return response()->json([
+                'message' => 'WH ETA Approval saved succesfully.',
+                'shipments' => $shipments,// O puedes filtrar solo los necesarios
+            ], 200);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Devolver errores de validación como JSON
+            return response()->json(['errors' => $e->errors()], 422);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'An unexpected error occurred.'], 500);
+        }
     }
 
     public function getShipmentswh(Request $request){
@@ -520,7 +596,7 @@ class ShipmentController extends Controller
             });
 
         // Filtros generales (searchemptytrailergeneral)
-        if ($request->has('searchwh')) {
+        /*esto se quitaif ($request->has('searchwh')) {
             $search = $request->input('searchwh');
             //$formattedDate = null;
             $formattedDateTime = null;
@@ -544,7 +620,7 @@ class ShipmentController extends Controller
                 //->orWhere('id_trailer','like',"%$search%")
                 //->orWhereNull('id_trailer')
 
-                ->orWhere('etd', 'like', $formattedDateTime);
+                ->orWhere('etd', 'like', $formattedDateTime);esto se quita*/
                 //->orWhereNull('etd')
 
                 //->orWhere('units','like',"%$search%")
@@ -575,21 +651,21 @@ class ShipmentController extends Controller
                 //->orWhereNull('billing_id')
                 ->orWhere('device_number','like',"%$search%");*/
                 //->orWhereNull('device_number');
-            });
-        }
+        /*esto se quita    });
+        }*/
 
 
         //Filtros específicos de parámetros (inputs de filtros aplicados)
-        if ($request->has('stm_id') && $request->input('stm_id') != '') {
+       /*este si va if ($request->has('stm_id') && $request->input('stm_id') != '') {
             $query->where('stm_id', 'like', "%{$request->input('stm_id')}%");
-        }
+        }*/
         /*if ($request->has('gnct_id_shipment_type') && $request->input('gnct_id_shipment_type') != '') {
             $query->whereHas('shipmenttype', function($q) use ($request) {
                 $q->where('gnct_id', $request->input('gnct_id_shipment_type'));
             });
         }*/
         // Filtro para múltiples ubicaciones seleccionadas
-        if ($request->has('shipment_types') && $request->input('shipment_types') != '') {
+        /*estos si van if ($request->has('shipment_types') && $request->input('shipment_types') != '') {
             $ship = explode(',', $request->input('shipment_types')); // Convierte la cadena en un array
 
             $query->whereHas('shipmenttype', function($q) use ($ship) {
@@ -707,7 +783,7 @@ class ShipmentController extends Controller
         }
         if ($request->has('device_number') && $request->input('device_number') != '') {
             $query->where('device_number', 'like', "%{$request->input('device_number')}%");
-        }
+        }*/
 
 
         // Obtener los trailers con los filtros aplicados

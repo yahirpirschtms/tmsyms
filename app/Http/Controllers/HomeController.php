@@ -132,8 +132,8 @@ public function update(Request $request)
             'updateinputpktrailer' => 'required', // pk_trailer
             //'updateinputidtrailer' => 'required|unique:empty_trailer,trailer_num',
             'updateinputdateofstatus' => 'required|date', // status
-            'updateinputpalletsontrailer' => 'required|numeric|min:1', // pallets_on_trailer
-            'updateinputpalletsonfloor' => 'required|numeric|min:1', // pallets_on_floor
+            'updateinputpalletsontrailer' => 'nullable|numeric', // pallets_on_trailer
+            'updateinputpalletsonfloor' => 'nullable|numeric', // pallets_on_floor
             'updateinputcarrier' => 'required', // carrier
             'updateinputavailabilityindicator' => 'nullable|exists:generic_catalogs,gnct_id', // gnct_id_availability_indicator
             'updateinputlocation' => 'nullable', // location
@@ -148,12 +148,12 @@ public function update(Request $request)
             //'updateinputlocation.required' => 'Location is required.',
             //'updateinputlocation.exists' => 'Location selected is not valid.',
             'updateinputdatein.required' => 'Date In is required.',
-            'updateinputpalletsontrailer.numeric' => 'Pallets on trailer must be an integer',
-            'updateinputpalletsonfloor.numeric' => 'Pallets on floor must be an integer',
-            'updateinputpalletsontrailer.required' => 'Pallets on trailer is required',
-            'updateinputpalletsonfloor.required' => 'Pallets on floor is required',
-            'updateinputpalletsontrailer.min' => 'Pallets on trailer must have a valid value',
-            'updateinputpalletsonfloor.min' => 'Pallets on floor must have a valid value',
+            'updateinputpalletsontrailer.numeric' => 'Pallets on trailer must be an integer.',
+            'updateinputpalletsonfloor.numeric' => 'Pallets on floor must be an integer.',
+            //'updateinputpalletsontrailer.required' => 'Pallets on trailer are required.',
+            //'updateinputpalletsonfloor.required' => 'Pallets on floor are required.',
+            //'updateinputpalletsontrailer.min' => 'Pallets on trailer must have a valid value.',
+            //'updateinputpalletsonfloor.min' => 'Pallets on floor must have a valid value.',
         ]);
 
         // Buscar el trailer
@@ -174,7 +174,15 @@ public function update(Request $request)
         // Actualizar el trailer
         $trailer->update($dataToUpdate);
 
-        return response()->json(['message' => 'Successfully updated trailer'], 200);
+        // Obtener todos los trailers actualizados o todos los trailers
+        $trailers = EmptyTrailer::with(['availabilityIndicator', 'locations', 'carriers'])
+        ->whereNull('availability')
+        ->get();
+        
+        return response()->json([
+            'message' => 'Successfully updated trailer',
+            'trailers' => $trailers,  // Devuelve todos los registros
+        ], 200);
 
     } catch (\Illuminate\Validation\ValidationException $e) {
         // Devolver errores de validación como JSON
@@ -198,7 +206,15 @@ public function update(Request $request)
         // Eliminar el tráiler
         $trailer->delete();
 
-        return response()->json(['message' => 'Trailer successfully removed'], 200);
+       // return response()->json(['message' => 'Trailer successfully removed'], 200);
+       $trailers = EmptyTrailer::with(['availabilityIndicator', 'locations', 'carriers'])
+        ->whereNull('availability')
+        ->get();
+
+        return response()->json([
+            'message' => 'Trailer successfully removed.',
+            'trailers' => $trailers,// O puedes filtrar solo los necesarios
+        ], 200);
     }
 
     //Funcion entrar a la app
@@ -221,8 +237,8 @@ public function update(Request $request)
 
             'inputidtrailer' => 'required|unique:empty_trailer,trailer_num',
             'inputdateofstatus' => 'required|date',
-            'inputpalletsontrailer' => 'required|numeric|min:1',
-            'inputpalletsonfloor' => 'required|numeric|min:1',
+            'inputpalletsontrailer' => 'nullable|numeric',
+            'inputpalletsonfloor' => 'nullable|numeric',
             'inputcarrier' => 'required',
             'inputavailabilityindicator' => 'nullable|exists:generic_catalogs,gnct_id',
             'inputlocation' => 'nullable',
@@ -237,12 +253,12 @@ public function update(Request $request)
             //'inputidtrailer.max' => 'The Trailer ID field cannot exceed 50 characters.',
             'inputdateofstatus.required' => 'Status date is required.',
             'inputdateofstatus.date' => 'The status date field must be a valid date.',
-            'inputpalletsontrailer.required' => 'Pallets on trailer are required.',
+            //'inputpalletsontrailer.required' => 'Pallets on trailer are required.',
             //'inputpalletsontrailer.string' => 'The Pallets on Trailer field must be a text string.',
-            'inputpalletsontrailer.min' => 'The Pallets On Trailer must have a valid value.',
-            'inputpalletsonfloor.required' => 'Pallets on floor are required.',
+            //'inputpalletsontrailer.min' => 'The Pallets On Trailer must have a valid value.',
+            //'inputpalletsonfloor.required' => 'Pallets on floor are required.',
             //'inputpalletsonfloor.string' => 'The Pallets on Floor field must be a text string.',
-            'inputpalletsonfloor.min' => 'The Pallets On Floor must have a valid value.',
+            //'inputpalletsonfloor.min' => 'The Pallets On Floor must have a valid value.',
             'inputcarrier.required' => 'Carrier is required.',
             //'inputcarrier.exists' => 'Carrier selected is not valid.',
             //'inputcarrier.max' => 'The Carrier field cannot exceed 50 characters.',
@@ -285,16 +301,25 @@ public function update(Request $request)
             'transaction_date' => $request->inputtransactiondate,
             'username' => $request->inputusername,
         ]);
+
+        $trailers = EmptyTrailer::with(['availabilityIndicator', 'locations', 'carriers'])
+        ->whereNull('availability')
+        ->get();
+
+        return response()->json([
+            'message' => 'Trailer successfully added.',
+            'trailers' => $trailers,// O puedes filtrar solo los necesarios
+        ], 200);
     
         // Redirigir con mensaje de éxito
-        return redirect()->route('emptytrailer')->with('success', 'Trailer successfully added!');
+        //return redirect()->route('emptytrailer')->with('success', 'Trailer successfully added!');
     }
     
     //Funcion actualizar tabla con los filtros o al refresh
     public function getEmptyTrailers(Request $request){
                 $query = EmptyTrailer::with(['availabilityIndicator', 'locations', 'carriers'])
                 ->whereNull('availability');                
-                
+/*                
                 // Filtros generales (searchemptytrailergeneral)
                 if ($request->has('search')) {
                     $search = $request->input('search');
@@ -407,7 +432,7 @@ public function update(Request $request)
                 $q->whereIn('location', $locations); // Filtra por cualquier ubicación en el array
             });
         }
-
+*/
         // Filtro de fechas para date_out
         /*if ($request->has('date_out_start') && $request->has('date_out_end') &&
             $request->input('date_out_start') != '' && $request->input('date_out_end') != '') {

@@ -8,6 +8,8 @@
     <!-- SweetAlert2 -->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!--Libreria para el Js de Excel-->
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.3.0/dist/exceljs.min.js"></script>
     <!-- Cargar FullCalendar 5.x con los plugins necesarios -->
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js"></script>
@@ -21,6 +23,12 @@
     <!--Flatpickr para fechas en inputs-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <!-- Estilo de DataTables -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <!-- JS de DataTables -->
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.3.0/css/responsive.dataTables.min.css">
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/responsive/2.3.0/js/dataTables.responsive.min.js"></script>
     <link rel="icon" type="image/png" href="{!! asset('/icons/tms_logo.jpg')!!}">
     @vite([
         'resources/sass/app.scss',
@@ -28,6 +36,10 @@
         ])
 
     <style>
+      .dataTables_filter {
+          display: none;
+      }
+
       .gradient-text {
         background: linear-gradient(135deg, #1e4877, rgb(13, 82, 200));
         -webkit-background-clip: text;
@@ -187,8 +199,17 @@
       .is-valid {
       border-color: #198754;
       }
+      .select2.is-invalid .select2-selection {
+        border-color: red !important;
+        box-shadow: 0 0 5px rgba(255, 0, 0, 0.5) !important;  /* Sombra roja */
+      }
+      .select2-selection.is-invalid {
+          border-color: red !important;
+          box-shadow: 0 0 5px rgba(255, 0, 0, 0.5) !important;  /* Sombra roja */
+      }
       .is-invalid {
-          border-color: #dc3545;
+        border-color: red !important;
+        box-shadow: 0 0 5px rgba(255, 0, 0, 0.5) !important;  /* Sombra roja */
       }
       .invalid-feedback {
           color: #dc3545;
@@ -198,6 +219,12 @@
           font-size: 0.875em;
           color: #dc3545;
       }
+      /*.select2-search__field:focus {
+          outline: none !important;
+          box-shadow: none !important;
+          border-color: transparent !important;
+      }*/
+
 
       /* Eliminar bordes de la tabla y las celdas */
   .table_style {
@@ -320,8 +347,13 @@
 }
 /* Eliminar el borde negro del campo de búsqueda cuando está enfocado */
 .select2-container--default .select2-search__field:focus {
-    border-color: transparent;  /* Eliminar el borde */
-    box-shadow: none;            /* Eliminar cualquier sombra aplicada */
+    border-color: transparent !important;   /* Eliminar el borde */
+    box-shadow: none !important;        /* Eliminar cualquier sombra aplicada */
+    border: 
+}
+.select2-container--default .select2-search--dropdown .select2-search__field {
+    /*border: 1px !important; */
+    /*border-color: #dee2e6 !important;*/
 }
 .select2-container--default .select2-selection--single .select2-selection__clear {
     right: 15px; /* Mueve la "X" más a la izquierda */

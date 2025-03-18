@@ -36,7 +36,7 @@
                 <button type="button" style="color: white;" class="btn me-2 btn-success" id="exportfile" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Export File">
                     <i class="fa-solid fa-file-export"></i>
                 </button>
-                <button type="button" style="color: white;" class="btn me-2 btn-primary" id="refreshemptytrailertable" data-url="{{ route('emptytrailer.data') }}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Refresh Table">
+                <button type="button" style="color: white;" class="btn me-2 btn-primary" id="refreshemptytrailertable" data-url="{{ route('emptytrailer.data') }}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Refresh Data">
                     <i class="fa-solid fa-arrows-rotate"></i>
                 </button>
                 <button class="btn me-2" style="color: white;;background-color:rgb(13, 82, 200);" id="addnewemptytrailer" type="button" data-bs-toggle="offcanvas" data-bs-target="#newtrailerempty" aria-controls="offcanvasWithBothOptions">
@@ -515,7 +515,7 @@
                                                     <h6 class="alert alert-danger">{{  $message  }}</h6>
                                                 @enderror
                                             </div>
-                                            <div class="mb-3 ">
+                                            <div class="mb-3">
                                                 <label for="inputcarrier" class="form-label ">Carrier</label>
                                                 <select class="form-control searchcarrier" aria-label="Default select example"  id="inputcarrier" name="inputcarrier" value="{{ old('inputcarrier') }}" data-url="{{ route('carrier-emptytrailerAjax') }}">
                                                     <option selected disabled hidden></option>
