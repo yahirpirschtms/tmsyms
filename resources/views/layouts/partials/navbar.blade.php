@@ -5,11 +5,11 @@
               <i class="fa-solid fa-bars text-light"></i>
             </button>
             <a class="navbar-brand fw-bolder d-none d-lg-block non" href="#"><img src="{!! asset('/icons/tms_logo1.png')!!}" alt="Logo" height="35" class="d-inline-block align-middle ">
-              TMS YMS</a>
+              YMST</a>
             <a class="d-md-block d-lg-none navbar-brand fw-bolder align-middle non" href="#">TMS YMS</a>
             <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
               <div class="offcanvas-header position-relative" style="background-color: #1e4877;">
-                <h5 class="offcanvas-title align-middle non text-light fw-bolder" id="offcanvasNavbarLabel">YMS TMS</h5>
+                <h5 class="offcanvas-title align-middle non text-light fw-bolder" id="offcanvasNavbarLabel">YMST</h5>
                 <div data-bs-theme="dark">
                 <button type="button" class="btn-close position-absolute top-0 end-0 " data-bs-dismiss="offcanvas" aria-label="Close" style="padding-top: 3.5rem; padding-right: 3.1rem"></button>
                 </div>
@@ -99,7 +99,7 @@
             </div>
             <div class="modal-body">
             <p>Bienvenido {{auth()->user()->username ?? auth()->user()->username}}</p>
-                
+
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

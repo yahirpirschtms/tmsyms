@@ -8,6 +8,9 @@ use App\Models\Shipments;
 use App\Models\Companies;
 use App\Models\Facilities;
 use App\Models\Driver;
+use App\Models\SealsHistory;
+use App\Models\TruckHistory;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -69,38 +72,53 @@ class ShipmentController extends Controller
     return redirect('/login');
 }
 
-    public function liveshipmentsshow()
-    {
-        if (Auth::check()) {
-            // Obtener el ID del estado 'Finalized' desde el catálogo
-            $finalizedStatus = GenericCatalog::where('gntc_value', 'Finalized')
-                ->where('gntc_group', 'CURRENT_STATUS')
-                ->first();
+public function liveshipmentsshow()
+{
+    if (Auth::check()) {
+        // Obtener el ID del estado 'Finalized' desde el catálogo
+        $finalizedStatus = GenericCatalog::where('gntc_value', 'Finalized')
+            ->where('gntc_group', 'CURRENT_STATUS')
+            ->first();
 
-            // Filtrar los envíos que no tienen el estado 'Finalized'
-            $shipments = Shipments::where('gnct_id_current_status', '!=', $finalizedStatus->gnct_id)->get();
+        // Filtrar los envíos que no tienen el estado 'Finalized'
+        $shipments = Shipments::where('gnct_id_current_status', '!=', $finalizedStatus->gnct_id)->get();
 
-            // Obtener los estados actuales desde la base de datos
-            $currentStatus = GenericCatalog::where('gntc_group', 'CURRENT_STATUS')->get();
+        // Obtener los estados actuales desde la base de datos
+        $currentStatus = GenericCatalog::where('gntc_group', 'CURRENT_STATUS')->get();
 
-            // Obtener los tipos de envío desde la base de datos
-            $shipmentType = GenericCatalog::where('gntc_group', 'SHIPMENT_TYPE')->get();
+        // Obtener los tipos de envío desde la base de datos
+        $shipmentType = GenericCatalog::where('gntc_group', 'SHIPMENT_TYPE')->get();
 
-            // Obtener todas las compañías para los selects
-            $companies = Companies::where('notes', 'ym')->get();
+        // Obtener todas las compañías para los selects
+        $companies = Companies::where('notes', 'ym')->get();
 
-            $facilities = Facilities::all();
+        // Obtener todas las instalaciones
+        $facilities = Facilities::all();
 
-            $trailers = EmptyTrailer::all();
-             // Obtener la lista de conductores
-            $drivers = Driver::all();
+        // Obtener todos los trailers vacíos
+        $trailers = EmptyTrailer::all();
 
-            // Pasar los envíos, estados, tipos de envío y compañías a la vista
-            return view('home.liveshipments', compact('shipments', 'currentStatus', 'shipmentType', 'companies', 'facilities', 'trailers', 'drivers'));
-        }
+        // Obtener la lista de conductores
+        $drivers = Driver::all();
 
-        return redirect('/login');
+        // Obtener la lista de compañías de seguridad
+        $securityCompanies = GenericCatalog::where('gntc_group', 'SEC_COMPANY')->get();
+
+        // Pasar los datos a la vista
+        return view('home.liveshipments', compact(
+            'shipments',
+            'currentStatus',
+            'shipmentType',
+            'companies',
+            'facilities',
+            'trailers',
+            'drivers',
+            'securityCompanies'
+        ));
     }
+
+    return redirect('/login');
+}
 
     public function details($pk_shipment)
 {
@@ -139,56 +157,111 @@ class ShipmentController extends Controller
 
     public function update(Request $request, $pk_shipment)
     {
-
         try {
-
-            // Buscar el envío por su ID
             $shipment = Shipments::findOrFail($pk_shipment);
 
-            // Validar los datos recibidos
             $validated = $request->validate([
-                'gnct_id_current_status' => 'nullable|integer',
+                'pk_shipment' => 'nullable|integer',
+                'stm_id' => 'nullable|string',
+                'reference' => 'nullable|string',
+                'bonded' => 'nullable|string',
+                'origin' => 'nullable|string',
+                'destination' => 'nullable|string',
+                'pre_alerted_datetime' => 'nullable|string',
+                'id_trailer' => 'nullable|string',
+                'id_company' => 'nullable|integer',
+                'trailer' => 'nullable|string',
+                'truck' => 'nullable|string',
+                'id_driver' => 'nullable|integer',
+                'etd' => 'nullable|string',
+                'units' => 'nullable|string',
+                'pallets' => 'nullable|string',
+                'seal1' => 'nullable|string',
+                'notes' => 'nullable|string',
+                'security_company_id' => 'nullable|integer',
+                'tracker1' => 'nullable|string',
+                'secondary_shipment_id' => 'nullable|string',
                 'driver_assigned_date' => 'nullable|string',
                 'pick_up_date' => 'nullable|string',
                 'intransit_date' => 'nullable|string',
                 'secured_yarddate' => 'nullable|string',
-                'sec_incident' => 'nullable|integer',
-                'incident_type' => 'nullable|string',
-                'incident_date' => 'nullable|string',
-                'device_number' => 'nullable|string',
-                'overhaul_id' => 'nullable|string',
-                'secondary_shipment_id' => 'nullable|string',
-                'reference' => 'nullable|string',
-                'shipment_type' => 'nullable|string',
-                'etd' => 'nullable|string',
-                'origin' => 'nullable|integer',
-                'destination' => 'nullable|integer',
-                'pre_alerted_datetime' => 'nullable|string',
-                'trailer_owner' => 'nullable|integer',
-                'carrier' => 'nullable|integer',
-                'id_driver' => 'nullable|integer',
-                'units' => 'nullable|string',
-                'pallets' => 'nullable|string',
-                'security_seals' => 'nullable|string',
-                'notes' => 'nullable|string',
+                'gnct_id_current_status' => 'nullable|integer',
+                'gnct_id_shipment_type' => 'nullable|integer',
+                'delivered_date' => 'nullable|string',
+                'at_door_date' => 'nullable|string',
+                'dateCreated' => 'nullable|string',
+                'dateUpdated' => 'nullable|string',
+                'wh_auth_date' => 'nullable|string',
+                'billing_id' => 'nullable|integer',
+                'billing_date' => 'nullable|string',
+                'offloading_time' => 'nullable|string',
+                'seal2' => 'nullable|string',
+                'tracker2' => 'nullable|string',
+                'tracker3' => 'nullable|string',
+                'removed_trackers' => 'nullable|string',
+                'dock_door_date' => 'nullable|string',
+                'door_number' => 'nullable|string',
+                'lane' => 'nullable|string',
+                'security_company' => 'nullable|integer'
             ]);
 
-            // Convertir fechas del formato m/d/Y H:i al formato Y-m-d H:i:s para MySQL
-            foreach (['driver_assigned_date', 'pick_up_date', 'intransit_date', 'secured_yarddate', 'incident_date', 'pre_alerted_datetime', 'etd'] as $field) {
-    if (!empty($validated[$field])) {
-        if ($field == 'pre_alerted_datetime') {
-            // Para pre_alerted_datetime, convertir a Y-m-d\TH:i
-            $validated[$field] = Carbon::createFromFormat('m/d/Y H:i', $validated[$field])->format('Y-m-d H:i:s');
-        } else {
-            // Para otros campos, mantener la conversión original
-            $validated[$field] = Carbon::createFromFormat('m/d/Y H:i', $validated[$field])->format('Y-m-d H:i:s');
-        }
-    } else {
-        $validated[$field] = null;
-    }
-}
 
-            // Actualizar el envío con los datos validados
+
+               // Si hay un cambio en el sello1 o sello2
+        if (isset($validated['seal1']) && $validated['seal1'] != $shipment->seal1) {
+            // Mover el sello actual a la tabla seals_history
+            SealsHistory::create([
+                'id_shipment' => $shipment->stm_id,
+                'seal_num' => $shipment->seal1,
+                'status' => 'O', // 'O' para Old
+                'transaction_date' => now(), // Fecha y hora actual
+            ]);
+
+            // Actualizar el sello en la tabla Shipments
+            $shipment->seal1 = $validated['seal1'];
+            $shipment->save();
+        }
+
+        if (isset($validated['seal2']) && $validated['seal2'] != $shipment->seal2) {
+            // Mover el sello actual a la tabla seals_history
+            SealsHistory::create([
+                'id_shipment' => $shipment->stm_id,
+                'seal_num' => $shipment->seal2,
+                'status' => 'O', // 'O' para Old
+                'transaction_date' => now(), // Fecha y hora actual
+            ]);
+
+            // Actualizar el sello en la tabla Shipments
+            $shipment->seal2 = $validated['seal2'];
+            $shipment->save();
+        }
+
+        // Si hay un cambio en el camión (truck)
+            if (isset($validated['truck']) && $validated['truck'] != $shipment->truck) {
+                // Mover el camión actual a la tabla truck_history
+                TruckHistory::create([
+                    'id_shipment' => $shipment->stm_id,
+                    'truck_number' => $shipment->truck,
+                    'status' => 'O', // 'O' para Old
+                    'transaction_date' => now(), // Fecha y hora actual
+                ]);
+
+                // Actualizar el camión en la tabla Shipments
+                $shipment->truck = $validated['truck'];
+                $shipment->save();
+            }
+            foreach ([
+                'driver_assigned_date', 'pick_up_date', 'intransit_date', 'secured_yarddate',
+                'incident_date', 'pre_alerted_datetime', 'etd', 'delivered_date',
+                'at_door_date', 'dateCreated', 'dateUpdated', 'wh_auth_date', 'billing_date', 'dock_door_date'
+            ] as $field) {
+                if (!empty($validated[$field])) {
+                    $validated[$field] = Carbon::createFromFormat('m/d/Y H:i', $validated[$field])->format('Y-m-d H:i:s');
+                } else {
+                    $validated[$field] = null;
+                }
+            }
+
             $shipment->update($validated);
 
             return response()->json(['message' => 'Shipment updated successfully'], 200);
@@ -196,6 +269,36 @@ class ShipmentController extends Controller
             return response()->json(['message' => 'Failed to update shipment', 'error' => $e->getMessage()], 500);
         }
     }
+
+    public function getPreviousShipment(Request $request, $pk_shipment)
+{
+    $reference = $request->input('reference');  // Solo necesitamos reference como parámetro de la consulta
+
+    // Verificar que 'reference' esté presente
+    if (!$reference || !$pk_shipment) {
+        return response()->json(['error' => 'Reference or Shipment pk_shipment missing'], 400);
+    }
+
+    // Buscar el envío actual usando pk_shipment
+    $currentShipment = Shipments::where('pk_shipment', $pk_shipment)->first();
+
+    if (!$currentShipment) {
+        return response()->json(['error' => 'Current shipment not found'], 404);
+    }
+
+    // Buscar el envío anterior basado en reference y lane 'L1-B'
+    $previousShipment = Shipments::where('reference', $reference)
+                                 ->where('lane', 'L1-B')
+                                 ->where('pk_shipment', '<', $currentShipment->pk_shipment) // Solo envíos anteriores
+                                 ->orderBy('pk_shipment', 'desc') // Tomar el más reciente dentro de los anteriores
+                                 ->first();
+
+    if ($previousShipment) {
+        return response()->json(['previousShipment' => $previousShipment]);
+    }
+
+    return response()->json(['previousShipment' => null], 404);
+}
     // Método para actualizar las notas del envío
     public function updateNotes(Request $request, Shipments $shipment)
     {
@@ -285,8 +388,8 @@ class ShipmentController extends Controller
             'inputshipmentetd' => 'required|date',
             'inputshipmentsunits' => 'required|min:1|integer',
             'inputpallets' => [
-        '', 
-        'required', 
+        '',
+        'required',
         'min:1', // No puede ser nulo ni 0
         function ($attribute, $value, $fail) use ($request) {
             // Mensaje personalizado si no es un número entero

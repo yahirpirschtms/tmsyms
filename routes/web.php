@@ -130,3 +130,5 @@ Route::get('/shipment/status', [GenericCatalogController::class, 'getOrigin']);
 Route::get('/shipment/{pk_shipment}', [CalendarController::class, 'getShipmentDetails'])->name('shipment.details');
 Route::put('/update-status/{pk_shipment}', [CalendarController::class, 'updateOffloadingStatus'])->name('update.status');
 Route::post('/get-status-id', [ShipmentController::class, 'getStatusIdByDescription']);
+
+Route::get('/path/to/previous-shipment/{pk_shipment}', [ShipmentController::class, 'getPreviousShipment'])->name('shipment.previous');
