@@ -674,47 +674,34 @@ $(document).ready(function () {
     }
 
 
-        //Funcion para buscar el availability indicator en la pantalla de empty trailer update
-        function loadAvailabilityIndicatorupdate() {
-            var availabilityRoute = $('#updateinputavailabilityindicator').data('url');
-              $.ajax({
-                  url: availabilityRoute,
-                  method: 'GET',
-                  success: function (data) {
-                      let select = $('#updateinputavailabilityindicator');
-                      let selectedValue = select.val();
-                      //let selectedValue = "{{ old('inputavailabilityindicator') }}"; // Recupera el valor previo
-                      select.empty(); // Limpia el select eliminando todas las opciones
-                      //select.append('<option selected disabled hidden></option>'); // Opción inicial
-    
-                      if (data.length === 0) {
-                          select.append('<option disabled>No options available</option>');
-                      } else {
-                            select.append('<option value="">Choose an option</option>');
-                            data.forEach(item => {
-                                select.append(`<option value="${item.gnct_id}">${item.gntc_description}</option>`);
-                            });
-                      }
-    
-                      if (selectedValue) {
-                          select.val(selectedValue); // Restaura el valor anterior
-                      }
-                  },
-                  error: function (xhr, status, error) {
-                      console.error('Error fetching data Availability Indicators:', error);
-                  }
-              });
-        }
+        
     
         // Cargar datos al enfocarse y al cargar la página update 
-        $(document).one('click', '.clickable-row', function () {
+        /*$(document).one('click', '.clickable-row', function () {
             loadAvailabilityIndicatorupdate();
             //loadCarriersUpdate();
-        });
+        });*/
 
-
+        loadAvailabilityIndicatorupdate();
         // Cargar datos al enfocarse y al cargar la página update 
-        $('#refreshemptytrailertable').on('click', loadAvailabilityIndicatorupdate);
+        //$('#refreshemptytrailertable').on('click', loadAvailabilityIndicatorupdate);
+
+
+    
+        // Cargar datos al enfocarse y al cargar la página update 
+        $('#addnewemptytrailer').one('click', loadAvailabilityIndicator);
+        
+        $('#addnewemptytrailer').on('click', function () {
+            $('#inputcarrier').val(null).trigger('change'); // Restablecer el select2
+
+            // Quitar clases de error
+            $('#inputcarrier').removeClass('is-invalid'); 
+            $('#inputcarrier').next('.select2-container').find('.select2-selection').removeClass('is-invalid');
+
+            // Borrar mensaje de error
+            $('#inputcarrier').parent().find('.invalid-feedback').text('');
+        });
+});
 
         //Funcion para buscar el availability indicator en la pantalla de empty trailer update
         function loadAvailabilityIndicator() {
@@ -747,21 +734,38 @@ $(document).ready(function () {
                   }
               });
         }
+
+        //Funcion para buscar el availability indicator en la pantalla de empty trailer update
+        function loadAvailabilityIndicatorupdate() {
+            var availabilityRoute = $('#updateinputavailabilityindicator').data('url');
+              $.ajax({
+                  url: availabilityRoute,
+                  method: 'GET',
+                  success: function (data) {
+                      let select = $('#updateinputavailabilityindicator');
+                      let selectedValue = select.val();
+                      //let selectedValue = "{{ old('inputavailabilityindicator') }}"; // Recupera el valor previo
+                      select.empty(); // Limpia el select eliminando todas las opciones
+                      //select.append('<option selected disabled hidden></option>'); // Opción inicial
     
-        // Cargar datos al enfocarse y al cargar la página update 
-        $('#addnewemptytrailer').one('click', loadAvailabilityIndicator);
-        
-        $('#addnewemptytrailer').on('click', function () {
-            $('#inputcarrier').val(null).trigger('change'); // Restablecer el select2
-
-            // Quitar clases de error
-            $('#inputcarrier').removeClass('is-invalid'); 
-            $('#inputcarrier').next('.select2-container').find('.select2-selection').removeClass('is-invalid');
-
-            // Borrar mensaje de error
-            $('#inputcarrier').parent().find('.invalid-feedback').text('');
-        });
-});
+                      if (data.length === 0) {
+                          select.append('<option disabled>No options available</option>');
+                      } else {
+                            select.append('<option value="">Choose an option</option>');
+                            data.forEach(item => {
+                                select.append(`<option value="${item.gnct_id}">${item.gntc_description}</option>`);
+                            });
+                      }
+    
+                      if (selectedValue) {
+                          select.val(selectedValue); // Restaura el valor anterior
+                      }
+                  },
+                  error: function (xhr, status, error) {
+                      console.error('Error fetching data Availability Indicators:', error);
+                  }
+              });
+        }
 
 
 //Busqueda de las location en el nuevo registros de los empty trailers 
@@ -1548,7 +1552,7 @@ $(document).ready(function() {
                             }
                         });
                     }
-                    
+                    loadAvailabilityIndicatorupdate();
                 },
                 error: function(xhr, status, error) {
                     // Limpia los errores anteriores
@@ -1773,7 +1777,7 @@ $(document).ready(function() {
                         }
                     //});
                 });
-
+                loadAvailabilityIndicatorupdate();
                 
             })
             .catch(error => console.error('Error:', error));
