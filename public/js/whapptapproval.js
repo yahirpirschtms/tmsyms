@@ -388,7 +388,6 @@ $(document).ready(function () {
     
     function updateShipmentWHETATable() {
         // Obtener los valores de los filtros
-
         const params = new URLSearchParams();
 
         function addParam(key, value) {
@@ -396,6 +395,10 @@ $(document).ready(function () {
                 params.set(key, value);
             }
         }
+
+        let searchValue = tablewhetaapproval.search(); // Guarda el término de búsqueda
+        let filters = tablewhetaapproval.columns().search(); // Guarda los filtros de cada columna
+
 
         // Aplicar la función solo a los valores que no estén vacíos
         addParam('searchwh', document.getElementById('searchemptytrailergeneralwh').value);
@@ -506,6 +509,9 @@ $(document).ready(function () {
             .then(response => response.json())
             .then(data => {
 
+                // Actualiza la tabla de DataTables
+                tablewhetaapproval.clear(); // Limpia la tabla actual
+
                 // Aquí va el código para actualizar trailersData
                 shipmentsData = data.reduce((acc, shipment) => {
                     acc[shipment.pk_shipment] = shipment;
@@ -531,7 +537,48 @@ $(document).ready(function () {
                     `;
                     tbody.innerHTML += row;
                 });*/
-                tablewhetaapproval.draw();
+                data.forEach(shipment => {
+                    // Agregar los datos a la tabla sin atributos
+                    const rowNode = tablewhetaapproval.row.add([
+                        shipment.shipmenttype?.gntc_description ?? '',  // Shipment Type
+                        shipment.stm_id ?? '',                        // STM ID
+                        shipment.etd ?? '',                           // Suggested Delivery Date
+                        shipment.units ?? '',                         // Units
+                        shipment.pallets ?? '',                       // Pallets
+                        shipment.secondary_shipment_id ?? '',         // secondary shipment id
+                        shipment.id_trailer ?? '',                    // trailer id
+                        shipment.billing_id ?? '',                    // billing id
+                        shipment.tracker1 ?? '',                      // tracker1
+                        shipment.tracker2 ?? '',                      // tracker2
+                        shipment.tracker3 ?? '',                      // tracker3
+                        shipment.driver_assigned_date ?? '',          // driver assigned date
+                        shipment.pick_up_date ?? '',                  // picked up date
+                        shipment.intransit_date ?? '',                // in transit date
+                        shipment.delivered_date ?? '',                // delivery/received date
+                        shipment.secured_yarddate ?? '',              // secured yard date
+                        shipment.wh_auth_date ?? '',                  // approved eta date
+                        shipment.billing_date ?? '',                  // date of billing
+                        shipment.offloading_time ?? ''
+                    ]).node(); // Esto devuelve el nodo de la fila agregada
+
+                    // Ahora añadimos los atributos a la fila
+                    $(rowNode).attr({
+                        'id': `trailer-${shipment.pk_shipment}`,
+                        'class': 'clickable-row',
+                        'data-bs-toggle': 'offcanvas',
+                        'data-bs-target': '#shipmentwhapptapprovaldetails',
+                        'aria-controls': 'shipmentwhapptapprovaldetails',
+                        'data-id': shipment.pk_shipment
+                    });
+                });
+                tablewhetaapproval.draw(false); // Redibuja la tabla sin reiniciar la paginación
+
+                // Restaurar la búsqueda y los filtros
+                tablewhetaapproval.search(searchValue).draw(); // Restablece la búsqueda general
+                filters.each((value, index) => {
+                    if (value) tablewhetaapproval.column(index).search(value).draw(); // Restablece los filtros por columna
+                });
+
                 $(document).off("click", ".clickable-row").on("click", ".clickable-row", function () {
                     const id = $(this).data("id");
                     const shipment = shipmentsData[id];
@@ -874,6 +921,9 @@ $(document).ready(function () {
     document.getElementById("whetaapprovalbuttonsave").addEventListener("click", function () {
         let valid = true;
 
+        let searchValue = tablewhetaapproval.search(); // Guarda el término de búsqueda
+        let filters = tablewhetaapproval.columns().search(); // Guarda los filtros de cada columna    
+
         // Validar cada campo antes de enviar
         formFields.forEach(fieldId => {
             const field = document.getElementById(fieldId);
@@ -1043,7 +1093,13 @@ $(document).ready(function () {
                             });
                         });
 
-                        tablewhetaapproval.draw();
+                        tablewhetaapproval.draw(false); // Redibuja la tabla sin reiniciar la paginación
+
+                        // Restaurar la búsqueda y los filtros
+                        tablewhetaapproval.search(searchValue).draw(); // Restablece la búsqueda general
+                        filters.each((value, index) => {
+                            if (value) tablewhetaapproval.column(index).search(value).draw(); // Restablece los filtros por columna
+                        });
 
                         $(document).off("click", ".clickable-row").on("click", ".clickable-row", function () {
                             const id = $(this).data("id");
