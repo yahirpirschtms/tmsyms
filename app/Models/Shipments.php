@@ -46,9 +46,11 @@ class Shipments extends Model
         'units',
         'pallets',
         'seal1',
+        'seal2',
+        'door_number',
         'notes',
-        'security_company_id',
-        'tracker1',
+        'overhaul_id',
+        'device_number',
         'secondary_shipment_id',
         'driver_assigned_date',
         'pick_up_date',
@@ -64,13 +66,8 @@ class Shipments extends Model
         'billing_id',
         'billing_date',
         'offloading_time',
-        'seal2',
-        'tracker2',
-        'tracker3',
-        'removed_trackers',
-        'dock_door_date',
-        'door_number',
-        'lane'
+        'billing_id',
+        'billing_date'
     ];
 
 
@@ -129,7 +126,19 @@ class Shipments extends Model
     }
     public function getetdAttribute($value)
     {
-            return Carbon::parse($value)->format('m/d/Y H:i:s');
+        return $value ? Carbon::parse($value)->format('m/d/Y H:i:s'): null;
+    }
+    public function getSecuredYarddateAttribute($value)
+    {
+        return $value ? Carbon::parse($value)->format('m/d/Y H:i:s'): null;
+    }
+    public function getDeliveredDateAttribute($value)
+    {
+        return $value ? Carbon::parse($value)->format('m/d/Y H:i:s'): null;
+    }
+    public function getBillingDateAttribute($value)
+    {
+        return $value ? Carbon::parse($value)->format('m/d/Y H:i:s'): null;
     }
 
 

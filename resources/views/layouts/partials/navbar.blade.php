@@ -40,7 +40,7 @@
                   </li>
 
                   <!--options catalog-->
-                  <li class="nav-item mx-lg-2 dropdown ">
+                  <!--<li class="nav-item mx-lg-2 dropdown ">
                     <a class="nav-link text-light" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                       Carriers
                     </a>
@@ -50,7 +50,7 @@
                       <li><a class="dropdown-item" href="#">Trailer Management</a></li>
                       <li><a class="dropdown-item" href="#">Truck Management</a></li>
                     </ul>
-                  </li>
+                  </li>-->
 
                   <!--options calendar-->
                   <li class="nav-item dropdown ">
@@ -58,25 +58,22 @@
                       Appointment Viewer
                     </a>
                     <ul class="ms-4 dropdown-menu dropdown-menu-start" style="background-color: #1e4877; border:none">
-                      <li><a class="dropdown-item text-light" href="{{ route('whapptapproval') }}">WH Appot Approval</a></li>
+                      <li><a class="dropdown-item text-light" href="{{ route('whapptapproval') }}">WH Appt Approval</a></li>
                       <li><a class="dropdown-item text-light" href="{{ route('calendar.view') }}">WH Appointment Viewer</a></li>
                       <li><a class="dropdown-item text-light" href="{{ route('historicalcalendar.view') }}">Historical Calendar Viewer</a></li>
                     </ul>
                   </li>
 
                   <!--options Maintenance-->
-                  <li class="nav-item dropdown ">
+                  <!--<li class="nav-item dropdown ">
                     <a class="nav-link text-light" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                       Maintenance
                     </a>
                     <ul class="ms-4 dropdown-menu dropdown-menu-start" style="background-color: #1e4877; border:none">
                       <li><a class="dropdown-item  text-light" href="#">Maintenance Done</a></li>
                       <li><a class="dropdown-item  text-light" href="#">Truck Maintenance</a></li>
-                      <!--<li>
-                        <hr class="dropdown-divider">
-                      </li>-->
                     </ul>
-                  </li>
+                  </li>-->
 
                 </ul>
               </div>
@@ -94,7 +91,7 @@
         <div class="modal-dialog modal-dialogg modal-sm">
             <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="staticBackdropLabel">TMS YMS</h1>
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">YMST</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">

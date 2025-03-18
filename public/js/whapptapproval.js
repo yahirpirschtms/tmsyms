@@ -1,5 +1,7 @@
+var tablewhetaapproval;  // Declara la variable de la tabla fuera de cualquier document.ready
 
-document.getElementById('exportfile').addEventListener('click', function () {
+
+/*document.getElementById('exportfile').addEventListener('click', function () {
     // Obtén la tabla con el id "table_wh_eta_approval_shipments"
     var table = document.getElementById('table_wh_eta_approval_shipments');
     
@@ -39,7 +41,62 @@ document.getElementById('exportfile').addEventListener('click', function () {
 
     // Exporta el archivo Excel con el nombre apropiado
     XLSX.writeFile(wb, filename);
+});*/
+
+document.getElementById('exportfile').addEventListener('click', async function () {
+    // Obtén la tabla con el id "table_wh_eta_approval_shipments"
+    var table = document.getElementById('table_wh_eta_approval_shipments');
+
+    // Crear un nuevo libro de Excel
+    var wb = new ExcelJS.Workbook();
+    var ws = wb.addWorksheet("WHApptApprovalShipments");
+
+    // Obtener los datos de la tabla
+    var rows = table.rows;
+
+    // Copiar las filas de la tabla a la hoja de trabajo
+    for (var i = 0; i < rows.length; i++) {
+        var row = rows[i];
+        var rowData = [];
+        for (var j = 0; j < row.cells.length; j++) {
+            rowData.push(row.cells[j].innerText); // Obtener el texto de cada celda
+        }
+        ws.addRow(rowData);
+    }
+
+    // Formatear la tercera columna (índice 2) para que sea m/d/yyyy h:mm:ss AM/PM
+    ws.getColumn(3).eachCell(function (cell, rowNumber) {
+        if (rowNumber > 1) { // Evitar el encabezado
+            var date = new Date(cell.value);
+            if (date instanceof Date && !isNaN(date)) {
+                // Establecer el formato de la fecha y hora como m/d/yyyy h:mm:ss AM/PM
+                cell.numFmt = 'm/d/yyyy h:mm:ss AM/PM';
+            }
+        }
+    });
+
+    // Crear un nombre de archivo basado en la fecha y hora actual
+    var now = new Date();
+    var year = now.getFullYear();
+    var month = String(now.getMonth() + 1).padStart(2, '0');
+    var day = String(now.getDate()).padStart(2, '0');
+    var hours = String(now.getHours()).padStart(2, '0');
+    var minutes = String(now.getMinutes()).padStart(2, '0');
+    var seconds = String(now.getSeconds()).padStart(2, '0');
+
+    var formattedDateTime = `${month}${day}${year}_${hours}-${minutes}-${seconds}`;
+    var filename = `WHApptApprovalShipments_${formattedDateTime}.xlsx`;
+
+    // Exportar el archivo Excel
+    wb.xlsx.writeBuffer().then(function (buffer) {
+        var blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        var link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        link.click();
+    });
 });
+
 
 // Inicializar los tooltips solo para los elementos con la clase memingo
 document.addEventListener('DOMContentLoaded', function () {
@@ -48,12 +105,333 @@ document.addEventListener('DOMContentLoaded', function () {
         return new bootstrap.Tooltip(tooltipTriggerEl)
     })
 });
+
+$(document).ready(function () {
+    //Busqueda de carries en un nuevo registro
+    var doorNumberRoutewhetaURL = $('#whetainputapproveddoornumber').data('url');
+    var newlyCreatedDoorNumberIdwheta = null; // Variable para almacenar el ID del carrier recién creado
+    var selectedDoorNumberswheta = [];
+    var isDoorNumberLoadedwheta = false; // Bandera para controlar la carga
+
+    loadDoorNumberWHETAOnce();
+
+    function loadDoorNumberWHETAOnce() {
+        if (isDoorNumberLoadedwheta) return; // Evita cargar dos veces
+    
+        $.ajax({
+            url: doorNumberRoutewhetaURL,
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                var doorNumbersData = data.map(item => ({
+                    id: item.gnct_id,
+                    text: item.gntc_value
+                }));
+                data.forEach(function (doornumber) {
+                    if (!selectedDoorNumberswheta.includes(doornumber.gntc_value)) {
+                        selectedDoorNumberswheta.push(doornumber.gntc_value); // Agregar al arreglo si no está ya
+                    }
+                });
+                console.log("Door Numbers cargados desde la base de datos:", selectedDoorNumberswheta);
+
+                $('#whetainputapproveddoornumber').select2({
+                    placeholder: 'Select a Door Number',
+                    allowClear: true,
+                    tags: false, // Permite agregar nuevas opciones
+                    data: doorNumbersData, // Pasar los datos directamente
+                    dropdownParent: $('#whetaapprovaloffcanvas'),
+                    minimumInputLength: 0
+                });
+    
+                isDoorNumberLoadedwheta = true; // Marcar como cargado
+            },
+            error: function (xhr, status, error) {
+                console.error('Error al cargar los Door Numbers:', error);
+            }
+        });
+    }
+
+    $('#whetainputapproveddoornumber').on('change', function () {
+        var selectedOptionDoorNumberWHETA = $(this).select2('data')[0]; // Obtener la opción seleccionada
+        var selectedTextDoorNumberWHETA = selectedOptionDoorNumberWHETA ? selectedOptionDoorNumberWHETA.text : ''; // Obtener el texto (nombre) de la opción seleccionada
+        
+        // Si no es el nuevo Door Number, lo procesamos
+        if (selectedTextDoorNumberWHETA !== newlyCreatedDoorNumberIdwheta &&  selectedTextDoorNumberWHETA.trim() !== '') {
+            console.log(selectedTextDoorNumberWHETA);
+            if (!selectedDoorNumberswheta.includes(selectedTextDoorNumberWHETA)) {
+                selectedDoorNumberswheta.push(selectedTextDoorNumberWHETA);  // Agregar al arreglo solo si no existe
+                console.log(selectedDoorNumberswheta);  // Mostrar el arreglo con todos los drivers seleccionados
+                saveNewDoorNumberWHETA(selectedTextDoorNumberWHETA);
+            }
+        }
+    });
+
+    // Guardar un nuevo carrier en la base de datos
+    function saveNewDoorNumberWHETA(doorNumberWHETA) {
+        $.ajax({
+            url: '/save-new-doornumberwheta',  // Ruta que manejará el backend
+            type: 'POST',
+            data: {
+                doorNumberWHETA: doorNumberWHETA,
+                _token: $('meta[name="csrf-token"]').attr('content')  // Asegúrate de incluir el CSRF token
+            },
+            success: function (response) {
+                console.log(response);
+
+                // Crear una nueva opción para el select2 con el nuevo carrier
+                var newOption = new Option(response.newDoorNumberWHETA.gntc_value, response.newDoorNumberWHETA.gnct_id, true, true);
+
+                // Agregar la nueva opción al select2
+                $('#whetainputapproveddoornumber').append(newOption).trigger('change');
+
+                // Seleccionar el nuevo carrier automáticamente
+                $('#whetainputapproveddoornumber').val(response.newDoorNumberWHETA.gnct_id).trigger('change');
+
+                // Marcar el nuevo ID para evitar que se haga otra solicitud
+                newlyCreatedDoorNumberIdwheta = response.newDoorNumberWHETA.gntc_value;
+                //loadTrailerOwnersShipment();
+
+                // Cuando el nuevo carrier sea creado, aseguramos que no se haga más AJAX para este carrier
+                $('#whetainputapproveddoornumber').on('select2:select', function (e) {
+                    var selectedId = e.params.data.id;
+                    if (selectedId === newlyCreatedDoorNumberIdwheta) {
+                        // Evitar que se reenvíe la solicitud para el nuevo carrier
+                        newlyCreatedDoorNumberIdwheta = null;  // Restablecer el ID del carrier creado
+                    }
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error('Error al guardar el Door Number', error);
+            }
+        });
+    }
+
+        // Verifica si la tabla ya ha sido inicializada antes de inicializarla
+        if (!$.fn.dataTable.isDataTable('#table_wh_eta_approval_shipments')) {
+            tablewhetaapproval = $('#table_wh_eta_approval_shipments').DataTable({
+                paging: false,  // Desactiva la paginación
+                searching: true, // Mantiene la búsqueda activada
+                info: false,     // Oculta la información
+                lengthChange: false, // Desactiva el cambio de cantidad de registros
+                columnDefs: [{ targets: [5,6,7,8,9,10,11,12,13,14,15,16,17,18], searchable: true, visible: false }], // Oculta la columna 5
+                //responsive: true,  // Habilita la responsividad de la tabla
+                autoWidth: false,  // Permite que las celdas se ajusten al contenido
+                //fixedColumns: { leftColumns: 2 }, // Fija las dos primeras columnas (ajusta según tus necesidades)
+            });
+        } else {
+            tablewhetaapproval = $('#table_wh_eta_approval_shipments').DataTable();
+            tablewhetaapproval.page.len(-1).draw();  // Muestra todos los registros sin paginación
+        }
+    
+        // Aplica el filtro en la columna "Shipment Type" (columna 0)
+        function applyshipmenttypes() {
+            var filterValues = $('#emptytrailerfilterinputshipmenttypecheckbox').val()
+                .split(',')
+                .map(value => value.trim()) // Elimina espacios extra
+                .filter(value => value !== '') // Elimina valores vacíos
+                .join('|'); // Convierte la lista en una regex separada por "|"
+    
+            if (filterValues) {
+                tablewhetaapproval.column(0).search(filterValues, true, false).draw(); // Busca con regex
+            } else {
+                tablewhetaapproval.column(0).search('').draw(); // Limpia el filtro si está vacío
+            }
+        }
+    
+        // Aplica el filtro general a todas las columnas
+        $('#searchemptytrailergeneralwh').on('input', function() {
+            tablewhetaapproval.search(this.value).draw();
+        });
+    
+        // Aplica el filtro solo a la columna 5 (incluso si está oculta)
+        $('#column5').on('input', function() {
+            let columnIndex = tablewhetaapproval.column(':contains("secondary shipment id")').index();
+            console.log('Columna 5 encontrada en índice:', columnIndex);
+    
+            if (columnIndex !== undefined) {
+                tablewhetaapproval.column(columnIndex).search(this.value).draw();
+            } else {
+                console.error("No se encontró la columna 5 en la tabla.");
+            }
+        });
+
+    function loadShypmentTypesFilterCheckbox() { 
+        //console.log("sikeeeee")
+        var locationsRoute = $('#multiCollapseapplyshipmenttypefiltercheckbox').data('url');
+        $.ajax({
+            url: locationsRoute,
+            type: 'GET',
+            success: function (data) {
+                let container = $('#ShipmentTypeCheckboxContainer');
+                container.empty();  // Limpiar cualquier contenido previo
+    
+                if (data.length === 0) {
+                    container.append('<p>No options available</p>');
+                } else {
+                    data.forEach(item => {
+                        // Crear un checkbox por cada ubicación
+                        container.append(`
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="${item.gnct_id}" id="shipmenttypecheckbox${item.gnct_id}">
+                                <label class="form-check-label" for="shipmenttypecheckbox${item.gnct_id}">
+                                    ${item.gntc_description}
+                                </label>
+                            </div>
+                        `);
+                    });
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching data ShipTypes:', error);
+            }
+        });
+    }
+    
+    // Ejecutar la función cuando el panel de filtros se haya expandido
+    /*$('#closeapplyshipmenttypefiltercheckbox').one('click', function () {
+        loadShypmentTypesFilterCheckbox();
+    });*/
+    loadShypmentTypesFilterCheckbox();
+
+    // Obtenemos los elementos
+    const updatetab = document.getElementById("refreshwhetapprovaltable");
+    const $checkboxContainer = $("#ShipmentTypeCheckboxContainer");
+    const $filterDiv = $("#emptytrailerfilterdivshipmenttypecheckbox");
+    const $inputPk = $("#emptytrailerfilterinputshipmenttypecheckboxpk");
+    const $inputLocation = $("#emptytrailerfilterinputshipmenttypecheckbox");
+    const $applyButton = $("#applyshipmenttypefiltercheckbox");
+    const $closeButton = $("#closeapplyshipmenttypefiltercheckbox");
+    const $offcanvas = $("#offcanvasaddmorefilters");
+    const $clearButton = $("#emptytrailerfilterbuttonshipmenttypecheckbox");
+
+    // Variable que guarda los elementos que abrirán el offcanvas
+    const openOffcanvasElements = $("#emptytrailerfilterinputshipmenttypecheckbox, #emptytrailerfilterbtnshipmenttypecheckbox");
+
+    // Escuchamos el cambio de checkboxes
+    $checkboxContainer.on("change", "input[type='checkbox']", function () {
+        const anyChecked = $checkboxContainer.find("input[type='checkbox']:checked").length > 0;
+        $closeButton.prop("disabled", anyChecked);
+    });
+
+    // Escuchamos el click del botón Apply
+    $applyButton.on("click", function () {
+        let selectedLocations = [];
+        let selectedIDs = [];
+
+        // Recorrer todos los checkboxes seleccionados
+        $checkboxContainer.find("input[type='checkbox']:checked").each(function () {
+            selectedIDs.push($(this).val());  // Guardar el ID (pk_company)
+            selectedLocations.push($(this).next("label").text().trim()); // Guardar el nombre (CoName)
+        });
+
+        if (selectedLocations.length > 0) {
+            $filterDiv.show(); // Mostrar el div
+            $inputPk.val(selectedIDs.join(",")); // Guardar IDs
+            $inputLocation.val(selectedLocations.join(", ")); // Guardar nombres
+            //Este debe ir descomentado
+            //updatetab.click();
+            applyshipmenttypes();
+        } else {
+            $filterDiv.hide();
+            $inputPk.val("");
+            $inputLocation.val("");
+            $closeButton.click();
+            //Este debe de ir descomentado
+            //updatetab.click();
+            applyshipmenttypes();
+        }
+    });
+
+    // Escuchamos el clic en el botón Close
+    $closeButton.on("click", function () {
+        if (!$filterDiv.is(":visible")) return;
+
+        // Limpiar los inputs si hay datos seleccionados
+        if ($inputLocation.val() !== "" || $inputPk.val() !== "") {
+            $inputLocation.val("");
+            $inputPk.val("");
+            //updatetab.click();
+            applyshipmenttypes();
+        }
+
+        applyshipmenttypes();
+        // Ocultar el div si está visible
+        $filterDiv.hide();
+        //debe de ir descomentado
+        // updatetab.click();
+    });
+
+    // Escuchar clic en los elementos que abrirán el offcanvas
+    openOffcanvasElements.on("click", function () {
+        if ($filterDiv.is(":visible")) {
+            $offcanvas.offcanvas("show"); // Abrir el offcanvas
+        }
+    });
+
+    // Escuchar clic en el botón de limpiar (vaciar inputs y ocultar el div)
+    $clearButton.on("click", function () {
+        if ($filterDiv.is(":visible") && ($inputLocation.val() !== "" || $inputPk.val() !== "")) {
+            // Limpiar los inputs y desmarcar los checkboxes
+            $inputLocation.val("");
+            $inputPk.val("");
+            $checkboxContainer.find("input[type='checkbox']").prop("checked", false);
+            $filterDiv.hide();
+            $closeButton.prop("disabled", false);
+            $closeButton.click();
+            applyshipmenttypes();
+            //debe de ir descomentado
+            // updatetab.click();
+        }
+    });
+
+});
     
     function updateShipmentWHETATable() {
         // Obtener los valores de los filtros
+
+        const params = new URLSearchParams();
+
+        function addParam(key, value) {
+            if (value && value.trim() !== '') {  // Solo agregar si tiene un valor
+                params.set(key, value);
+            }
+        }
+
+        // Aplicar la función solo a los valores que no estén vacíos
+        addParam('searchwh', document.getElementById('searchemptytrailergeneralwh').value);
+        addParam('gnct_id_shipment_type', document.getElementById('emptytrailerfilterinputshipmenttypepk').value);
+        addParam('stm_id', document.getElementById('emptytrailerfilterinputidstm').value);
+        addParam('secondary_shipment_id', document.getElementById('emptytrailerfilterinputsecondaryid').value);
+        addParam('id_trailer', document.getElementById('emptytrailerfilterinputidtrailerwh').value);
+        addParam('etd_start', document.getElementById('emptytrailerfilterinputstartsdd').value);
+        addParam('etd_end', document.getElementById('emptytrailerfilterinputendsdd').value);
+        addParam('units', document.getElementById('emptytrailerfilterinputunits').value);
+        addParam('pallets', document.getElementById('emptytrailerfilterinputpallets').value);
+        addParam('driver_assigned_date_start', document.getElementById('emptytrailerfilterinputstartdriverassigneddate').value);
+        addParam('driver_assigned_date_end', document.getElementById('emptytrailerfilterinputenddriverassigneddate').value);
+        addParam('pick_up_date_start', document.getElementById('emptytrailerfilterinputstartpud').value);
+        addParam('pick_up_date_end', document.getElementById('emptytrailerfilterinputendpud').value);
+        addParam('billing_id', document.getElementById('emptytrailerfilterinputbillingid').value);
+        addParam('device_number', document.getElementById('emptytrailerfilterinputdevicenumber').value);
+
+        // Agregar shipment types seleccionados
+        let selectedShipmentTypes = [];
+        $('#ShipmentTypeCheckboxContainer input[type="checkbox"]:checked').each(function () {
+            selectedShipmentTypes.push($(this).val());
+        });
+        if (selectedShipmentTypes.length > 0) {
+            params.set('shipment_types', selectedShipmentTypes.join(','));
+        }
+
+        if (!params.toString()) {
+            params.set('searchwh', ''); // Parámetro ficticio
+        }
+
+        // Construir la URL optimizada
+        const url = new URL(document.getElementById('refreshwhetapprovaltable').getAttribute('data-url'));
+        url.search = params.toString();
         
-        const searchwh = document.getElementById('searchemptytrailergeneralwh').value;
-        //console.log(searchwh);
+        /*const searchwh = document.getElementById('searchemptytrailergeneralwh').value;
         const shipmenttypewh = document.getElementById('emptytrailerfilterinputshipmenttypepk').value;
         const idstmwh = document.getElementById('emptytrailerfilterinputidstm').value;
         const secondaryshipmentwh = document.getElementById('emptytrailerfilterinputsecondaryid').value;
@@ -80,6 +458,13 @@ document.addEventListener('DOMContentLoaded', function () {
         const dobend = document.getElementById('emptytrailerfilterinputenddob').value;
         const biwh = document.getElementById('emptytrailerfilterinputbillingid').value;
         const dnwh = document.getElementById('emptytrailerfilterinputdevicenumber').value;
+
+        let selectedShipmentTypes = [];
+        $('#ShipmentTypeCheckboxContainer input[type="checkbox"]:checked').each(function () {
+            selectedShipmentTypes.push($(this).val()); // Agrega el ID de la ubicación
+        });
+
+        const shypmenttypes = selectedShipmentTypes.join(','); // Convertir array en string separado por comas
         
         // Construir la URL con los parámetros de filtro
         const url = new URL(document.getElementById('refreshwhetapprovaltable').getAttribute('data-url'));
@@ -88,6 +473,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Agregar los filtros a los parámetros de la URL
         params.set('searchwh', searchwh);
         params.set('gnct_id_shipment_type', shipmenttypewh);
+        params.set('shipment_types', shypmenttypes);
         params.set('stm_id', idstmwh);
         params.set('secondary_shipment_id', secondaryshipmentwh);
         params.set('id_trailer', idtrailerwh);
@@ -114,7 +500,7 @@ document.addEventListener('DOMContentLoaded', function () {
         params.set('billing_id', biwh);
         params.set('device_number', dnwh);
 
-        url.search = params.toString();
+        url.search = params.toString();*/
         //console.log(url);
         fetch(url)
             .then(response => response.json())
@@ -126,7 +512,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     return acc;
                 }, {});
                 // Actualizar la tabla con los datos filtrados
-                const tbody = document.getElementById('shipmentWHTableBody');
+               /* const tbody = document.getElementById('shipmentWHTableBody');
                 tbody.innerHTML = ''; // Limpiar la tabla antes de agregar nuevas filas
 
                 data.forEach(shipment => {
@@ -144,10 +530,45 @@ document.addEventListener('DOMContentLoaded', function () {
                         </tr>
                     `;
                     tbody.innerHTML += row;
+                });*/
+                tablewhetaapproval.draw();
+                $(document).off("click", ".clickable-row").on("click", ".clickable-row", function () {
+                    const id = $(this).data("id");
+                    const shipment = shipmentsData[id];
+                
+                    if (shipment) {
+                        // Cambiar el título del canvas concatenando el número del envío
+                        const titleElement = document.getElementById('shipmentwhapptapprovaldetailstitle');
+                        const originalTitle = titleElement.dataset.originalTitle || titleElement.textContent; // Guardar el título original
+                        titleElement.dataset.originalTitle = originalTitle; // Almacenar en un atributo de datos personalizados
+                        if (shipment.stm_id !== null) {
+                            titleElement.textContent = `${originalTitle} - ${shipment.stm_id}`;
+                        }
+                
+                        // Asignamos los datos al offcanvas
+                        document.getElementById("offcanvasdetails-pk_shipment").textContent = shipment.pk_shipment;
+                        document.getElementById("offcanvasdetails-id_trailer").textContent = shipment.id_trailer;
+                        document.getElementById("offcanvasdetails-stm_id").textContent = shipment.stm_id;
+                        document.getElementById("offcanvasdetails-etd").textContent = shipment.etd;
+                        document.getElementById("offcanvasdetails-units").textContent = shipment.units;
+                        document.getElementById("offcanvasdetails-pallets").textContent = shipment.pallets;
+                        document.getElementById("offcanvasdetails-driver_assigned_date").textContent = shipment.driver_assigned_date;
+                        document.getElementById("offcanvasdetails-intransit_date").textContent = shipment.intransit_date;
+                        document.getElementById("offcanvasdetails-gnct_id_shipment_type").textContent = shipment.shipmenttype && shipment.shipmenttype.gntc_description ? shipment.shipmenttype.gntc_description : 'N/A';
+                        document.getElementById("offcanvasdetails-pick_up_date").textContent = shipment.pick_up_date;
+                
+                    } else {
+                        console.error(`No data found for shipment ID ${id}`);
+                    }
+                
+                    // Restaurar el título al cerrar el canvas
+                    document.getElementById('shipmentwhapptapprovaldetails').addEventListener('hidden.bs.offcanvas', function () {
+                        titleElement.textContent = originalTitle; // Restaurar el título original
+                    });
                 });
 
                 // Vuelve a agregar los listeners de clic después de actualizar la tabla
-                const rows = document.querySelectorAll(".clickable-row");
+                /*const rows = document.querySelectorAll(".clickable-row");
                 rows.forEach(row => {
                     row.addEventListener("click", function () {
                         const id = this.getAttribute("data-id");
@@ -192,7 +613,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             titleElement.textContent = originalTitle; // Restaurar el título original
                         }); 
                     });
-                });
+                });*/
 
             })
             .catch(error => console.error('Error:', error));
@@ -206,14 +627,22 @@ document.addEventListener('DOMContentLoaded', function () {
         input.addEventListener('input', updateShipmentWHETATable);
     });
 
+    /*let debounceTimer;
+
+    function debounceUpdate() {
+        clearTimeout(debounceTimer); // Cancela el temporizador anterior
+        debounceTimer = setTimeout(updateShipmentWHETATable, 1000); // Espera 3 segundos antes de ejecutar la función
+    }
+
     const filterGeneralInputs = document.querySelectorAll('#searchemptytrailergeneralwh');
     filterGeneralInputs.forEach(input => {
-        input.addEventListener('input', updateShipmentWHETATable);
-    });
+        input.addEventListener('input', debounceUpdate);
+    });*/
+    
 
     // Actualización automática cada 5 minutos (300,000 ms)
     setInterval(updateShipmentWHETATable, 5000000);
-    
+
     //Formato de fechas
     $(document).ready(function() {
     
@@ -346,29 +775,54 @@ document.addEventListener('DOMContentLoaded', function () {
         'whetainputunits',
         //'whetainputedt',
         'whetainputapprovedeta',
+        'whetainputapproveddoornumber',
     ];
 
     // Validación de cada campo
     formFields.forEach(fieldId => {
         const field = document.getElementById(fieldId);
         const errorElement = document.getElementById(`error-${fieldId}`);
+        const isSelect2 = $(field).hasClass("searchdoornumberwheta"); // Detecta si es un select2
 
-        // Validación en tiempo real: keyup y blur
-        field.addEventListener('keyup', function () {
-            validateField(field, errorElement);
-        });
-
-        field.addEventListener('blur', function () {
-            validateField(field, errorElement);
-        });
+        if (isSelect2) {
+            // Para select2, usa 'change'
+            $(field).on('change', function () {
+                validateField(field, errorElement, isSelect2);
+            });
+        } else {
+            // Para inputs normales, usa keyup y blur
+            field.addEventListener('keyup', function () {
+                validateField(field, errorElement, isSelect2);
+            });
+    
+            field.addEventListener('blur', function () {
+                validateField(field, errorElement, isSelect2);
+            });
+        }
     });
 
     // Función común para validar cada campo
-    function validateField(field, errorElement) {
+    function validateField(field, errorElement, isSelect2) {
         // Validar si el campo está vacío
         if (field.value.trim() === '') {
             field.classList.add('is-invalid');
             errorElement.textContent = 'This field is required'; // Mensaje de error
+
+            // Si es select2, aplica la clase al contenedor correcto
+            /*if (isSelect2) {
+                $(field).next('.select2-container').find('.select2-selection').addClass("is-invalid");
+            }*/
+                if((field.id === 'whetainputapprovedeta'))errorElement.textContent = 'WH Auth Date is required.';
+
+                if((field.id === 'whetainputunits'))errorElement.textContent = 'Units are required.';
+
+                if((field.id === 'whetainputpallets'))errorElement.textContent = 'Pallets are required.';
+
+                // Si es un select2, aplica la clase al contenedor
+                if (isSelect2) {
+                    $(field).siblings(".select2").find(".select2-selection").addClass("is-invalid");
+                    errorElement.textContent = 'Door number is required';
+                }
         }
             // Validar si el campo es un número entero y mayor que 0
            else if ((field.id === 'whetainputpallets' || field.id === 'whetainputunits')) {
@@ -399,6 +853,10 @@ document.addEventListener('DOMContentLoaded', function () {
         else {
             field.classList.remove('is-invalid');
             errorElement.textContent = ''; // Limpiar el mensaje de error
+
+            if (isSelect2) {
+                $(field).next('.select2-container').find('.select2-selection').removeClass("is-invalid");
+            }
         }
     }
 
@@ -410,12 +868,25 @@ document.addEventListener('DOMContentLoaded', function () {
         formFields.forEach(fieldId => {
             const field = document.getElementById(fieldId);
             const errorElement = document.getElementById(`error-${fieldId}`);
+            const isSelect2 = $(field).hasClass("searchdoornumberwheta"); // Detecta si es un select2
 
             // Validar el campo
             if (field.value.trim() === '') {
                 valid = false;
                 field.classList.add('is-invalid');
                 errorElement.textContent = 'This field is required';
+                
+                if((field.id === 'whetainputapprovedeta'))errorElement.textContent = 'WH Auth Date is required.';
+
+                if((field.id === 'whetainputunits'))errorElement.textContent = 'Units are required.';
+
+                if((field.id === 'whetainputpallets'))errorElement.textContent = 'Pallets are required.';
+
+                // Si es un select2, aplica la clase al contenedor
+                if (isSelect2) {
+                    $(field).siblings(".select2").find(".select2-selection").addClass("is-invalid");
+                    errorElement.textContent = 'Door number is required';
+                }
             }
             // Validar si el campo es un número entero y mayor que 0
             else if ((field.id === 'whetainputpallets' || field.id === 'whetainputunits')) {
@@ -446,6 +917,11 @@ document.addEventListener('DOMContentLoaded', function () {
             else {
                 field.classList.remove('is-invalid');
                 errorElement.textContent = '';
+
+                // Si es un select2, elimina la clase del contenedor
+                if (isSelect2) {
+                    $(field).siblings(".select2").find(".select2-selection").removeClass("is-invalid");
+                }
             }
         });
 
@@ -479,10 +955,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     pk_shipment: document.getElementById("whetainputpkshipment").value,
                     //id_trailer: document.getElementById("whaetainputidtrailer").value,
                     //stm_id: document.getElementById("whetainputidstm").value,
-                    pallets: document.getElementById("whetainputpallets").value,
-                    units: document.getElementById("whetainputunits").value,
+                    whetainputpallets: document.getElementById("whetainputpallets").value,
+                    whetainputunits: document.getElementById("whetainputunits").value,
                     //etd: document.getElementById("whetainputedt").value,
-                    wh_auth_date: document.getElementById("whetainputapprovedeta").value,
+                    whetainputapprovedeta: document.getElementById("whetainputapprovedeta").value,
+                    whetainputapproveddoornumber: document.getElementById("whetainputapproveddoornumber").value,
                 };
 
                 fetch(urlwhetaapproval, {
@@ -493,7 +970,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     },
                     body: JSON.stringify(data),
                 })
-                    .then((response) => {
+                    /*.then((response) => {
                         if (response.ok) {
                             Swal.fire("Saved!", "The changes were saved successfully.", "success");
                             closewhetaapprovalbutton.click();
@@ -504,9 +981,123 @@ document.addEventListener('DOMContentLoaded', function () {
                                 throw new Error(data.message || "Error saving changes.");
                             });
                         }
+                    })*/
+                    .then((response) => {
+                        if (!response.ok) {
+                            return response.json().then((errorData) => {
+                                throw errorData;
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then((data) => {
+                        Swal.fire("Saved!", data.message, "success");
+                        shipmentsData = {};
+
+                        tablewhetaapproval.clear();
+
+                        data.shipments.forEach(shipment => {
+                            // Guardar los datos actualizados en trailersData
+                            shipmentsData[shipment.pk_shipment] = shipment;
+                            // Agregar los datos a la tabla sin atributos
+                            const rowNode = tablewhetaapproval.row.add([
+                                shipment.shipmenttype?.gntc_description ?? '',  // Shipment Type
+                                shipment.stm_id ?? '',                        // STM ID
+                                shipment.etd ?? '',                           // Suggested Delivery Date
+                                shipment.units ?? '',                         // Units
+                                shipment.pallets ?? '',                       // Pallets
+                                shipment.secondary_shipment_id ?? '',         // secondary shipment id
+                                shipment.id_trailer ?? '',                    // trailer id
+                                shipment.billing_id ?? '',                    // billing id
+                                shipment.tracker1 ?? '',                      // tracker1
+                                shipment.tracker2 ?? '',                      // tracker2
+                                shipment.tracker3 ?? '',                      // tracker3
+                                shipment.driver_assigned_date ?? '',          // driver assigned date
+                                shipment.pick_up_date ?? '',                  // picked up date
+                                shipment.intransit_date ?? '',                // in transit date
+                                shipment.delivered_date ?? '',                // delivery/received date
+                                shipment.secured_yarddate ?? '',              // secured yard date
+                                shipment.wh_auth_date ?? '',                  // approved eta date
+                                shipment.billing_date ?? '',                  // date of billing
+                                shipment.offloading_time ?? ''
+                            ]).node(); // Esto devuelve el nodo de la fila agregada
+    
+                            // Ahora añadimos los atributos a la fila
+                            $(rowNode).attr({
+                                'id': `trailer-${shipment.pk_shipment}`,
+                                'class': 'clickable-row',
+                                'data-bs-toggle': 'offcanvas',
+                                'data-bs-target': '#shipmentwhapptapprovaldetails',
+                                'aria-controls': 'shipmentwhapptapprovaldetails',
+                                'data-id': shipment.pk_shipment
+                            });
+                        });
+
+                        tablewhetaapproval.draw();
+
+                        $(document).off("click", ".clickable-row").on("click", ".clickable-row", function () {
+                            const id = $(this).data("id");
+                            const shipment = shipmentsData[id];
+                        
+                            if (shipment) {
+                                // Cambiar el título del canvas concatenando el número del envío
+                                const titleElement = document.getElementById('shipmentwhapptapprovaldetailstitle');
+                                const originalTitle = titleElement.dataset.originalTitle || titleElement.textContent; // Guardar el título original
+                                titleElement.dataset.originalTitle = originalTitle; // Almacenar en un atributo de datos personalizados
+                                if (shipment.stm_id !== null) {
+                                    titleElement.textContent = `${originalTitle} - ${shipment.stm_id}`;
+                                }
+                        
+                                // Asignamos los datos al offcanvas
+                                document.getElementById("offcanvasdetails-pk_shipment").textContent = shipment.pk_shipment;
+                                document.getElementById("offcanvasdetails-id_trailer").textContent = shipment.id_trailer;
+                                document.getElementById("offcanvasdetails-stm_id").textContent = shipment.stm_id;
+                                document.getElementById("offcanvasdetails-etd").textContent = shipment.etd;
+                                document.getElementById("offcanvasdetails-units").textContent = shipment.units;
+                                document.getElementById("offcanvasdetails-pallets").textContent = shipment.pallets;
+                                document.getElementById("offcanvasdetails-driver_assigned_date").textContent = shipment.driver_assigned_date;
+                                document.getElementById("offcanvasdetails-intransit_date").textContent = shipment.intransit_date;
+                                document.getElementById("offcanvasdetails-gnct_id_shipment_type").textContent = shipment.shipmenttype && shipment.shipmenttype.gntc_description ? shipment.shipmenttype.gntc_description : 'N/A';
+                                document.getElementById("offcanvasdetails-pick_up_date").textContent = shipment.pick_up_date;
+                        
+                            } else {
+                                console.error(`No data found for shipment ID ${id}`);
+                            }
+                        
+                            // Restaurar el título al cerrar el canvas
+                            document.getElementById('shipmentwhapptapprovaldetails').addEventListener('hidden.bs.offcanvas', function () {
+                                titleElement.textContent = originalTitle; // Restaurar el título original
+                            });
+                        });
+                        //Swal.fire("Saved!", "The changes were saved successfully.", "success");
+                        closewhetaapprovalbutton.click();
+                        closeoffcanvaswhetaapprovaldetails.click();
+                        //refreshButtonUpdate.click();
                     })
                     .catch((error) => {
-                        Swal.fire("Error", error.message, "error");
+                        console.log(error); // Muestra el error
+                        if (error.errors) {
+                            Object.keys(error.errors).forEach(field => {
+                                const fieldId = field; 
+                                const errorMessages = error.errors[field]; // Los mensajes de error
+                                const errorElement = document.getElementById(`error-${fieldId}`);
+                                const fieldElement = document.getElementById(fieldId);
+                                const isSelect2 = $(fieldElement).hasClass("searchdoornumberwheta"); // Detecta si es select2
+                    
+                                if (fieldElement) {
+                                    fieldElement.classList.add('is-invalid'); // Marca el campo como inválido
+                                    errorElement.textContent = errorMessages.join(', '); // Muestra el error en el campo
+
+                                    // Si es un select2, aplica la clase a la interfaz de select2
+                                    if (isSelect2) {
+                                        $(fieldElement).next('.select2-container').find('.select2-selection').addClass("is-invalid");
+                                    }
+                                }
+                            });
+                        } else {
+                            Swal.fire("Error", error.message || "An unknown error occurred", "error");
+                        }
+                        //Swal.fire("Error", error.message, "error");
                     });
             }
         });
@@ -550,6 +1141,32 @@ document.addEventListener('DOMContentLoaded', function () {
     //Manejo de filtros de inputs simples
     $(document).ready(function () {
 
+        // Verifica si la tabla ya ha sido inicializada antes de inicializarla
+        if (!$.fn.dataTable.isDataTable('#table_wh_eta_approval_shipments')) {
+            tablewhetaapproval = $('#table_wh_eta_approval_shipments').DataTable({
+                paging: false,  // Desactiva la paginación
+                searching: true, // Mantiene la búsqueda activada
+                info: false,     // Oculta la información
+                lengthChange: false, // Desactiva el cambio de cantidad de registros
+                columnDefs: [{ targets: [5,6,7,8,9,10,11,12,13,14,15,16,17,18], searchable: true, visible: false }], // Oculta la columna 5
+                //responsive: true,  // Habilita la responsividad de la tabla
+                autoWidth: false,  // Permite que las celdas se ajusten al contenido
+                //fixedColumns: { leftColumns: 2 }, // Fija las dos primeras columnas (ajusta según tus necesidades)
+            });
+        } else {
+            tablewhetaapproval = $('#table_wh_eta_approval_shipments').DataTable();
+            tablewhetaapproval.page.len(-1).draw();  // Muestra todos los registros sin paginación
+        }
+
+        /*let columnIndex = tablewhetaapproval.column(':contains("secondary shipment id")').index();
+            console.log('Columna 5 encontrada en índice:', columnIndex);
+    
+            if (columnIndex !== undefined) {
+                tablewhetaapproval.column(columnIndex).search(this.value).draw();
+            } else {
+                console.error("No se encontró la columna 5 en la tabla.");
+            }*/
+
         const updatetab = document.getElementById("refreshwhetapprovaltable");
         // Función genérica para habilitar o deshabilitar botones
         function toggleApplyButton(inputSelector, buttonSelector) {
@@ -568,29 +1185,72 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Si el div del filtro ya está visible, actualiza el valor
                 if ($(divSelector).is(':visible')) {
                     $(inputFilterSelector).val(inputValue);
-                    updatetab.click();
+                    //Este debe ir descomentado
+                    //updatetab.click();
+                    tablewhetaapproval.column(1).search($('#emptytrailerfilterinputidstm').val()).draw();
+                    tablewhetaapproval.column(3).search($('#emptytrailerfilterinputunits').val()).draw();
+                    tablewhetaapproval.column(4).search($('#emptytrailerfilterinputpallets').val()).draw();
+                    
+                    tablewhetaapproval.column(5).search($('#emptytrailerfilterinputsecondaryid').val()).draw();
+                    tablewhetaapproval.column(6).search($('#emptytrailerfilterinputidtrailerwh').val()).draw();
+                    tablewhetaapproval.column(7).search($('#emptytrailerfilterinputbillingid').val()).draw();
+                    tablewhetaapproval.column(8).search($('#emptytrailerfilterinputdevicenumber').val()).draw();
+                    tablewhetaapproval.column(9).search($('#emptytrailerfilterinputdevicenumber1').val()).draw();
+                    tablewhetaapproval.column(10).search($('#emptytrailerfilterinputdevicenumber2').val()).draw();
                 } else {
                     // Si el div no está visible, muestra el div y coloca el valor
                     $(inputFilterSelector).val(inputValue);
                     $(divSelector).show();
-                    updatetab.click();
+                    //Este debe de ir descomentado
+                    //updatetab.click();
+                    tablewhetaapproval.column(1).search($('#emptytrailerfilterinputidstm').val()).draw();
+                    tablewhetaapproval.column(3).search($('#emptytrailerfilterinputunits').val()).draw();
+                    tablewhetaapproval.column(4).search($('#emptytrailerfilterinputpallets').val()).draw();
+
+                    tablewhetaapproval.column(5).search($('#emptytrailerfilterinputsecondaryid').val()).draw();
+                    tablewhetaapproval.column(6).search($('#emptytrailerfilterinputidtrailerwh').val()).draw();
+                    tablewhetaapproval.column(7).search($('#emptytrailerfilterinputbillingid').val()).draw();
+                    tablewhetaapproval.column(8).search($('#emptytrailerfilterinputdevicenumber').val()).draw();
+                    tablewhetaapproval.column(9).search($('#emptytrailerfilterinputdevicenumber1').val()).draw();
+                    tablewhetaapproval.column(10).search($('#emptytrailerfilterinputdevicenumber2').val()).draw();
                 }
             } else {
                 // Si el campo está vacío, vacía el input del filtro y oculta el div
                 $(inputFilterSelector).val('');
+                tablewhetaapproval.column(1).search($('#emptytrailerfilterinputidstm').val()).draw();
+                tablewhetaapproval.column(3).search($('#emptytrailerfilterinputunits').val()).draw();
+                tablewhetaapproval.column(4).search($('#emptytrailerfilterinputpallets').val()).draw();
+
+                tablewhetaapproval.column(5).search($('#emptytrailerfilterinputsecondaryid').val()).draw();
+                tablewhetaapproval.column(6).search($('#emptytrailerfilterinputidtrailerwh').val()).draw();
+                tablewhetaapproval.column(7).search($('#emptytrailerfilterinputbillingid').val()).draw();
+                tablewhetaapproval.column(8).search($('#emptytrailerfilterinputdevicenumber').val()).draw();
+                tablewhetaapproval.column(9).search($('#emptytrailerfilterinputdevicenumber1').val()).draw();
+                tablewhetaapproval.column(10).search($('#emptytrailerfilterinputdevicenumber2').val()).draw();
                 $(divSelector).hide();
                 $(closeButtonSelector).click(); // Simula un clic en Collapse
-                updatetab.click();
+                //Este debe ir descomentado
+                //updatetab.click();
             }
         }
     
         // Función genérica para manejar clics en botones X
         function handleClearButton(divSelector, inputSelector, applyButtonSelector, closeButtonSelector) {
             $(inputSelector).val('');
+            tablewhetaapproval.column(1).search($('#emptytrailerfilterinputidstm').val()).draw();
+            tablewhetaapproval.column(3).search($('#emptytrailerfilterinputunits').val()).draw();
+            tablewhetaapproval.column(4).search($('#emptytrailerfilterinputpallets').val()).draw();
+
+            tablewhetaapproval.column(5).search($('#emptytrailerfilterinputsecondaryid').val()).draw();
+            tablewhetaapproval.column(6).search($('#emptytrailerfilterinputidtrailerwh').val()).draw();
+            tablewhetaapproval.column(7).search($('#emptytrailerfilterinputbillingid').val()).draw();
+            tablewhetaapproval.column(8).search($('#emptytrailerfilterinputdevicenumber').val()).draw();
+            tablewhetaapproval.column(9).search($('#emptytrailerfilterinputdevicenumber1').val()).draw();
+            tablewhetaapproval.column(10).search($('#emptytrailerfilterinputdevicenumber2').val()).draw();
             $(divSelector).hide();
             $(closeButtonSelector).prop('disabled', false); // Habilita el botón
             $(applyButtonSelector).click(); // Simula clic en Apply
-            updatetab.click();
+            //updatetab.click();
         }
     
         // Función genérica para abrir el offcanvas y enfocar el input
@@ -604,8 +1264,22 @@ document.addEventListener('DOMContentLoaded', function () {
         function handleCloseCollapseButton(inputSelector, divSelector, inputFilterSelector) {
             if (!$(inputSelector).val()) {
                 $(inputFilterSelector).val(''); // Limpia el input asociado al filtro
+                if ($(divSelector).is(":visible")) {
+                    //Debe de ir descomentar
+                    //updatetab.click();
+                    tablewhetaapproval.column(1).search($('#emptytrailerfilterinputidstm').val()).draw();
+                    tablewhetaapproval.column(3).search($('#emptytrailerfilterinputunits').val()).draw();
+                    tablewhetaapproval.column(4).search($('#emptytrailerfilterinputpallets').val()).draw();
+
+                    tablewhetaapproval.column(5).search($('#emptytrailerfilterinputsecondaryid').val()).draw();
+                    tablewhetaapproval.column(6).search($('#emptytrailerfilterinputidtrailerwh').val()).draw();
+                    tablewhetaapproval.column(7).search($('#emptytrailerfilterinputbillingid').val()).draw();
+                    tablewhetaapproval.column(8).search($('#emptytrailerfilterinputdevicenumber').val()).draw();
+                    tablewhetaapproval.column(9).search($('#emptytrailerfilterinputdevicenumber1').val()).draw();
+                    tablewhetaapproval.column(10).search($('#emptytrailerfilterinputdevicenumber2').val()).draw();
+                } 
                 $(divSelector).hide(); // Oculta el div del filtro
-                updatetab.click();
+               
             }
         }
 
@@ -735,7 +1409,7 @@ document.addEventListener('DOMContentLoaded', function () {
             handleCloseCollapseButton('#inputbillingidfilter', '#emptytrailerfilterdivbillingid', '#emptytrailerfilterinputbillingid');
         });
 
-        // Device Number
+        // tracker 1
         $('#inputdevicenumberfilter').on('input', function () {
             toggleApplyButton('#inputdevicenumberfilter', '#closeapplydevicenumberfilter');
         });
@@ -754,6 +1428,50 @@ document.addEventListener('DOMContentLoaded', function () {
         
         $('#closeapplydevicenumberfilter').on('click', function () {
             handleCloseCollapseButton('#inputdevicenumberfilter', '#emptytrailerfilterdivdevicenumber', '#emptytrailerfilterinputdevicenumber');
+        });
+
+
+        // tracker 2
+        $('#inputdevicenumberfilter1').on('input', function () {
+            toggleApplyButton('#inputdevicenumberfilter1', '#closeapplydevicenumberfilter1');
+        });
+    
+        $('#applydevicenumberfilter1').on('click', function () {
+            handleApplyButton('#inputdevicenumberfilter1', '#emptytrailerfilterdivdevicenumber1', '#emptytrailerfilterinputdevicenumber1', '#closeapplydevicenumberfilter1');
+        });
+    
+        $('#emptytrailerfilterbuttondevicenumber1').on('click', function () {
+            handleClearButton('#emptytrailerfilterdivdevicenumber1', '#inputdevicenumberfilter1', '#applydevicenumberfilter1', '#closeapplydevicenumberfilter1');
+        });
+    
+        $('#emptytrailerfilterbtndevicenumber1, #emptytrailerfilterinputdevicenumber1').on('click', function () {
+            handleFilterButtonClick('offcanvasaddmorefilters', '#inputdevicenumberfilter1');
+        });
+        
+        $('#closeapplydevicenumberfilter1').on('click', function () {
+            handleCloseCollapseButton('#inputdevicenumberfilter1', '#emptytrailerfilterdivdevicenumber1', '#emptytrailerfilterinputdevicenumber1');
+        });
+
+
+        // tracker3
+        $('#inputdevicenumberfilter2').on('input', function () {
+            toggleApplyButton('#inputdevicenumberfilter2', '#closeapplydevicenumberfilter2');
+        });
+    
+        $('#applydevicenumberfilter2').on('click', function () {
+            handleApplyButton('#inputdevicenumberfilter2', '#emptytrailerfilterdivdevicenumber2', '#emptytrailerfilterinputdevicenumber2', '#closeapplydevicenumberfilter2');
+        });
+    
+        $('#emptytrailerfilterbuttondevicenumber2').on('click', function () {
+            handleClearButton('#emptytrailerfilterdivdevicenumber2', '#inputdevicenumberfilter2', '#applydevicenumberfilter2', '#closeapplydevicenumberfilter2');
+        });
+    
+        $('#emptytrailerfilterbtndevicenumber2, #emptytrailerfilterinputdevicenumber2').on('click', function () {
+            handleFilterButtonClick('offcanvasaddmorefilters', '#inputdevicenumberfilter2');
+        });
+        
+        $('#closeapplydevicenumberfilter2').on('click', function () {
+            handleCloseCollapseButton('#inputdevicenumberfilter2', '#emptytrailerfilterdivdevicenumber2', '#emptytrailerfilterinputdevicenumber2');
         });
     });
 
@@ -792,7 +1510,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Cargar datos al enfocarse y al cargar la página filters
     $('#inputapplyshipmenttypefilter').on('focus', loadShipmentTypeFilter);
     $(document).ready(function () {
-        loadShipmentTypeFilter();
+        //loadShipmentTypeFilter();
     });
 
     //Filtros de select Shipment Type
@@ -900,9 +1618,142 @@ document.addEventListener('DOMContentLoaded', function () {
 
     //Manejo Filtro de fechas datetime 
     $(document).ready(function () {
+        // Verifica si la tabla ya ha sido inicializada antes de inicializarla
+        if (!$.fn.dataTable.isDataTable('#table_wh_eta_approval_shipments')) {
+            tablewhetaapproval = $('#table_wh_eta_approval_shipments').DataTable({
+                paging: false,  // Desactiva la paginación
+                searching: true, // Mantiene la búsqueda activada
+                info: false,     // Oculta la información
+                lengthChange: false, // Desactiva el cambio de cantidad de registros
+                columnDefs: [{ targets: [5,6,7,8,9,10,11,12,13,14,15,16,17,18], searchable: true, visible: false }], // Oculta la columna 5
+                //responsive: true,  // Habilita la responsividad de la tabla
+                autoWidth: false,  // Permite que las celdas se ajusten al contenido
+                //fixedColumns: { leftColumns: 2 }, // Fija las dos primeras columnas (ajusta según tus necesidades)
+            });
+        } else {
+            tablewhetaapproval = $('#table_wh_eta_approval_shipments').DataTable();
+            tablewhetaapproval.page.len(-1).draw();  // Muestra todos los registros sin paginación
+        }
+
+        $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+            var startDateStatus = $('#emptytrailerfilterinputstartsdd').val();
+            var endDateStatus = $('#emptytrailerfilterinputendsdd').val();
+            var dateColumnIndexStatus = 2;
+            var rowDateStatus = data[dateColumnIndexStatus] || "";
+
+            // Usa flatpickr para parsear correctamente las fechas
+            var rowDateStatusObj = rowDateStatus ? flatpickr.parseDate(rowDateStatus, "d/m/Y H:i:s") : null;
+            var startDateStatusObj = startDateStatus ? flatpickr.parseDate(startDateStatus, "d/m/Y H:i:s") : null;
+            var endDateStatusObj = endDateStatus ? flatpickr.parseDate(endDateStatus, "d/m/Y H:i:s") : null;
+
+            // **Lógica de filtrado**
+            var statusMatch = (!startDateStatusObj || rowDateStatusObj >= startDateStatusObj) &&
+                            (!endDateStatusObj || rowDateStatusObj <= endDateStatusObj);
+
+            // **Filtro Driver Assigned Date**
+            var startDateDriverAssigned = $('#emptytrailerfilterinputstartdriverassigneddate').val();
+            var endDateDriverAssigned = $('#emptytrailerfilterinputenddriverassigneddate').val();
+            var rowDateDriverAssigned = data[11] || "";
+
+            var rowDateDriverAssignedObj = rowDateDriverAssigned ? flatpickr.parseDate(rowDateDriverAssigned, "d/m/Y H:i:s") : null;
+            var startDateDriverAssignedObj = startDateDriverAssigned ? flatpickr.parseDate(startDateDriverAssigned, "d/m/Y H:i:s") : null;
+            var endDateDriverAssignedObj = endDateDriverAssigned ? flatpickr.parseDate(endDateDriverAssigned, "d/m/Y H:i:s") : null;
+
+            var driverAssignedMatch = (!startDateDriverAssignedObj || rowDateDriverAssignedObj >= startDateDriverAssignedObj) &&
+                                    (!endDateDriverAssignedObj || rowDateDriverAssignedObj <= endDateDriverAssignedObj);
+
+            // **Filtro PUD**
+            var startDatePUD = $('#emptytrailerfilterinputstartpud').val();
+            var endDatePUD = $('#emptytrailerfilterinputendpud').val();
+            var rowDatePUD = data[12] || "";
+
+            var rowDatePUDObj = rowDatePUD ? flatpickr.parseDate(rowDatePUD, "d/m/Y H:i:s") : null;
+            var startDatePUDObj = startDatePUD ? flatpickr.parseDate(startDatePUD, "d/m/Y H:i:s") : null;
+            var endDatePUDObj = endDatePUD ? flatpickr.parseDate(endDatePUD, "d/m/Y H:i:s") : null;
+
+            var PUDMatch = (!startDatePUDObj || rowDatePUDObj >= startDatePUDObj) &&
+                        (!endDatePUDObj || rowDatePUDObj <= endDatePUDObj);
+
+            // **Filtro ITD**
+            var startDateITD = $('#emptytrailerfilterinputstartitd').val();
+            var endDateITD = $('#emptytrailerfilterinputenditd').val();
+            var rowDateITD = data[13] || "";
+
+            var rowDateITDObj = rowDateITD ? flatpickr.parseDate(rowDateITD, "d/m/Y H:i:s") : null;
+            var startDateITDObj = startDateITD ? flatpickr.parseDate(startDateITD, "d/m/Y H:i:s") : null;
+            var endDateITDObj = endDateITD ? flatpickr.parseDate(endDateITD, "d/m/Y H:i:s") : null;
+
+            var ITDMatch = (!startDateITDObj || rowDateITDObj >= startDateITDObj) &&
+                        (!endDateITDObj || rowDateITDObj <= endDateITDObj);
+
+            // **Filtro DRD**
+            var startDateDRD = $('#emptytrailerfilterinputstartdrd').val();
+            var endDateDRD = $('#emptytrailerfilterinputenddrd').val();
+            var rowDateDRD = data[14] || "";
+
+            var rowDateDRDObj = rowDateDRD ? flatpickr.parseDate(rowDateDRD, "d/m/Y H:i:s") : null;
+            var startDateDRDObj = startDateDRD ? flatpickr.parseDate(startDateDRD, "d/m/Y H:i:s") : null;
+            var endDateDRDObj = endDateDRD ? flatpickr.parseDate(endDateDRD, "d/m/Y H:i:s") : null;
+
+            var DRDMatch = (!startDateDRDObj || rowDateDRDObj >= startDateDRDObj) &&
+                        (!endDateDRDObj || rowDateDRDObj <= endDateDRDObj);
+
+            // **Filtro SYD**
+            var startDateSYD = $('#emptytrailerfilterinputstartsyd').val();
+            var endDateSYD = $('#emptytrailerfilterinputendsyd').val();
+            var rowDateSYD = data[15] || "";
+
+            var rowDateSYDObj = rowDateSYD ? flatpickr.parseDate(rowDateSYD, "d/m/Y H:i:s") : null;
+            var startDateSYDObj = startDateSYD ? flatpickr.parseDate(startDateSYD, "d/m/Y H:i:s") : null;
+            var endDateSYDObj = endDateSYD ? flatpickr.parseDate(endDateSYD, "d/m/Y H:i:s") : null;
+
+            var SYDMatch = (!startDateSYDObj || rowDateSYDObj >= startDateSYDObj) &&
+                        (!endDateSYDObj || rowDateSYDObj <= endDateSYDObj);
+
+            // **Filtro AED**
+            var startDateAED = $('#emptytrailerfilterinputstartaed').val();
+            var endDateAED = $('#emptytrailerfilterinputendaed').val();
+            var rowDateAED = data[16] || "";
+
+            var rowDateAEDObj = rowDateAED ? flatpickr.parseDate(rowDateAED, "d/m/Y H:i:s") : null;
+            var startDateAEDObj = startDateAED ? flatpickr.parseDate(startDateAED, "d/m/Y H:i:s") : null;
+            var endDateAEDObj = endDateAED ? flatpickr.parseDate(endDateAED, "d/m/Y H:i:s") : null;
+
+            var AEDMatch = (!startDateAEDObj || rowDateAEDObj >= startDateAEDObj) &&
+                        (!endDateAEDObj || rowDateAEDObj <= endDateAEDObj);
+
+            // **Filtro DOB**
+            var startDateDOB = $('#emptytrailerfilterinputstartdob').val();
+            var endDateDOB = $('#emptytrailerfilterinputenddob').val();
+            var rowDateDOB = data[17] || "";
+
+            var rowDateDOBObj = rowDateDOB ? flatpickr.parseDate(rowDateDOB, "d/m/Y H:i:s") : null;
+            var startDateDOBObj = startDateDOB ? flatpickr.parseDate(startDateDOB, "d/m/Y H:i:s") : null;
+            var endDateDOBObj = endDateDOB ? flatpickr.parseDate(endDateDOB, "d/m/Y H:i:s") : null;
+
+            var DOBMatch = (!startDateDOBObj || rowDateDOBObj >= startDateDOBObj) &&
+                        (!endDateDOBObj || rowDateDOBObj <= endDateDOBObj);
+
+            // **Filtro para emptytrailerfilterinputstartolt y emptytrailerfilterinputendolt**
+            var startTimeOLT = $('#emptytrailerfilterinputstartolt').val();
+            var endTimeOLT = $('#emptytrailerfilterinputendolt').val();
+            var rowTimeOLT = data[18] || "";  // Asume que la columna 5 contiene el valor de tiempo para OLT
+
+            // Convierte las fechas de tipo string en objetos Date
+            var rowTimeOLTObj = rowTimeOLT ? new Date("1970-01-01T" + rowTimeOLT + "Z") : null;
+            var startTimeOLTObj = startTimeOLT ? new Date("1970-01-01T" + startTimeOLT + "Z") : null;
+            var endTimeOLTObj = endTimeOLT ? new Date("1970-01-01T" + endTimeOLT + "Z") : null;
+
+            var oltMatch = (!startTimeOLTObj || rowTimeOLTObj >= startTimeOLTObj) &&
+                        (!endTimeOLTObj || rowTimeOLTObj <= endTimeOLTObj);
+
+
+            return statusMatch && oltMatch && driverAssignedMatch && PUDMatch && ITDMatch && DRDMatch && SYDMatch && AEDMatch && DOBMatch;
+        });
+
         const updatetab = document.getElementById("refreshwhetapprovaltable");
         // Función para manejar el estado de los botones (habilitar/deshabilitar)
-        function toggleDateRangeButtons(startInputSelector, endInputSelector, closeButtonSelector, applyButtonSelector) {
+        function toggleDateRangeButtons(startInputSelector, endInputSelector, closeButtonSelector, applyButtonSelector, divSelector) {
             if ($(startInputSelector).val() || $(endInputSelector).val()) {
                 $(closeButtonSelector).prop('disabled', true); // Habilita el botón Collapse
             } else {
@@ -912,7 +1763,9 @@ document.addEventListener('DOMContentLoaded', function () {
             // Deshabilita el botón Apply hasta que ambos inputs estén llenos
             if ($(startInputSelector).val() && $(endInputSelector).val()) {
                 $(applyButtonSelector).prop('disabled', false); // Habilita el botón Apply
-            } else {
+            } else if(!$(startInputSelector).val() && !$(endInputSelector).val() && $(divSelector).is(":visible")) {
+                $(applyButtonSelector).prop('disabled', false); // Deshabilita el botón Apply
+            }else{
                 $(applyButtonSelector).prop('disabled', true); // Deshabilita el botón Apply
             }
         }
@@ -927,21 +1780,27 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Actualiza los inputs del filtro con los valores de fecha seleccionados
                     $(startFilterInputSelector).val(startDate); // Actualiza el Start Date en el div de filtros
                     $(endFilterInputSelector).val(endDate); // Actualiza el End Date en el div de filtros
-                    updatetab.click();
+                    //Debe ir descomentado
+                    //updatetab.click();
+                    tablewhetaapproval.draw();
                 } else {
                     $(startFilterInputSelector).val(startDate); // Actualiza el Start Date en el div de filtros
                     $(endFilterInputSelector).val(endDate); // Actualiza el End Date en el div de filtros
                     $(divSelector).show(); // Muestra el div del filtro
-                    updatetab.click();
+                    //debe ir descomentado
+                    //updatetab.click();
+                    tablewhetaapproval.draw();
                 }
             } else {
                 $(startFilterInputSelector).val(''); // Limpia el input del Start Date asociado al filtro
                 $(endFilterInputSelector).val(''); // Limpia el input del End Date asociado al filtro
+                tablewhetaapproval.draw();
                 $(divSelector).hide(); // Oculta el div del filtro
                 $(closeButtonSelector).click(); // Simula un clic en Collapse
-                updatetab.click();
+                //Deberia ir descomentado
+                //updatetab.click();
             }
-            toggleDateRangeButtons(startInputSelector, endInputSelector, closeButtonSelector, applyButtonSelector);
+            toggleDateRangeButtons(startInputSelector, endInputSelector, closeButtonSelector, applyButtonSelector, divSelector);
         }
     
         // Función para limpiar el filtro (botón X)
@@ -952,16 +1811,23 @@ document.addEventListener('DOMContentLoaded', function () {
             $(closeButtonSelector).prop('disabled', false); // Habilita el botón Collapse
             $(closeButtonSelector).click(); // Simula un clic en Collapse
             $(applyButtonSelector).prop('disabled', true); // Deshabilita el botón Apply
-            updatetab.click();
+            //Deberia ir descomentado
+            //updatetab.click();
+            tablewhetaapproval.draw();
         }
     
         // Función para manejar clics en botones de cerrar Collapse
-        function handleCloseDateRangeCollapse(startInputSelector, endInputSelector, divSelector, startFilterInputSelector, endFilterInputSelector) {
+        function handleCloseDateRangeCollapse(startInputSelector, endInputSelector, divSelector, startFilterInputSelector, endFilterInputSelector, applyButtonSelector) {
             if (!$(startInputSelector).val() && !$(endInputSelector).val()) {
                 $(startFilterInputSelector).val(''); // Limpia el Start Date del filtro
                 $(endFilterInputSelector).val(''); // Limpia el End Date del filtro
+                if ($(divSelector).is(":visible")) {
+                    //Deberia ir descomentado
+                    //updatetab.click();
+                    tablewhetaapproval.draw();
+                    $(applyButtonSelector).prop('disabled', true); // Deshabilita el botón Apply
+                } 
                 $(divSelector).hide(); // Oculta el div del filtro
-                updatetab.click();
             }
         }
     
@@ -1009,7 +1875,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 '#inputapplysddenfilter', // End Date input en el offcanvas
                 '#emptytrailerfiltersdd', // Div del filtro
                 '#emptytrailerfilterinputstartsdd', // Start Date input en el filtro
-                '#emptytrailerfilterinputendsdd' // End Date input en el filtro
+                '#emptytrailerfilterinputendsdd', // End Date input en el filtro
+                '#applysddfilter'
             );
         });
     
@@ -1050,7 +1917,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 '#inputapplydadenfilter', // End Date input en el offcanvas
                 '#emptytrailerfilterdivdriverassigneddate', // Div del filtro
                 '#emptytrailerfilterinputstartdriverassigneddate', // Start Date input en el filtro
-                '#emptytrailerfilterinputenddriverassigneddate' // End Date input en el filtro
+                '#emptytrailerfilterinputenddriverassigneddate', // End Date input en el filtro
+                '#applydadfilter'
             );
         });
     
@@ -1091,7 +1959,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 '#inputapplypudenfilter', // End Date input en el offcanvas
                 '#emptytrailerfilterdivpud', // Div del filtro
                 '#emptytrailerfilterinputstartpud', // Start Date input en el filtro
-                '#emptytrailerfilterinputendpud' // End Date input en el filtro
+                '#emptytrailerfilterinputendpud', // End Date input en el filtro
+                '#applypudfilter'
             );
         });
 
@@ -1132,7 +2001,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 '#inputapplyitdenfilter', // End Date input en el offcanvas
                 '#emptytrailerfilterdivitd', // Div del filtro
                 '#emptytrailerfilterinputstartitd', // Start Date input en el filtro
-                '#emptytrailerfilterinputenditd' // End Date input en el filtro
+                '#emptytrailerfilterinputenditd', // End Date input en el filtro
+                '#applyitdfilter'
             );
         });
 
@@ -1173,7 +2043,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 '#inputapplydrdenfilter', // End Date input en el offcanvas
                 '#emptytrailerfilterdivdrd', // Div del filtro
                 '#emptytrailerfilterinputstartdrd', // Start Date input en el filtro
-                '#emptytrailerfilterinputenddrd' // End Date input en el filtro
+                '#emptytrailerfilterinputenddrd', // End Date input en el filtro
+                '#applydrdfilter'
             );
         });
 
@@ -1214,7 +2085,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 '#inputapplysydenfilter', // End Date input en el offcanvas
                 '#emptytrailerfilterdivsyd', // Div del filtro
                 '#emptytrailerfilterinputstartsyd', // Start Date input en el filtro
-                '#emptytrailerfilterinputendsyd' // End Date input en el filtro
+                '#emptytrailerfilterinputendsyd', // End Date input en el filtro
+                '#applysydfilter'
             );
         });
 
@@ -1255,7 +2127,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 '#inputapplyaedenfilter', // End Date input en el offcanvas
                 '#emptytrailerfilterdivaed', // Div del filtro
                 '#emptytrailerfilterinputstartaed', // Start Date input en el filtro
-                '#emptytrailerfilterinputendaed' // End Date input en el filtro
+                '#emptytrailerfilterinputendaed', // End Date input en el filtro
+                '#applyaedfilter'
             );
         });
 
@@ -1296,7 +2169,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 '#inputapplyoltenfilter', // End Date input en el offcanvas
                 '#emptytrailerfilterdivolt', // Div del filtro
                 '#emptytrailerfilterinputstartolt', // Start Date input en el filtro
-                '#emptytrailerfilterinputendolt' // End Date input en el filtro
+                '#emptytrailerfilterinputendolt', // End Date input en el filtro
+                '#applyoltfilter'
             );
         });
 
@@ -1337,54 +2211,55 @@ document.addEventListener('DOMContentLoaded', function () {
                 '#inputapplydobenfilter', // End Date input en el offcanvas
                 '#emptytrailerfilterdivdob', // Div del filtro
                 '#emptytrailerfilterinputstartdob', // Start Date input en el filtro
-                '#emptytrailerfilterinputenddob' // End Date input en el filtro
+                '#emptytrailerfilterinputenddob', // End Date input en el filtro
+                '#applydobfilter'
             );
         });
     
         // Detectar cambios en los inputs de las fechas para habilitar o deshabilitar botones
         $('#inputapplysddstfilter, #inputapplysddenfilter').on('input', function () {
-            toggleDateRangeButtons('#inputapplysddstfilter', '#inputapplysddenfilter', '#closeapplysddfilter', '#applysddfilter');
+            toggleDateRangeButtons('#inputapplysddstfilter', '#inputapplysddenfilter', '#closeapplysddfilter', '#applysddfilter', '#emptytrailerfiltersdd');
         });
     
         $('#inputapplydadstfilter, #inputapplydadenfilter').on('input', function () {
-            toggleDateRangeButtons('#inputapplydadstfilter', '#inputapplydadenfilter', '#closeapplydadfilter', '#applydadfilter');
+            toggleDateRangeButtons('#inputapplydadstfilter', '#inputapplydadenfilter', '#closeapplydadfilter', '#applydadfilter', '#emptytrailerfilterdivdriverassigneddate');
         });
     
         $('#inputapplypudstfilter, #inputapplypudenfilter').on('input', function () {
-            toggleDateRangeButtons('#inputapplypudstfilter', '#inputapplypudenfilter', '#closeapplypudfilter', '#applypudfilter');
+            toggleDateRangeButtons('#inputapplypudstfilter', '#inputapplypudenfilter', '#closeapplypudfilter', '#applypudfilter', '#emptytrailerfilterdivpud');
         });
         $('#inputapplyitdstfilter, #inputapplyitdenfilter').on('input', function () {
-            toggleDateRangeButtons('#inputapplyitdstfilter', '#inputapplyitdenfilter', '#closeapplyitdfilter', '#applyitdfilter');
+            toggleDateRangeButtons('#inputapplyitdstfilter', '#inputapplyitdenfilter', '#closeapplyitdfilter', '#applyitdfilter', '#emptytrailerfilterdivitd');
         });
     
         $('#inputapplydrdstfilter, #inputapplydrdenfilter').on('input', function () {
-            toggleDateRangeButtons('#inputapplydrdstfilter', '#inputapplydrdenfilter', '#closeapplydrdfilter', '#applydrdfilter');
+            toggleDateRangeButtons('#inputapplydrdstfilter', '#inputapplydrdenfilter', '#closeapplydrdfilter', '#applydrdfilter', '#emptytrailerfilterdivdrd');
         });
         $('#inputapplysydstfilter, #inputapplysydenfilter').on('input', function () {
-            toggleDateRangeButtons('#inputapplysydstfilter', '#inputapplysydenfilter', '#closeapplysydfilter', '#applysydfilter');
+            toggleDateRangeButtons('#inputapplysydstfilter', '#inputapplysydenfilter', '#closeapplysydfilter', '#applysydfilter', '#emptytrailerfilterdivsyd');
         });
     
         $('#inputapplyaedstfilter, #inputapplyaedenfilter').on('input', function () {
-            toggleDateRangeButtons('#inputapplyaedstfilter', '#inputapplyaedenfilter', '#closeapplyaedfilter', '#applyaedfilter');
+            toggleDateRangeButtons('#inputapplyaedstfilter', '#inputapplyaedenfilter', '#closeapplyaedfilter', '#applyaedfilter', '#emptytrailerfilterdivaed');
         });
         $('#inputapplyoltstfilter, #inputapplyoltenfilter').on('input', function () {
-            toggleDateRangeButtons('#inputapplyoltstfilter', '#inputapplyoltenfilter', '#closeapplyoltfilter', '#applyoltfilter');
+            toggleDateRangeButtons('#inputapplyoltstfilter', '#inputapplyoltenfilter', '#closeapplyoltfilter', '#applyoltfilter', '#emptytrailerfilterdivolt');
         });
     
         $('#inputapplydobstfilter, #inputapplydobenfilter').on('input', function () {
-            toggleDateRangeButtons('#inputapplydobstfilter', '#inputapplydobenfilter', '#closeapplydobfilter', '#applydobfilter');
+            toggleDateRangeButtons('#inputapplydobstfilter', '#inputapplydobenfilter', '#closeapplydobfilter', '#applydobfilter', '#emptytrailerfilterdivdob');
         });
     
         // Llamada inicial para verificar los botones
-        toggleDateRangeButtons('#inputapplysddstfilter', '#inputapplysddenfilter', '#closeapplysddfilter', '#applysddfilter');
-        toggleDateRangeButtons('#inputapplydadstfilter', '#inputapplydadenfilter', '#closeapplydadfilter', '#applydadfilter');
-        toggleDateRangeButtons('#inputapplypudstfilter', '#inputapplypudenfilter', '#closeapplypudfilter', '#applypudfilter');
-        toggleDateRangeButtons('#inputapplyitdstfilter', '#inputapplyitdenfilter', '#closeapplyitdfilter', '#applyitdfilter');
-        toggleDateRangeButtons('#inputapplydrdstfilter', '#inputapplydrdenfilter', '#closeapplydrdfilter', '#applydrdfilter');
-        toggleDateRangeButtons('#inputapplysydstfilter', '#inputapplysydenfilter', '#closeapplysydfilter', '#applysydfilter');
-        toggleDateRangeButtons('#inputapplyaedstfilter', '#inputapplyaedenfilter', '#closeapplyaedfilter', '#applyaedfilter');
-        toggleDateRangeButtons('#inputapplyoltstfilter', '#inputapplyoltenfilter', '#closeapplyoltfilter', '#applyoltfilter');
-        toggleDateRangeButtons('#inputapplydobstfilter', '#inputapplydobenfilter', '#closeapplydobfilter', '#applydobfilter');
+        toggleDateRangeButtons('#inputapplysddstfilter', '#inputapplysddenfilter', '#closeapplysddfilter', '#applysddfilter', '#emptytrailerfiltersdd');
+        toggleDateRangeButtons('#inputapplydadstfilter', '#inputapplydadenfilter', '#closeapplydadfilter', '#applydadfilter', '#emptytrailerfilterdivdriverassigneddate');
+        toggleDateRangeButtons('#inputapplypudstfilter', '#inputapplypudenfilter', '#closeapplypudfilter', '#applypudfilter', '#emptytrailerfilterdivpud');
+        toggleDateRangeButtons('#inputapplyitdstfilter', '#inputapplyitdenfilter', '#closeapplyitdfilter', '#applyitdfilter', '#emptytrailerfilterdivitd');
+        toggleDateRangeButtons('#inputapplydrdstfilter', '#inputapplydrdenfilter', '#closeapplydrdfilter', '#applydrdfilter', '#emptytrailerfilterdivdrd');
+        toggleDateRangeButtons('#inputapplysydstfilter', '#inputapplysydenfilter', '#closeapplysydfilter', '#applysydfilter', '#emptytrailerfilterdivsyd');
+        toggleDateRangeButtons('#inputapplyaedstfilter', '#inputapplyaedenfilter', '#closeapplyaedfilter', '#applyaedfilter', '#emptytrailerfilterdivaed');
+        toggleDateRangeButtons('#inputapplyoltstfilter', '#inputapplyoltenfilter', '#closeapplyoltfilter', '#applyoltfilter', '#emptytrailerfilterdivolt');
+        toggleDateRangeButtons('#inputapplydobstfilter', '#inputapplydobenfilter', '#closeapplydobfilter', '#applydobfilter', '#emptytrailerfilterdivdob');
     });
     /*
     //Guardar los valores de los filtros para recargas de la pagina

@@ -6,6 +6,7 @@ use App\Http\Requests\LoginRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class LoginController extends Controller
 {
@@ -18,8 +19,40 @@ class LoginController extends Controller
         }
         return view('auth.login');
     }
+    public function login(LoginRequest $request)
+{
+    $credentials = $request->getCredentials();
 
-    public function login(LoginRequest $request){
+    // Obtener solo las columnas necesarias para optimizar el rendimiento
+    $user = User::select('pk_users', 'password')
+        ->where('username', $credentials['username'])
+        ->first();
+
+    if (!$user) {
+        return redirect()->to('/login')->withErrors(['auth.failed' => 'Incorrect username']);
+    }
+
+    // Verificar si la contraseña es válida (texto plano, MD5 o bcrypt)
+    if (
+        $user->password === $credentials['password'] || 
+        $user->password === md5($credentials['password']) || 
+        Hash::check($credentials['password'], $user->password)
+    ) {
+        // Actualizar la contraseña a bcrypt si no lo está
+        if ($user->password === $credentials['password'] || $user->password === md5($credentials['password'])) {
+            $user->update(['password' => bcrypt($credentials['password'])]);
+        }
+
+        // Iniciar sesión
+        Auth::login($user);
+
+        return $this->authenticated($request, $user);
+    }
+
+    return redirect()->to('/login')->withErrors(['auth.failed' => 'Incorrect password']);
+}
+
+    /*public function login(LoginRequest $request){
         
         $credentials = $request->getCredentials();
 
@@ -48,20 +81,7 @@ class LoginController extends Controller
             return $this->authenticated($request, $user);
         }
             return redirect()->to('/login')->withErrors(['auth.failed' => 'Incorrect password']);
-        
-
-        
-
-        /*if(!Auth::validate($credentials)){
-            return redirect()->to('/login')->withErrors('auth.failed');
-        }
-
-        $user = Auth::getProvider()->retrieveByCredentials($credentials);
-
-        Auth::login($user);
-
-        return $this->authenticated($request, $user);*/
-    }
+    }*/
 
     public function authenticated(Request $request, $user){
         return redirect('/trafficworkflowstart');
