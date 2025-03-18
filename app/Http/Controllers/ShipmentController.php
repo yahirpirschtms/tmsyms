@@ -15,7 +15,6 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
 
@@ -590,8 +589,8 @@ public function liveshipmentsshow()
                 //'units' => 'required|min:1|integer',
                 'whetainputunits' => 'required|min:1|integer',
                 'whetainputpallets' => [
-                    '', 
-                    'required', 
+                    '',
+                    'required',
                     'min:1', // No puede ser nulo ni 0
                     function ($attribute, $value, $fail) use ($request) {
                         // Mensaje personalizado si no es un número entero
@@ -899,7 +898,7 @@ public function liveshipmentsshow()
     /*public function getService(Request $request)
     {
         $id_service = $request->id_service;
-        
+
         $service = Cache::remember("service_{$id_service}", 60, function () use ($id_service) {
             return DB::table('services')
                 ->where('id_service', $id_service)
