@@ -180,7 +180,7 @@ public function liveshipmentsshow()
                 'pallets' => 'nullable|string',
                 'seal1' => 'nullable|string',
                 'notes' => 'nullable|string',
-                'security_company_id' => 'nullable|integer',
+                'security_company_id' => 'nullable|string',
                 'tracker1' => 'nullable|string',
                 'secondary_shipment_id' => 'nullable|string',
                 'driver_assigned_date' => 'nullable|string',
