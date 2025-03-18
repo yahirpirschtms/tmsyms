@@ -14,6 +14,8 @@ $(document).ready(function () {
         // Si la tabla ya está inicializada, se puede actualizar la configuración
         table.page.len(-1).draw();  // Muestra todos los registros sin paginación
     }
+
+    updateTrailerTable(); // Llamar a la función para actualizar la tabla
     
     function applycarriers(){
         var filterValues = $('#emptytrailerfilterinputcarriercheckbox').val()
@@ -682,7 +684,7 @@ $(document).ready(function () {
             //loadCarriersUpdate();
         });*/
 
-        loadAvailabilityIndicatorupdate();
+        //loadAvailabilityIndicatorupdate();
         // Cargar datos al enfocarse y al cargar la página update 
         //$('#refreshemptytrailertable').on('click', loadAvailabilityIndicatorupdate);
 
