@@ -181,6 +181,8 @@ class CalendarController extends Controller
                 'at_door_date' => 'nullable|date_format:m/d/Y H:i', // Fecha de llegada
                 'offloading_time' => 'nullable|date_format:H:i', // Hora de descarga
                 'wh_auth_date' => 'nullable|date_format:m/d/Y H:i', // Fecha de autorización
+                'removed_trackers' => 'required|in:Yes,No', // Confirmación de removed trackers (obligatorio)
+                'door_number' => 'nullable|string|max:50', // Número de puerta (editable)
             ]);
 
             // Convertir las fechas a formato compatible con la base de datos

@@ -47,13 +47,46 @@
                         </div>
                     </div>
 
-                    <!-- Filtro por Status-->
+                    <!-- Filtro por Status -->
                     <div>
-                        <button class="btn btn-primary w-100 mb-2" id="closeapplysecondaryshipmentidfilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapssecondaryshipmentidfilter" aria-expanded="false" aria-controls="multiCollapssecondaryshipmentidfilter">Status</button>
+                        <button class="btn btn-primary w-100 mb-2" id="closeapplystatusidfilter" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapsstatusidfilter" aria-expanded="false" aria-controls="multiCollapsstatusidfilter">
+                            Status
+                        </button>
                         <div class="row mb-2">
                             <div class="col">
-                                <div class="collapse multi-collapse" id="multiCollapssecondaryshipmentidfilter">
-                                    <input type="text" class="form-control" id="inputapplystatusidfilter">
+                                <div class="collapse multi-collapse" id="multiCollapsstatusidfilter">
+                                    <div class="form-check">
+                                        <input class="form-check-input status-filter" type="checkbox" value="New" id="statusNew">
+                                        <label class="form-check-label" for="statusNew">New</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input status-filter" type="checkbox" value="Prealerted" id="statusPrealerted">
+                                        <label class="form-check-label" for="statusPrealerted">Prealerted</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input status-filter" type="checkbox" value="Driver Assigned" id="statusDriverAssigned">
+                                        <label class="form-check-label" for="statusDriverAssigned">Driver Assigned</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input status-filter" type="checkbox" value="Picked Up" id="statusPickedUp">
+                                        <label class="form-check-label" for="statusPickedUp">Picked Up</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input status-filter" type="checkbox" value="Finalized" id="statusFinalized">
+                                        <label class="form-check-label" for="statusFinalized">Finalized</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input status-filter" type="checkbox" value="Delivered" id="statusDelivered">
+                                        <label class="form-check-label" for="statusDelivered">Delivered</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input status-filter" type="checkbox" value="Secured Yard" id="statusSecuredYard">
+                                        <label class="form-check-label" for="statusSecuredYard">Secured Yard</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input status-filter" type="checkbox" value="Dock Door" id="statusDockDoor">
+                                        <label class="form-check-label" for="statusDockDoor">Dock Door</label>
+                                    </div>
                                     <button class="btn btn-primary mt-2 filterapply" type="button" id="applystatusidfilter">Apply</button>
                                 </div>
                             </div>
@@ -85,14 +118,14 @@
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-2" id="cardsContainer">
                 @foreach ($shipments as $shipment)
                     <div class="col shipment-card"
-                        data-search="{{ $shipment->stm_id }} {{ $shipment->shipment_type }} {{ $shipment->status }} {{ $shipment->company->CoName ?? '' }} {{ $shipment->currentStatus->gntc_description ?? '' }} {{ $shipment->driver->drivername ?? '' }}">
+                        data-search="{{ $shipment->stm_id }} {{ $shipment->shipment_type }} {{ $shipment->status }} {{ $shipment->services->from ?? '' }} {{ $shipment->currentStatus->gntc_description ?? '' }} {{ $shipment->driver->drivername ?? '' }}">
                         <div class="card">
                             <div class="card-body text-black border border-1 rounded" style="">
                                 <h5 class="card-title fw-bolder" style="color:#1e4877">{{ $shipment->stm_id }}</h5>
-                                <p class="origin" style="color: #252525;">{{ $shipment->company->CoName ?? 'Origin not Availiable' }}</p>
+                                <p class="origin" style="color: #252525;">{{ $shipment->services->from ?? 'Origin not Availiable' }}</p>
 
                                 <p class="status" style="color: #252525;">{{ $shipment->currentStatus->gntc_description ?? 'Status Not Availiable' }}</p>
-                                <p class="" style="color: #252525;">{{ $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y') : 'Approved ETA date not available' }}</p>
+                                <p class="" style="color: #252525;">{{ $shipment->etd ? \Carbon\Carbon::parse($shipment->etd)->format('m/d/Y') : '' }}</p>
                                 <p class="driver" style="color: #252525;">{{ $shipment->driver->drivername ?? 'Driver not assigned' }}</p>
                                 <div class="d-flex justify-content-between">
                                     <button class="btn btn-sm text-white" data-bs-toggle="offcanvas" style="background-color: rgb(13, 82, 200);"
@@ -155,19 +188,38 @@
                         <div class="tab-content" style="border: none;" id="pills-tabContent-{{ $shipment->stm_id }}">
                         <div class="tab-pane fade show active" id="pills-initial-status-{{ $shipment->stm_id }}" role="tabpanel" aria-labelledby="pills-initial-status-tab">
 
+                            <input type="hidden" name="pk_shipment" value="{{ $shipment->pk_shipment }}">
+
                             <div class="mb-3">
                                 <label for="stm_id" class="form-label">STM ID</label>
                                 <input type="text" class="form-control" id="stm_id" value="{{ $shipment->stm_id ?? 'STM ID Not Available' }}" readonly data-original="{{ $shipment->stm_id ?? 'STM ID not available' }}">
                             </div>
 
                             <div class="mb-3">
-                                <label for="device_number" class="form-label">Device Number</label>
-                                <input type="text" class="form-control" id="device_number" name="device_number" value="{{ $shipment->device_number }}" data-original="{{ $shipment->device_number }}">
+                                <label for="tracker1" class="form-label">Tracker 1</label>
+                                <input type="text" class="form-control" id="tracker1" name="tracker1" value="{{ $shipment->tracker1 }}" data-original="{{ $shipment->tracker1 }}">
                             </div>
 
                             <div class="mb-3">
-                                <label for="overhaul_id" class="form-label">Overhaul ID</label>
-                                <input type="text" class="form-control" id="overhaul_id" name="overhaul_id" value="{{ $shipment->overhaul_id }}" data-original="{{ $shipment->overhaul_id }}">
+                                <label for="tracker2" class="form-label">Tracker 2</label>
+                                <input type="text" class="form-control" id="tracker2" name="tracker2" value="{{ $shipment->tracker2 }}" data-original="{{ $shipment->tracker2 }}">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="tracker3" class="form-label">Tracker 3</label>
+                                <input type="text" class="form-control" id="tracker3" name="tracker3" value="{{ $shipment->tracker3 }}" data-original="{{ $shipment->tracker3 }}">
+                            </div>
+
+
+                            <div class="mb-3">
+                                <label for="security_company_id" class="form-label">Security Company ID</label>
+                                <input type="text" class="form-control" id="security_company_id" name="security_company_id" value="{{ $shipment->security_company_id }}" data-original="{{ $shipment->security_company_id }}">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="securityCompany" class="form-label">Security Company</label>
+                                <input type="text" class="form-control" id="securityCompany-{{ $shipment->stm_id }}"
+                                       value="{{ $shipment->securityCompany->gntc_description ?? '-- No Company Selected --' }}" readonly>
                             </div>
 
                             <div class="mb-3">
@@ -176,7 +228,7 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="reference" class="form-label">Landstar Reference</label>
+                                <label for="reference" class="form-label">Carrier Reference</label>
                                 <input type="text" class="form-control" id="reference" name="reference" value="{{ $shipment->reference }}" data-original="{{ $shipment->reference }}">
                             </div>
 
@@ -192,30 +244,16 @@
                                     placeholder="mm/dd/yyyy --:--" data-original="{{ $shipment->etd ? \Carbon\Carbon::parse($shipment->etd)->format('m/d/Y H:i') : '' }}">
                             </div>
 
-                            <!-- Origin -->
+                           <!-- Origin -->
                             <div class="mb-3">
                                 <label for="origin-{{ $shipment->stm_id }}" class="form-label">Origin</label>
-                                <select class="form-select" id="origin-{{ $shipment->stm_id }}" name="origin" data-original="{{ $shipment->origin }}">
-                                    @foreach ($companies as $company)
-                                        <option value="{{ $company->pk_company }}"
-                                            {{ old("origin-{$shipment->stm_id}", $shipment->origin) == $company->pk_company ? 'selected' : '' }}>
-                                            {{ $company->CoName }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                <input type="text" class="form-control" id="origin-{{ $shipment->stm_id }}" name="origin" value="{{ $shipment->origin }}" readonly>
                             </div>
 
                             <!-- Destination -->
                             <div class="mb-3">
                                 <label for="destination-{{ $shipment->stm_id }}" class="form-label">Destination</label>
-                                <select class="form-select" id="destination-{{ $shipment->stm_id }}" name="destination" data-original="{{ $shipment->destination }}">
-                                    @foreach ($companies as $company)
-                                        <option value="{{ $company->pk_company }}"
-                                            {{ old("destination-{$shipment->stm_id}", $shipment->destination) == $company->pk_company ? 'selected' : '' }}>
-                                            {{ $company->CoName }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                <input type="text" class="form-control" id="destination-{{ $shipment->stm_id }}" name="destination" value="{{ $shipment->destination }}" readonly>
                             </div>
 
                             <div class="mb-3">
@@ -271,7 +309,7 @@
 
                             <div class="mb-3">
                                 <label for="Truck" class="form-label">Truck</label>
-                                <input type="text" class="form-control" id="Truck" name="units" value="{{ $shipment->truck }}" data-original="{{ $shipment->truck }}">
+                                <input type="text" class="form-control" id="Truck" name="truck" value="{{ $shipment->truck }}" data-original="{{ $shipment->truck }}">
                             </div>
 
                             <div class="mb-3">
@@ -287,8 +325,18 @@
                             <span id="error-message-{{ $shipment->stm_id }}" style="color: red; display: none;"></span>
 
                             <div class="mb-3">
-                                <label for="security_seals" class="form-label">Security Seal</label>
-                                <input type="text" class="form-control" id="security_seals" name="security_seals" value="{{ $shipment->security_seals }}" data-original="{{ $shipment->security_seals }}">
+                                <label for="seal1" class="form-label">Seal 1</label>
+                                <input type="text" class="form-control" id="seal1" name="seal1" value="{{ $shipment->seal1 }}" data-original="{{ $shipment->seal1 }}">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="seal2" class="form-label">Seal 2</label>
+                                <input type="text" class="form-control" id="seal2" name="seal2" value="{{ $shipment->seal2 }}" data-original="{{ $shipment->seal2 }}">
+                            </div>
+
+                            <div class="mb-3" hidden>
+                                <label for="lane" class="form-label">Lane</label>
+                                <input type="text" class="form-control" id="lane" name="lane" value="{{ $shipment->lane }}" data-original="{{ $shipment->lane }}">
                             </div>
 
                             <div class="mb-3">
@@ -319,6 +367,15 @@
                                         </option>
                                     @endforeach
                                 </select>
+
+                                <div class="mb-3">
+                                    <label for="dockDoorDate-{{ $shipment->stm_id }}" class="form-label">Dock Door Date</label>
+                                    <input type="text" class="form-control flatpickr" id="dockDoorDate-{{ $shipment->stm_id }}" name="dock_door_date"
+                                        value="{{ $shipment->dock_door_date ? \Carbon\Carbon::parse($shipment->dock_door_date)->format('m/d/Y H:i') : '' }}"
+                                        placeholder="mm/dd/yyyy --:--"
+                                        data-original="{{ $shipment->dock_door_date ? \Carbon\Carbon::parse($shipment->dock_door_date)->format('m/d/Y H:i') : '' }}"
+                                        onfocus="checkAndChangeStatus('dockDoorDate-{{ $shipment->stm_id }}', 'Dock Door', '{{ $shipment->stm_id }}')">
+                                </div>
 
                                 <div class="mb-3">
                                     <label for="driverAssignmentDate-{{ $shipment->stm_id }}" class="form-label">Driver Assignment Date</label>
@@ -399,11 +456,12 @@
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Origin</label>
-                                    <p>{{ optional($companies->firstWhere('pk_company', $shipment->origin))->CoName ?? 'Origin not available' }}</p>
+                                    <p>{{ $shipment->origin ?? 'Origin not available' }}</p>
                                 </div>
+
                                 <div class="mb-3">
                                     <label class="form-label">Destination</label>
-                                    <p>{{ optional($companies->firstWhere('pk_company', $shipment->destination))->CoName ?? 'Not available' }}</p>
+                                    <p>{{ $shipment->destination ?? 'Not available' }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Pre-Alerted Date & Time</label>
@@ -442,16 +500,36 @@
                                     <p>{{ $shipment->pallets ?? 'Not Available' }}</p>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label">Security Seals</label>
-                                    <p>{{ $shipment->security_seals ?? 'Not Available' }}</p>
+                                    <label class="form-label">Seal 1</label>
+                                    <p>{{ $shipment->seal1 ?? 'Not Available' }}</p>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Seal 2</label>
+                                    <p>{{ $shipment->seal2 ?? 'Not Available' }}</p>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label">Overhaul ID</label>
-                                    <p>{{ $shipment->overhaul_id ?? 'Not Available' }}</p>
+                                    <label class="form-label">Security Company ID</label>
+                                    <p>{{ $shipment->security_company_id ?? 'Not Available' }}</p>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Security Company</label>
+                                    <p>{{ $shipment->securityCompany->gntc_description ?? 'Not Available' }}</p>
                                 </div>
                                 <div class="mb-3">
-                                    <label class="form-label">Device Number</label>
-                                    <p>{{ $shipment->device_number ?? 'Not Available' }}</p>
+                                    <label class="form-label">Tracker 1</label>
+                                    <p>{{ $shipment->tracker1 ?? 'Not Available' }}</p>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Tracker 2</label>
+                                    <p>{{ $shipment->tracker2 ?? 'Not Available' }}</p>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Tracker 3</label>
+                                    <p>{{ $shipment->tracker3 ?? 'Not Available' }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Secondary Shipment ID</label>
@@ -516,13 +594,119 @@
         event.preventDefault(); // Previene el envío estándar del formulario
         console.log('Formulario enviado (delegado)');
 
-        let formAction = $(this).attr('action');
-        let formData = $(this).serialize();
+        let form = $(this);
+        let formAction = form.attr('action');
+        let formData = form.serialize();
 
+        let lane = form.find('[name="lane"]').val(); // Aseguramos que buscamos dentro del formulario específico
+        let pickUpDate = form.find('[name="pick_up_date"]').val();
+        let inTransitDate = form.find('[name="intransit_date"]').val();
+        let reference = form.find('[name="reference"]').val(); // Obtener referencia
+
+        let warningMessage = "";
+
+        // Depuración para ver las fechas
+        console.log('Pick Up Date:', pickUpDate);
+        console.log('In Transit Date:', inTransitDate);
+
+        // Validación L2-B
+        if (lane === 'L2-B' && pickUpDate && inTransitDate) {
+            const pickUp = new Date(pickUpDate);
+            const inTransit = new Date(inTransitDate);
+
+            console.log('pickUp:', pickUp);
+            console.log('inTransit:', inTransit);
+
+            // Comparar solo la fecha (día, mes, año)
+            if (pickUp.toISOString().split('T')[0] !== inTransit.toISOString().split('T')[0]) {
+                warningMessage = 'The Picked Up Date does not match the In Transit Date for this shipment, Are you sure to save?.';
+                console.log('Warning:', warningMessage); // Verifica si se asignó el mensaje
+            }
+        }
+
+        // Nueva validación para L1-C comparando con el envío anterior con L1-B
+        if (lane === 'L1-C' && reference) {
+            console.log('Buscando envío anterior con referencia:', reference, 'y lane L1-B');
+            let shipmentpkId = form.find('[name="pk_shipment"]').val();  // Ahora obtiene el valor del campo oculto pk_shipment
+            console.log('shipmentpkId:', shipmentpkId);
+
+            $.ajax({
+                url: '/path/to/previous-shipment/' + shipmentpkId, // Incluimos el pk_shipment en la URL
+                method: 'GET',
+                data: {
+                    reference: reference,  // Pasamos la referencia para identificar el envío
+                },
+                success: function (response) {
+                    console.log('Respuesta del servidor:', response);
+                    if (response.previousShipment) {
+                        // Compara solo el día de la fecha "pick_up_date"
+                        let previousShipment = response.previousShipment;
+                        let previousPickUpDate = new Date(previousShipment.pick_up_date); // Convertir a objeto Date
+                        let currentPickUpDate = new Date(pickUpDate); // Convertir a objeto Date
+
+                        // Obtener el día (sin considerar el mes, horas, minutos, etc.)
+                        let previousPickUpDay = previousPickUpDate.getDate();
+                        let currentPickUpDay = currentPickUpDate.getDate();
+
+                        // Verificar si los días de pick_up_date no coinciden
+                        if (currentPickUpDay !== previousPickUpDay) {
+                            warningMessage = 'The Picked Up Date does not match the previous L1-B event, Are you sure to save?.';
+                            Swal.fire({
+                                title: 'Warning',
+                                text: warningMessage,
+                                icon: 'warning',
+                                confirmButtonText: 'Continue'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    sendFormData(formAction, formData); // Enviar el formulario si el usuario acepta
+                                }
+                            });
+                        } else {
+                            sendFormData(formAction, formData); // Si los días coinciden, enviar el formulario
+                        }
+                    } else {
+                        // Si no se encuentra el envío anterior, continuar con el envío
+                        sendFormData(formAction, formData);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error en la solicitud AJAX:', error);
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'No se pudo obtener el envío anterior.',
+                        icon: 'error',
+                        confirmButtonText: 'Aceptar'
+                    });
+                }
+            });
+
+            return; // Evitar que el formulario se envíe hasta que tengamos la respuesta de la validación
+        }
+
+        // Si no hay advertencia, enviamos el formulario
+        if (warningMessage) {
+            Swal.fire({
+                title: 'Warning',
+                text: warningMessage,
+                icon: 'warning',
+                confirmButtonText: 'Continue'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    sendFormData(formAction, formData); // Enviar el formulario si el usuario acepta
+                }
+            });
+        } else {
+            // Si no hay advertencia, enviamos el formulario
+            sendFormData(formAction, formData);
+        }
+    });
+
+    // Función para enviar los datos del formulario
+    function sendFormData(formAction, formData) {
         $.ajax({
             url: formAction,
-            method: 'PUT',
-            data: formData,
+            method: 'POST', // Laravel maneja PUT con _method en datos
+            data: formData + "&_method=PUT", // Asegura compatibilidad con Laravel
             beforeSend: function () {
                 Swal.fire({
                     title: 'Enviando datos...',
@@ -536,7 +720,7 @@
             },
             success: function (response) {
                 Swal.fire({
-                    title: '¡Éxito!',
+                    title: '¡Success!',
                     text: response.message || 'Los datos se actualizaron correctamente.',
                     icon: 'success',
                     confirmButtonText: 'Aceptar'
@@ -556,7 +740,7 @@
                 console.error('Error en la solicitud:', xhr.responseJSON || xhr.responseText);
             },
         });
-    });
+    }
 </script>
 
 
@@ -581,83 +765,68 @@
     </script>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const cardsContainer = document.getElementById("cardsContainer");  // Contenedor de las tarjetas
-        const cardElements = cardsContainer.querySelectorAll(".card");  // Todas las tarjetas dentro del contenedor
+document.addEventListener("DOMContentLoaded", function () {
+    const cardsContainer = document.getElementById("cardsContainer");
+    const cardElements = cardsContainer.querySelectorAll(".card");
+    const $activeFilterDiv = $('#activeFilterDiv');
+    const $activeFilterText = $('#activeFilterText');
+    const closeActiveFilterButton = document.getElementById("closeActiveFilter");
 
-        // Función común para aplicar filtros
-        function applyFilter(inputId, buttonId, filterClass) {
-            const inputFilter = document.getElementById(inputId);  // Campo de filtro
-            const applyButton = document.getElementById(buttonId);  // Botón "Apply"
-            const $activeFilterDiv = $('#activeFilterDiv');
-            const $activeFilterText = $('#activeFilterText');
-            const $closeActiveFilterButton = $('#closeActiveFilter');
+    // 🔹 Función para obtener los valores de los checkboxes seleccionados
+    function getSelectedStatuses() {
+        return Array.from(document.querySelectorAll(".status-filter:checked")).map(checkbox => checkbox.value.toLowerCase());
+    }
 
-            // Lógica para aplicar el filtro
-            if (applyButton) {
-                applyButton.addEventListener("click", function () {
-                    const filterValue = inputFilter.value.trim().toLowerCase();  // Obtener el valor y convertirlo a minúsculas
+    // 🔹 Función para aplicar filtros de status (SOLO cuando se presiona "Apply")
+    function applyCheckboxFilter() {
+        const selectedStatuses = getSelectedStatuses();
 
-                    if (filterValue) {
-                        console.log("Filtro aplicado: " + filterValue);
+        console.log("Estados seleccionados (Apply presionado):", selectedStatuses);
 
-                        // Mostrar el filtro aplicado con el texto "Filtro: "
-                        $activeFilterText.text("Filtro" + inputFilter.placeholder + ": " + filterValue);
-                        $activeFilterDiv.show();
-
-                        // Filtrar las tarjetas
-                        cardElements.forEach(card => {
-                            const cardText = card.querySelector(filterClass) ? card.querySelector(filterClass).textContent : "";  // Obtener el texto de la clase de filtro
-
-                            if (cardText.toLowerCase().includes(filterValue)) {
-                                card.style.display = "";  // Mostrar la tarjeta si coincide con el filtro
-                            } else {
-                                card.style.display = "none";  // Ocultar la tarjeta si no coincide
-                            }
-                        });
-                    } else {
-                        // Si no hay valor en el filtro, mostrar todas las tarjetas
-                        cardElements.forEach(card => card.style.display = "");
-                        $activeFilterDiv.hide();  // Ocultar la sección de filtro aplicado si no hay filtro
-                    }
-                });
-            }
-
-            // Lógica para cerrar el filtro y resetear las tarjetas al hacer clic en la "X"
-            if ($closeActiveFilterButton) {
-                $closeActiveFilterButton.on('click', function () {
-                    // Limpiar el campo de filtro y mostrar todas las tarjetas
-                    inputFilter.value = "";
-                    cardElements.forEach(card => card.style.display = "");
-
-                    // Ocultar la sección de filtro aplicado
-                    $activeFilterDiv.hide();
-                });
-            }
-        }
-
-        // Filtro por Origin (Filtro basado en la clase .origin dentro de cada tarjeta)
-        applyFilter('inputapplyoriginfilter', 'applyoriginfilter', '.origin');  // Filtro por Origin
-
-        // Filtro por Status (Filtro basado en la clase .status dentro de cada tarjeta)
-        applyFilter('inputapplystatusidfilter', 'applystatusidfilter', '.status');  // Filtro por Status
-
-        // Filtro por Driver (Filtro basado en la clase .driver dentro de cada tarjeta)
-        applyFilter('inputapplydriverfilter', 'applydriverfilter', '.driver');  // Filtro por Driver
-
-        // Evento para el botón de refresh
-        const refreshButton = document.getElementById("refreshshipmentstable");
-        if (refreshButton) {
-            refreshButton.addEventListener("click", function () {
-                // Recargar las tarjetas, por ejemplo, mostrando todas las tarjetas y limpiando los filtros
-                cardElements.forEach(card => card.style.display = "");  // Mostrar todas las tarjetas
-                const inputs = document.querySelectorAll('input');  // Obtener todos los campos de filtro
-                inputs.forEach(input => input.value = "");  // Limpiar los filtros
-                $('#activeFilterDiv').hide();  // Ocultar la sección del filtro activo
-                console.log("Tarjetas recargadas");
+        if (selectedStatuses.length > 0) {
+            cardElements.forEach(card => {
+                const cardStatus = card.querySelector(".status") ? card.querySelector(".status").textContent.toLowerCase() : "";
+                card.style.display = selectedStatuses.includes(cardStatus) ? "" : "none";
             });
+
+            $activeFilterText.text("Filter: Status - " + selectedStatuses.join(", "));
+            $activeFilterDiv.show();
+        } else {
+            resetFilters();
         }
-    });
+    }
+
+    // 🔹 Función para resetear todos los filtros
+    function resetFilters() {
+        cardElements.forEach(card => card.style.display = "");  // Mostrar todas las tarjetas
+        document.querySelectorAll('input[type="text"]').forEach(input => input.value = "");  // Limpiar los inputs de texto
+        document.querySelectorAll(".status-filter").forEach(checkbox => checkbox.checked = false);  // Desmarcar los checkboxes
+        $activeFilterDiv.hide();
+    }
+
+    // 🔹 Evento para cerrar el filtro al hacer clic en "X"
+    if (closeActiveFilterButton) {
+        closeActiveFilterButton.addEventListener("click", function () {
+            resetFilters();
+            console.log("Filtro eliminado");
+        });
+    }
+
+    // 🔹 Evento para el botón "Apply" de status (Solo filtra cuando se presiona)
+    const applyStatusButton = document.getElementById("applystatusidfilter");
+    if (applyStatusButton) {
+        applyStatusButton.addEventListener("click", applyCheckboxFilter);
+    }
+
+    // 🔹 Evento para el botón de refresh
+    const refreshButton = document.getElementById("refreshshipmentstable");
+    if (refreshButton) {
+        refreshButton.addEventListener("click", function () {
+            resetFilters();
+            console.log("Tarjetas recargadas");
+        });
+    }
+});
 </script>
 
 
@@ -694,6 +863,7 @@
             'Driver Assigned': 'Driver Assigned', // gntc_description 'Driver Assigned'
             'In Transit': 'In Transit',     // gntc_description 'In Transit'
             'Secured Yard': 'Secured Yard',
+            'Dock Door': 'Dock Door',
             // Agrega otras descripciones si es necesario
         };
 
@@ -723,30 +893,30 @@
 
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll("[id^='nextButton-']").forEach(button => {
-        button.addEventListener("click", function () {
-            // Obtener el ID del shipment
-            var shipmentId = button.id.replace("nextButton-", "");
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll("[id^='nextButton-']").forEach(button => {
+            button.addEventListener("click", function () {
+                // Obtener el ID del shipment
+                var shipmentId = button.id.replace("nextButton-", "");
 
-            // Buscar la pestaña de destino
-            var nextTab = document.querySelector("#pills-update-status-tab-" + shipmentId);
+                // Buscar la pestaña de destino
+                var nextTab = document.querySelector("#pills-update-status-tab-" + shipmentId);
 
-            if (nextTab) {
-                console.log("Cambiando a la pestaña:", nextTab.id); // Debug
-                var tab = new bootstrap.Tab(nextTab);
-                tab.show();
+                if (nextTab) {
+                    console.log("Cambiando a la pestaña:", nextTab.id); // Debug
+                    var tab = new bootstrap.Tab(nextTab);
+                    tab.show();
 
-                // Esperar a que la pestaña se muestre antes de hacer scroll
-                setTimeout(() => {
-                    document.querySelector("#pills-update-status-" + shipmentId).scrollIntoView({ behavior: "smooth" });
-                }, 100);
-            } else {
-                console.error("No se encontró la pestaña de destino.");
-            }
+                    // Esperar a que la pestaña se muestre antes de hacer scroll
+                    setTimeout(() => {
+                        document.querySelector("#pills-update-status-" + shipmentId).scrollIntoView({ behavior: "smooth" });
+                    }, 100);
+                } else {
+                    console.error("No se encontró la pestaña de destino.");
+                }
+            });
         });
     });
-});
 </script>
 
 <script>
@@ -765,7 +935,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function () {
     const offcanvasUpdateStatusElements = document.querySelectorAll("[id^='offcanvasUpdateStatus-']");
 
     offcanvasUpdateStatusElements.forEach(offcanvasUpdateStatus => {
@@ -801,8 +971,9 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
     });
-});
+    });
 </script>
+
 <script>
  // JavaScript para cambiar de pestaña al hacer clic en "Next"
  document.getElementById('nextButton').addEventListener('click', function () {
@@ -817,7 +988,7 @@ document.addEventListener("DOMContentLoaded", function () {
         var tab = new bootstrap.Tab(nextTab);
         tab.show(); // Muestra la siguiente pestaña
     }
-});
+    });
 </script>
 
 
@@ -861,6 +1032,56 @@ document.addEventListener("DOMContentLoaded", function () {
         return true;
     }
 </script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Al cargar la página, deshabilitar los campos con valores existentes, pero sin perder sus valores
+    document.querySelectorAll(".flatpickr").forEach(function (input) {
+        if (input.value.trim() !== "" && input.name !== "etd") {  // Excluir el campo 'etd'
+            // Crear un campo oculto para almacenar el valor original
+            let hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = input.name;
+            hiddenInput.value = input.value.trim();
+            input.parentElement.appendChild(hiddenInput); // Añadir el campo oculto al formulario
+
+            input.setAttribute("disabled", "disabled"); // Deshabilitar el campo
+        }
+    });
+
+    // Cuando el usuario cambia un campo, removemos la deshabilitación
+    document.querySelectorAll(".flatpickr").forEach(function (input) {
+        input.addEventListener("input", function () {
+            if (input.value.trim() !== "" && input.name !== "etd") {  // Excluir el campo 'etd'
+                input.removeAttribute("disabled"); // Habilitar el campo si tiene valor
+            }
+        });
+    });
+
+    // Al hacer clic en "guardar", deshabilitar campos que tienen valor y no permitir cambios
+    document.getElementById("saveButton").addEventListener("click", function () {
+        document.querySelectorAll(".flatpickr").forEach(function (input) {
+            if (input.value.trim() !== "" && input.name !== "etd") {  // Excluir el campo 'etd'
+                input.setAttribute("disabled", "disabled"); // Deshabilitar el campo
+            }
+        });
+    });
+});
+
+// Evitar que los valores de los campos deshabilitados se pierdan al hacer submit
+document.querySelector("form").addEventListener("submit", function (event) {
+    document.querySelectorAll(".flatpickr").forEach(function (input) {
+        if (input.disabled) {
+            let hiddenInput = document.querySelector(`input[name="${input.name}"]`);
+            if (hiddenInput) {
+                hiddenInput.value = input.value; // Mantener el valor original al hacer submit
+            }
+        }
+    });
+});
+</script>
+
 @endsection
 
 @section('custom-css')

@@ -5,6 +5,8 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Mail\ShipmentPickedUpNotification;
+use Illuminate\Support\Facades\Mail;
 
 class Shipments extends Model
 {
@@ -28,6 +30,7 @@ class Shipments extends Model
 
     // Campos que pueden ser asignados masivamente
     protected $fillable = [
+        'pk_shipment',
         'stm_id',
         'reference',
         'bonded',
@@ -46,10 +49,8 @@ class Shipments extends Model
         'seal2',
         'door_number',
         'notes',
-        'security_company_id',
-        'tracker1',
-        'tracker2',
-        'tracker3',
+        'overhaul_id',
+        'device_number',
         'secondary_shipment_id',
         'driver_assigned_date',
         'pick_up_date',
@@ -59,17 +60,25 @@ class Shipments extends Model
         'gnct_id_shipment_type',
         'delivered_date',
         'at_door_date',
+        'dateCreated',
+        'dateUpdated',
         'wh_auth_date',
+        'billing_id',
+        'billing_date',
         'offloading_time',
         'billing_id',
         'billing_date',
-        'dock_door_date',
-        'removed_trackers',
         'lane',
+        'security_company_id',
+        'tracker1',
+        'tracker2',
+        'tracker3',
         'have_trackers',
-        'security_company'
-        
+        'security_company',
+        'door_number',
+        'dock_door_date'
     ];
+
 
     protected static function boot(){
             parent::boot();
@@ -86,11 +95,30 @@ class Shipments extends Model
             });
     }
 
+    protected static function booted()
+    {
+        static::saved(function ($shipment) {
+            if (
+                in_array($shipment->lane, ['L1-A', 'L2-A']) &&
+                $shipment->have_trackers === 'No' &&
+                $shipment->gnct_id_current_status === '69'
+            ) {
+                Mail::to('christiandiaznavarro@hotmail.com')->send(new ShipmentPickedUpNotification($shipment));
+            }
+        });
+    }
+
     //Convertir Fechas
     /*public function getStatusAttribute($value)
     {
         return Carbon::parse($value)->format('m/d/Y');
     }*/
+
+    public function getDockDoorDateAttribute($value)
+    {
+    return $value ? Carbon::parse($value)->format('m/d/Y H:i:s') : null;
+    }
+
     public function getPickUpDateAttribute($value)
     {
         return $value ? Carbon::parse($value)->format('m/d/Y H:i:s') : null;
@@ -163,6 +191,12 @@ class Shipments extends Model
     public function currentstatus()
     {
         return $this->belongsTo(GenericCatalog::class, 'gnct_id_current_status', 'gnct_id');
+    }
+
+    // Relación con la tabla `generic_catalogs` para la compañía de seguridad
+    public function securityCompany()
+    {
+        return $this->belongsTo(GenericCatalog::class, 'security_company', 'gnct_id');
     }
 
     // Relación con la tabla `generic_catalogs` para el tipo de envío

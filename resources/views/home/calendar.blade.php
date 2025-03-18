@@ -45,7 +45,7 @@
                             <a class="nav-link active" id="pills-shipment-details-tab{{ $shipment->stm_id }}" data-bs-toggle="pill" href="#pills-shipment-details{{ $shipment->stm_id }}" role="tab" aria-controls="pills-shipment-details{{ $shipment->stm_id }}" aria-selected="true">Shipment Details</a>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <a class="nav-link" id="pills-update-status-tab{{ $shipment->stm_id }}" data-bs-toggle="pill" href="#pills-update-status{{ $shipment->stm_id }}" role="tab" aria-controls="pills-update-status{{ $shipment->stm_id }}" aria-selected="false">Offloading Menu</a>
+                            <a class="nav-link" id="pills-update-status-tab{{ $shipment->stm_id }}" data-bs-toggle="pill" href="#pills-update-status{{ $shipment->stm_id }}" role="tab" aria-controls="pills-update-status{{ $shipment->stm_id }}" aria-selected="false">Offloading</a>
                         </li>
                     </ul>
 
@@ -57,7 +57,7 @@
                                 <p>{{ $shipment->stm_id }}</p>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Landstar Reference</label>
+                                <label class="form-label">Carrier Reference</label>
                                 <p>{{ $shipment->reference }}</p>
                             </div>
                             <div class="mb-3">
@@ -79,6 +79,10 @@
                             <div class="mb-3">
                                 <label class="form-label">Approved ETA Date & Time</label>
                                 <p>{{ $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y H:i') : 'N/A' }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Door Number</label>
+                                <p>{{ $shipment->door_number ? $shipment->door_number : 'N/A' }}</p>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Units</label>
@@ -134,6 +138,11 @@
                                 </div>
 
                                 <div class="mb-3">
+                                    <label for="doorNumber{{ $shipment->stm_id }}" class="form-label">Door Number</label>
+                                    <input type="text" class="form-control" id="doorNumber{{ $shipment->stm_id }}" name="door_number" value="{{ $shipment->door_number ?? '' }}" data-original="{{ $shipment->door_number ?? '' }}">
+                                </div>
+
+                                <div class="mb-3">
                                     <label for="offloadTime{{ $shipment->stm_id }}" class="form-label">Offload Time</label>
                                     <input type="time" class="form-control" id="offloadTime{{ $shipment->stm_id }}" name="offloading_time"
                                         value="{{ old('offloading_time', $shipment->offloading_time ? \Carbon\Carbon::parse($shipment->offloading_time)->format('H:i') : '') }}"
@@ -146,6 +155,16 @@
                                         value="{{ old('wh_auth_date', $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y H:i') : '') }}"
                                         data-original="{{ old('wh_auth_date', $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y H:i') : '') }}">
                                 </div>
+
+                                <div class="mb-3">
+                                    <label for="removedTrackers{{ $shipment->stm_id }}" class="form-label">Removed Trackers?</label>
+                                    <select class="form-select" id="removedTrackers{{ $shipment->stm_id }}" name="removed_trackers" required data-original="{{ $shipment->removed_trackers }}">
+                                        <option value="" disabled selected>Select an option</option>
+                                        <option value="Yes" {{ old('removed_trackers', $shipment->removed_trackers) == 'Yes' ? 'selected' : '' }}>Yes</option>
+                                        <option value="No" {{ old('removed_trackers', $shipment->removed_trackers) == 'No' ? 'selected' : '' }}>No</option>
+                                    </select>
+                                </div>
+
                                 <div class="d-flex justify-content-end">
                                     <button type="submit" class="btn btn-primary" id="saveButton{{ $shipment->stm_id }}">Save</button>
                                 </div>

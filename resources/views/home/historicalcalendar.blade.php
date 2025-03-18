@@ -31,134 +31,153 @@
     </div>
 </div>
 @foreach ($shipments as $shipment)
-<div id="shipmentModal{{ $shipment->stm_id }}" class="modal fade" tabindex="-1" aria-labelledby="shipmentModalLabel{{ $shipment->stm_id }}" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header" style="background-color: #0056b3;">
-                <h5 class="modal-title" id="shipmentModalLabel{{ $shipment->stm_id }}">Shipment Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <!-- Pestañas de detalle -->
-                <ul class="nav nav-pills mb-3" id="pills-tab{{ $shipment->stm_id }}" role="tablist">
-                    <li class="nav-item me-2" role="presentation">
-                        <a class="nav-link active" id="pills-shipment-details-tab{{ $shipment->stm_id }}" data-bs-toggle="pill" href="#pills-shipment-details{{ $shipment->stm_id }}" role="tab" aria-controls="pills-shipment-details{{ $shipment->stm_id }}" aria-selected="true">Shipment Details</a>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <a class="nav-link" id="pills-update-status-tab{{ $shipment->stm_id }}" data-bs-toggle="pill" href="#pills-update-status{{ $shipment->stm_id }}" role="tab" aria-controls="pills-update-status{{ $shipment->stm_id }}" aria-selected="false">Offloading Menu</a>
-                    </li>
-                </ul>
+    <div id="shipmentModal{{ $shipment->stm_id }}" class="modal fade" tabindex="-1" aria-labelledby="shipmentModalLabel{{ $shipment->stm_id }}" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #0056b3;">
+                    <h5 class="modal-title" id="shipmentModalLabel{{ $shipment->stm_id }}">Shipment Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Pestañas de detalle -->
+                    <ul class="nav nav-pills mb-3" id="pills-tab{{ $shipment->stm_id }}" role="tablist">
+                        <li class="nav-item me-2" role="presentation">
+                            <a class="nav-link active" id="pills-shipment-details-tab{{ $shipment->stm_id }}" data-bs-toggle="pill" href="#pills-shipment-details{{ $shipment->stm_id }}" role="tab" aria-controls="pills-shipment-details{{ $shipment->stm_id }}" aria-selected="true">Shipment Details</a>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <a class="nav-link" id="pills-update-status-tab{{ $shipment->stm_id }}" data-bs-toggle="pill" href="#pills-update-status{{ $shipment->stm_id }}" role="tab" aria-controls="pills-update-status{{ $shipment->stm_id }}" aria-selected="false">Offloading</a>
+                        </li>
+                    </ul>
 
-                <div class="tab-content" id="pills-tabContent{{ $shipment->stm_id }}">
-                    <!-- Shipment Details -->
-                    <div class="tab-pane fade show active" id="pills-shipment-details{{ $shipment->stm_id }}" role="tabpanel" aria-labelledby="pills-shipment-details-tab{{ $shipment->stm_id }}">
-                        <div class="mb-3">
-                            <label class="form-label">STM ID</label>
-                            <p>{{ $shipment->stm_id }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Landstar Reference</label>
-                            <p>{{ $shipment->reference }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Origin</label>
-                            <p>{{ $shipment->company->CoName ?? 'Origen no disponible' }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Destination</label>
-                            <p>{{ optional($companies->firstWhere('pk_company', $shipment->destination))->CoName ?? 'Not available' }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Current Status</label>
-                            <p>{{ $shipment->currentStatus->gntc_description ?? 'Unknown' }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Suggested Delivery Date</label>
-                            <p>{{ \Carbon\Carbon::parse($shipment->etd)->format('m/d/Y H:i') }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Approved ETA Date & Time</label>
-                            <p>{{ $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y H:i') : 'N/A' }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Units</label>
-                            <p>{{ $shipment->units }}</p>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Pallets</label>
-                            <p>{{ $shipment->pallets }}</p>
-                        </div>
-                    </div>
-
-                    <!-- Update Shipment Status (Offloading Menu) -->
-                    <div class="tab-pane fade" id="pills-update-status{{ $shipment->stm_id }}" role="tabpanel" aria-labelledby="pills-update-status-tab{{ $shipment->stm_id }}">
-                        @if ($shipment)
-                        <form id="offloadingForm{{ $shipment->stm_id }}" method="POST" action="{{ route('update.status', ['pk_shipment' => $shipment->pk_shipment]) }}">
-                            @method('PUT')
-                            @csrf
+                    <div class="tab-content" id="pills-tabContent{{ $shipment->stm_id }}">
+                        <!-- Shipment Details -->
+                        <div class="tab-pane fade show active" id="pills-shipment-details{{ $shipment->stm_id }}" role="tabpanel" aria-labelledby="pills-shipment-details-tab{{ $shipment->stm_id }}">
                             <div class="mb-3">
-                                <label for="trailerId{{ $shipment->stm_id }}" class="form-label">Trailer ID</label>
-                                <input type="text" class="form-control" id="trailerId{{ $shipment->stm_id }}" name="id_trailer" value="{{ $shipment->id_trailer ?? '' }}" readonly data-original="{{ $shipment->id_trailer ?? '' }}">
+                                <label class="form-label">STM ID</label>
+                                <p>{{ $shipment->stm_id }}</p>
                             </div>
-
                             <div class="mb-3">
-                                <label for="currentStatus{{ $shipment->stm_id }}" class="form-label">Current Status</label>
-                                <select class="form-select" id="currentStatus-{{ $shipment->stm_id }}" name="gnct_id_current_status" data-original="{{ $shipment->gnct_id_current_status }}">
-                                    @foreach ($currentStatus as $status)
-                                        <option value="{{ $status->gnct_id }}"
-                                            {{ old('gnct_id_current_status', $shipment->gnct_id_current_status) == $status->gnct_id ? 'selected' : '' }}>
-                                            {{ $status->gntc_description }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                                <label class="form-label">Carrier Reference</label>
+                                <p>{{ $shipment->reference }}</p>
                             </div>
-
                             <div class="mb-3">
-                                <label for="deliveredDate{{ $shipment->stm_id }}" class="form-label">Delivered Date</label>
-                                <input type="text"
-                                    class="form-control datetime-picker"
-                                    id="deliveredDate{{ $shipment->stm_id }}"
-                                    name="delivered_date"
-                                    value="{{ $shipment->delivered_date ? \Carbon\Carbon::parse($shipment->delivered_date)->format('m/d/Y H:i') : '' }}"
-                                    placeholder="{{ $shipment->delivered_date ? '' : 'mm/dd/yyyy --:--' }}"
-                                    data-original="{{ $shipment->delivered_date ? \Carbon\Carbon::parse($shipment->delivered_date)->format('m/d/Y H:i') : '' }}"
-                                    onfocus="checkAndChangeStatus('deliveredDate{{ $shipment->stm_id }}', 'Delivered', '{{ $shipment->stm_id }}')">
+                                <label class="form-label">Origin</label>
+                                <p>{{ $shipment->company->CoName ?? 'Origen no disponible' }}</p>
                             </div>
-
                             <div class="mb-3">
-                                <label for="atDoorDate{{ $shipment->stm_id }}" class="form-label">At Door Date</label>
-                                <input type="text" class="form-control datetime-picker" id="atDoorDate{{ $shipment->stm_id }}" name="at_door_date"
-                                    value="{{ old('at_door_date', $shipment->at_door_date ? \Carbon\Carbon::parse($shipment->at_door_date)->format('m/d/Y H:i') : '') }}"
-                                    placeholder="mm/dd/yyyy --:--"
-                                    data-original="{{ old('at_door_date', $shipment->at_door_date ? \Carbon\Carbon::parse($shipment->at_door_date)->format('m/d/Y H:i') : '') }}">
+                                <label class="form-label">Destination</label>
+                                <p>{{ optional($companies->firstWhere('pk_company', $shipment->destination))->CoName ?? 'Not available' }}</p>
                             </div>
-
                             <div class="mb-3">
-                                <label for="offloadTime{{ $shipment->stm_id }}" class="form-label">Offload Time</label>
-                                <input type="time" class="form-control" id="offloadTime{{ $shipment->stm_id }}" name="offloading_time"
-                                    value="{{ old('offloading_time', $shipment->offloading_time ? \Carbon\Carbon::parse($shipment->offloading_time)->format('H:i') : '') }}"
-                                    data-original="{{ old('offloading_time', $shipment->offloading_time ? \Carbon\Carbon::parse($shipment->offloading_time)->format('H:i') : '') }}">
+                                <label class="form-label">Current Status</label>
+                                <p>{{ $shipment->currentStatus->gntc_description ?? 'Unknown' }}</p>
                             </div>
-
                             <div class="mb-3">
-                                <label for="approvedETADateTime{{ $shipment->stm_id }}" class="form-label">Approved ETA Date & Time</label>
-                                <input type="text" class="form-control datetime-picker" id="approvedETADateTime{{ $shipment->stm_id }}" name="wh_auth_date"
-                                    value="{{ old('wh_auth_date', $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y H:i') : '') }}"
-                                    data-original="{{ old('wh_auth_date', $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y H:i') : '') }}">
+                                <label class="form-label">Suggested Delivery Date</label>
+                                <p>{{ \Carbon\Carbon::parse($shipment->etd)->format('m/d/Y H:i') }}</p>
                             </div>
-                            <div class="d-flex justify-content-end">
-                                <button type="submit" class="btn btn-primary" id="saveButton{{ $shipment->stm_id }}">Save</button>
+                            <div class="mb-3">
+                                <label class="form-label">Approved ETA Date & Time</label>
+                                <p>{{ $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y H:i') : 'N/A' }}</p>
                             </div>
-                        </form>
-                        @else
-                            <p>No hay envíos disponibles actualmente.</p>
-                        @endif
+                            <div class="mb-3">
+                                <label class="form-label">Door Number</label>
+                                <p>{{ $shipment->door_number ? $shipment->door_number : 'N/A' }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Units</label>
+                                <p>{{ $shipment->units }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Pallets</label>
+                                <p>{{ $shipment->pallets }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Update Shipment Status (Offloading Menu) -->
+                        <div class="tab-pane fade" id="pills-update-status{{ $shipment->stm_id }}" role="tabpanel" aria-labelledby="pills-update-status-tab{{ $shipment->stm_id }}">
+                            @if ($shipment)
+                            <form id="offloadingForm{{ $shipment->stm_id }}" method="POST" action="{{ route('update.status', ['pk_shipment' => $shipment->pk_shipment]) }}">
+                                @method('PUT')
+                                @csrf
+                                <div class="mb-3">
+                                    <label for="trailerId{{ $shipment->stm_id }}" class="form-label">Trailer ID</label>
+                                    <input type="text" class="form-control" id="trailerId{{ $shipment->stm_id }}" name="id_trailer" value="{{ $shipment->id_trailer ?? '' }}" readonly data-original="{{ $shipment->id_trailer ?? '' }}">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="currentStatus{{ $shipment->stm_id }}" class="form-label">Current Status</label>
+                                    <select class="form-select" id="currentStatus-{{ $shipment->stm_id }}" name="gnct_id_current_status" data-original="{{ $shipment->gnct_id_current_status }}">
+                                        @foreach ($currentStatus as $status)
+                                            <option value="{{ $status->gnct_id }}"
+                                                {{ old('gnct_id_current_status', $shipment->gnct_id_current_status) == $status->gnct_id ? 'selected' : '' }}>
+                                                {{ $status->gntc_description }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="deliveredDate{{ $shipment->stm_id }}" class="form-label">Delivered Date</label>
+                                    <input type="text"
+                                        class="form-control datetime-picker"
+                                        id="deliveredDate{{ $shipment->stm_id }}"
+                                        name="delivered_date"
+                                        value="{{ $shipment->delivered_date ? \Carbon\Carbon::parse($shipment->delivered_date)->format('m/d/Y H:i') : '' }}"
+                                        placeholder="{{ $shipment->delivered_date ? '' : 'mm/dd/yyyy --:--' }}"
+                                        data-original="{{ $shipment->delivered_date ? \Carbon\Carbon::parse($shipment->delivered_date)->format('m/d/Y H:i') : '' }}"
+                                        onfocus="checkAndChangeStatus('deliveredDate{{ $shipment->stm_id }}', 'Delivered', '{{ $shipment->stm_id }}')">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="atDoorDate{{ $shipment->stm_id }}" class="form-label">At Door Date</label>
+                                    <input type="text" class="form-control datetime-picker" id="atDoorDate{{ $shipment->stm_id }}" name="at_door_date"
+                                        value="{{ old('at_door_date', $shipment->at_door_date ? \Carbon\Carbon::parse($shipment->at_door_date)->format('m/d/Y H:i') : '') }}"
+                                        placeholder="mm/dd/yyyy --:--"
+                                        data-original="{{ old('at_door_date', $shipment->at_door_date ? \Carbon\Carbon::parse($shipment->at_door_date)->format('m/d/Y H:i') : '') }}">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="doorNumber{{ $shipment->stm_id }}" class="form-label">Door Number</label>
+                                    <input type="text" class="form-control" id="doorNumber{{ $shipment->stm_id }}" name="door_number" value="{{ $shipment->door_number ?? '' }}" data-original="{{ $shipment->door_number ?? '' }}">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="offloadTime{{ $shipment->stm_id }}" class="form-label">Offload Time</label>
+                                    <input type="time" class="form-control" id="offloadTime{{ $shipment->stm_id }}" name="offloading_time"
+                                        value="{{ old('offloading_time', $shipment->offloading_time ? \Carbon\Carbon::parse($shipment->offloading_time)->format('H:i') : '') }}"
+                                        data-original="{{ old('offloading_time', $shipment->offloading_time ? \Carbon\Carbon::parse($shipment->offloading_time)->format('H:i') : '') }}">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="approvedETADateTime{{ $shipment->stm_id }}" class="form-label">Approved ETA Date & Time</label>
+                                    <input type="text" class="form-control datetime-picker" id="approvedETADateTime{{ $shipment->stm_id }}" name="wh_auth_date"
+                                        value="{{ old('wh_auth_date', $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y H:i') : '') }}"
+                                        data-original="{{ old('wh_auth_date', $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y H:i') : '') }}">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="removedTrackers{{ $shipment->stm_id }}" class="form-label">Removed Trackers?</label>
+                                    <select class="form-select" id="removedTrackers{{ $shipment->stm_id }}" name="removed_trackers" required data-original="{{ $shipment->removed_trackers }}">
+                                        <option value="" disabled selected>Select an option</option>
+                                        <option value="Yes" {{ old('removed_trackers', $shipment->removed_trackers) == 'Yes' ? 'selected' : '' }}>Yes</option>
+                                        <option value="No" {{ old('removed_trackers', $shipment->removed_trackers) == 'No' ? 'selected' : '' }}>No</option>
+                                    </select>
+                                </div>
+
+                                <div class="d-flex justify-content-end">
+                                    <button type="submit" class="btn btn-primary" id="saveButton{{ $shipment->stm_id }}">Save</button>
+                                </div>
+                            </form>
+                            @else
+                                <p>No hay envíos disponibles actualmente.</p>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 @endforeach
 @endauth
 

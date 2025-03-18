@@ -14,6 +14,8 @@ $(document).ready(function () {
         // Si la tabla ya está inicializada, se puede actualizar la configuración
         table.page.len(-1).draw();  // Muestra todos los registros sin paginación
     }
+
+    updateTrailerTable(); // Llamar a la función para actualizar la tabla
     
     function applycarriers(){
         var filterValues = $('#emptytrailerfilterinputcarriercheckbox').val()
@@ -674,47 +676,34 @@ $(document).ready(function () {
     }
 
 
-        //Funcion para buscar el availability indicator en la pantalla de empty trailer update
-        function loadAvailabilityIndicatorupdate() {
-            var availabilityRoute = $('#updateinputavailabilityindicator').data('url');
-              $.ajax({
-                  url: availabilityRoute,
-                  method: 'GET',
-                  success: function (data) {
-                      let select = $('#updateinputavailabilityindicator');
-                      let selectedValue = select.val();
-                      //let selectedValue = "{{ old('inputavailabilityindicator') }}"; // Recupera el valor previo
-                      select.empty(); // Limpia el select eliminando todas las opciones
-                      //select.append('<option selected disabled hidden></option>'); // Opción inicial
-    
-                      if (data.length === 0) {
-                          select.append('<option disabled>No options available</option>');
-                      } else {
-                            select.append('<option value="">Choose an option</option>');
-                            data.forEach(item => {
-                                select.append(`<option value="${item.gnct_id}">${item.gntc_description}</option>`);
-                            });
-                      }
-    
-                      if (selectedValue) {
-                          select.val(selectedValue); // Restaura el valor anterior
-                      }
-                  },
-                  error: function (xhr, status, error) {
-                      console.error('Error fetching data Availability Indicators:', error);
-                  }
-              });
-        }
+        
     
         // Cargar datos al enfocarse y al cargar la página update 
-        $(document).one('click', '.clickable-row', function () {
+        /*$(document).one('click', '.clickable-row', function () {
             loadAvailabilityIndicatorupdate();
             //loadCarriersUpdate();
-        });
+        });*/
 
-
+        //loadAvailabilityIndicatorupdate();
         // Cargar datos al enfocarse y al cargar la página update 
-        $('#refreshemptytrailertable').on('click', loadAvailabilityIndicatorupdate);
+        //$('#refreshemptytrailertable').on('click', loadAvailabilityIndicatorupdate);
+
+
+    
+        // Cargar datos al enfocarse y al cargar la página update 
+        $('#addnewemptytrailer').one('click', loadAvailabilityIndicator);
+        
+        $('#addnewemptytrailer').on('click', function () {
+            $('#inputcarrier').val(null).trigger('change'); // Restablecer el select2
+
+            // Quitar clases de error
+            $('#inputcarrier').removeClass('is-invalid'); 
+            $('#inputcarrier').next('.select2-container').find('.select2-selection').removeClass('is-invalid');
+
+            // Borrar mensaje de error
+            $('#inputcarrier').parent().find('.invalid-feedback').text('');
+        });
+});
 
         //Funcion para buscar el availability indicator en la pantalla de empty trailer update
         function loadAvailabilityIndicator() {
@@ -747,21 +736,38 @@ $(document).ready(function () {
                   }
               });
         }
+
+        //Funcion para buscar el availability indicator en la pantalla de empty trailer update
+        function loadAvailabilityIndicatorupdate() {
+            var availabilityRoute = $('#updateinputavailabilityindicator').data('url');
+              $.ajax({
+                  url: availabilityRoute,
+                  method: 'GET',
+                  success: function (data) {
+                      let select = $('#updateinputavailabilityindicator');
+                      let selectedValue = select.val();
+                      //let selectedValue = "{{ old('inputavailabilityindicator') }}"; // Recupera el valor previo
+                      select.empty(); // Limpia el select eliminando todas las opciones
+                      //select.append('<option selected disabled hidden></option>'); // Opción inicial
     
-        // Cargar datos al enfocarse y al cargar la página update 
-        $('#addnewemptytrailer').one('click', loadAvailabilityIndicator);
-        
-        $('#addnewemptytrailer').on('click', function () {
-            $('#inputcarrier').val(null).trigger('change'); // Restablecer el select2
-
-            // Quitar clases de error
-            $('#inputcarrier').removeClass('is-invalid'); 
-            $('#inputcarrier').next('.select2-container').find('.select2-selection').removeClass('is-invalid');
-
-            // Borrar mensaje de error
-            $('#inputcarrier').parent().find('.invalid-feedback').text('');
-        });
-});
+                      if (data.length === 0) {
+                          select.append('<option disabled>No options available</option>');
+                      } else {
+                            select.append('<option value="">Choose an option</option>');
+                            data.forEach(item => {
+                                select.append(`<option value="${item.gnct_id}">${item.gntc_description}</option>`);
+                            });
+                      }
+    
+                      if (selectedValue) {
+                          select.val(selectedValue); // Restaura el valor anterior
+                      }
+                  },
+                  error: function (xhr, status, error) {
+                      console.error('Error fetching data Availability Indicators:', error);
+                  }
+              });
+        }
 
 
 //Busqueda de las location en el nuevo registros de los empty trailers 
@@ -1467,6 +1473,9 @@ $(document).ready(function() {
         // Cuando el formulario se envía (al hacer clic en Save)
         $('#emptytrailerformm').submit(function(e) {
             e.preventDefault(); // Evita el envío del formulario
+
+            let searchValue = table.search(); // Guarda el término de búsqueda
+            let filters = table.columns().search(); // Guarda los filtros de cada columna    
         
             const saveButton = $('#saveButton');
             const url = saveButton.data('url'); // URL para la petición AJAX
@@ -1521,9 +1530,13 @@ $(document).ready(function() {
                                 'data-id': trailer.pk_trailer
                             });
                         });
-                        // Redibujar la tabla con los nuevos datos
-                        table.draw();
+                        table.draw(false); // Redibuja la tabla sin reiniciar la paginación
 
+                        // Restaurar la búsqueda y los filtros
+                        table.search(searchValue).draw(); // Restablece la búsqueda general
+                        filters.each((value, index) => {
+                            if (value) table.column(index).search(value).draw(); // Restablece los filtros por columna
+                        });
 
                         // Asignar eventos correctamente incluso tras filtros
                         $(document).off("click", ".clickable-row").on("click", ".clickable-row", function () {
@@ -1548,7 +1561,7 @@ $(document).ready(function() {
                             }
                         });
                     }
-                    
+                    loadAvailabilityIndicatorupdate();
                 },
                 error: function(xhr, status, error) {
                     // Limpia los errores anteriores
@@ -1599,19 +1612,11 @@ $(document).ready(function() {
         });
         
     });
-    // Verifica si la tabla ya ha sido inicializada antes de inicializarla
-    if (!$.fn.dataTable.isDataTable('#table_empty_trailers')) {
-        table = $('#table_empty_trailers').DataTable({
-            paging: false,  // Desactiva la paginación
-            searching: true, // Mantiene la búsqueda activada
-            info: false,     // Oculta la información
-            lengthChange: false // Desactiva el cambio de cantidad de registros
-        });
-    } else {
-        // Si la tabla ya está inicializada, se puede actualizar la configuración
-        table.page.len(-1).draw();  // Muestra todos los registros sin paginación
-    }
     function updateTrailerTable() {
+
+        let searchValue = table.search(); // Guarda el término de búsqueda
+        let filters = table.columns().search(); // Guarda los filtros de cada columna
+
         // Obtener los valores de los filtros
         // Función para agregar parámetros solo si tienen valor
         function addParam(key, value) {
@@ -1708,17 +1713,41 @@ $(document).ready(function() {
             .then(response => response.json())
             .then(data => {
 
+            // Actualiza la tabla de DataTables
+            table.clear(); // Limpia la tabla actual
+
                 // Aquí va el código para actualizar trailersData
                 trailersData = data.reduce((acc, trailer) => {
                     acc[trailer.pk_trailer] = trailer;
                     return acc;
                 }, {});
                 // Actualizar la tabla con los datos filtrados
-                /*const tbody = document.getElementById('emptyTrailerTableBody');
-                tbody.innerHTML = ''; // Limpiar la tabla antes de agregar nuevas filas
+                const tbody = document.getElementById('emptyTrailerTableBody');
+                //tbody.innerHTML = ''; // Limpiar la tabla antes de agregar nuevas filas
     
                 data.forEach(trailer => {
-                    const row = `
+                    const rowNode = table.row.add([
+                        trailer.trailer_num ?? '',
+                        trailer.status ?? '',
+                        trailer.pallets_on_trailer ?? '',
+                        trailer.pallets_on_floor ?? '',
+                        trailer.carriers?.CoName ?? '',
+                        trailer.availability_indicator?.gntc_description ?? '',
+                        trailer.date_in ?? '',
+                        trailer.username ?? ''
+                    ]).node(); // Esto devuelve el nodo de la fila agregada
+
+                    // Ahora añadimos los atributos a la fila
+                    $(rowNode).attr({
+                        'id': `trailer-${trailer.pk_trailer}`,
+                        'class': 'clickable-row',
+                        'data-bs-toggle': 'offcanvas',
+                        'data-bs-target': '#emptytrailer',
+                        'aria-controls': 'emptytrailer',
+                        'data-id': trailer.pk_trailer
+                    });
+                    
+                    /*const row = `
                         <tr id="trailer-${trailer.pk_trailer}" class="clickable-row " 
                             data-bs-toggle="offcanvas" 
                             data-bs-target="#emptytrailer" 
@@ -1737,8 +1766,8 @@ $(document).ready(function() {
                             <td>${trailer.username ?? '' }</td>
                         </tr>
                     `;
-                    tbody.innerHTML += row;
-                });*/
+                    tbody.innerHTML += row;*/
+                });
 
                 // Vuelve a agregar los listeners de clic después de actualizar la tabla
                 /*const rows = document.querySelectorAll(".clickable-row");
@@ -1747,7 +1776,16 @@ $(document).ready(function() {
                         const id = this.getAttribute("data-id");
                         const trailer = trailersData[id]; // Busca los datos del tráiler*/
                         //console.log(trailer);
-                        table.draw();
+                
+                table.draw(false); // Redibuja la tabla sin reiniciar la paginación
+
+                // Restaurar la búsqueda y los filtros
+                table.search(searchValue).draw(); // Restablece la búsqueda general
+                filters.each((value, index) => {
+                    if (value) table.column(index).search(value).draw(); // Restablece los filtros por columna
+                });
+
+
                 $(document).off("click", ".clickable-row").on("click", ".clickable-row", function () {
                     const id = $(this).data("id");
                     const trailer = trailersData[id]; 
@@ -1773,7 +1811,7 @@ $(document).ready(function() {
                         }
                     //});
                 });
-
+                loadAvailabilityIndicatorupdate();
                 
             })
             .catch(error => console.error('Error:', error));
@@ -1912,6 +1950,10 @@ $(document).ready(function() {
         const trailerId = document.getElementById('pk_trailer').innerText.trim(); // ID del tráiler
         const baseUrl = deleteButton.getAttribute('data-url'); // Base URL
 
+        let searchValue = table.search(); // Guarda el término de búsqueda
+        let filters = table.columns().search(); // Guarda los filtros de cada columna
+
+
           if (trailerId) {
             // Construir la URL completa
             const deleteUrl = `${baseUrl}/${trailerId}`;
@@ -2012,7 +2054,14 @@ $(document).ready(function() {
 
 
                             // Redibujar la tabla con los nuevos datos
-                            table.draw();
+                            //table.draw();
+                            table.draw(false); // Redibuja la tabla sin reiniciar la paginación
+
+                            // Restaurar la búsqueda y los filtros
+                            table.search(searchValue).draw(); // Restablece la búsqueda general
+                            filters.each((value, index) => {
+                                if (value) table.column(index).search(value).draw(); // Restablece los filtros por columna
+                            });
 
                             // Simular el clic en el botón de cerrar el offcanvas
                             closeButton.click();
@@ -2390,6 +2439,10 @@ $(document).ready(function() {
 document.getElementById("updatesaveButton").addEventListener("click", function () {
     let valid = true;
 
+    let searchValue = table.search(); // Guarda el término de búsqueda
+    let filters = table.columns().search(); // Guarda los filtros de cada columna
+
+
     // Validar cada campo antes de enviar
     formFields.forEach(fieldId => {
         const field = document.getElementById(fieldId);
@@ -2532,8 +2585,14 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
                         });
                     });
 
-                    // Redibujar la tabla con los nuevos datos
-                    table.draw();
+                    table.draw(false); // Redibuja la tabla sin reiniciar la paginación
+
+                    // Restaurar la búsqueda y los filtros
+                    table.search(searchValue).draw(); // Restablece la búsqueda general
+                    filters.each((value, index) => {
+                        if (value) table.column(index).search(value).draw(); // Restablece los filtros por columna
+                    });
+                    
                     // Asignar eventos correctamente incluso tras filtros
                     $(document).off("click", ".clickable-row").on("click", ".clickable-row", function () {
                         const id = $(this).data("id");
