@@ -66,7 +66,7 @@
 
                   <!--Trailer Status-->
                   <li class="nav-item ">
-                    <a class="nav-link mx-lg-2 text-light" aria-current="page" href="{{ route('emptytrailer') }}">Dashboard</a>
+                    <a class="nav-link mx-lg-2 text-light" aria-current="page" href="{{ route('dashboard') }}">Dashboard</a>
                   </li>
 
                 </ul>
