@@ -1,4 +1,12 @@
 document.addEventListener("DOMContentLoaded", function() {
+    // Llamar automáticamente al cargar la página
+    cargarDashboard(); 
+
+    document.getElementById("recargar").addEventListener("click", function () {
+        cargarDashboard(); // Llamar cuando se haga clic en el botón
+    });
+
+    
     // Obtener la fecha actual en la zona horaria del usuario
     let now = new Date();
     let yesterday = new Date();
@@ -15,3 +23,16 @@ document.addEventListener("DOMContentLoaded", function() {
     // Insertar la fecha en el elemento HTML
     document.getElementById("dateDisplay").textContent = `${formattedYesterday} - ${formattedToday}`;
 });
+
+function cargarDashboard() {
+    fetch('/updatedashboard')
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                console.log(data.data);
+            } else {
+                console.error("Error:", data.message);
+            }
+        })
+        .catch(error => console.error("Error al obtener el dashboard:", error));
+}

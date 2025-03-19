@@ -3,7 +3,7 @@
 @endphp
 @extends('layouts.app-master')
 
-@section('title', 'Empty Trailer')
+@section('title', 'Dashboard')
 
 @section('content')
 
@@ -43,47 +43,96 @@
             <div class="my-4 d-flex justify-content-center align-items-center">
                 <h2 class="gradient-text text-capitalize fw-bolder" style="">Dashboard</h2>
             </div>
+            <button id="recargar" style="display:none">Recargar</button>
         </div>
 
         <div class="container  mb-4" style="margin-top: 220px;">
             <div class="row">
                 <!-- Primera columna con 3 divs -->
                 <div class="col-md-6">
-                    <div class="mb-4  grow-1">
+                    <div class="mb-4  grow-1 shadow-sm rounded">
                         <div class="card">
                             <div class="card-body">
                                 <h5 class="card-title fw-bold" style="color:#1e4877">EMPTY POOL</h5>
                                 <div class="text-black">
                                     <hr>
                                 </div>
-                            </div>
-                            <div class="container text-center mb-4">
-                                <div class="row align-items-start">
-                                    <div class="col">
-                                    Location 1
+                                <div class="container text-center mb-0 mt-0">
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">BW2</div>
+                                        <div class="col" id="bw2_emptypool"></div>
                                     </div>
-                                    <div class="col">
-                                    14
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">BW3</div>
+                                        <div class="col" id="bw3_emptypool"></div>
+                                    </div>
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">Foxconn</div>
+                                        <div class="col" id="foxconn_emptypool"></div>
+                                    </div>
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">On Time Forwarding</div>
+                                        <div class="col" id="ontimeforwarding_emptypool"></div>
+                                    </div>
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">Escoto</div>
+                                        <div class="col" id="escoto_emptypool"></div>
+                                    </div>
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TFEMA Yard</div>
+                                        <div class="col" id="tfemayard_emptypool"></div>
+                                    </div>
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TNL Express</div>
+                                        <div class="col" id="tnlexpress_emptypool"></div>
+                                    </div>
+                                    <div class="row align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TNCH Yard</div>
+                                        <div class="col" id="tnchyard_emptypool"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="mb-4 grow-1">
+                    <div class="mb-4 grow-1 shadow-sm rounded">
                         <div class="card">
                             <div class="card-body">
                                 <h5 class="card-title fw-bold" style="color:#1e4877">PREALERTED</h5>
                                 <div class="text-black">
                                     <hr>
                                 </div>
-                            </div>
-                            <div class="container text-center mb-4">
-                                <div class="row align-items-start">
-                                    <div class="col">
-                                    Location 1
+                                <div class="container text-center mb-0 mt-0">
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">BW2</div>
+                                        <div class="col" id="bw2_prealerted"></div>
                                     </div>
-                                    <div class="col">
-                                    14
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">BW3</div>
+                                        <div class="col" id="bw3_prealerted"></div>
+                                    </div>
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">Foxconn</div>
+                                        <div class="col" id="foxconn_prealerted"></div>
+                                    </div>
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">On Time Forwarding</div>
+                                        <div class="col" id="ontimeforwarding_prealerted"></div>
+                                    </div>
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">Escoto</div>
+                                        <div class="col" id="escoto_prealerted"></div>
+                                    </div>
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TFEMA Yard</div>
+                                        <div class="col" id="tfemayard_prealerted"></div>
+                                    </div>
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TNL Express</div>
+                                        <div class="col" id="tnlexpress_prealerted"></div>
+                                    </div>
+                                    <div class="row align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TNCH Yard</div>
+                                        <div class="col" id="tnchyard_prealerted"></div>
                                     </div>
                                 </div>
                             </div>
@@ -98,21 +147,45 @@
                             </div>-->
                         </div>
                     </div>
-                    <div class="mb-4 grow-1">
+                    <div class="mb-4 grow-1 shadow-sm rounded">
                         <div class="card">
                             <div class="card-body">
                                 <h5 class="card-title fw-bold" style="color:#1e4877">DRIVER ASSIGNED</h5>
                                 <div class="text-black">
                                     <hr>
                                 </div>
-                            </div>
-                            <div class="container text-center mb-4">
-                                <div class="row align-items-start">
-                                    <div class="col">
-                                    Location 1
+                                <div class="container text-center mb-0 mt-0">
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">BW2</div>
+                                        <div class="col" id="bw2_driverassigned"></div>
                                     </div>
-                                    <div class="col">
-                                    14
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">BW3</div>
+                                        <div class="col" id="bw3_driverassigned"></div>
+                                    </div>
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">Foxconn</div>
+                                        <div class="col" id="foxconn_driverassigned"></div>
+                                    </div>
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">On Time Forwarding</div>
+                                        <div class="col" id="ontimeforwarding_driverassigned"></div>
+                                    </div>
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">Escoto</div>
+                                        <div class="col" id="escoto_driverassigned"></div>
+                                    </div>
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TFEMA Yard</div>
+                                        <div class="col" id="tfemayard_driverassigned"></div>
+                                    </div>
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TNL Express</div>
+                                        <div class="col" id="tnlexpress_driverassigned"></div>
+                                    </div>
+                                    <div class="row align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TNCH Yard</div>
+                                        <div class="col" id="tnchyard_driverassigned"></div>
                                     </div>
                                 </div>
                             </div>
@@ -122,46 +195,81 @@
 
                 <!-- Segunda columna con 2 divs que ocupan todo el alto proporcionalmente -->
                 <div class="col-md-6">
-                    <div class="mb-4 grow-2">
-                        <div class="card">
+                    <div class="mb-4 grow-2 shadow rounded">
+                        <div class="card border border-primary-subtle">
                             <div class="card-body">
                                 <h5 class="card-title fw-bold" style="color:#1e4877">IN TRANSIT</h5>
                                 <div class="text-black">
                                     <hr>
                                 </div>
-                            </div>
-                            <div class="container text-center mb-4">
-                                <div class="row align-items-start">
-                                    <div class="col">
-                                        <p class="fw-bold">FROM</p>
+
+                                <div class="container text-center mb-0">
+                                    <div class="row align-items-start mb-0 mt-0">
+                                        <div class="col d-flex justify-content-start ms-5">
+                                            <p class="fw-bold">FROM</p>
+                                        </div>
+                                        <div class="col d-flex justify-content-start">
+                                            <p class="fw-bold">TO</p>
+                                        </div>
+                                        <div class="col">
+                                            <p class="fw-bold">AMOUNT</p>
+                                        </div>
                                     </div>
-                                    <div class="col">
-                                        <p class="fw-bold">TO</p>
-                                    </div>
-                                    <div class="col">
-                                        <p class="fw-bold">AMOUNT</p>
+                                    <div class="mx-4" style="color:#1e4877">
+                                        <hr>
                                     </div>
                                 </div>
-                                <div class="mx-4" style="color:#1e4877">
-                                    <hr>
-                                </div>
-                            </div>
-                            <div class="container text-center mb-4">
-                                <div class="row align-items-start">
-                                    <div class="col">
-                                    Location 1
+                                <div class="container text-start mb-0">
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">BW2</div>
+                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">On Time Forwarding</div>
+                                        <div class="col d-flex justify-content-center" id="bw2_intransit"></div>
                                     </div>
-                                    <div class="col">
-                                    Location 2
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">BW3</div>
+                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">On Time Forwarding</div>
+                                        <div class="col d-flex justify-content-center" id="bw3_intransit"></div>
                                     </div>
-                                    <div class="col">
-                                    14
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">Foxconn</div>
+                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">Escoto</div>
+                                        <div class="col d-flex justify-content-center" id="foxconn_intransit"></div>
+                                    </div>
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">On Time Forwarding</div>
+                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">TFEMA Yard</div>
+                                        <div class="col d-flex justify-content-center" id="ontimeforwardingtfema_intransit"></div>
+                                    </div>
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">On Time Forwarding</div>
+                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">TNL Express</div>
+                                        <div class="col d-flex justify-content-center" id="ontimeforwardingtnlexpress_intransit"></div>
+                                    </div>
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">Escoto</div>
+                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">TNCH Yard</div>
+                                        <div class="col d-flex justify-content-center" id="escoto_intransit"></div>
+                                    </div>
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TFEMA Yard</div>
+                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">K & N</div>
+                                        <div class="col d-flex justify-content-center" id="tfema_intransit"></div>
+                                    </div>
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TNL Express</div>
+                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">K & N</div>
+                                        <div class="col d-flex justify-content-center" id="tnlexpress_intransit"></div>
+                                    </div>
+                                    <div class="row align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TNCH Yard</div>
+                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">K & N</div>
+                                        <div class="col d-flex justify-content-center" id="tnchyard_intransit"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="mb-4 grow-2">
+                    <div class="mb-4 grow-2 shadow-sm rounded">
                         <div class="card">
                             <div class="card-body">
                                 <h5 class="card-title fw-bold" style="color:#1e4877">DELIVERED</h5>
@@ -169,33 +277,67 @@
                                 <div class="text-black">
                                     <hr>
                                 </div>
-                            </div>
-                            <div class="container text-center mb-4">
-                                <div class="row align-items-start">
-                                    <div class="col">
-                                        <p class="fw-bold">FROM</p>
+                                <div class="container text-center mt-0 mb-0">
+                                    <div class="row align-items-center mb-0 mt-0">
+                                        <div class="col d-flex justify-content-start ms-5">
+                                            <p class="fw-bold">FROM</p>
+                                        </div>
+                                        <div class="col d-flex justify-content-start">
+                                            <p class="fw-bold">TO</p>
+                                        </div>
+                                        <div class="col">
+                                            <p class="fw-bold">AMOUNT</p>
+                                        </div>
                                     </div>
-                                    <div class="col">
-                                        <p class="fw-bold">TO</p>
-                                    </div>
-                                    <div class="col">
-                                        <p class="fw-bold">AMOUNT</p>
+                                    <div class="mx-4 my-0" style="color:#1e4877">
+                                        <hr>
                                     </div>
                                 </div>
-                                <div class="mx-4" style="color:#1e4877">
-                                    <hr>
-                                </div>
-                            </div>
-                            <div class="container text-center mb-4">
-                                <div class="row align-items-start">
-                                    <div class="col">
-                                    Location 1
+                                <div class="container text-start mt-0 mb-0">
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">BW2</div>
+                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">On Time Forwarding</div>
+                                        <div class="col d-flex justify-content-center" id="bw2_delivered"></div>
                                     </div>
-                                    <div class="col">
-                                    Location 2
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">BW3</div>
+                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">On Time Forwarding</div>
+                                        <div class="col d-flex justify-content-center" id="bw3_delivered"></div>
                                     </div>
-                                    <div class="col">
-                                    14
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">Foxconn</div>
+                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">Escoto</div>
+                                        <div class="col d-flex justify-content-center" id="foxconn_delivered"></div>
+                                    </div>
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">On Time Forwarding</div>
+                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">TFEMA Yard</div>
+                                        <div class="col d-flex justify-content-center" id="ontimeforwardingtfema_delivered"></div>
+                                    </div>
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">On Time Forwarding</div>
+                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">TNL Express</div>
+                                        <div class="col d-flex justify-content-center" id="ontimeforwardingtnlexpress_delivered"></div>
+                                    </div>
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">Escoto</div>
+                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">TNCH Yard</div>
+                                        <div class="col d-flex justify-content-center" id="escoto_delivered"></div>
+                                    </div>
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TFEMA Yard</div>
+                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">K & N</div>
+                                        <div class="col d-flex justify-content-center" id="tfema_delivered"></div>
+                                    </div>
+                                    <div class="row mb-2 align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TNL Express</div>
+                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">K & N</div>
+                                        <div class="col d-flex justify-content-center" id="tnlexpress_delivered"></div>
+                                    </div>
+                                    <div class="row align-items-start">
+                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TNCH Yard</div>
+                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">K & N</div>
+                                        <div class="col d-flex justify-content-center" id="tnchyard_delivered"></div>
                                     </div>
                                 </div>
                             </div>
@@ -205,39 +347,38 @@
             </div>
         </div>
 
-
-        @foreach ($shipments as $status => $shipmentList)
+        @foreach ($shipments as $status => $shipmentGroups)
     <div class="card">
         <div class="card-body">
             <h5 class="card-title fw-bold" style="color:#1e4877">
-                {{ strtoupper($status) }} ({{ $shipmentCounts[$status] }})
+                {{ strtoupper($status) }} ({{ array_sum($shipmentCounts[$status] ?? []) }})
             </h5>
-            <div class="text-black">
-                <hr>
-            </div>
+            <div class="text-black"><hr></div>
         </div>
-        <div class="container text-center mb-4">
-            <div class="row align-items-start">
-                <div class="col fw-bold">FROM</div>
-                <div class="col fw-bold">TO</div>
-                <div class="col fw-bold">AMOUNT</div>
-            </div>
-            <div class="mx-4" style="color:#1e4877">
-                <hr>
-            </div>
-        </div>
-        @foreach ($shipmentList as $shipment)
-            <div class="container text-center mb-4">
-                <div class="row align-items-start">
-                    <div class="col">{{ $shipment->origin->name ?? 'N/A' }}</div>
-                    <div class="col">{{ $shipment->destinations->name ?? 'N/A' }}</div>
-                    <div class="col">14</div>
+
+        @foreach ($shipmentGroups as $origin => $shipmentsList)
+            <div class="container">
+                <h6 class="fw-bold text-primary">{{ strtoupper($origin) }} ({{ $shipmentCounts[$status][$origin] ?? 0 }})</h6>
+                <div class="text-black"><hr></div>
+
+                <div class="row text-center">
+                    <div class="col fw-bold">FROM</div>
+                    <div class="col fw-bold">TO</div>
+                    <div class="col fw-bold">AMOUNT</div>
                 </div>
+                <div class="mx-4" style="color:#1e4877"><hr></div>
+
+                @foreach ($shipmentsList as $shipment)
+                    <div class="row text-center">
+                        <div class="col">{{ $shipment->origins->CoName ?? 'N/A' }}</div>
+                        <div class="col">{{ $shipment->destinations->CoName ?? 'N/A' }}</div>
+                        <div class="col">14</div>
+                    </div>
+                @endforeach
             </div>
         @endforeach
     </div>
 @endforeach
-
 
     
     @endauth

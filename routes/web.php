@@ -42,6 +42,9 @@ Route::get('/home', [HomeController::class, 'index'])->name('emptytrailer');
 //Ruta para ir a el dashboard
 Route::get('/dashboard', [DashboardController::class, 'getdashboard'])->name('dashboard');
 
+//Ruta para actualizacion del dashboard
+Route::get('/updatedashboard', [DashboardController::class, 'getupdatedashboard'])->name('updatedashboard');
+
 Route::get('/shipments', [ShipmentController::class, 'allshipmentsshow'])->name('all-shipments');
 
 Route::get('/get-service', [ShipmentController::class, 'getService'])->name('information-shipment');
