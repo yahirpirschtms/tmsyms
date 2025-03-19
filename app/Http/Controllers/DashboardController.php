@@ -327,7 +327,8 @@ class DashboardController extends Controller
             'data' => [
                 'shipmentCounts' => $shipmentCounts,
                 'shipments' => $shipments,
-                'origins' => $origins
+                'origins' => $origins,
+                'destinations' => $destinations
             ]
         ]);
     }

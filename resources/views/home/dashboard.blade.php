@@ -57,38 +57,38 @@
                                 <div class="text-black">
                                     <hr>
                                 </div>
-                                <div class="container text-center mb-0 mt-0">
+                                <div class="container text-start mb-0 mt-0">
                                     <div class="row mb-2 align-items-start">
                                         <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">BW2</div>
-                                        <div class="col" id="bw2_emptypool"></div>
+                                        <div class="col d-flex justify-content-center" id="bw2_emptypool"></div>
                                     </div>
                                     <div class="row mb-2 align-items-start">
                                         <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">BW3</div>
-                                        <div class="col" id="bw3_emptypool"></div>
+                                        <div class="col d-flex justify-content-center" id="bw3_emptypool"></div>
                                     </div>
                                     <div class="row mb-2 align-items-start">
                                         <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">Foxconn</div>
-                                        <div class="col" id="foxconn_emptypool"></div>
+                                        <div class="col d-flex justify-content-center" id="foxconn_emptypool"></div>
                                     </div>
                                     <div class="row mb-2 align-items-start">
                                         <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">On Time Forwarding</div>
-                                        <div class="col" id="ontimeforwarding_emptypool"></div>
+                                        <div class="col d-flex justify-content-center" id="ontimeforwarding_emptypool"></div>
                                     </div>
                                     <div class="row mb-2 align-items-start">
                                         <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">Escoto</div>
-                                        <div class="col" id="escoto_emptypool"></div>
+                                        <div class="col d-flex justify-content-center" id="escoto_emptypool"></div>
                                     </div>
                                     <div class="row mb-2 align-items-start">
                                         <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TFEMA Yard</div>
-                                        <div class="col" id="tfemayard_emptypool"></div>
+                                        <div class="col d-flex justify-content-center" id="tfemayard_emptypool"></div>
                                     </div>
                                     <div class="row mb-2 align-items-start">
                                         <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TNL Express</div>
-                                        <div class="col" id="tnlexpress_emptypool"></div>
+                                        <div class="col d-flex justify-content-center" id="tnlexpress_emptypool"></div>
                                     </div>
                                     <div class="row align-items-start">
                                         <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TNCH Yard</div>
-                                        <div class="col" id="tnchyard_emptypool"></div>
+                                        <div class="col d-flex justify-content-center" id="tnchyard_emptypool"></div>
                                     </div>
                                 </div>
                             </div>
@@ -101,38 +101,38 @@
                                 <div class="text-black">
                                     <hr>
                                 </div>
-                                <div class="container text-center mb-0 mt-0">
+                                <div class="container text-start mb-0 mt-0">
                                     <div class="row mb-2 align-items-start">
                                         <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">BW2</div>
-                                        <div class="col" id="bw2_prealerted"></div>
+                                        <div class="col d-flex justify-content-center" id="bw2_prealerted"></div>
                                     </div>
                                     <div class="row mb-2 align-items-start">
                                         <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">BW3</div>
-                                        <div class="col" id="bw3_prealerted"></div>
+                                        <div class="col d-flex justify-content-center" id="bw3_prealerted"></div>
                                     </div>
                                     <div class="row mb-2 align-items-start">
                                         <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">Foxconn</div>
-                                        <div class="col" id="foxconn_prealerted"></div>
+                                        <div class="col d-flex justify-content-center" id="foxconn_prealerted"></div>
                                     </div>
                                     <div class="row mb-2 align-items-start">
                                         <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">On Time Forwarding</div>
-                                        <div class="col" id="ontimeforwarding_prealerted"></div>
+                                        <div class="col d-flex justify-content-center" id="ontimeforwarding_prealerted"></div>
                                     </div>
                                     <div class="row mb-2 align-items-start">
                                         <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">Escoto</div>
-                                        <div class="col" id="escoto_prealerted"></div>
+                                        <div class="col d-flex justify-content-center" id="escoto_prealerted"></div>
                                     </div>
                                     <div class="row mb-2 align-items-start">
                                         <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TFEMA Yard</div>
-                                        <div class="col" id="tfemayard_prealerted"></div>
+                                        <div class="col d-flex justify-content-center" id="tfemayard_prealerted"></div>
                                     </div>
                                     <div class="row mb-2 align-items-start">
                                         <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TNL Express</div>
-                                        <div class="col" id="tnlexpress_prealerted"></div>
+                                        <div class="col d-flex justify-content-center" id="tnlexpress_prealerted"></div>
                                     </div>
                                     <div class="row align-items-start">
                                         <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TNCH Yard</div>
-                                        <div class="col" id="tnchyard_prealerted"></div>
+                                        <div class="col d-flex justify-content-center" id="tnchyard_prealerted"></div>
                                     </div>
                                 </div>
                             </div>
@@ -154,38 +154,38 @@
                                 <div class="text-black">
                                     <hr>
                                 </div>
-                                <div class="container text-center mb-0 mt-0">
+                                <div class="container text-start mb-0 mt-0">
                                     <div class="row mb-2 align-items-start">
                                         <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">BW2</div>
-                                        <div class="col" id="bw2_driverassigned"></div>
+                                        <div class="col d-flex justify-content-center" id="bw2_driverassigned"></div>
                                     </div>
                                     <div class="row mb-2 align-items-start">
                                         <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">BW3</div>
-                                        <div class="col" id="bw3_driverassigned"></div>
+                                        <div class="col d-flex justify-content-center" id="bw3_driverassigned"></div>
                                     </div>
                                     <div class="row mb-2 align-items-start">
                                         <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">Foxconn</div>
-                                        <div class="col" id="foxconn_driverassigned"></div>
+                                        <div class="col d-flex justify-content-center" id="foxconn_driverassigned"></div>
                                     </div>
                                     <div class="row mb-2 align-items-start">
                                         <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">On Time Forwarding</div>
-                                        <div class="col" id="ontimeforwarding_driverassigned"></div>
+                                        <div class="col d-flex justify-content-center" id="ontimeforwarding_driverassigned"></div>
                                     </div>
                                     <div class="row mb-2 align-items-start">
                                         <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">Escoto</div>
-                                        <div class="col" id="escoto_driverassigned"></div>
+                                        <div class="col d-flex justify-content-center" id="escoto_driverassigned"></div>
                                     </div>
                                     <div class="row mb-2 align-items-start">
                                         <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TFEMA Yard</div>
-                                        <div class="col" id="tfemayard_driverassigned"></div>
+                                        <div class="col d-flex justify-content-center" id="tfemayard_driverassigned"></div>
                                     </div>
                                     <div class="row mb-2 align-items-start">
                                         <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TNL Express</div>
-                                        <div class="col" id="tnlexpress_driverassigned"></div>
+                                        <div class="col d-flex justify-content-center" id="tnlexpress_driverassigned"></div>
                                     </div>
                                     <div class="row align-items-start">
                                         <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TNCH Yard</div>
-                                        <div class="col" id="tnchyard_driverassigned"></div>
+                                        <div class="col d-flex justify-content-center" id="tnchyard_driverassigned"></div>
                                     </div>
                                 </div>
                             </div>
