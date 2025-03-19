@@ -9,8 +9,8 @@
 
     @auth
     <script>//almacenar trailers
-        let shipmentsData = @json($shipments->keyBy('pk_shipment'));
-        console.log(shipmentsData);
+        //let shipmentsData = @json($shipments->keyBy('pk_shipment'));
+        //console.log(shipmentsData);
     </script>
 
     <style>
@@ -204,6 +204,40 @@
                 </div>
             </div>
         </div>
+
+
+        @foreach ($shipments as $status => $shipmentList)
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title fw-bold" style="color:#1e4877">
+                {{ strtoupper($status) }} ({{ $shipmentCounts[$status] }})
+            </h5>
+            <div class="text-black">
+                <hr>
+            </div>
+        </div>
+        <div class="container text-center mb-4">
+            <div class="row align-items-start">
+                <div class="col fw-bold">FROM</div>
+                <div class="col fw-bold">TO</div>
+                <div class="col fw-bold">AMOUNT</div>
+            </div>
+            <div class="mx-4" style="color:#1e4877">
+                <hr>
+            </div>
+        </div>
+        @foreach ($shipmentList as $shipment)
+            <div class="container text-center mb-4">
+                <div class="row align-items-start">
+                    <div class="col">{{ $shipment->origin->name ?? 'N/A' }}</div>
+                    <div class="col">{{ $shipment->destinations->name ?? 'N/A' }}</div>
+                    <div class="col">14</div>
+                </div>
+            </div>
+        @endforeach
+    </div>
+@endforeach
+
 
     
     @endauth
