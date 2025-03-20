@@ -57,39 +57,8 @@
                                 <div class="text-black">
                                     <hr>
                                 </div>
-                                <div class="container text-start mb-0 mt-0">
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">BW2</div>
-                                        <div class="col d-flex justify-content-center" id="bw2_emptypool"></div>
-                                    </div>
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">BW3</div>
-                                        <div class="col d-flex justify-content-center" id="bw3_emptypool"></div>
-                                    </div>
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">Foxconn</div>
-                                        <div class="col d-flex justify-content-center" id="foxconn_emptypool"></div>
-                                    </div>
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">On Time Forwarding</div>
-                                        <div class="col d-flex justify-content-center" id="ontimeforwarding_emptypool"></div>
-                                    </div>
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">Escoto</div>
-                                        <div class="col d-flex justify-content-center" id="escoto_emptypool"></div>
-                                    </div>
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TFEMA Yard</div>
-                                        <div class="col d-flex justify-content-center" id="tfemayard_emptypool"></div>
-                                    </div>
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TNL Express</div>
-                                        <div class="col d-flex justify-content-center" id="tnlexpress_emptypool"></div>
-                                    </div>
-                                    <div class="row align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TNCH Yard</div>
-                                        <div class="col d-flex justify-content-center" id="tnchyard_emptypool"></div>
-                                    </div>
+                                <div class="container text-start mb-0" id="emptypool_container">
+                                    <!-- Aquí se insertarán dinámicamente los datos -->
                                 </div>
                             </div>
                         </div>
@@ -101,39 +70,8 @@
                                 <div class="text-black">
                                     <hr>
                                 </div>
-                                <div class="container text-start mb-0 mt-0">
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">BW2</div>
-                                        <div class="col d-flex justify-content-center" id="bw2_prealerted"></div>
-                                    </div>
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">BW3</div>
-                                        <div class="col d-flex justify-content-center" id="bw3_prealerted"></div>
-                                    </div>
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">Foxconn</div>
-                                        <div class="col d-flex justify-content-center" id="foxconn_prealerted"></div>
-                                    </div>
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">On Time Forwarding</div>
-                                        <div class="col d-flex justify-content-center" id="ontimeforwarding_prealerted"></div>
-                                    </div>
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">Escoto</div>
-                                        <div class="col d-flex justify-content-center" id="escoto_prealerted"></div>
-                                    </div>
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TFEMA Yard</div>
-                                        <div class="col d-flex justify-content-center" id="tfemayard_prealerted"></div>
-                                    </div>
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TNL Express</div>
-                                        <div class="col d-flex justify-content-center" id="tnlexpress_prealerted"></div>
-                                    </div>
-                                    <div class="row align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TNCH Yard</div>
-                                        <div class="col d-flex justify-content-center" id="tnchyard_prealerted"></div>
-                                    </div>
+                                <div class="container text-start mb-0 mt-0" id="prealerted_container">
+                                    <!-- Aquí se insertarán dinámicamente los datos -->
                                 </div>
                             </div>
                             <!--<ul class="list-group list-group-flush">
@@ -154,39 +92,8 @@
                                 <div class="text-black">
                                     <hr>
                                 </div>
-                                <div class="container text-start mb-0 mt-0">
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">BW2</div>
-                                        <div class="col d-flex justify-content-center" id="bw2_driverassigned"></div>
-                                    </div>
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">BW3</div>
-                                        <div class="col d-flex justify-content-center" id="bw3_driverassigned"></div>
-                                    </div>
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">Foxconn</div>
-                                        <div class="col d-flex justify-content-center" id="foxconn_driverassigned"></div>
-                                    </div>
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">On Time Forwarding</div>
-                                        <div class="col d-flex justify-content-center" id="ontimeforwarding_driverassigned"></div>
-                                    </div>
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">Escoto</div>
-                                        <div class="col d-flex justify-content-center" id="escoto_driverassigned"></div>
-                                    </div>
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TFEMA Yard</div>
-                                        <div class="col d-flex justify-content-center" id="tfemayard_driverassigned"></div>
-                                    </div>
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TNL Express</div>
-                                        <div class="col d-flex justify-content-center" id="tnlexpress_driverassigned"></div>
-                                    </div>
-                                    <div class="row align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TNCH Yard</div>
-                                        <div class="col d-flex justify-content-center" id="tnchyard_driverassigned"></div>
-                                    </div>
+                                <div class="container text-start mb-0 mt-0" id="driverassigned_container">
+                                    <!-- Aquí se insertarán dinámicamente los datos de Driver Assigned -->
                                 </div>
                             </div>
                         </div>
@@ -219,52 +126,8 @@
                                         <hr>
                                     </div>
                                 </div>
-                                <div class="container text-start mb-0">
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">BW2</div>
-                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">On Time Forwarding</div>
-                                        <div class="col d-flex justify-content-center" id="bw2_intransit"></div>
-                                    </div>
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">BW3</div>
-                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">On Time Forwarding</div>
-                                        <div class="col d-flex justify-content-center" id="bw3_intransit"></div>
-                                    </div>
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">Foxconn</div>
-                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">Escoto</div>
-                                        <div class="col d-flex justify-content-center" id="foxconn_intransit"></div>
-                                    </div>
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">On Time Forwarding</div>
-                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">TFEMA Yard</div>
-                                        <div class="col d-flex justify-content-center" id="ontimeforwardingtfema_intransit"></div>
-                                    </div>
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">On Time Forwarding</div>
-                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">TNL Express</div>
-                                        <div class="col d-flex justify-content-center" id="ontimeforwardingtnlexpress_intransit"></div>
-                                    </div>
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">Escoto</div>
-                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">TNCH Yard</div>
-                                        <div class="col d-flex justify-content-center" id="escoto_intransit"></div>
-                                    </div>
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TFEMA Yard</div>
-                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">K & N</div>
-                                        <div class="col d-flex justify-content-center" id="tfema_intransit"></div>
-                                    </div>
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TNL Express</div>
-                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">K & N</div>
-                                        <div class="col d-flex justify-content-center" id="tnlexpress_intransit"></div>
-                                    </div>
-                                    <div class="row align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TNCH Yard</div>
-                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">K & N</div>
-                                        <div class="col d-flex justify-content-center" id="tnchyard_intransit"></div>
-                                    </div>
+                                <div class="container text-start mb-0" id="intransit_container">
+                                    <!-- Aquí se insertarán dinámicamente los datos -->
                                 </div>
                             </div>
                         </div>
@@ -293,52 +156,8 @@
                                         <hr>
                                     </div>
                                 </div>
-                                <div class="container text-start mt-0 mb-0">
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">BW2</div>
-                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">On Time Forwarding</div>
-                                        <div class="col d-flex justify-content-center" id="bw2_delivered"></div>
-                                    </div>
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">BW3</div>
-                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">On Time Forwarding</div>
-                                        <div class="col d-flex justify-content-center" id="bw3_delivered"></div>
-                                    </div>
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">Foxconn</div>
-                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">Escoto</div>
-                                        <div class="col d-flex justify-content-center" id="foxconn_delivered"></div>
-                                    </div>
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">On Time Forwarding</div>
-                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">TFEMA Yard</div>
-                                        <div class="col d-flex justify-content-center" id="ontimeforwardingtfema_delivered"></div>
-                                    </div>
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">On Time Forwarding</div>
-                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">TNL Express</div>
-                                        <div class="col d-flex justify-content-center" id="ontimeforwardingtnlexpress_delivered"></div>
-                                    </div>
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">Escoto</div>
-                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">TNCH Yard</div>
-                                        <div class="col d-flex justify-content-center" id="escoto_delivered"></div>
-                                    </div>
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TFEMA Yard</div>
-                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">K & N</div>
-                                        <div class="col d-flex justify-content-center" id="tfema_delivered"></div>
-                                    </div>
-                                    <div class="row mb-2 align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TNL Express</div>
-                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">K & N</div>
-                                        <div class="col d-flex justify-content-center" id="tnlexpress_delivered"></div>
-                                    </div>
-                                    <div class="row align-items-start">
-                                        <div class="col d-flex justify-content-start ms-5" style="font-weight: 600;">TNCH Yard</div>
-                                        <div class="col d-flex justify-content-start" style="font-weight: 600;">K & N</div>
-                                        <div class="col d-flex justify-content-center" id="tnchyard_delivered"></div>
-                                    </div>
+                                <div class="container text-start mb-0" id="delivered_container">
+                                    <!-- Aquí se insertarán dinámicamente los datos -->
                                 </div>
                             </div>
                         </div>
@@ -380,7 +199,7 @@
     </div>
 @endforeach
 
-    
+
     @endauth
 
 @guest
