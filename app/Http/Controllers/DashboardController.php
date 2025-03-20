@@ -185,6 +185,7 @@ foreach ($categorias as $categoria) {
 
             $emptyTrailers = EmptyTrailer::with('locations')
             ->whereIn('location', $origins->values()) // Filtrar solo por los orígenes válidos
+            ->whereNull('availability') 
             ->get();
 
             // Agrupar Empty Trailers por `location`

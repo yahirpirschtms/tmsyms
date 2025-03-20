@@ -1895,7 +1895,7 @@ $(document).ready(function() {
     });
 
     // Actualización automática cada 5 minutos (300,000 ms)
-    setInterval(updateTrailerTable, 5000000);
+    setInterval(updateTrailerTable, 60000);
     
 
   //Resetear Off Canvas al cerrarlo
