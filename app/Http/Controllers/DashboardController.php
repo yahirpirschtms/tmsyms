@@ -96,85 +96,27 @@ class DashboardController extends Controller
         return redirect('/login');
     }
 
-    /*public function getupdatedashboard()
-    {
+    public function getupdatedashboard(){
         if (Auth::check()) {
             // Categorías a filtrar
             $categorias = ['Prealerted', 'Driver Assigned', 'In Transit', 'Delivered'];
-    
-            // Obtener los IDs de los estados en la tabla `generic_catalogs`
-            $statusIds = GenericCatalog::where('gntc_group', 'CURRENT_STATUS')
-                ->whereIn('gntc_description', $categorias)
-                ->pluck('gnct_id', 'gntc_description');
-    
-            // Obtener los IDs de los orígenes en `companies`
-            $origins = Companies::where('Notes', 'LIKE', '%YM%')
-                ->whereIn('CoName', ['BW2', 'BW3', 'Foxconn', 'On Time Forwarding', 'Escoto', 'TFEMA Yard', 'TNL Express', 'TNCH Yard'])
-                ->pluck('pk_company', 'CoName');
-    
-            // Obtener todos los Shipments con sus relaciones
-            $shipments = Shipments::with(['currentstatus', 'origin'])
-                ->whereIn('gnct_id_current_status', $statusIds)
-                ->whereIn('origin', $origins->values())
-                ->get();
-    
-            // Agrupar por Status y por Origin
-            $shipmentCounts = [];
-            foreach ($categorias as $categoria) {
-                $shipmentCounts[$categoria] = [];
-    
-                // Buscar el ID correspondiente a esta categoría
-                $statusId = $statusIds[$categoria] ?? null;
-    
-                foreach ($origins as $originName => $pk_company) {
-                    // Contar los Shipments que coincidan con el Status y el Origin
-                    $count = $shipments->where('gnct_id_current_status', $statusId)
-                                       ->where('origin', $pk_company)
-                                       ->count();
-    
-                    $shipmentCounts[$categoria][$originName] = $count;
-                }
-            }
-    
-            // Retornar en formato JSON
-            return response()->json([
-                'status' => 'success',
-                'data' => [
-                    'shipmentCounts' => $shipmentCounts,
-                    'shipments' => $shipments,
-                    'origins' => $origins
-                ]
-            ]);
-        }
-    
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Unauthorized'
-        ], 401);
-    }*/
 
-    /*public function getupdatedashboard()
-    {
-        if (Auth::check()) {
-            // Categorías a filtrar
-            $categorias = ['Prealerted', 'Driver Assigned', 'In Transit', 'Delivered'];
-    
             // Obtener los IDs de los estados en la tabla `generic_catalogs`
             $statusIds = GenericCatalog::where('gntc_group', 'CURRENT_STATUS')
                 ->whereIn('gntc_description', $categorias)
                 ->pluck('gnct_id', 'gntc_description');
-    
-            // Obtener los IDs de los orígenes en `companies`
+
+            // Obtener los IDs de los orígenes
             $origins = Companies::where('Notes', 'LIKE', '%YM%')
                 ->whereIn('CoName', ['BW2', 'BW3', 'Foxconn', 'On Time Forwarding', 'Escoto', 'TFEMA Yard', 'TNL Express', 'TNCH Yard'])
                 ->pluck('pk_company', 'CoName');
-            
-            // Obtener los IDs de los destinos en `companies`
-            $destinations = Companies::where('Notes', 'LIKE', '%YM%')
-                ->whereIn('CoName', ['BW2', 'BW3', 'Foxconn', 'On Time Forwarding', 'Escoto', 'TFEMA Yard', 'TNL Express', 'TNCH Yard, K&N'])
-                ->pluck('pk_company', 'CoName');
-    
-            // Definir las combinaciones de Origen-Destino para "In Transit" y "Delivered"
+
+            // Obtener los IDs de los destinos
+            $destinations = Companies::whereIn('CoName', [
+                'On Time Forwarding', 'Escoto', 'TFEMA Yard', 'TNL Express', 'TNCH Yard', 'K&N'
+            ])->pluck('pk_company', 'CoName');
+
+            // Definir los pares de Origen -> Destino en base a nombres
             $originDestinationPairs = [
                 'BW2' => 'On Time Forwarding',
                 'BW3' => 'On Time Forwarding',
@@ -186,41 +128,69 @@ class DashboardController extends Controller
                 'TNL Express' => 'K&N',
                 'TNCH Yard' => 'K&N',
             ];
-    
+
+            // Convertir nombres en IDs
+            $originDestinationPairsIDs = [];
+            foreach ($originDestinationPairs as $originName => $destinationName) {
+                if (isset($origins[$originName]) && isset($destinations[$destinationName])) {
+                    $originDestinationPairsIDs[$origins[$originName]] = $destinations[$destinationName];
+                }
+            }
+
             // Obtener todos los Shipments con sus relaciones
             $shipments = Shipments::with(['currentstatus', 'origin', 'destinations'])
                 ->whereIn('gnct_id_current_status', $statusIds)
+                ->whereIn('origin', $origins->values()) // Solo traer shipments con orígenes válidos
                 ->get();
-    
-            // Agrupar por Status y por Origin/Destination
+
+            // Agrupar por Status y por Origin/Destination según la categoría
             $shipmentCounts = [];
             foreach ($categorias as $categoria) {
                 $shipmentCounts[$categoria] = [];
-    
+
                 // Buscar el ID correspondiente a esta categoría
                 $statusId = $statusIds[$categoria] ?? null;
-    
-                foreach ($origins as $originName => $pk_company) {
-                    // Filtrar para "In Transit" y "Delivered" por destino también
-                    if (in_array($categoria, ['In Transit', 'Delivered'])) {
-                        foreach ($originDestinationPairs as $origin => $destination) {
-                            // Contar los Shipments que coincidan con el Status, Origin y Destination
-                            $count = $shipments->where('gnct_id_current_status', $statusId)
-                                               ->where('origin', $origin)
-                                               ->where('destination', $destination)
-                                               ->count();
-                            $shipmentCounts[$categoria]["$origin - $destination"] = $count;
-                        }
-                    } else {
-                        // Filtrar solo por Origin para los demás estados
+
+                if (in_array($categoria, ['In Transit', 'Delivered'])) {
+                    // Filtrar por Origen y Destino
+                    foreach ($originDestinationPairsIDs as $originID => $destinationID) {
                         $count = $shipments->where('gnct_id_current_status', $statusId)
-                                           ->where('origin', $pk_company)
-                                           ->count();
+                                        ->where('origin', $originID)
+                                        ->where('destination', $destinationID)
+                                        ->count();
+                        // Obtener nombres de origen y destino
+                        $originName = array_search($originID, $origins->toArray());
+                        $destinationName = array_search($destinationID, $destinations->toArray());
+
+                        // Guardar en el array con los nombres en lugar de los IDs
+                        $shipmentCounts[$categoria]["$originName - $destinationName"] = $count;
+                    }
+                } else {
+                    // Filtrar solo por Origen
+                    foreach ($origins as $originName => $originID) {
+                        $count = $shipments->where('gnct_id_current_status', $statusId)
+                                        ->where('origin', $originID)
+                                        ->count();
                         $shipmentCounts[$categoria][$originName] = $count;
                     }
                 }
             }
-    
+
+            $emptyTrailers = EmptyTrailer::with('locations')
+            ->whereIn('location', $origins->values()) // Filtrar solo por los orígenes válidos
+            ->get();
+
+            // Agrupar Empty Trailers por `location`
+            $emptyTrailerCounts = [];
+            foreach ($emptyTrailers as $trailer) {
+                $locationName = $trailer->locations ? $trailer->locations->CoName : 'Desconocido';
+
+                if (!isset($emptyTrailerCounts[$locationName])) {
+                    $emptyTrailerCounts[$locationName] = 0;
+                }
+                $emptyTrailerCounts[$locationName]++;
+            }
+
             // Retornar en formato JSON
             return response()->json([
                 'status' => 'success',
@@ -228,118 +198,16 @@ class DashboardController extends Controller
                     'shipmentCounts' => $shipmentCounts,
                     'shipments' => $shipments,
                     'origins' => $origins,
-                    'destinations' => $originDestinationPairs // Añadimos los destinos aquí
+                    'destinations' => $destinations,
+                    'emptyTrailerCounts' => $emptyTrailerCounts, // 🔹 Agregamos el conteo de Empty Trailers
+                    'emptyTrailers' => $emptyTrailers, // 🔹 Agregamos la lista completa de trailers vacíos
                 ]
             ]);
         }
-    
+
         return response()->json([
             'status' => 'error',
             'message' => 'Unauthorized'
         ], 401);
     }
-    */
-
-    public function getupdatedashboard()
-{
-    if (Auth::check()) {
-        // Categorías a filtrar
-        $categorias = ['Prealerted', 'Driver Assigned', 'In Transit', 'Delivered'];
-
-        // Obtener los IDs de los estados en la tabla `generic_catalogs`
-        $statusIds = GenericCatalog::where('gntc_group', 'CURRENT_STATUS')
-            ->whereIn('gntc_description', $categorias)
-            ->pluck('gnct_id', 'gntc_description');
-
-        // Obtener los IDs de los orígenes
-        $origins = Companies::where('Notes', 'LIKE', '%YM%')
-            ->whereIn('CoName', ['BW2', 'BW3', 'Foxconn', 'On Time Forwarding', 'Escoto', 'TFEMA Yard', 'TNL Express', 'TNCH Yard'])
-            ->pluck('pk_company', 'CoName');
-
-        // Obtener los IDs de los destinos
-        $destinations = Companies::whereIn('CoName', [
-            'On Time Forwarding', 'Escoto', 'TFEMA Yard', 'TNL Express', 'TNCH Yard', 'K&N'
-        ])->pluck('pk_company', 'CoName');
-
-        // Definir los pares de Origen -> Destino en base a nombres
-        $originDestinationPairs = [
-            'BW2' => 'On Time Forwarding',
-            'BW3' => 'On Time Forwarding',
-            'Foxconn' => 'Escoto',
-            'On Time Forwarding' => 'TFEMA Yard',
-            'On Time Forwarding' => 'TNL Express',
-            'Escoto' => 'TNCH Yard',
-            'TFEMA Yard' => 'K&N',
-            'TNL Express' => 'K&N',
-            'TNCH Yard' => 'K&N',
-        ];
-
-        // Convertir nombres en IDs
-        $originDestinationPairsIDs = [];
-        foreach ($originDestinationPairs as $originName => $destinationName) {
-            if (isset($origins[$originName]) && isset($destinations[$destinationName])) {
-                $originDestinationPairsIDs[$origins[$originName]] = $destinations[$destinationName];
-            }
-        }
-
-        // Obtener todos los Shipments con sus relaciones
-        $shipments = Shipments::with(['currentstatus', 'origin', 'destinations'])
-            ->whereIn('gnct_id_current_status', $statusIds)
-            ->whereIn('origin', $origins->values()) // Solo traer shipments con orígenes válidos
-            ->get();
-
-        // Agrupar por Status y por Origin/Destination según la categoría
-        $shipmentCounts = [];
-        foreach ($categorias as $categoria) {
-            $shipmentCounts[$categoria] = [];
-
-            // Buscar el ID correspondiente a esta categoría
-            $statusId = $statusIds[$categoria] ?? null;
-
-            if (in_array($categoria, ['In Transit', 'Delivered'])) {
-                // Filtrar por Origen y Destino
-                foreach ($originDestinationPairsIDs as $originID => $destinationID) {
-                    $count = $shipments->where('gnct_id_current_status', $statusId)
-                                       ->where('origin', $originID)
-                                       ->where('destination', $destinationID)
-                                       ->count();
-                    // Obtener nombres de origen y destino
-                    $originName = array_search($originID, $origins->toArray());
-                    $destinationName = array_search($destinationID, $destinations->toArray());
-
-                    // Guardar en el array con los nombres en lugar de los IDs
-                    $shipmentCounts[$categoria]["$originName - $destinationName"] = $count;
-                }
-            } else {
-                // Filtrar solo por Origen
-                foreach ($origins as $originName => $originID) {
-                    $count = $shipments->where('gnct_id_current_status', $statusId)
-                                       ->where('origin', $originID)
-                                       ->count();
-                    $shipmentCounts[$categoria][$originName] = $count;
-                }
-            }
-        }
-
-        // Retornar en formato JSON
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'shipmentCounts' => $shipmentCounts,
-                'shipments' => $shipments,
-                'origins' => $origins,
-                'destinations' => $destinations
-            ]
-        ]);
-    }
-
-    return response()->json([
-        'status' => 'error',
-        'message' => 'Unauthorized'
-    ], 401);
-}
-
-
-
-
 }
