@@ -116,7 +116,7 @@ function cargarDashboard() {
                 // Obtener la fecha de ayer y hoy
                 const today = new Date();
                 const yesterday = new Date(today);
-                yesterday.setDate(today.getDate() - 1);
+                yesterday.setDate(today.getDate() - 7);
 
                 // Formato de la fecha (Ayer - Hoy)
                 const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
