@@ -940,11 +940,13 @@ public function liveshipmentsshow()
     // Buscar en 'companies' los valores de 'CoName' y 'pk_company' con los IDs obtenidos
     $fromCompany = DB::table('companies')
         ->where('CoName', $service->from)
+        ->where('Notes', 'like', '%YM%') // Filtra solo si 'notes' contiene 'YM'
         ->select('CoName', 'pk_company')
         ->first();
 
     $toCompany = DB::table('companies')
         ->where('CoName', $service->to)
+        ->where('Notes', 'like', '%YM%') // Filtra solo si 'notes' contiene 'YM'
         ->select('CoName', 'pk_company')
         ->first();
 

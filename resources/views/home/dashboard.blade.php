@@ -166,40 +166,6 @@
             </div>
         </div>
 
-        @foreach ($shipments as $status => $shipmentGroups)
-    <div class="card">
-        <div class="card-body">
-            <h5 class="card-title fw-bold" style="color:#1e4877">
-                {{ strtoupper($status) }} ({{ array_sum($shipmentCounts[$status] ?? []) }})
-            </h5>
-            <div class="text-black"><hr></div>
-        </div>
-
-        @foreach ($shipmentGroups as $origin => $shipmentsList)
-            <div class="container">
-                <h6 class="fw-bold text-primary">{{ strtoupper($origin) }} ({{ $shipmentCounts[$status][$origin] ?? 0 }})</h6>
-                <div class="text-black"><hr></div>
-
-                <div class="row text-center">
-                    <div class="col fw-bold">FROM</div>
-                    <div class="col fw-bold">TO</div>
-                    <div class="col fw-bold">AMOUNT</div>
-                </div>
-                <div class="mx-4" style="color:#1e4877"><hr></div>
-
-                @foreach ($shipmentsList as $shipment)
-                    <div class="row text-center">
-                        <div class="col">{{ $shipment->origins->CoName ?? 'N/A' }}</div>
-                        <div class="col">{{ $shipment->destinations->CoName ?? 'N/A' }}</div>
-                        <div class="col">14</div>
-                    </div>
-                @endforeach
-            </div>
-        @endforeach
-    </div>
-@endforeach
-
-
     @endauth
 
 @guest
