@@ -856,16 +856,28 @@
                                 </div>
 
                                <!-- Origin -->
-                                <div class="mb-3">
-                                    <label for="origin-{{ $shipment->stm_id }}" class="form-label">Origin</label>
-                                    <input type="text" class="form-control" id="origin-{{ $shipment->stm_id }}" name="origin" value="{{ $shipment->company->CoName }}" readonly>
-                                </div>
+                           <div class="mb-3">
+                            <label for="origin-{{ $shipment->stm_id }}" class="form-label">Origin</label>
+                            <!-- Campo oculto para enviar el pk_company de origin -->
+                            <input type="hidden" id="origin-{{ $shipment->stm_id }}" name="origin"
+                                value="{{ $shipment->company->pk_company ?? '' }}">
 
-                                <!-- Destination -->
-                                <div class="mb-3">
-                                    <label for="destination-{{ $shipment->stm_id }}" class="form-label">Destination</label>
-                                    <input type="text" class="form-control" id="destination-{{ $shipment->stm_id }}" name="destination" value="{{ $shipment->companydest->CoName }}" readonly>
-                                </div>
+                            <!-- Campo de solo lectura para mostrar el CoName de origin -->
+                            <input type="text" class="form-control"
+                                value="{{ $shipment->company->CoName ?? 'N/A' }}" readonly>
+                            </div>
+
+                            <!-- Destination -->
+                            <div class="mb-3">
+                                <label for="destination-{{ $shipment->stm_id }}" class="form-label">Destination</label>
+                                <!-- Campo oculto para enviar el pk_company de destination -->
+                                <input type="hidden" id="destination-{{ $shipment->stm_id }}" name="destination"
+                                    value="{{ $shipment->companydest->pk_company ?? '' }}">
+
+                                <!-- Campo de solo lectura para mostrar el CoName de destination -->
+                                <input type="text" class="form-control"
+                                    value="{{ $shipment->companydest->CoName ?? 'N/A' }}" readonly>
+                            </div>
 
                                 <div class="mb-3">
                                     <label for="preAlertedDatetime-{{ $shipment->stm_id }}" class="form-label">Pre-Alerted Datetime</label>
