@@ -208,7 +208,7 @@
                             <th scope="col">Pallets On floor</th>
                             <th scope="col">Carrier</th>
                             <th scope="col">Availability Indicator</th>
-                            <!--<th scope="col">Location</th>-->
+                            <th scope="col">Location</th>
                             <th scope="col">Date In</th>
                             <!--<th scope="col">Date Out</th>-->
                             <!--<th scope="col">Transaction Date</th>-->
@@ -228,7 +228,7 @@
                             <td>{{ $trailer->pallets_on_floor ?? ''  }}</td>
                             <td>{{ $trailer->carriers->CoName ?? '' }}</td>
                             <td>{{ $trailer->availabilityIndicator->gntc_description ?? '' }}</td>
-                            <!--<td>{{ $trailer->locations->CoName ?? '' }}</td>-->
+                            <td>{{ $trailer->locations->CoName ?? '' }}</td>
                             <td>{{ $trailer->date_in ?? ''  }}</td>
                             <!--<td>{{ $trailer->date_out ?? ''  }}</td>-->
                             <!--<td>{{ $trailer->transaction_date ?? ''  }}</td>-->
@@ -358,7 +358,7 @@
                             </div>
                         </div>
                     </div>
-                    <div style=display:none>
+                    <div >
                         <button class="btn btn-primary w-100 mb-2" id="closeapplylocationfiltercheckbox" type="button" data-bs-toggle="collapse" data-bs-target="#multiCollapseapplylocationfiltercheckbox" aria-expanded="false" aria-controls="multiCollapseapplylocationfiltercheckbox">Location</button>
                         <div class="row mb-2">
                             <div class="col">
@@ -450,7 +450,7 @@
                         <p><strong>Pallets on Floor:</strong> <span id="offcanvas-pallets-on-floor"></span></p>
                         <p><strong>Carrier:</strong> <span id="offcanvas-carrier"></span></p>
                         <p><strong>Availability:</strong> <span id="offcanvas-availability"></span></p>
-                        <!--<p><strong>Location:</strong> <span id="offcanvas-location"></span></p>-->
+                        <p><strong>Location:</strong> <span id="offcanvas-location"></span></p>
                         <p><strong>Date In:</strong> <span id="offcanvas-date-in"></span></p>
                         <!--<p><strong>Date Out:</strong> <span id="offcanvas-date-out"></span></p>-->
                         <!--<p><strong>Transaction Date:</strong> <span id="offcanvas-transaction-date"></span></p>-->
@@ -539,7 +539,7 @@
                                                     <h6 class="alert alert-danger">{{  $message  }}</h6>
                                                 @enderror
                                             </div>-->
-                                            <div class="mb-3 " style="display:none">
+                                            <div class="mb-3 " style="">
                                                 <label for="inputlocation" class="form-label ">Location</label>
                                                 <select class="form-select searchlocation" aria-label="Default select example"  id="inputlocation" name="inputlocation" value="{{ old('inputlocation') }}" data-url="{{ route('locations-emptytrailerAjax') }}">
                                                     <option selected disabled hidden></option>
@@ -647,7 +647,7 @@
                                                 <div class="invalid-feedback" id="error-updateinputavailabilityindicator"></div>
                                             </div>
 
-                                            <div class="mb-3 " style="display:none">
+                                            <div class="mb-3 " style="">
                                                 <label for="updateinputlocation" class="form-label ">Location</label>
                                                 <select class="form-select searchlocation" aria-label="Default select example"  id="updateinputlocation" name="updateinputlocation" value="{{ old('updateinputlocation') }}" data-url="{{ route('locations-emptytrailerAjax') }}">
                                                 </select>
