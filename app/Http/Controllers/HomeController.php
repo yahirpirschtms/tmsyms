@@ -136,7 +136,7 @@ public function update(Request $request)
             'updateinputpalletsonfloor' => 'nullable|numeric', // pallets_on_floor
             'updateinputcarrier' => 'required', // carrier
             'updateinputavailabilityindicator' => 'nullable|exists:generic_catalogs,gnct_id', // gnct_id_availability_indicator
-            'updateinputlocation' => 'nullable', // location
+            'updateinputlocation' => 'required', // location
             'updateinputdatein' => 'required|date', // date_in
         ], [
             //'updateinputidtrailer.required' => 'ID Trailer is required.',
@@ -145,7 +145,7 @@ public function update(Request $request)
             'updateinputdateofstatus.date' => 'The status date field must be a valid date.',
             'updateinputcarrier.required' => 'Carrier is required.',
             //'updateinputcarrier.exists' => 'Carrier selected is not valid.',
-            //'updateinputlocation.required' => 'Location is required.',
+            'updateinputlocation.required' => 'Location is required.',
             //'updateinputlocation.exists' => 'Location selected is not valid.',
             'updateinputdatein.required' => 'Date In is required.',
             'updateinputpalletsontrailer.numeric' => 'Pallets on trailer must be an integer.',
@@ -167,7 +167,7 @@ public function update(Request $request)
             'pallets_on_floor' => $validated['updateinputpalletsonfloor'],
             'carrier' => $validated['updateinputcarrier'],
             'gnct_id_availability_indicator' => $validated['updateinputavailabilityindicator'],
-            //'location' => $validated['updateinputlocation'],
+            'location' => $validated['updateinputlocation'],
             'date_in' => Carbon::createFromFormat('m/d/Y H:i:s', $validated['updateinputdatein'])->format('Y-m-d H:i:s'),
         ];
 
@@ -241,7 +241,7 @@ public function update(Request $request)
             'inputpalletsonfloor' => 'nullable|numeric',
             'inputcarrier' => 'required',
             'inputavailabilityindicator' => 'nullable|exists:generic_catalogs,gnct_id',
-            'inputlocation' => 'nullable',
+            'inputlocation' => 'required',
             'inputdatein' => 'required|date',
             'inputdateout' => 'nullable',
             'inputtransactiondate' => 'nullable',
@@ -265,7 +265,7 @@ public function update(Request $request)
             //'inputavailabilityindicator.required' => 'Availability Indicator is required.',
             //'inputavailabilityindicator.integer' => 'Availability Indicator must be an integer.',
             'inputavailabilityindicator.exists' => 'Availability Indicator selected is not valid.',
-            //'inputlocation.required' => 'Location is required.',
+            'inputlocation.required' => 'Location is required.',
             //'inputlocation.string' => 'Location must be a text string.',
             //'inputlocation.exists' => 'Location selected is not valid.',
             'inputdatein.required' => 'Date In is required.',
