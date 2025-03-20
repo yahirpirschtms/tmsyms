@@ -116,65 +116,72 @@ class DashboardController extends Controller
                 'On Time Forwarding', 'Escoto', 'TFEMA Yard', 'TNL Express', 'TNCH Yard', 'K&N'
             ])->pluck('pk_company', 'CoName');
 
-            // Definir los pares de Origen -> Destino en base a nombres
-            $originDestinationPairs = [
-                'BW2' => 'On Time Forwarding',
-                'BW3' => 'On Time Forwarding',
-                'Foxconn' => 'Escoto',
-                'On Time Forwarding' => 'TFEMA Yard',
-                'On Time Forwarding' => 'TNL Express',
-                'Escoto' => 'TNCH Yard',
-                'TFEMA Yard' => 'K&N',
-                'TNL Express' => 'K&N',
-                'TNCH Yard' => 'K&N',
-            ];
+            // Definir los pares de Origen -> Destino en base a nombres como arrays
+$originDestinationPairs = [
+    'BW2' => ['On Time Forwarding'],
+    'BW3' => ['On Time Forwarding'],
+    'Foxconn' => ['Escoto'],
+    'On Time Forwarding' => ['TFEMA Yard', 'TNL Express'], // 🔹 Ahora es un array
+    'Escoto' => ['TNCH Yard'],
+    'TFEMA Yard' => ['K&N'],
+    'TNL Express' => ['K&N'],
+    'TNCH Yard' => ['K&N'],
+];
 
-            // Convertir nombres en IDs
-            $originDestinationPairsIDs = [];
-            foreach ($originDestinationPairs as $originName => $destinationName) {
-                if (isset($origins[$originName]) && isset($destinations[$destinationName])) {
-                    $originDestinationPairsIDs[$origins[$originName]] = $destinations[$destinationName];
-                }
+// Convertir nombres en IDs
+$originDestinationPairsIDs = [];
+foreach ($originDestinationPairs as $originName => $destinationNames) {
+    if (isset($origins[$originName])) {
+        foreach ($destinationNames as $destinationName) {
+            if (isset($destinations[$destinationName])) {
+                $originDestinationPairsIDs[] = [
+                    'origin' => $origins[$originName],
+                    'destination' => $destinations[$destinationName]
+                ];
             }
+        }
+    }
+}
 
-            // Obtener todos los Shipments con sus relaciones
-            $shipments = Shipments::with(['currentstatus', 'origin', 'destinations'])
-                ->whereIn('gnct_id_current_status', $statusIds)
-                ->whereIn('origin', $origins->values()) // Solo traer shipments con orígenes válidos
-                ->get();
+// Obtener todos los Shipments con sus relaciones
+$shipments = Shipments::with(['currentstatus', 'origin', 'destinations'])
+    ->whereIn('gnct_id_current_status', $statusIds)
+    ->whereIn('origin', $origins->values()) // Solo traer shipments con orígenes válidos
+    ->get();
 
-            // Agrupar por Status y por Origin/Destination según la categoría
-            $shipmentCounts = [];
-            foreach ($categorias as $categoria) {
-                $shipmentCounts[$categoria] = [];
+// Agrupar por Status y por Origin/Destination según la categoría
+$shipmentCounts = [];
+foreach ($categorias as $categoria) {
+    $shipmentCounts[$categoria] = [];
 
-                // Buscar el ID correspondiente a esta categoría
-                $statusId = $statusIds[$categoria] ?? null;
+    // Buscar el ID correspondiente a esta categoría
+    $statusId = $statusIds[$categoria] ?? null;
 
-                if (in_array($categoria, ['In Transit', 'Delivered'])) {
-                    // Filtrar por Origen y Destino
-                    foreach ($originDestinationPairsIDs as $originID => $destinationID) {
-                        $count = $shipments->where('gnct_id_current_status', $statusId)
-                                        ->where('origin', $originID)
-                                        ->where('destination', $destinationID)
-                                        ->count();
-                        // Obtener nombres de origen y destino
-                        $originName = array_search($originID, $origins->toArray());
-                        $destinationName = array_search($destinationID, $destinations->toArray());
+    if (in_array($categoria, ['In Transit', 'Delivered'])) {
+        // Filtrar por Origen y Destino
+        foreach ($originDestinationPairsIDs as $pair) {
+            $count = $shipments->where('gnct_id_current_status', $statusId)
+                               ->where('origin', $pair['origin'])
+                               ->where('destination', $pair['destination'])
+                               ->count();
+            // Obtener nombres de origen y destino
+            $originName = array_search($pair['origin'], $origins->toArray());
+            $destinationName = array_search($pair['destination'], $destinations->toArray());
 
-                        // Guardar en el array con los nombres en lugar de los IDs
-                        $shipmentCounts[$categoria]["$originName - $destinationName"] = $count;
-                    }
-                } else {
-                    // Filtrar solo por Origen
-                    foreach ($origins as $originName => $originID) {
-                        $count = $shipments->where('gnct_id_current_status', $statusId)
-                                        ->where('origin', $originID)
-                                        ->count();
-                        $shipmentCounts[$categoria][$originName] = $count;
-                    }
-                }
-            }
+            // Guardar en el array con los nombres en lugar de los IDs
+            $shipmentCounts[$categoria]["$originName - $destinationName"] = $count;
+        }
+    } else {
+        // Filtrar solo por Origen
+        foreach ($origins as $originName => $originID) {
+            $count = $shipments->where('gnct_id_current_status', $statusId)
+                               ->where('origin', $originID)
+                               ->count();
+            $shipmentCounts[$categoria][$originName] = $count;
+        }
+    }
+}
+
 
             $emptyTrailers = EmptyTrailer::with('locations')
             ->whereIn('location', $origins->values()) // Filtrar solo por los orígenes válidos
