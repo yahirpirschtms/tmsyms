@@ -721,14 +721,15 @@
                     </thead>
                     <tbody>
                         @foreach ($shipments as $shipment)
+
                         <tr data-bs-toggle="modal" data-bs-target="#shipmentModal{{ $shipment->stm_id }}" class="clickable-row" data-shipment-id="{{ $shipment->stm_id }}">
                             <td>{{ $shipment->shipmentType->gntc_description ?? '' }}</td>
                             <td>{{ $shipment->stm_id ?? '' }}</td>
                             <td>{{ $shipment->secondary_shipment_id ?? '' }}</td>
                             <td>{{ $shipment->reference ?? '' }}</td>
-                            <td>{{ $shipment->services->from ?? '' }}</td>
+                            <td>{{ optional($shipment->company)->CoName }}</td>
                             <td>{{ $shipment->id_trailer ?? '' }}</td>
-                            <td>{{ $shipment->services->to ?? '' }}</td>
+                            <td>{{ optional($shipment->companydest)->CoName ?? '' }}</td>
                             <td>{{ $shipment->pre_alerted_datetime ? \Carbon\Carbon::parse($shipment->pre_alerted_datetime)->format('m/d/Y H:i') : '' }}</td>
                             <td>{{ $shipment->company->CoName ?? '' }}</td>
                             <td>{{ $shipment->trailer ?? '' }}</td>
@@ -857,13 +858,13 @@
                                <!-- Origin -->
                                 <div class="mb-3">
                                     <label for="origin-{{ $shipment->stm_id }}" class="form-label">Origin</label>
-                                    <input type="text" class="form-control" id="origin-{{ $shipment->stm_id }}" name="origin" value="{{ $shipment->origin }}" readonly>
+                                    <input type="text" class="form-control" id="origin-{{ $shipment->stm_id }}" name="origin" value="{{ $shipment->company->CoName }}" readonly>
                                 </div>
 
                                 <!-- Destination -->
                                 <div class="mb-3">
                                     <label for="destination-{{ $shipment->stm_id }}" class="form-label">Destination</label>
-                                    <input type="text" class="form-control" id="destination-{{ $shipment->stm_id }}" name="destination" value="{{ $shipment->destination }}" readonly>
+                                    <input type="text" class="form-control" id="destination-{{ $shipment->stm_id }}" name="destination" value="{{ $shipment->companydest->CoName }}" readonly>
                                 </div>
 
                                 <div class="mb-3">
@@ -1063,12 +1064,12 @@
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label">Origin</label>
-                                        <p>{{ $shipment->origin ?? 'Origin not available' }}</p>
+                                        <p>{{ $shipment->company->CoName ?? 'Origin not available' }}</p>
                                     </div>
 
                                     <div class="mb-3">
                                         <label class="form-label">Destination</label>
-                                        <p>{{ $shipment->destination ?? 'Not available' }}</p>
+                                        <p>{{ $shipment->companydest->CoName ?? 'Not available' }}</p>
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label">Pre-Alerted Date & Time</label>

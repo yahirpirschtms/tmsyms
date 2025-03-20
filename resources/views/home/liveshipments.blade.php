@@ -118,11 +118,11 @@
             <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mt-2" id="cardsContainer">
                 @foreach ($shipments as $shipment)
                     <div class="col shipment-card"
-                        data-search="{{ $shipment->stm_id }} {{ $shipment->shipment_type }} {{ $shipment->status }} {{ $shipment->services->from ?? '' }} {{ $shipment->currentStatus->gntc_description ?? '' }} {{ $shipment->driver->drivername ?? '' }}">
+                        data-search="{{ $shipment->stm_id }} {{ $shipment->shipment_type }} {{ $shipment->status }} {{ $shipment->origin->CoName ?? '' }} {{ $shipment->currentStatus->gntc_description ?? '' }} {{ $shipment->driver->drivername ?? '' }}">
                         <div class="card">
                             <div class="card-body text-black border border-1 rounded" style="">
                                 <h5 class="card-title fw-bolder" style="color:#1e4877">{{ $shipment->stm_id }}</h5>
-                                <p class="origin" style="color: #252525;">{{ $shipment->services->from ?? 'Origin not Availiable' }}</p>
+                                <p class="origin" style="color: #252525;">{{ $shipment->company->CoName ?? 'Origin not Availiable' }}</p>
 
                                 <p class="status" style="color: #252525;">{{ $shipment->currentStatus->gntc_description ?? 'Status Not Availiable' }}</p>
                                 <p class="" style="color: #252525;">{{ $shipment->etd ? \Carbon\Carbon::parse($shipment->etd)->format('m/d/Y') : '' }}</p>
@@ -245,15 +245,27 @@
                             </div>
 
                            <!-- Origin -->
-                            <div class="mb-3">
-                                <label for="origin-{{ $shipment->stm_id }}" class="form-label">Origin</label>
-                                <input type="text" class="form-control" id="origin-{{ $shipment->stm_id }}" name="origin" value="{{ $shipment->services->from ?? '' }}" readonly>
+                           <div class="mb-3">
+                            <label for="origin-{{ $shipment->stm_id }}" class="form-label">Origin</label>
+                            <!-- Campo oculto para enviar el pk_company de origin -->
+                            <input type="hidden" id="origin-{{ $shipment->stm_id }}" name="origin"
+                                value="{{ $shipment->company->pk_company ?? '' }}">
+
+                            <!-- Campo de solo lectura para mostrar el CoName de origin -->
+                            <input type="text" class="form-control"
+                                value="{{ $shipment->company->CoName ?? 'N/A' }}" readonly>
                             </div>
 
                             <!-- Destination -->
                             <div class="mb-3">
                                 <label for="destination-{{ $shipment->stm_id }}" class="form-label">Destination</label>
-                                <input type="text" class="form-control" id="destination-{{ $shipment->stm_id }}" name="destination" value="{{ $shipment->services->to ?? '' }}" readonly>
+                                <!-- Campo oculto para enviar el pk_company de destination -->
+                                <input type="hidden" id="destination-{{ $shipment->stm_id }}" name="destination"
+                                    value="{{ $shipment->companydest->pk_company ?? '' }}">
+
+                                <!-- Campo de solo lectura para mostrar el CoName de destination -->
+                                <input type="text" class="form-control"
+                                    value="{{ $shipment->companydest->CoName ?? 'N/A' }}" readonly>
                             </div>
 
                             <div class="mb-3">
@@ -456,12 +468,12 @@
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Origin</label>
-                                    <p>{{ $shipment->services->from ?? 'Origin not available' }}</p>
+                                    <p>{{ $shipment->company->CoName ?? 'Origin not available' }}</p>
                                 </div>
 
                                 <div class="mb-3">
                                     <label class="form-label">Destination</label>
-                                    <p>{{ $shipment->services->to ?? 'Not available' }}</p>
+                                    <p>{{ $shipment->companydest->CoName ?? 'Not available' }}</p>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Pre-Alerted Date & Time</label>

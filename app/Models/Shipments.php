@@ -169,6 +169,11 @@ class Shipments extends Model
         return $this->belongsTo(Companies::class, 'origin', 'pk_company');
     }
 
+    public function destinations()
+    {
+        return $this->belongsTo(Companies::class, 'destination', 'pk_company');
+    }
+
     // Relación con la tabla `companies`
     public function carrier()
     {
@@ -210,10 +215,7 @@ class Shipments extends Model
     {
         return $this->belongsTo(Facilities::class, 'destination', 'fac_id');
     }*/
-    public function destinations()
-    {
-        return $this->belongsTo(Companies::class, 'destination', 'pk_company');
-    }
+
 
 
     //Formatos de Fecha de Christian y Relaciones
@@ -282,6 +284,11 @@ class Shipments extends Model
     public function company()
     {
         return $this->belongsTo(Companies::class, 'origin', 'pk_company'); // Relación con la tabla companies
+    }
+
+    public function companydest()
+    {
+        return $this->belongsTo(Companies::class, 'destination', 'pk_company'); // Relación con la tabla companies
     }
 
     public function destinationFacility()

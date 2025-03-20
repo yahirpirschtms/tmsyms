@@ -41,38 +41,40 @@ class ShipmentController extends Controller
     public function index()
     {
         $origins = Shipments::select('origin')->distinct()->get();
-        $shipments = Shipments::all();
+
+        // Cargar las relaciones correctamente
+        $shipments = Shipments::with(['origin', 'destinations'])->get();
 
         return view('shipments', compact('shipments', 'origins'));
     }
 
     public function allshipmentsshow()
-{
-    if (Auth::check()) {
-        // Obtener todos los envíos desde la base de datos
-        $shipments = Shipments::all();
+    {
+        if (Auth::check()) {
+             // Usar 'with' para cargar la relación directamente
+             $shipments = Shipments::with('company', 'companydest')->get();
 
 
-        // Obtener los estados actuales desde la base de datos
-        $currentStatus = GenericCatalog::where('gntc_group', 'CURRENT_STATUS')->get();
 
-        // Obtener los tipos de envío desde la base de datos
-        $shipmentType = GenericCatalog::where('gntc_group', 'SHIPMENT_TYPE')->get();
+                       // Obtener los estados actuales desde la base de datos
+            $currentStatus = GenericCatalog::where('gntc_group', 'CURRENT_STATUS')->get();
 
-        // Obtener todas las compañías para los selects
-        $companies = Companies::where('notes', 'ym')->get();
+            // Obtener los tipos de envío desde la base de datos
+            $shipmentType = GenericCatalog::where('gntc_group', 'SHIPMENT_TYPE')->get();
 
-        $facilities = Facilities::all();
+            // Obtener todas las compañías para los selects
+            $companies = Companies::where('notes', 'ym')->get();
 
-        $trailers = EmptyTrailer::all();
-         // Obtener la lista de conductores
-        $drivers = Driver::all();
+            $facilities = Facilities::all();
+            $trailers = EmptyTrailer::all();
+            $drivers = Driver::all();
 
-        // Pasar los envíos, estados, tipos de envío y compañías a la vista
-        return view('home.all-shipments', compact('shipments', 'currentStatus', 'shipmentType', 'companies', 'facilities', 'trailers', 'drivers'));
+            // Pasar los datos a la vista
+            return view('home.all-shipments', compact('shipments', 'currentStatus', 'shipmentType', 'companies', 'facilities', 'trailers', 'drivers'));
+        }
+
+        return redirect('/login');
     }
-    return redirect('/login');
-}
 
 public function liveshipmentsshow()
 {
@@ -82,8 +84,10 @@ public function liveshipmentsshow()
             ->where('gntc_group', 'CURRENT_STATUS')
             ->first();
 
-        // Filtrar los envíos que no tienen el estado 'Finalized'
-        $shipments = Shipments::where('gnct_id_current_status', '!=', $finalizedStatus->gnct_id)->get();
+        // Filtrar los envíos que no tienen el estado 'Finalized', y cargar las relaciones origin y destination
+        $shipments = Shipments::where('gnct_id_current_status', '!=', $finalizedStatus->gnct_id)
+            ->with(['company', 'companydest']) // Cargar las relaciones origin y destination
+            ->get();
 
         // Obtener los estados actuales desde la base de datos
         $currentStatus = GenericCatalog::where('gntc_group', 'CURRENT_STATUS')->get();
