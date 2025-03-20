@@ -1,6 +1,7 @@
 var table;  // Declara la variable de la tabla fuera de cualquier document.ready
 
 var selectedCarriersUpdate = [];
+var selectedLocationsUpdate = [];
 $(document).ready(function () {
     // Verifica si la tabla ya ha sido inicializada antes de inicializarla
     if (!$.fn.dataTable.isDataTable('#table_empty_trailers')) {
@@ -47,6 +48,21 @@ $(document).ready(function () {
         }
     }
 
+    function applylocations(){
+        var filterValues = $('#emptytrailerfilterinputlocationcheckbox').val()
+        .split(',')
+        .map(value => value.trim()) // Elimina espacios extra
+        .filter(value => value !== '') // Elimina valores vacíos
+        .map(value => `^${value}$`) // Agrega los delimitadores ^ y $ para coincidencia exacta
+        .join('|'); // Convierte la lista en una regex separada por "|"
+
+        if (filterValues) {
+            table.column(6).search(filterValues, true, false).draw(); // Busca con regex
+        } else {
+            table.column(6).search('').draw(); // Limpia el filtro si está vacío
+        }
+    }
+
     //Esto es para los checkbotons de los filtros
     function setupCheckboxFilter(
         containerId, applyBtnId, closeBtnId, inputPkId, inputTextId,
@@ -87,6 +103,7 @@ $(document).ready(function () {
                 //updatetab.click();
                 applycarriers();
                 applyindicators();
+                applylocations();
             } else {
                 $filterDiv.hide();
                 $inputPk.val("");
@@ -96,6 +113,7 @@ $(document).ready(function () {
                 //updatetab.click();
                 applycarriers();
                 applyindicators();
+                applylocations();
             }
         });
 
@@ -109,9 +127,11 @@ $(document).ready(function () {
                 //updatetab.click();
                 applycarriers();
                 applyindicators();
+                applylocations();
             }
             applycarriers();
             applyindicators();
+            applylocations();
             $filterDiv.hide();
             //debe de ir descomentado
             //updatetab.click();
@@ -135,6 +155,7 @@ $(document).ready(function () {
                 $closeButton.click();
                 applycarriers();
                 applyindicators();
+                applylocations();
                 //debe de ir descomentado
                 //updatetab.click();
             }
@@ -164,6 +185,18 @@ $(document).ready(function () {
         "#emptytrailerfilterbuttoncarriercheckbox",
         "refreshemptytrailertable",
         "#emptytrailerfilterinputcarriercheckbox, #emptytrailerfilterbtncarriercheckbox"
+    );
+
+    setupCheckboxFilter(
+        "#locationCheckboxContainer",
+        "#applylocationfiltercheckbox",
+        "#closeapplylocationfiltercheckbox",
+        "#emptytrailerfilterinputlocationcheckboxpk",
+        "#emptytrailerfilterinputlocationcheckbox",
+        "#emptytrailerfilterdivlocationcheckbox",
+        "#emptytrailerfilterbuttonlocationcheckbox",
+        "refreshemptytrailertable",
+        "#emptytrailerfilterinputlocationcheckbox, #emptytrailerfilterbtnlocationcheckbox"
     );
 });
 
@@ -292,6 +325,7 @@ $(document).ready(function () {
     $('#addmorefiltersemptytrailer').one('click', function () {
         loadAvailabilityIndicatorsFilterCheckbox();
         loadCarriersFilterCheckbox();
+        loadLocationsFilterCheckbox();
     });
     //loadAvailabilityIndicatorsFilterCheckbox();
 
@@ -328,15 +362,7 @@ $(document).ready(function () {
         });
     }
     
-    // Ejecutar la función cuando el panel de filtros se haya expandido
-    /*$('#closeapplycarrierfiltercheckbox').on('click', function () {
-        loadCarriersFilterCheckbox();
-    });*/
-    //loadCarriersFilterCheckbox();
-
-    //Cargar los Locations en los filtros de los checkbox
     function loadLocationsFilterCheckbox() { 
-        //console.log("sikeeeee")
         var locationsRoute = $('#multiCollapseapplylocationfiltercheckbox').data('url');
         $.ajax({
             url: locationsRoute,
@@ -368,9 +394,9 @@ $(document).ready(function () {
     }
     
     // Ejecutar la función cuando el panel de filtros se haya expandido
-    $('#closeapplylocationfiltercheckbox').on('click', function () {
+    /*$('#closeapplylocationfiltercheckbox').on('click', function () {
         loadLocationsFilterCheckbox();
-    });
+    });*/
     //loadLocationsFilterCheckbox();
 
 
@@ -703,6 +729,15 @@ $(document).ready(function () {
 
             // Borrar mensaje de error
             $('#inputcarrier').parent().find('.invalid-feedback').text('');
+
+            $('#inputlocation').val(null).trigger('change'); // Restablecer el select2
+
+            // Quitar clases de error
+            $('#inputlocation').removeClass('is-invalid'); 
+            $('#inputlocation').next('.select2-container').find('.select2-selection').removeClass('is-invalid');
+
+            // Borrar mensaje de error
+            $('#inputlocation').parent().find('.invalid-feedback').text('');
         });
 });
 
@@ -774,67 +809,64 @@ $(document).ready(function () {
 //Busqueda de las location en el nuevo registros de los empty trailers 
 //Busqueda de Location en un nuevo registro
 $(document).ready(function () {
-    var carrierRoute = $('#inputlocation').data('url');
+    var locationsRoute = $('#inputlocation').data('url');
     var newlyCreatedCarrierId = null; // Variable para almacenar el ID del carrier recién creado
     var selectedLocations = []; // Arreglo para almacenar todos los drivers seleccionados
+    var isLocationsLoaded = false;
 
-    function loadLocations() {
-        $('#inputlocation').select2({
-            placeholder: 'Select or enter a New Location',
-            //allowClear: true,
-            //tags: true, // Permite agregar nuevas opciones
-            dropdownParent: $('#newtrailerempty'),
-            ajax: {
-                url: carrierRoute,
+    loadLocationsOnce();
+
+    function loadLocationsOnce() {
+        if(isLocationsLoaded) return;
+
+        $.ajax({
+                url: locationsRoute,
+                type: 'GET',
                 dataType: 'json',
-                delay: 450,
-                data: function (params) {
-                    return {
-                        search: params.term || '' // Si no hay texto, envía un string vacío
-                    };
+                success: function (data) {
+                    var locationsData = data.map(item => ({
+                        id: item.pk_company,
+                        text: item.CoName
+                    }));
+                    data.forEach(function (location) {
+                        if (!selectedLocations.includes(location.CoName)) {
+                            selectedLocations.push(location.CoName); // Agregar al arreglo si no está ya
+                        }
+                    });
+                    selectedLocationsUpdate = [...selectedLocations]; 
+                    console.log("Locations cargados desde la base de datos:", selectedLocations);
+                    console.log("Locations copiados a selectedLocationsUpdate:", selectedLocationsUpdate);
+
+                    // Inicializar Select2 sin AJAX
+                    $('#inputlocation').select2({
+                        placeholder: 'Select a Location',
+                        allowClear: true,
+                        tags: false, // Permite agregar nuevas opciones
+                        data: locationsData, // Pasar los datos directamente
+                        dropdownParent: $('#newtrailerempty'),
+                        minimumInputLength: 0
+                    });
+                    
+
+                    $('#updateinputlocation').select2({
+                        placeholder: 'Select a Location',
+                        allowClear: true,
+                        tags: false, // Permite agregar nuevas opciones
+                        data: locationsData, // Pasar los datos directamente
+                        dropdownParent: $('#updatenewtrailerempty'),
+                        minimumInputLength: 0
+                    });
+
+                    isLocationsLoaded = true;
                 },
-                processResults: function (data) {
-                    return {
-                        results: data.map(item => ({
-                            id: item.pk_company,
-                            text: item.CoName
-                        }))
-                    };
-                },
-                cache: true
-            },
-            minimumInputLength: 0
+                error: function (xhr, status, error) {
+                    console.error('Error al cargar los locations:', error);
+                }
         });
     }
 
-    //Esta funcion solo carga los locations al cargar la pagina
-    //loadLocations();
-    
-    //Esta funcion lo que hace es guardar los locations ya existentes para que al comprar el nuevo sepa si ya existe o no
-    /*$.ajax({
-        url: '/locations-emptytrailerAjax',  // Ruta que manejará la carga de los drivers existentes
-        type: 'GET',
-        dataType: 'json',
-        success: function (data) {
-            data.forEach(function (carrier) {
-                if (!selectedLocations.includes(carrier.CoName)) {
-                    selectedLocations.push(carrier.CoName); // Agregar al arreglo si no está ya
-                }
-            });
-            console.log("Locarions Registro cargados desde la base de datos:", selectedLocations);
-        },
-        error: function (xhr, status, error) {
-            console.error('Error al cargar los Locations Registro existentes:', error);
-        }
-    });*/
-
-    // Actualizar la lista cuando se haga clic en el select
-    $('#inputlocation').on('click', function () {
-        loadLocations();
-    });
-
     // Cuando el usuario seleccione o ingrese un nuevo valor
-    /*$('#inputlocation').on('change', function () {
+    $('#inputlocation').on('change', function () {
         var selectedOption = $(this).select2('data')[0]; // Obtener la opción seleccionada
         var selectedText = selectedOption ? selectedOption.text : ''; // Obtener el texto (nombre) de la opción seleccionada
 
@@ -842,13 +874,19 @@ $(document).ready(function () {
         if (selectedText  !== newlyCreatedCarrierId &&  selectedText.trim() !== '') {
             console.log(selectedText);
             //saveNewCarrier(selectedText);
-            if (!selectedLocations.includes(selectedText)) {
-                selectedLocations.push(selectedText);  // Agregar al arreglo solo si no existe
-                console.log(selectedLocations);  // Mostrar el arreglo con todos los drivers seleccionados
+            if (!selectedLocations.includes(selectedText) || !selectedLocationsUpdate.includes(selectedText)) {
+                if(!selectedLocations.includes(selectedText)){
+                    selectedLocations.push(selectedText);  // Agregar al arreglo solo si no existe
+                    console.log(selectedLocations);  // Mostrar el arreglo con todos los drivers seleccionados
+                }
+                if(!selectedLocationsUpdate.includes(selectedText)){
+                    selectedLocationsUpdate.push(selectedText);  // Agregar al arreglo solo si no existe
+                    console.log(selectedLocationsUpdate);  // Mostrar el arreglo con todos los drivers seleccionados
+                }
                 saveNewCarrier(selectedText);
             }
         }
-    });*/
+    });
 
     // Guardar un nuevo carrier en la base de datos
     function saveNewCarrier(carrierName) {
@@ -864,9 +902,13 @@ $(document).ready(function () {
 
                 // Crear una nueva opción para el select2 con el nuevo carrier
                 var newOption = new Option(response.newCarrier.CoName, response.newCarrier.pk_company, true, true);
+                // Crear una nueva opción para cada select2
+                var newOption1 = new Option(response.newCarrier.CoName, response.newCarrier.pk_company, true, true);
+                var newOption2 = new Option(response.newCarrier.CoName, response.newCarrier.pk_company, true, true);
 
-                // Agregar la nueva opción al select2
-                $('#inputlocation').append(newOption).trigger('change');
+                // Agregar la opción a ambos select2 sin eliminarla del otro
+                $('#updateinputlocation').append(newOption1).trigger('change');
+                $('#inputlocation').append(newOption2).trigger('change');
 
                 // Seleccionar el nuevo carrier automáticamente
                 $('#inputlocation').val(response.newCarrier.pk_company).trigger('change');
@@ -882,9 +924,74 @@ $(document).ready(function () {
                         newlyCreatedCarrierId = null;  // Restablecer el ID del carrier creado
                     }
                 });
+                loadLocationsFilterCheckbox();
             },
             error: function (xhr, status, error) {
                 console.error('Error al guardar la Location', error);
+            }
+        });
+    }
+    var newlyCreatedCarrierIdUpdate = null;
+
+    $('#updateinputlocation').on('change', function () {
+        var selectedOption = $(this).select2('data')[0]; // Obtener la opción seleccionada
+        var selectedText = selectedOption ? selectedOption.text : ''; // Obtener el texto (nombre) de la opción seleccionada
+
+        // Si no es el nuevo carrier, lo procesamos
+        if (selectedText  !== newlyCreatedCarrierIdUpdate &&  selectedText.trim() !== '') {
+            console.log(selectedText);
+            //saveNewCarrier(selectedText);
+            if (!selectedLocations.includes(selectedText) || !selectedLocationsUpdate.includes(selectedText)) {
+                if(!selectedLocations.includes(selectedText)){
+                    selectedLocations.push(selectedText);  // Agregar al arreglo solo si no existe
+                    console.log(selectedLocations);  // Mostrar el arreglo con todos los drivers seleccionados
+                }
+                if(!selectedLocationsUpdate.includes(selectedText)){
+                    selectedLocationsUpdate.push(selectedText);  // Agregar al arreglo solo si no existe
+                    console.log(selectedLocationsUpdate);  // Mostrar el arreglo con todos los drivers seleccionados
+                }
+                saveNewlocationUpdate(selectedText);
+            }
+        }
+    });
+
+    function saveNewlocationUpdate(carrierName) {
+        $.ajax({
+            url: '/save-new-location',  // Ruta que manejará el backend
+            type: 'POST',
+            data: {
+                carrierName: carrierName,
+                _token: $('meta[name="csrf-token"]').attr('content')  // Asegúrate de incluir el CSRF token
+            },
+            success: function (response) {
+                console.log(response);
+
+                // Crear una nueva opción para el select2 con el nuevo carrier
+                var newOption1 = new Option(response.newCarrier.CoName, response.newCarrier.pk_company, true, true);
+                var newOption2 = new Option(response.newCarrier.CoName, response.newCarrier.pk_company, true, true);
+
+                // Agregar la opción a ambos select2
+                $('#updateinputlocation').append(newOption1).trigger('change');
+                $('#inputlocation').append(newOption2).trigger('change');
+
+                // Seleccionar el nuevo carrier automáticamente
+                $('#updateinputlocation').val(response.newCarrier.pk_company).trigger('change');
+
+                // Marcar el nuevo ID para evitar que se haga otra solicitud
+                newlyCreatedCarrierIdUpdate = response.newCarrier.CoName;
+
+                // Cuando el nuevo carrier sea creado, aseguramos que no se haga más AJAX para este carrier
+                $('#updateinputlocation').on('select2:select', function (e) {
+                    var selectedId = e.params.data.id;
+                    if (selectedId === newlyCreatedCarrierIdUpdate) {
+                        // Evitar que se reenvíe la solicitud para el nuevo carrier
+                        newlyCreatedCarrierIdUpdate = null;  // Restablecer el ID del carrier creado
+                    }
+                });
+                loadLocationsFilterCheckbox();
+            },
+            error: function (xhr, status, error) {
+                console.error('Error al guardar el Location', error);
             }
         });
     }
@@ -925,85 +1032,6 @@ $(document).ready(function () {
         });
     }
 
-    //loadLocationsUpdate();
-
-    /*$.ajax({
-        url: '/locations-emptytrailerAjax',  // Ruta que manejará la carga de los drivers existentes
-        type: 'GET',
-        dataType: 'json',
-        success: function (data) {
-            data.forEach(function (carrier) {
-                if (!selectedLocationsUpdate.includes(carrier.CoName)) {
-                    selectedLocationsUpdate.push(carrier.CoName); // Agregar al arreglo si no está ya
-                }
-            });
-            console.log("Locations Update cargados desde la base de datos:", selectedLocationsUpdate);
-        },
-        error: function (xhr, status, error) {
-            console.error('Error al cargar los Locations Update existentes:', error);
-        }
-    });*/
-
-    // Actualizar la lista cuando se haga clic en el select
-    $('#updateinputlocation').on('click', function () {
-        loadLocationsUpdate();
-    });
-
-    // Cuando el usuario seleccione o ingrese un nuevo valor
-    /*$('#updateinputlocation').on('change', function () {
-        var selectedOption = $(this).select2('data')[0]; // Obtener la opción seleccionada
-        var selectedText = selectedOption ? selectedOption.text : ''; // Obtener el texto (nombre) de la opción seleccionada
-
-        // Si no es el nuevo carrier, lo procesamos
-        if (selectedText  !== newlyCreatedCarrierId &&  selectedText.trim() !== '') {
-            console.log(selectedText);
-            //saveNewLocation(selectedText);
-            if (!selectedLocationsUpdate.includes(selectedText)) {
-                selectedLocationsUpdate.push(selectedText);  // Agregar al arreglo solo si no existe
-                console.log(selectedLocationsUpdate);  // Mostrar el arreglo con todos los drivers seleccionados
-                saveNewLocation(selectedText);
-            }
-        }
-    });*/
-
-    // Guardar un nuevo carrier en la base de datos
-    function saveNewLocation(carrierName) {
-        $.ajax({
-            url: '/save-new-location',  // Ruta que manejará el backend
-            type: 'POST',
-            data: {
-                carrierName: carrierName,
-                _token: $('meta[name="csrf-token"]').attr('content')  // Asegúrate de incluir el CSRF token
-            },
-            success: function (response) {
-                console.log(response);
-
-                // Crear una nueva opción para el select2 con el nuevo carrier
-                var newOption = new Option(response.newCarrier.CoName, response.newCarrier.pk_company, true, true);
-
-                // Agregar la nueva opción al select2
-                $('#updateinputlocation').append(newOption).trigger('change');
-
-                // Seleccionar el nuevo carrier automáticamente
-                $('#updateinputlocation').val(response.newCarrier.pk_company).trigger('change');
-
-                // Marcar el nuevo ID para evitar que se haga otra solicitud
-                newlyCreatedCarrierId = response.newCarrier.CoName;
-
-                // Cuando el nuevo carrier sea creado, aseguramos que no se haga más AJAX para este carrier
-                $('#updateinputlocation').on('select2:select', function (e) {
-                    var selectedId = e.params.data.id;
-                    if (selectedId === newlyCreatedCarrierId) {
-                        // Evitar que se reenvíe la solicitud para el nuevo carrier
-                        newlyCreatedCarrierId = null;  // Restablecer el ID del carrier creado
-                    }
-                });
-            },
-            error: function (xhr, status, error) {
-                console.error('Error al guardar el Location', error);
-            }
-        });
-    }
 });
 
 document.getElementById('exportfile').addEventListener('click', function () {
@@ -1331,6 +1359,26 @@ $(document).ready(function() {
             errorContainer.text(''); // Borrar mensaje de error
         });
 
+        // Evento cuando se borra la selección con la "X"
+        $('#inputlocation').on('select2:clear', function() {
+            const field = $(this);
+            const errorContainer = field.parent().find('.invalid-feedback');
+
+            field.addClass('is-invalid'); // Agregar borde rojo
+            field.next('.select2-container').find('.select2-selection').addClass('is-invalid');
+            errorContainer.text('Location is required.'); // Mostrar mensaje de error
+        });
+
+        // Si selecciona un valor válido, eliminar error
+        $('#inputlocation').on('select2:select', function() {
+            const field = $(this);
+            const errorContainer = field.parent().find('.invalid-feedback');
+
+            field.removeClass('is-invalid'); // Quitar borde rojo
+            field.next('.select2-container').find('.select2-selection').removeClass('is-invalid');
+            errorContainer.text(''); // Borrar mensaje de error
+        });
+
         // Validación en vivo cuando el usuario interactúa con los campos
         $('input, select').on('input change', function() {
             const field = $(this);
@@ -1517,6 +1565,7 @@ $(document).ready(function() {
                                 trailer.pallets_on_floor ?? '',
                                 trailer.carriers?.CoName ?? '',
                                 trailer.availability_indicator && trailer.availability_indicator.gntc_description ? trailer.availability_indicator.gntc_description : '',
+                                trailer.locations?.CoName ?? '',
                                 trailer.date_in ?? '',
                                 trailer.username ?? ''
                             ]).node(); // Esto devuelve el nodo de la fila agregada
@@ -1552,6 +1601,7 @@ $(document).ready(function() {
                                 document.getElementById("offcanvas-pallets-on-floor").textContent = trailer.pallets_on_floor;
                                 document.getElementById("offcanvas-carrier").textContent = trailer.carriers?.CoName ?? '';
                                 document.getElementById("offcanvas-availability").textContent = trailer.availability_indicator && trailer.availability_indicator.gntc_description ? trailer.availability_indicator.gntc_description : '';
+                                document.getElementById("offcanvas-location").textContent = trailer.locations?.CoName ?? '';
                                 document.getElementById("offcanvas-date-in").textContent = trailer.date_in;
                                 document.getElementById("offcanvas-username").textContent = trailer.username;
                                 document.getElementById("pk_availability").textContent = trailer.availability_indicator && trailer.availability_indicator.gnct_id ? trailer.availability_indicator.gnct_id : '';
@@ -1734,6 +1784,7 @@ $(document).ready(function() {
                         trailer.pallets_on_floor ?? '',
                         trailer.carriers?.CoName ?? '',
                         trailer.availability_indicator?.gntc_description ?? '',
+                        trailer.locations?.CoName ?? '',
                         trailer.date_in ?? '',
                         trailer.username ?? ''
                     ]).node(); // Esto devuelve el nodo de la fila agregada
@@ -1799,7 +1850,7 @@ $(document).ready(function() {
                             document.getElementById("offcanvas-pallets-on-floor").textContent = trailer.pallets_on_floor;
                             document.getElementById("offcanvas-carrier").textContent = trailer.carriers && trailer.carriers.CoName ? trailer.carriers.CoName : '';
                             document.getElementById("offcanvas-availability").textContent = trailer.availability_indicator && trailer.availability_indicator.gntc_description ? trailer.availability_indicator.gntc_description : '';
-                            //document.getElementById("offcanvas-location").textContent = trailer.locations && trailer.locations.CoName ? trailer.locations.CoName : '';
+                            document.getElementById("offcanvas-location").textContent = trailer.locations && trailer.locations.CoName ? trailer.locations.CoName : '';
                             document.getElementById("offcanvas-date-in").textContent = trailer.date_in;
                             //document.getElementById("offcanvas-date-out").textContent = trailer.date_out;
                             //document.getElementById("offcanvas-transaction-date").textContent = trailer.transaction_date;
@@ -1844,7 +1895,7 @@ $(document).ready(function() {
     });
 
     // Actualización automática cada 5 minutos (300,000 ms)
-    setInterval(updateTrailerTable, 5000000);
+    setInterval(updateTrailerTable, 60000);
     
 
   //Resetear Off Canvas al cerrarlo
@@ -1898,10 +1949,7 @@ $(document).ready(function() {
 
             // Resetear Select2 manualmente
             $('#inputcarrier').val(null).trigger('change');  // Restablecer el valor del select
-            //$('#inputcarrier').select2("destroy").select2(); // Reiniciar select2
-
-            //$('#inputlocation').val(null).trigger('change');  // Restablecer el valor del select
-            //$('#inputlocation').select2("destroy").select2(); // Reiniciar select2
+            $('#inputlocation').val(null).trigger('change'); 
         });
   });
   
@@ -1929,7 +1977,7 @@ $(document).ready(function() {
                       document.getElementById("offcanvas-pallets-on-floor").textContent = trailer.pallets_on_floor;
                       document.getElementById("offcanvas-carrier").textContent = trailer.carriers && trailer.carriers.CoName ? trailer.carriers.CoName : '';
                       document.getElementById("offcanvas-availability").textContent = trailer.availability_indicator && trailer.availability_indicator.gntc_description ? trailer.availability_indicator.gntc_description : '';
-                      //document.getElementById("offcanvas-location").textContent = trailer.locations && trailer.locations.CoName ? trailer.locations.CoName : '';
+                      document.getElementById("offcanvas-location").textContent = trailer.locations && trailer.locations.CoName ? trailer.locations.CoName : '';
                       document.getElementById("offcanvas-date-in").textContent = trailer.date_in;
                       //document.getElementById("offcanvas-date-out").textContent = trailer.date_out;
                       //document.getElementById("offcanvas-transaction-date").textContent = trailer.transaction_date;
@@ -2016,6 +2064,7 @@ $(document).ready(function() {
                                     trailer.pallets_on_floor ?? '',
                                     trailer.carriers?.CoName ?? '',
                                     trailer.availability_indicator && trailer.availability_indicator.gntc_description ? trailer.availability_indicator.gntc_description : '',
+                                    trailer.locations?.CoName ?? '',
                                     trailer.date_in ?? '',
                                     trailer.username ?? ''
                                 ]).node(); // Esto devuelve el nodo de la fila agregada
@@ -2043,6 +2092,7 @@ $(document).ready(function() {
                                     document.getElementById("offcanvas-pallets-on-floor").textContent = trailer.pallets_on_floor;
                                     document.getElementById("offcanvas-carrier").textContent = trailer.carriers?.CoName ?? '';
                                     document.getElementById("offcanvas-availability").textContent = trailer.availability_indicator && trailer.availability_indicator.gntc_description ? trailer.availability_indicator.gntc_description : '';
+                                    document.getElementById("offcanvas-location").textContent = trailer.locations?.CoName ?? '';
                                     document.getElementById("offcanvas-date-in").textContent = trailer.date_in;
                                     document.getElementById("offcanvas-username").textContent = trailer.username;
                                     document.getElementById("pk_availability").textContent = trailer.availability_indicator && trailer.availability_indicator.gnct_id ? trailer.availability_indicator.gnct_id : '';
@@ -2177,28 +2227,17 @@ $(document).ready(function() {
 
         }*/
         // Crear promesas para las dos solicitudes AJAX
-        /*let locationPromise = new Promise((resolve, reject) => {
+        let locationPromise = new Promise((resolve, reject) => {
             if (trailer.location) {
-                $.ajax({
-                    url: 'locations-emptytrailerAjax', // Cambia esta URL si es necesario
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function (data) {
-                        let location = data.find(item => item.pk_company == trailer.location);
-                        if (location) {
-                            let newOption = new Option(location.CoName, location.pk_company, true, true);
-                            $('#updateinputlocation').append(newOption).trigger('change');
-                        }
-                        resolve(); // Resolver la promesa cuando termine esta solicitud
-                    },
-                    error: function (xhr, status, error) {
-                        reject('Error al cargar las locations: ' + error); // Rechazar si hay error
-                    }
-                });
+                let location = selectedLocationsUpdate.find(item => item === trailer.location);
+                // Si el carrier está en la lista, solo se selecciona automáticamente
+                $('#updateinputlocation').val(trailer.location).trigger('change');
+                resolve();
             } else {
-                resolve(); // Resolver inmediatamente si no hay ubicación
+                $('#updateinputlocation').val(null).trigger('change');
+                //resolve();
             }
-        });*/
+        });
 
         let carrierPromise = new Promise((resolve, reject) => {
             if (trailer.carrier) {
@@ -2230,7 +2269,7 @@ $(document).ready(function() {
         });
 
         // Esperar a que ambas promesas se resuelvan antes de mostrar el offcanvas
-        Promise.all([/*locationPromise*/, carrierPromise])
+        Promise.all([locationPromise, carrierPromise])
             .then(() => {
                 const updateCanvas = new bootstrap.Offcanvas(document.getElementById('updatenewtrailerempty'));
                 updateCanvas.show(); // Mostrar el offcanvas cuando ambas solicitudes terminen
@@ -2269,7 +2308,7 @@ $(document).ready(function() {
         'updateinputpalletsonfloor',
         'updateinputcarrier',
         //'updateinputavailabilityindicator',
-        //'updateinputlocation',
+        'updateinputlocation',
         'updateinputdatein',
         //'updateinputdateout',
         //'updateinputtransactiondate',
@@ -2281,46 +2320,65 @@ $(document).ready(function() {
         const field = document.getElementById(fieldId);
         const errorElement = document.getElementById(`error-${fieldId}`);
         const isSelect2 = $(field).hasClass("searchcarrier"); // Detecta si es un select2
-
+        const isSelect2Location = $(field).hasClass("searchlocation");
+        
         if (isSelect2) {
             // Para select2, usa 'change'
             $(field).on('change', function () {
-                validateField(field, errorElement, isSelect2);
+                validateField(field, errorElement, isSelect2, isSelect2Location);
             });
         } else {
             // Para inputs normales, usa keyup y blur
             field.addEventListener('keyup', function () {
-                validateField(field, errorElement, isSelect2);
+                validateField(field, errorElement, isSelect2, isSelect2Location);
             });
     
             field.addEventListener('blur', function () {
-                validateField(field, errorElement, isSelect2);
+                validateField(field, errorElement, isSelect2, isSelect2Location);
+            });
+        }
+
+        if (isSelect2Location) {
+            // Para select2, usa 'change'
+            $(field).on('change', function () {
+                validateField(field, errorElement, isSelect2, isSelect2Location);
+            });
+        } else {
+            // Para inputs normales, usa keyup y blur
+            field.addEventListener('keyup', function () {
+                validateField(field, errorElement, isSelect2, isSelect2Location);
+            });
+    
+            field.addEventListener('blur', function () {
+                validateField(field, errorElement, isSelect2, isSelect2Location);
             });
         }
     });
 
     // Función común para validar cada campo
-    function validateField(field, errorElement, isSelect2) {
+    function validateField(field, errorElement, isSelect2, isSelect2Location) {
         // Validar si el campo está vacío
         if (field.value.trim() === '') {
             //field.classList.add('is-invalid');
             //errorElement.textContent = 'This field is required'; // Mensaje de error
 
             /// Si es un select2, aplica la clase al contenedor
-            if (isSelect2) {
+            if (isSelect2 ) {
                 $(field).siblings(".select2").find(".select2-selection").addClass("is-invalid");
                 field.classList.add('is-invalid');
                 errorElement.textContent = 'Carrier is required.';
-            }/*else if(field.id === 'updateinputpalletsonfloor'){
-                errorElement.textContent = 'Pallets on floor are required.';
-            }else if(field.id === 'updateinputpalletsontrailer'){
+            }else if(isSelect2Location){
+                $(field).siblings(".select2").find(".select2-selection").addClass("is-invalid");
+                field.classList.add('is-invalid');
+                errorElement.textContent = 'Location is required.';
+            }/*else if(field.id === 'updateinputpalletsontrailer'){
                 errorElement.textContent = 'Pallets on trailer are required.';
             }*/else if(field.id === 'updateinputdateofstatus'){
                 field.classList.add('is-invalid');
                 errorElement.textContent = 'Status date is required.';
-                field.classList.add('is-invalid');
             }else if(field.id === 'updateinputdatein'){
                 errorElement.textContent = 'Date In is required.';
+                field.classList.add('is-invalid');
             }
         }
         // Validar si el campo es un número entero para los campos 'updateinputpalletsonfloor' y 'updateinputpalletsontrailer'
@@ -2341,6 +2399,9 @@ $(document).ready(function() {
             errorElement.textContent = ''; // Limpiar el mensaje de error
 
             if (isSelect2) {
+                $(field).next('.select2-container').find('.select2-selection').removeClass("is-invalid");
+            }
+            if(isSelect2Location){
                 $(field).next('.select2-container').find('.select2-selection').removeClass("is-invalid");
             }
         }
@@ -2449,6 +2510,7 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
         const field = document.getElementById(fieldId);
         const errorElement = document.getElementById(`error-${fieldId}`);
         const isSelect2 = $(field).hasClass("searchcarrier"); // Detecta si es un select2
+        const isSelect2Location = $(field).hasClass("searchlocation");
 
         // Validar el campo
         if (field.value.trim() === '' && field.id !== 'updateinputpalletsonfloor' && field.id !== 'updateinputpalletsontrailer') {
@@ -2461,9 +2523,11 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
                 $(field).siblings(".select2").find(".select2-selection").addClass("is-invalid");
                 field.classList.add('is-invalid');
                 errorElement.textContent = 'Carrier is required.';
-            }/*else if(field.id === 'updateinputpalletsonfloor'){
-                errorElement.textContent = 'Pallets on floor are required.';
-            }else if(field.id === 'updateinputpalletsontrailer'){
+            }else if(isSelect2Location){
+                $(field).siblings(".select2").find(".select2-selection").addClass("is-invalid");
+                field.classList.add('is-invalid');
+                errorElement.textContent = 'Location is required.';
+            }/*else if(field.id === 'updateinputpalletsontrailer'){
                 errorElement.textContent = 'Pallets on trailer are required.';
             }*/else if(field.id === 'updateinputdateofstatus'){
                 field.classList.add('is-invalid');
@@ -2491,6 +2555,9 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
 
             // Si es un select2, elimina la clase del contenedor
             if (isSelect2) {
+                $(field).siblings(".select2").find(".select2-selection").removeClass("is-invalid");
+            }
+            if(isSelect2Location){
                 $(field).siblings(".select2").find(".select2-selection").removeClass("is-invalid");
             }
         }
@@ -2529,7 +2596,7 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
                 updateinputpalletsonfloor: document.getElementById("updateinputpalletsonfloor").value,
                 updateinputcarrier: document.getElementById("updateinputcarrier").value,
                 updateinputavailabilityindicator: document.getElementById("updateinputavailabilityindicator").value,
-                //updateinputlocation: document.getElementById("updateinputlocation").value,
+                updateinputlocation: document.getElementById("updateinputlocation").value,
                 updateinputdatein: document.getElementById("updateinputdatein").value,
                 updateinputusername: document.getElementById("updateinputusername").value,
             };
@@ -2571,6 +2638,7 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
                             trailer.pallets_on_floor ?? '',
                             trailer.carriers?.CoName ?? '',
                             trailer.availability_indicator && trailer.availability_indicator.gntc_description ? trailer.availability_indicator.gntc_description : '',
+                            trailer.locations?.CoName ?? '',
                             trailer.date_in ?? '',
                             trailer.username ?? ''
                         ]).node(); // Esto devuelve el nodo de la fila agregada
@@ -2607,6 +2675,7 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
                             document.getElementById("offcanvas-pallets-on-floor").textContent = trailer.pallets_on_floor;
                             document.getElementById("offcanvas-carrier").textContent = trailer.carriers?.CoName ?? '';
                             document.getElementById("offcanvas-availability").textContent = trailer.availability_indicator && trailer.availability_indicator.gntc_description ? trailer.availability_indicator.gntc_description : '';
+                            document.getElementById("offcanvas-location").textContent = trailer.locations?.CoName ?? '';
                             document.getElementById("offcanvas-date-in").textContent = trailer.date_in;
                             document.getElementById("offcanvas-username").textContent = trailer.username;
                             document.getElementById("pk_availability").textContent = trailer.availability_indicator && trailer.availability_indicator.gnct_id ? trailer.availability_indicator.gnct_id : '';
@@ -2631,6 +2700,7 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
                             const errorElement = document.getElementById(`error-${fieldId}`);
                             const fieldElement = document.getElementById(fieldId);
                             const isSelect2 = $(fieldElement).hasClass("searchcarrier"); // Detecta si es select2
+                            const isSelect2Location = $(fieldElement).hasClass("searchlocation");
                 
                             if (fieldElement) {
                                 fieldElement.classList.add('is-invalid'); // Marca el campo como inválido
@@ -2638,6 +2708,10 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
 
                                 // Si es un select2, aplica la clase a la interfaz de select2
                                 if (isSelect2) {
+                                    $(fieldElement).next('.select2-container').find('.select2-selection').addClass("is-invalid");
+                                }
+
+                                if (isSelect2Location){
                                     $(fieldElement).next('.select2-container').find('.select2-selection').addClass("is-invalid");
                                 }
                             }
@@ -2866,7 +2940,7 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
                     table.column(0).search($('#emptytrailerfilterinputidtrailer').val()).draw();
                     table.column(2).search($('#emptytrailerfilterinputpalletsontrailer').val()).draw();
                     table.column(3).search($('#emptytrailerfilterinputpalletsonfloor').val()).draw();
-                    table.column(7).search($('#emptytrailerfilterinputusername').val()).draw();
+                    table.column(8).search($('#emptytrailerfilterinputusername').val()).draw();
 
                 } else {
                     // Si el div no está visible, muestra el div y coloca el valor
@@ -2875,7 +2949,7 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
                     table.column(0).search($('#emptytrailerfilterinputidtrailer').val()).draw();
                     table.column(2).search($('#emptytrailerfilterinputpalletsontrailer').val()).draw();
                     table.column(3).search($('#emptytrailerfilterinputpalletsonfloor').val()).draw();
-                    table.column(7).search($('#emptytrailerfilterinputusername').val()).draw();
+                    table.column(8).search($('#emptytrailerfilterinputusername').val()).draw();
                     //este update si debe ir descomentado
                     //updatetab.click();
                 }
@@ -2885,7 +2959,7 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
                 table.column(0).search($('#emptytrailerfilterinputidtrailer').val()).draw();
                 table.column(2).search($('#emptytrailerfilterinputpalletsontrailer').val()).draw();
                 table.column(3).search($('#emptytrailerfilterinputpalletsonfloor').val()).draw();
-                table.column(7).search($('#emptytrailerfilterinputusername').val()).draw();
+                table.column(8).search($('#emptytrailerfilterinputusername').val()).draw();
                 $(divSelector).hide();
                 $(closeButtonSelector).click(); // Simula un clic en Collapse
                 //este update si debe ir descomentado
@@ -2921,7 +2995,7 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
                     table.column(0).search($('#emptytrailerfilterinputidtrailer').val()).draw();
                     table.column(2).search($('#emptytrailerfilterinputpalletsontrailer').val()).draw();
                     table.column(3).search($('#emptytrailerfilterinputpalletsonfloor').val()).draw();
-                    table.column(7).search($('#emptytrailerfilterinputusername').val()).draw();
+                    table.column(8).search($('#emptytrailerfilterinputusername').val()).draw();
                 }
                 $(divSelector).hide(); // Oculta el div del filtro
             }
@@ -3037,7 +3111,7 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
             // **Filtro 2**: Manejo de "Date In" (columna 6)
             var startDateIn = $('#emptytrailerfilterinputstartdatein').val();
             var endDateIn = $('#emptytrailerfilterinputenddatein').val();
-            var dateColumnIndexIn = 6;
+            var dateColumnIndexIn = 7;
             var rowDateIn = data[dateColumnIndexIn] || "";
 
             // Usa flatpickr para parsear correctamente las fechas
@@ -3224,7 +3298,7 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
             // **Filtro 2**: Manejo de "Date In" (columna 6)
             var startDateIn = $('#emptytrailerfilterinputstartdatein').val();
             var endDateIn = $('#emptytrailerfilterinputenddatein').val();
-            var dateColumnIndexIn = 6;
+            var dateColumnIndexIn = 7;
             var rowDateIn = data[dateColumnIndexIn] || "";
 
             // Usa flatpickr para parsear correctamente las fechas

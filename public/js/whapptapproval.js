@@ -688,7 +688,7 @@ $(document).ready(function () {
     
 
     // Actualización automática cada 5 minutos (300,000 ms)
-    setInterval(updateShipmentWHETATable, 5000000);
+    setInterval(updateShipmentWHETATable, 60000);
 
     //Formato de fechas
     $(document).ready(function() {
