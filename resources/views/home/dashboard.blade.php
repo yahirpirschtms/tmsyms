@@ -103,7 +103,7 @@
                 <!-- Segunda columna con 2 divs que ocupan todo el alto proporcionalmente -->
                 <div class="col-md-6">
                     <div class="mb-4 grow-2 shadow rounded">
-                        <div class="card border border-primary-subtle">
+                        <div class="card border border-primary-subtle border-4">
                             <div class="card-body">
                                 <h5 class="card-title fw-bold" style="color:#1e4877">IN TRANSIT</h5>
                                 <div class="text-black">
