@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\GenericCatalog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class GenericCatalogController extends Controller
 {
     public function getDoorNumberWHETAAjax(Request $request){
+    if (Auth::check()) {
         $query = GenericCatalog::where('gntc_group', 'WHMIAMI_DOOR_NUMBER');
     
         if ($request->has('search') && !empty($request->search)) {
@@ -19,9 +22,11 @@ class GenericCatalogController extends Controller
     
         return response()->json($doornumbers);
     }
+    return redirect('/login');
+    }
 
-    public function saveNewDoorNumberWHETA(Request $request)
-    {
+    public function saveNewDoorNumberWHETA(Request $request){
+    if (Auth::check()) {
         // Validar el nombre del carrier
         $request->validate([
             'doorNumberWHETA' => 'required|string|max:255',
@@ -61,11 +66,13 @@ class GenericCatalogController extends Controller
             ]);
         }
     }
+    return redirect('/login');
+    }
 
     
     //Sacar todos los Availability Indicators
-    public function getAvailabilityIndicators()
-    {
+    public function getAvailabilityIndicators(){
+    if (Auth::check()) {
         $data = GenericCatalog::where('gntc_group', 'AVAILABILITY_INDICATOR')
             //->where('gntc_status', 1) // Filtrar sólo registros activos
             ->select('gnct_id', 'gntc_description')
@@ -80,10 +87,12 @@ class GenericCatalogController extends Controller
 
         return response()->json($data);
     }
+    return redirect('/login');
+    }
 
     //Sacar todos los Shipment Types
-    public function getShipmentTypes()
-    {
+    public function getShipmentTypes(){
+    if (Auth::check()) {
         $data = GenericCatalog::where('gntc_group', 'SHIPMENT_TYPE')
             //->where('gntc_status', 1) // Filtrar sólo registros activos
             ->select('gnct_id', 'gntc_description')
@@ -98,10 +107,12 @@ class GenericCatalogController extends Controller
 
         return response()->json($data);
     }
+    return redirect('/login');
+    }
 
     //Sacar todos los Current Status
-    public function getCurrentStatus()
-    {
+    public function getCurrentStatus(){
+    if (Auth::check()) {
         $data = GenericCatalog::where('gntc_group', 'CURRENT_STATUS')
             //->where('gntc_status', 1) // Filtrar sólo registros activos
             ->select('gnct_id', 'gntc_description')
@@ -116,8 +127,11 @@ class GenericCatalogController extends Controller
 
         return response()->json($data);
     }
+    return redirect('/login');
+    }
 
     public function getSecurityCompaniesAjax(Request $request){
+    if (Auth::check()) {
         $query = GenericCatalog::where('gntc_group', 'SEC_COMPANY');
     
         if ($request->has('search') && !empty($request->search)) {
@@ -127,5 +141,7 @@ class GenericCatalogController extends Controller
         $securitycompanies = $query->select('gnct_id', 'gntc_value')->get();
     
         return response()->json($securitycompanies);
+    }
+    return redirect('/login');
     }
 }

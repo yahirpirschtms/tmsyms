@@ -126,6 +126,7 @@ class HomeController extends Controller
 }*/
 public function update(Request $request)
 {
+if (Auth::check()) {
     try {
         // Validar los datos enviados
         $validated = $request->validate([
@@ -191,11 +192,14 @@ public function update(Request $request)
         return response()->json(['message' => 'An unexpected error occurred.'], 500);
     }
 }
+return redirect('/login');
+}
 
 
 
     //Funcion eliminar trailers
     public function destroy($id){
+    if (Auth::check()) {
         // Buscar el tráiler por ID
         $trailer = EmptyTrailer::find($id);
 
@@ -216,6 +220,8 @@ public function update(Request $request)
             'trailers' => $trailers,// O puedes filtrar solo los necesarios
         ], 200);
     }
+    return redirect('/login');
+    }
 
     //Funcion entrar a la app
     public function index(){
@@ -232,6 +238,7 @@ public function update(Request $request)
     //Funcion Guardar un nuevo empty trailer
     public function store(Request $request)
     {
+    if (Auth::check()) {
         // Validaciones
         $validated = $request->validate([
 
@@ -314,9 +321,13 @@ public function update(Request $request)
         // Redirigir con mensaje de éxito
         //return redirect()->route('emptytrailer')->with('success', 'Trailer successfully added!');
     }
+    return redirect('/login');
+    }
     
     //Funcion actualizar tabla con los filtros o al refresh
     public function getEmptyTrailers(Request $request){
+    if (Auth::check()) {
+
                 $query = EmptyTrailer::with(['availabilityIndicator', 'locations', 'carriers'])
                 ->whereNull('availability');                
 /*                
@@ -460,6 +471,9 @@ public function update(Request $request)
         
         // Devolver los datos en formato JSON
         return response()->json($emptyTrailers);
+
+    }
+    return redirect('/login');
     }
 
     

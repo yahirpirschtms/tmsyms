@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Companies;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class CompaniesController extends Controller
 {
     //
-    public function getLocations(Request $request)
-    {
+    public function getLocations(Request $request){
+    if (Auth::check()) {
         // Filtrar por el código "CBMX"
         //$locations = Companies::where('code', 'CBMX')->pluck('CoName', 'pk_company');
         $locations = Companies::where('Notes', 'YM')
@@ -19,8 +22,11 @@ class CompaniesController extends Controller
         // Retornar los datos en formato JSON
         return response()->json($locations);
     }
+    return redirect('/login');
+    }
 
     public function getLocationsAjax(Request $request){
+    if (Auth::check()) {
         $query = Companies::where('Notes', 'YM');
     
         if ($request->has('search') && !empty($request->search)) {
@@ -31,9 +37,11 @@ class CompaniesController extends Controller
     
         return response()->json($locations);
     }
+    return redirect('/login');
+    }
 
-    public function saveNewLocation(Request $request)
-    {
+    public function saveNewLocation(Request $request){
+    if (Auth::check()) {        
         // Validar el nombre del carrier
         $request->validate([
             'carrierName' => 'required|string|max:255',
@@ -68,9 +76,11 @@ class CompaniesController extends Controller
             ]);
         }
     }
+    return redirect('/login');
+    }
 
-    public function getCarriersAjax(Request $request)
-    {
+    public function getCarriersAjax(Request $request){
+    if (Auth::check()) {    
         $query = Companies::where('Notes', 'YM');
     
         if ($request->has('search') && !empty($request->search)) {
@@ -81,9 +91,11 @@ class CompaniesController extends Controller
     
         return response()->json($locations);
     }
+    return redirect('/login');
+    }
     
-    public function saveNewCarrier(Request $request)
-    {
+    public function saveNewCarrier(Request $request){
+    if (Auth::check()) {
         // Validar el nombre del carrier
         $request->validate([
             'carrierName' => 'required|string|max:255',
@@ -118,9 +130,11 @@ class CompaniesController extends Controller
             ]);
         }
     }
+    return redirect('/login');
+    }
 
-    public function getTrailerOwnersAjax(Request $request)
-    {
+    public function getTrailerOwnersAjax(Request $request){
+    if (Auth::check()) { 
         $query = Companies::where('Notes', 'YM');
     
         if ($request->has('search') && !empty($request->search)) {
@@ -131,9 +145,11 @@ class CompaniesController extends Controller
     
         return response()->json($locations);
     }
+    return redirect('/login');
+    }
 
-    public function saveNewTrailerOwner(Request $request)
-    {
+    public function saveNewTrailerOwner(Request $request){
+    if (Auth::check()) {
         // Validar el nombre del carrier
         $request->validate([
             'carrierName' => 'required|string|max:255',
@@ -168,9 +184,11 @@ class CompaniesController extends Controller
             ]);
         }
     }
+    return redirect('/login');
+    }
 
     public function getDestinationsAjax(Request $request){
-
+    if (Auth::check()) {
         $query = $request->get('query', '');
 
         // Filtrar solo las compañías donde Notes sea "yms"
@@ -184,6 +202,8 @@ class CompaniesController extends Controller
         $data = $queryBuilder->get();
 
         return response()->json($data);
+    }
+    return redirect('/login');
     }
 
 }
