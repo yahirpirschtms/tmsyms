@@ -346,11 +346,11 @@ public function getupdatedashboard() {
             ]
         ]);
     }
-
-    return response()->json([
+    return redirect('/login');
+    /*return response()->json([
         'status' => 'error',
         'message' => 'Unauthorized'
-    ], 401);
+    ], 401);*/
 }
 
 

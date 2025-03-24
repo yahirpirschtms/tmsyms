@@ -4,16 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Models\Facilities;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class FacilitiesController extends Controller
 {
     //
     //Sacar todos los Destinations para los shipments
-    public function getFacilities()
-    {
+    public function getFacilities(){
+    if (Auth::check()) {
         $data = Facilities::all();
         
         return response()->json($data);
+    }
+    return redirect('/login');
     }
     /*public function getFacilities(Request $request)
     {

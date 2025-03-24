@@ -4,22 +4,27 @@ namespace App\Http\Controllers;
 
 use App\Models\Driver;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class DriversController extends Controller
 {
     //
     //Sacar todos los Drivers para los shipments
-    public function getDriversByCompany($id_company)
-    {
+    public function getDriversByCompany($id_company){
+    if (Auth::check()) {
         // Filtrar los drivers por id_company
         $drivers = Driver::where('id_company', $id_company)->get();
 
         return response()->json($drivers);
     }
+    return redirect('/login');
+    }
 
 
-    public function getDriversAjax(Request $request)
-    {
+    public function getDriversAjax(Request $request){
+    if (Auth::check()) {
         $query = Driver::query();
     
         if ($request->has('search') && !empty($request->search)) {
@@ -30,9 +35,11 @@ class DriversController extends Controller
     
         return response()->json($drivers);
     }
+    return redirect('/login');
+    }
     
-    public function saveNewDriver(Request $request)
-    {
+    public function saveNewDriver(Request $request){
+    if (Auth::check()) {
         // Validar el nombre del carrier
         $request->validate([
             'driversName' => 'required|string|max:255',
@@ -66,6 +73,8 @@ class DriversController extends Controller
                 'newDriver' => $existingDriver
             ]);
         }
+    }
+    return redirect('/login');
     }
 }
 

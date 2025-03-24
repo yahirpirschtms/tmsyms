@@ -372,8 +372,8 @@ public function liveshipmentsshow()
         return redirect('/login');
     }
 
-    public function store(Request $request)
-    {
+    public function store(Request $request){
+    if (Auth::check()) {
         // Validación de los datos
         $validatedData = $request->validate([
             'inputshipmentstmid' => 'required|unique:shipments,stm_id|exists:services,id_service',
@@ -399,23 +399,23 @@ public function liveshipmentsshow()
             'tracker2' => 'nullable|required_if:tracker2,!=,null', // Lo mismo para tracker2
             'tracker3' => 'nullable|required_if:tracker3,!=,null', // Lo mismo para tracker3
             'inputpallets' => [
-        '',
-        'required',
-        'min:1', // No puede ser nulo ni 0
-        function ($attribute, $value, $fail) use ($request) {
-            // Mensaje personalizado si no es un número entero
-            $valuee = intval($value); // Asegurarse de que el valor es un entero
-            if($value < 1){
-                $fail('Pallets must have a valid value.');
-            }
-            if (!is_int($valuee)) {
-                $fail('Pallets must be an integer.');
-            }
-            if ($request->input('inputshipmentsunits') !== null && $value > $request->input('inputshipmentsunits')) {
-                $fail('The number of pallets cannot be greater than the number of shipment units.');
-            }
-        },
-    ],
+                '',
+                'required',
+                'min:1', // No puede ser nulo ni 0
+                function ($attribute, $value, $fail) use ($request) {
+                    // Mensaje personalizado si no es un número entero
+                    $valuee = intval($value); // Asegurarse de que el valor es un entero
+                    if($value < 1){
+                        $fail('Pallets must have a valid value.');
+                    }
+                    if (!is_int($valuee)) {
+                        $fail('Pallets must be an integer.');
+                    }
+                    if ($request->input('inputshipmentsunits') !== null && $value > $request->input('inputshipmentsunits')) {
+                        $fail('The number of pallets cannot be greater than the number of shipment units.');
+                    }
+                },
+            ],
             'inputshipmentsecurityseals' => 'nullable',
             'inputshipmentsecurityseals2' => 'nullable',
             'inputshipmentnotes' => 'nullable',
@@ -561,6 +561,8 @@ public function liveshipmentsshow()
         // Redirigir con mensaje de éxito
         return redirect()->route('workflowtrafficstart')->with('success', 'Shipment successfully added!');
     }
+    return redirect('/login');
+    }
 
     public function indexwhapptapproval(){
         if (Auth::check()) {
@@ -583,6 +585,7 @@ public function liveshipmentsshow()
 
     //Funcion actualizar EmptyTrailers
     public function whetaapproval(Request $request){
+    if (Auth::check()) {
         try {
             // Validar los datos
             $validated = $request->validate([
@@ -688,8 +691,11 @@ public function liveshipmentsshow()
             return response()->json(['message' => 'An unexpected error occurred.'], 500);
         }
     }
+    return redirect('/login');
+    }
 
     public function getShipmentswh(Request $request){
+    if (Auth::check()) {
         $query = Shipments::with(['shipmenttype', 'currentstatus', 'origin', 'destinations', 'carrier', 'emptytrailer', 'services', 'driverowner', 'drivers'])
             // Aplicar filtro de 'fac_auth' directamente
             /*->whereHas('destinations', function ($query) {
@@ -898,6 +904,8 @@ public function liveshipmentsshow()
         // Devolver los datos en formato JSON
         return response()->json($shipments);
     }
+    return redirect('/login');
+    }
 
     /*public function getService(Request $request)
     {
@@ -923,6 +931,7 @@ public function liveshipmentsshow()
 
     public function getService(Request $request)
 {
+if (Auth::check()) {
     $id_service = $request->id_service;
 
     // Cachear la consulta de 'services'
@@ -958,8 +967,11 @@ public function liveshipmentsshow()
         'to_id' => $toCompany ? $toCompany->pk_company : null
     ]);
 }
+return redirect('/login');
+}
 
     public function getLanesTrafficWorkflowStart(Request $request){
+    if (Auth::check()) {
         $id_companie = $request->id_companie;
 
         // Usamos Cache para almacenar resultados y evitar consultas repetidas
@@ -976,6 +988,8 @@ public function liveshipmentsshow()
         } else {
             return response()->json(['success' => false]);
         }
+    }
+    return redirect('/login');
     }
 
 
