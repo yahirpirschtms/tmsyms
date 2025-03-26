@@ -23,6 +23,7 @@ class CalendarController extends Controller
             // Filtrar los envíos que no tienen el estado 'Finalized'
             $shipments = Shipments::where('gnct_id_current_status', '!=', $finalizedStatus->gnct_id)->get();
             $currentStatus = GenericCatalog::where('gntc_group', 'CURRENT_STATUS')->get();
+            $doorNumbers = GenericCatalog::where('gntc_group', 'WHMIAMI_DOOR_NUMBER')->get();
 
             // Obtener los catálogos para 'MWD_LOCATION' (origen) y 'STATUS_E_REPORT' (estado actual)
             $originCatalog = GenericCatalog::where('gntc_group', 'MWD_LOCATION')->get()->keyBy('gnct_id');
@@ -83,6 +84,7 @@ class CalendarController extends Controller
                 'shipment' => $shipment,
                 'currentStatus'=> $currentStatus,
                 'companies' => $companies,
+                'doorNumbers' => $doorNumbers,
             ]);
         }
 
@@ -94,6 +96,7 @@ class CalendarController extends Controller
             // Obtener todos los envíos
             $shipments = Shipments::all();
             $currentStatus = GenericCatalog::where('gntc_group', 'CURRENT_STATUS')->get();
+            $doorNumbers = GenericCatalog::where('gntc_group', 'WHMIAMI_DOOR_NUMBER')->get();
 
             // Obtener los catálogos para 'MWD_LOCATION' (origen) y 'STATUS_E_REPORT' (estado actual)
             $originCatalog = GenericCatalog::where('gntc_group', 'MWD_LOCATION')->get()->keyBy('gnct_id');
@@ -142,6 +145,7 @@ class CalendarController extends Controller
                 'shipment' => $shipment,
                 'currentStatus' => $currentStatus,
                 'companies' => $companies,
+                'doorNumbers' => $doorNumbers,
             ]);
         }
 
