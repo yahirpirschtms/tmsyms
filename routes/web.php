@@ -23,9 +23,12 @@ Route::get('/', function () {
 
 Route::get('/login', [LoginController::class, 'show']);
 
-Route::post('/login', [LoginController::class, 'login']);
+Route::post('/login', [LoginController::class, 'login'])->name('login');
 
 //Route::get('/home', [HomeController::class, 'index']);
+
+//Middleware para usuarios no autentificados
+Route::middleware('auth')->group(function () {
 
 //Ruta guardar un nuveo Empty Trailer
 Route::post('/emptytrailer/store', [HomeController::class, 'store'])->name('emptytrailer.store');
@@ -150,3 +153,4 @@ Route::put('/update-status/{pk_shipment}', [CalendarController::class, 'updateOf
 Route::post('/get-status-id', [ShipmentController::class, 'getStatusIdByDescription']);
 
 Route::get('/path/to/previous-shipment/{pk_shipment}', [ShipmentController::class, 'getPreviousShipment'])->name('shipment.previous');
+});
