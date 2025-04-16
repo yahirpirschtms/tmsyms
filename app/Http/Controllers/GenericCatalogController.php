@@ -12,8 +12,8 @@ class GenericCatalogController extends Controller
 {
     public function getDoorNumberWHETAAjax(Request $request){
     if (Auth::check()) {
-        $query = GenericCatalog::where('gntc_group', 'WHMIAMI_DOOR_NUMBER');
-    
+        $query = GenericCatalog::where('gntc_group', 'WHMIAMI_DOOR_NUMBER')
+        ->where('gntc_status', 1);
         if ($request->has('search') && !empty($request->search)) {
             $query->where('gntc_value', 'like', '%' . $request->search . '%');
         }
@@ -34,7 +34,7 @@ class GenericCatalogController extends Controller
 
         // Verificar si el carrier ya existe en la base de datos
         $existingDoorNumberWHETA = GenericCatalog::where('gntc_value', $request->doorNumberWHETA)
-        //->orWhere('pk_company', $request->carrierName) // Verificar si el ID del carrier ya existe
+        ->where('gntc_status', 1)
         ->first();
 
         $currentDateTime = now();
@@ -47,6 +47,7 @@ class GenericCatalogController extends Controller
             $newDoorNumberWHETA->gntc_group = 'WHMIAMI_DOOR_NUMBER'; // Establecer otros campos según sea 
             $newDoorNumberWHETA->gntc_description = $request->doorNumberWHETA;
             $newDoorNumberWHETA->gntc_creation_date = $currentDateTime;
+            $newDoorNumberWHETA->gntc_status = 1;
             $newDoorNumberWHETA->gntc_user = $username;
             $newDoorNumberWHETA->save();
 
@@ -74,7 +75,7 @@ class GenericCatalogController extends Controller
     public function getAvailabilityIndicators(){
     if (Auth::check()) {
         $data = GenericCatalog::where('gntc_group', 'AVAILABILITY_INDICATOR')
-            //->where('gntc_status', 1) // Filtrar sólo registros activos
+            ->where('gntc_status', 1) // Filtrar sólo registros activos
             ->select('gnct_id', 'gntc_description')
             ->get();
             
@@ -94,7 +95,7 @@ class GenericCatalogController extends Controller
     public function getShipmentTypes(){
     if (Auth::check()) {
         $data = GenericCatalog::where('gntc_group', 'SHIPMENT_TYPE')
-            //->where('gntc_status', 1) // Filtrar sólo registros activos
+            ->where('gntc_status', 1) // Filtrar sólo registros activos
             ->select('gnct_id', 'gntc_description')
             ->get();
             
@@ -114,7 +115,7 @@ class GenericCatalogController extends Controller
     public function getCurrentStatus(){
     if (Auth::check()) {
         $data = GenericCatalog::where('gntc_group', 'CURRENT_STATUS')
-            //->where('gntc_status', 1) // Filtrar sólo registros activos
+            ->where('gntc_status', 1) // Filtrar sólo registros activos
             ->select('gnct_id', 'gntc_description')
             ->get();
             
@@ -132,7 +133,8 @@ class GenericCatalogController extends Controller
 
     public function getSecurityCompaniesAjax(Request $request){
     if (Auth::check()) {
-        $query = GenericCatalog::where('gntc_group', 'SEC_COMPANY');
+        $query = GenericCatalog::where('gntc_group', 'SEC_COMPANY')
+        ->where('gntc_status', 1);
     
         if ($request->has('search') && !empty($request->search)) {
             $query->where('gntc_value', 'like', '%' . $request->search . '%');

@@ -139,8 +139,16 @@
 
                                 <div class="mb-3">
                                     <label for="doorNumber{{ $shipment->stm_id }}" class="form-label">Door Number</label>
-                                    <input type="text" class="form-control" id="doorNumber{{ $shipment->stm_id }}" name="door_number" value="{{ $shipment->door_number ?? '' }}" data-original="{{ $shipment->door_number ?? '' }}">
+                                    <select class="form-select" id="doorNumber{{ $shipment->stm_id }}" name="door_number" data-original="{{ $shipment->door_number ?? '' }}">
+                                        <option value="">Select a Door</option>
+                                        @foreach ($doorNumbers as $door)
+                                            <option value="{{ $door->gntc_description }}" {{ old('door_number', $shipment->door_number) == $door->gntc_description ? 'selected' : '' }}>
+                                                {{ $door->gntc_description }}
+                                            </option>
+                                        @endforeach
+                                    </select>
                                 </div>
+
 
                                 <div class="mb-3">
                                     <label for="offloadTime{{ $shipment->stm_id }}" class="form-label">Offload Time</label>

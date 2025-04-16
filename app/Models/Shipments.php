@@ -76,7 +76,8 @@ class Shipments extends Model
         'have_trackers',
         'security_company',
         'door_number',
-        'dock_door_date'
+        'dock_door_date',
+        'removed_trackers'
     ];
 
 
