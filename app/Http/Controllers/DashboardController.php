@@ -58,6 +58,7 @@ class DashboardController extends Controller
             // Obtener los status de la tabla GenericCatalog
             $statusIds = GenericCatalog::where('gntc_group', 'CURRENT_STATUS')
                 ->whereIn('gntc_description', $categorias)
+                ->where('gntc_status', 1) // Solo estados activos
                 ->pluck('gnct_id', 'gntc_description');
 
             // Obtener los origins válidos
@@ -227,6 +228,7 @@ public function getupdatedashboard() {
         // Obtener IDs de estados en la tabla `generic_catalogs`
         $statusIds = GenericCatalog::where('gntc_group', 'CURRENT_STATUS')
             ->whereIn('gntc_description', $categorias)
+            ->where('gntc_status', 1) // Solo estados activos
             ->pluck('gnct_id', 'gntc_description');
 
         // Obtener IDs de orígenes y destinos
