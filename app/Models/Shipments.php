@@ -77,7 +77,8 @@ class Shipments extends Model
         'security_company',
         'door_number',
         'dock_door_date',
-        'removed_trackers'
+        'removed_trackers',
+        'late_reason'
     ];
 
 
@@ -173,6 +174,11 @@ class Shipments extends Model
     public function destinations()
     {
         return $this->belongsTo(Companies::class, 'destination', 'pk_company');
+    }
+
+    public function lateReason()
+    {
+        return $this->belongsTo(LateReason::class, 'late_reason', 'pk_id');
     }
 
     // Relación con la tabla `companies`

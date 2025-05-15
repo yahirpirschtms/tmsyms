@@ -962,10 +962,26 @@
                                     <input type="text" class="form-control" id="lane" name="lane" value="{{ $shipment->lane }}" data-original="{{ $shipment->lane }}">
                                 </div>
 
+
+                                <div class="mb-3">
+                                    <label for="late_reason" class="form-label">Late Reason</label>
+                                    <select class="form-select" id="late_reason-{{ $shipment->stm_id }}" name="late_reason" data-original="{{ old('late_reason', $shipment->late_reason_id) }}">
+                                        <option value="">-- Select Reason --</option>
+                                        @foreach ($lateReasons as $reason)
+                                            <option value="{{ $reason->pk_id }}"
+                                                {{ old('late_reason', $shipment->late_reason) == $reason->pk_id ? 'selected' : '' }}>
+                                                {{ $reason->value }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
                                 <div class="mb-3">
                                     <label for="notes" class="form-label">Notes</label>
                                     <textarea class="form-control" id="notes" name="notes" rows="3" data-original="{{ $shipment->notes }}">{{ $shipment->notes }}</textarea>
                                 </div>
+
+
 
 
                                     <!-- Agrega más campos si es necesario -->
@@ -1189,6 +1205,11 @@
                                     <div class="mb-3">
                                         <label class="form-label">Approved ETA date & Time</label>
                                         <p>{{ $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y H:i:s') : 'Not Available' }}</p>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Late Reason</label>
+                                        <p>{{ $shipment->lateReason->value ?? 'Not Available' }}</p>
                                     </div>
                                 </form>
 
@@ -1960,6 +1981,35 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
     </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Selecciona todos los modales que empiecen con "shipmentModal"
+        const modals = document.querySelectorAll('[id^="shipmentModal"]');
+
+        modals.forEach(modal => {
+            modal.addEventListener('shown.bs.modal', function () {
+                const stmId = this.id.replace('shipmentModal', '');
+                const currentStatusSelect = document.getElementById(`currentStatus-${stmId}`);
+                const lateReasonSelect = document.getElementById(`late_reason-${stmId}`);
+
+                if (!currentStatusSelect || !lateReasonSelect) return;
+
+                const handleStatusChange = () => {
+                    const selectedText = currentStatusSelect.options[currentStatusSelect.selectedIndex].text.trim();
+                    if (['Delivered', 'Finalized'].includes(selectedText)) {
+                        lateReasonSelect.disabled = true;
+                    } else {
+                        lateReasonSelect.disabled = false;
+                    }
+                };
+
+                currentStatusSelect.addEventListener('change', handleStatusChange);
+                handleStatusChange(); // Inicial
+            });
+        });
+    });
+</script>
 
 @endsection
 

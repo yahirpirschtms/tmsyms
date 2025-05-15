@@ -352,9 +352,23 @@
                             </div>
 
                             <div class="mb-3">
+                                <label for="late_reason" class="form-label">Late Reason</label>
+                                <select class="form-select" id="late_reason-{{ $shipment->stm_id }}" name="late_reason" data-original="{{ old('late_reason', $shipment->late_reason_id) }}">
+                                    <option value="">-- Select Reason --</option>
+                                    @foreach ($lateReasons as $reason)
+                                        <option value="{{ $reason->pk_id }}"
+                                            {{ old('late_reason', $shipment->late_reason) == $reason->pk_id ? 'selected' : '' }}>
+                                            {{ $reason->value }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
                                 <label for="notes" class="form-label">Notes</label>
                                 <textarea class="form-control" id="notes" name="notes" rows="3" data-original="{{ $shipment->notes }}">{{ $shipment->notes }}</textarea>
                             </div>
+
 
 
                                 <!-- Agrega más campos si es necesario -->
@@ -582,6 +596,11 @@
                                 <div class="mb-3">
                                     <label class="form-label">Approved ETA date & Time</label>
                                     <p>{{ $shipment->wh_auth_date ? \Carbon\Carbon::parse($shipment->wh_auth_date)->format('m/d/Y H:i:s') : 'Not Available' }}</p>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Late Reason</label>
+                                    <p>{{ $shipment->lateReason->value ?? 'Not Available' }}</p>
                                 </div>
                             </form>
 
@@ -1092,6 +1111,44 @@ document.querySelector("form").addEventListener("submit", function (event) {
         }
     });
 });
+</script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Buscar todos los offcanvas (uno por cada shipment)
+        const offcanvases = document.querySelectorAll('.offcanvas');
+
+        offcanvases.forEach(offcanvas => {
+            offcanvas.addEventListener('shown.bs.offcanvas', function () {
+                const shipmentId = this.id.split('-')[1]; // Extrae el ID desde el ID del offcanvas
+
+                const currentStatusSelect = document.getElementById(`currentStatus-${shipmentId}`);
+                const lateReasonField = document.getElementById(`late_reason-${shipmentId}`);
+
+                if (!currentStatusSelect || !lateReasonField) return;
+
+                const currentStatusValue = currentStatusSelect.options[currentStatusSelect.selectedIndex].text.trim().toLowerCase();
+
+                // Deshabilitar si el texto del status es "delivered" o "finalized"
+                if (['delivered', 'finalized'].includes(currentStatusValue)) {
+                    lateReasonField.disabled = true;
+                } else {
+                    lateReasonField.disabled = false;
+                }
+
+                // También puedes actualizar dinámicamente si cambia el select
+                currentStatusSelect.addEventListener('change', function () {
+                    const updatedStatus = this.options[this.selectedIndex].text.trim().toLowerCase();
+                    if (['delivered', 'finalized'].includes(updatedStatus)) {
+                        lateReasonField.disabled = true;
+                    } else {
+                        lateReasonField.disabled = false;
+                    }
+                });
+            });
+        });
+    });
 </script>
 
 @endsection

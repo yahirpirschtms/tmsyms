@@ -10,6 +10,7 @@ use App\Models\Facilities;
 use App\Models\Driver;
 use App\Models\SealsHistory;
 use App\Models\TruckHistory;
+use App\Models\LateReason;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -63,14 +64,16 @@ class ShipmentController extends Controller
             $shipmentType = GenericCatalog::where('gntc_group', 'SHIPMENT_TYPE')->get();
 
             // Obtener todas las compañías para los selects
+            $lateReasons = LateReason::where('group', 'LATE_REASON_TRSP_MEX')->where('status', 1)->get();
             $companies = Companies::where('notes', 'ym')->get();
+            $securityCompanies = GenericCatalog::where('gntc_group', 'SEC_COMPANY')->get();
 
             $facilities = Facilities::all();
             $trailers = EmptyTrailer::all();
             $drivers = Driver::all();
 
             // Pasar los datos a la vista
-            return view('home.all-shipments', compact('shipments', 'currentStatus', 'shipmentType', 'companies', 'facilities', 'trailers', 'drivers'));
+            return view('home.all-shipments', compact('shipments', 'currentStatus', 'shipmentType', 'companies', 'facilities', 'trailers', 'drivers', 'lateReasons','securityCompanies' ));
         }
 
         return redirect('/login');
@@ -110,6 +113,8 @@ public function liveshipmentsshow()
         // Obtener la lista de compañías de seguridad
         $securityCompanies = GenericCatalog::where('gntc_group', 'SEC_COMPANY')->get();
 
+        $lateReasons = LateReason::where('group', 'LATE_REASON_TRSP_MEX')->where('status', 1)->get();
+
         // Pasar los datos a la vista
         return view('home.liveshipments', compact(
             'shipments',
@@ -119,7 +124,8 @@ public function liveshipmentsshow()
             'facilities',
             'trailers',
             'drivers',
-            'securityCompanies'
+            'securityCompanies',
+            'lateReasons'
         ));
     }
 
@@ -208,7 +214,8 @@ public function liveshipmentsshow()
                 'dock_door_date' => 'nullable|string',
                 'door_number' => 'nullable|string',
                 'lane' => 'nullable|string',
-                'security_company' => 'nullable|integer'
+                'security_company' => 'nullable|integer',
+                'late_reason' => 'nullable|string'
             ]);
 
 
