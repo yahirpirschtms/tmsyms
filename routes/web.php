@@ -70,6 +70,14 @@ Route::get('/trailerowner-emptytrailerAjax', [CompaniesController::class, 'getTr
 
 Route::get('/doornumberwheta-whetaapproval', [GenericCatalogController::class, 'getDoorNumberWHETAAjax'])->name('doornumberwheta-whetaapproval');
 
+Route::get('/getInfoGeneric', [GenericCatalogController::class, 'getInfoGeneric'])->name('getInfoGeneric');
+
+Route::get('/getLoadInfo', [GenericCatalogController::class, 'getLoadInfo'])->name('getLoadInfo');
+
+Route::get('/generalCatalogs', [GenericCatalogController::class, 'generalCatalogs'])->name('generalCatalogs');
+
+Route::get('/loadCheckBoxfiltersEmptyTrailer', [GenericCatalogController::class, 'loadCheckBoxfiltersEmptyTrailer'])->name('loadCheckBoxfiltersEmptyTrailer');
+
 Route::get('/drivers-shipment', [DriversController::class, 'getDriversAjax'])->name('drivers-shipment');
 
 Route::get('/securitycompany-shipment', [GenericCatalogController::class, 'getSecurityCompaniesAjax'])->name('securitycompany-shipment');

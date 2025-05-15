@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\GenericCatalog;
+use App\Models\Driver;
+use App\Models\Companies;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -69,6 +71,83 @@ class GenericCatalogController extends Controller
     }
     return redirect('/login');
     }
+    
+    //Funcion ara traer los catalogos en la pantalla del WH approval
+    public function getInfoGeneric(Request $request){
+    if (Auth::check()) {
+        $doornumbers = GenericCatalog::where('gntc_group', 'WHMIAMI_DOOR_NUMBER')->where('gntc_status', 1)->select('gnct_id', 'gntc_value')->get();
+        $shipmenttypes = GenericCatalog::where('gntc_group', 'SHIPMENT_TYPE')->where('gntc_status', 1)->select('gnct_id', 'gntc_value')->get();
+
+        return response()->json([
+            'door_numbers' => $doornumbers,
+            'shipment_types' => $shipmenttypes,
+        ]);
+    }
+    return redirect('/login');
+    }
+
+    //Funcion ara traer los catalogos en la pantalla del Traffic Workflow Start
+    public function getLoadInfo(Request $request){
+    if (Auth::check()) {
+        $currentstatus = GenericCatalog::where('gntc_group', 'CURRENT_STATUS')->where('gntc_status', 1)->select('gnct_id', 'gntc_value')->get();
+        $shipmenttypes = GenericCatalog::where('gntc_group', 'SHIPMENT_TYPE')->where('gntc_status', 1)->select('gnct_id', 'gntc_value')->get();
+        $securitycompanies = GenericCatalog::where('gntc_group', 'SEC_COMPANY')->where('gntc_status', 1)->select('gnct_id', 'gntc_value')->get();
+        $drivers = Driver::select('pk_driver', 'drivername')->get();
+        $carriers = Companies::where('Notes', 'YM')->select('pk_company', 'CoName')->get();
+        $trailerOwners = Companies::where('Notes', 'YM')->select('pk_company', 'CoName')->get();
+
+        return response()->json([
+            'current_status' => $currentstatus,
+            'shipment_types' => $shipmenttypes,
+            'security_companies' => $securitycompanies,
+            'drivers' => $drivers,
+            'carriers' => $carriers,
+            'trailer_owners' => $trailerOwners,
+        ]);
+    }
+    return redirect('/login');
+    }
+
+    //Funcion ara traer los catalogos en la pantalla del Empty Trailer
+    public function generalCatalogs(Request $request){
+    if (Auth::check()) {
+        $carriers = Companies::where('Notes', 'YM')->select('pk_company', 'CoName')->get();
+        $locations = Companies::where('Notes', 'YM')->select('pk_company', 'CoName')->get();
+        $availabilityindicator = GenericCatalog::where('gntc_group', 'AVAILABILITY_INDICATOR')->where('gntc_status', 1)->select('gnct_id', 'gntc_value')->get();
+
+        return response()->json([
+            'carriers' => $carriers,
+            'locations' => $locations,
+            'availability_indicator' => $availabilityindicator,
+        ]);
+    }
+    return redirect('/login');
+    }
+
+    //Funcion ara traer los filtros en la pantalla del Empty Trailer
+    public function loadCheckBoxfiltersEmptyTrailer(Request $request){
+    if (Auth::check()) {
+        $currentstatus = GenericCatalog::where('gntc_group', 'CURRENT_STATUS')->where('gntc_status', 1)->select('gnct_id', 'gntc_value')->get();
+        $shipmenttypes = GenericCatalog::where('gntc_group', 'SHIPMENT_TYPE')->where('gntc_status', 1)->select('gnct_id', 'gntc_value')->get();
+        $securitycompanies = GenericCatalog::where('gntc_group', 'SEC_COMPANY')->where('gntc_status', 1)->select('gnct_id', 'gntc_value')->get();
+        $drivers = Driver::select('pk_driver', 'drivername')->get();
+        $carriers = Companies::where('Notes', 'YM')->select('pk_company', 'CoName')->get();
+        $locations = Companies::where('Notes', 'YM')->select('pk_company', 'CoName')->get();
+        $availabilityindicator = GenericCatalog::where('gntc_group', 'AVAILABILITY_INDICATOR')->where('gntc_status', 1)->select('gnct_id', 'gntc_value')->get();
+
+        return response()->json([
+            'current_status' => $currentstatus,
+            'shipment_types' => $shipmenttypes,
+            'security_companies' => $securitycompanies,
+            'drivers' => $drivers,
+            'carriers' => $carriers,
+            'locations' => $locations,
+            'availability_indicator' => $availabilityindicator,
+        ]);
+    }
+    return redirect('/login');
+    }
+
 
     
     //Sacar todos los Availability Indicators

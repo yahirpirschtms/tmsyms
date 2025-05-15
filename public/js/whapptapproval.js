@@ -113,7 +113,66 @@ $(document).ready(function () {
     var selectedDoorNumberswheta = [];
     var isDoorNumberLoadedwheta = false; // Bandera para controlar la carga
 
-    loadDoorNumberWHETAOnce();
+    var isGenericCatalogsLoadedwheta = false; // Bandera para controlar la carga de la nueva funcion 
+    loadInfoGenericCatalogs();
+
+    function loadInfoGenericCatalogs(){
+        if (isGenericCatalogsLoadedwheta) return; // Evita cargar dos veces
+
+        $.ajax({
+            url: 'getInfoGeneric',
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                var doorNumbersData = data.door_numbers.map(item => ({
+                    id: item.gnct_id,
+                    text: item.gntc_value
+                }));
+                data.door_numbers.forEach(function (doornumber) {
+                    if (!selectedDoorNumberswheta.includes(doornumber.gntc_value)) {
+                        selectedDoorNumberswheta.push(doornumber.gntc_value); // Agregar al arreglo si no está ya
+                    }
+                });
+
+                let container = $('#ShipmentTypeCheckboxContainer');
+                container.empty();  // Limpiar cualquier contenido previo
+    
+                if (data.shipment_types.length === 0) {
+                    container.append('<p>No options available</p>');
+                } else {
+                    data.shipment_types.forEach(item => {
+                        // Crear un checkbox por cada ubicación
+                        container.append(`
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="${item.gnct_id}" id="shipmenttypecheckbox${item.gnct_id}">
+                                <label class="form-check-label" for="shipmenttypecheckbox${item.gnct_id}">
+                                    ${item.gntc_value}
+                                </label>
+                            </div>
+                        `);
+                    });
+                }
+
+                console.log("Door Numbers cargados desde la base de datos:", selectedDoorNumberswheta);
+
+                $('#whetainputapproveddoornumber').select2({
+                    placeholder: 'Select a Door Number',
+                    allowClear: true,
+                    tags: false, // Permite agregar nuevas opciones
+                    data: doorNumbersData, // Pasar los datos directamente
+                    dropdownParent: $('#whetaapprovaloffcanvas'),
+                    minimumInputLength: 0
+                });
+    
+                isGenericCatalogsLoadedwheta = true; // Marcar como cargado
+            },
+            error: function (xhr, status, error) {
+                console.error('Error al cargar los catalogos:', error);
+            }
+        });
+    }
+
+    //loadDoorNumberWHETAOnce();
 
     function loadDoorNumberWHETAOnce() {
         if (isDoorNumberLoadedwheta) return; // Evita cargar dos veces
@@ -291,7 +350,7 @@ $(document).ready(function () {
     /*$('#closeapplyshipmenttypefiltercheckbox').one('click', function () {
         loadShypmentTypesFilterCheckbox();
     });*/
-    loadShypmentTypesFilterCheckbox();
+    //loadShypmentTypesFilterCheckbox();
 
     // Obtenemos los elementos
     const updatetab = document.getElementById("refreshwhetapprovaltable");

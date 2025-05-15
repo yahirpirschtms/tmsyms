@@ -1,15 +1,250 @@
+var selectedShipmentTypes = []; // Array para almacenar los nombres de 'shipment types'
+var selectedCurrentStatus = []; // Array para almacenar los nombres de 'current status'
+var selectedSecurityCompanies = []; // Array para almacenar los nombres de 'current status'
+var selectedDrivers = []; // Arreglo para almacenar todos los drivers seleccionados
+var selectedCarriers = []; // Arreglo para almacenar todos los carriers seleccionados
+var selectedTrailerOwners = []; // Arreglo para almacenar todos los Trailer Owners seleccionados
+var shipmentTypeData = null;
+var currenStatusData = null;
+var securityCompaniesData = null;
+var driversData = null;
+var carriersData = null;
+var trailerOwnersData = null;
 
 $(document).ready(function () {
+    var selectedCarrierId = $('#inputshipmentcarrier').data('carrier');
+    var selectedTrailerId = $('#inputshipmenttrailer').data('trailerowner');
+    var isGeneralCatalogLoaded = false;
+    //funcion nutrir los diferentes selects 
+    function loadGeneralcatalogs(){
+        if (isGeneralCatalogLoaded) return; // Evita cargar dos veces
+
+        $.ajax({
+            url: 'getLoadInfo',
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                //Cargar los shipment type
+                shipmentTypeData = data.shipment_types.map(item => ({
+                    id: item.gnct_id,
+                    text: item.gntc_value
+                }));
+                // Asegurarse de que no haya duplicados en 'shipment_type'
+                data.shipment_types.forEach(function (type) {
+                    if (!selectedShipmentTypes.includes(type.gntc_value)) {
+                        selectedShipmentTypes.push(type.gntc_value); // Agregar al arreglo si no está ya
+                    }
+                });
+                console.log("Shipment Type cargados:", selectedShipmentTypes);
+
+                let selectShipmentType = $('#inputshipmentshipmenttype');
+                let selectedValueShipmenttype = selectShipmentType.val();
+
+                // Inicializar Select2 para 'inputshipmentshipmenttype'
+                $('#inputshipmentshipmenttype').select2({
+                    placeholder: 'Select a shipment type',
+                    allowClear: false,
+                    tags: false,
+                    data: shipmentTypeData, // Los datos cargados desde el backend
+                    //dropdownParent: $('#neweditcfsproject'),
+                    minimumInputLength: 0
+                });
+
+                if (selectedValueShipmenttype) {
+                    selectShipmentType.val(selectedValueShipmenttype); // Restaura el valor anterior
+                }
+                //Cargar los current status
+                currenStatusData = data.current_status.map(item => ({
+                    id: item.gnct_id,
+                    text: item.gntc_value
+                }));
+                // Asegurarse de que no haya duplicados en 'current_status'
+                data.current_status.forEach(function (status) {
+                    if (!selectedCurrentStatus.includes(status.gntc_value)) {
+                        selectedCurrentStatus.push(status.gntc_value); // Agregar al arreglo si no está ya
+                    }
+                });
+                console.log("Current Status cargados:", selectedCurrentStatus);
+
+                let selectCurrentStatus = $('#inputshipmentcurrentstatus');
+                let currentValueCurrentStatus = selectCurrentStatus.val(); // Valor actual seleccionado por el usuario
+                let initialValueCurrentStatus = selectCurrentStatus.attr('value'); // Valor inicial definido en el HTML
+                let selectedValueCurrentStatus = currentValueCurrentStatus || initialValueCurrentStatus;
+
+                if (!selectedValueCurrentStatus) {
+                    selectCurrentStatus.append('<option selected disabled hidden></option>');
+                }
+        
+                if (data.current_status.length === 0) {
+                    select.append('<option disabled>No options available</option>');
+                } else {
+                    // Inicializar Select2 para 'inputshipmentcurrentstatus'
+                    $('#inputshipmentcurrentstatus').select2({
+                        placeholder: 'Select a Status',
+                        allowClear: false,
+                        tags: false,
+                        data: currenStatusData, // Los datos cargados desde el backend
+                        //dropdownParent: $('#neweditcfsproject'),
+                        minimumInputLength: 0
+                    });
+
+                    setDefaultCurrentStatus();
+                }
+                //Cargar las security companies
+                securityCompaniesData = data.security_companies.map(item => ({
+                    id: item.gnct_id,
+                    text: item.gntc_value
+                }));
+                // Asegurarse de que no haya duplicados en 'security companies'
+                data.security_companies.forEach(function (companie) {
+                    if (!selectedSecurityCompanies.includes(companie.gntc_value)) {
+                        selectedSecurityCompanies.push(companie.gntc_value); // Agregar al arreglo si no está ya
+                    }
+                });
+                console.log("Security Companies cargados:", selectedSecurityCompanies);
+
+                // Inicializar Select2 sin AJAX
+                $('#inputshipmentsecuritycompany').select2({
+                    placeholder: 'Select a Security Company',
+                    allowClear: true,
+                    tags: false, // Permite agregar nuevas opciones
+                    data: securityCompaniesData, // Pasar los datos directamente
+                    minimumInputLength: 0
+                });
+                //Cargar las drivers
+                driversData = data.drivers.map(item => ({
+                    id: item.pk_driver,
+                    text: item.drivername
+                }));
+                // Asegurarse de que no haya duplicados en 'drivers'
+                data.drivers.forEach(function (driver) {
+                    if (!selectedDrivers.includes(driver.drivername)) {
+                        selectedDrivers.push(driver.drivername); // Agregar al arreglo si no está ya
+                    }
+                });
+                console.log("Drivers cargados:", selectedDrivers);
+
+                $('#inputshipmentdriver').select2({
+                    placeholder: 'Select or enter a New Driver',
+                    allowClear: true,
+                    tags: true, // Permite agregar nuevas opciones
+                    data: driversData, // Pasar los datos directamente
+                    minimumInputLength: 0
+                });
+
+                //Cargar los carriers
+                carriersData = data.carriers.map(item => ({
+                    id: item.pk_company,
+                    text: item.CoName
+                }));
+                // Asegurarse de que no haya duplicados en Carriers'
+                data.carriers.forEach(function (carrier) {
+                    if (!selectedCarriers.includes(carrier.CoName)) {
+                        selectedCarriers.push(carrier.CoName); // Agregar al arreglo si no está ya
+                    }
+                });
+                console.log("Carriers cargados:", selectedCarriers);
+                
+                $('#inputshipmentcarrier').select2({
+                    placeholder: 'Select a Carrier',
+                    allowClear: true,
+                    tags: false, // Permite agregar nuevas opciones
+                    data: carriersData, // Pasar los datos directamente
+                    minimumInputLength: 0
+                });
+
+                let carrier = carriersData.find(item => item.id == selectedCarrierId);
+                if (carrier) {
+                    let exists = $('#inputshipmentcarrier option[value="' + carrier.id + '"]').length > 0;
+                    if (!exists) {
+                        let newOption = new Option(carrier.text, carrier.id, true, true);
+                        $('#inputshipmentcarrier').append(newOption).trigger('change');
+                    } else {
+                        $('#inputshipmentcarrier').val(carrier.id).trigger('change');
+                    }
+                }
+
+                //Cargar los Trailer Owners
+                trailerOwnersData = data.trailer_owners.map(item => ({
+                    id: item.pk_company,
+                    text: item.CoName
+                }));
+                // Asegurarse de que no haya duplicados en Carriers'
+                data.trailer_owners.forEach(function (trailer) {
+                    if (!selectedTrailerOwners.includes(trailer.CoName)) {
+                        selectedTrailerOwners.push(trailer.CoName); // Agregar al arreglo si no está ya
+                    }
+                });
+                console.log("Trailer Owners cargados:", selectedTrailerOwners);
+
+                // Inicializar Select2 sin AJAX
+                $('#inputshipmenttrailer').select2({
+                    placeholder: 'Select a Trailer Owner',
+                    allowClear: true,
+                    tags: false, // Permite agregar nuevas opciones
+                    data: trailerOwnersData, // Pasar los datos directamente
+                    minimumInputLength: 0
+                });
+
+                let trailer = trailerOwnersData.find(item => item.id == selectedTrailerId);
+                if (trailer) {
+                    let exists = $('#inputshipmenttrailer option[value="' + trailer.id + '"]').length > 0;
+                    if (!exists) {
+                        let newOption = new Option(trailer.text, trailer.id, true, true);
+                        $('#inputshipmenttrailer').append(newOption).trigger('change');
+                    } else {
+                        $('#inputshipmenttrailer').val(trailer.id).trigger('change');
+                    }
+                }
+
+                isGeneralCatalogLoaded = true; // Marcar como cargado
+            },
+            error: function (xhr, status, error) {
+                console.error('Error al cargar los catálogos:', error);
+            }
+        });
+    }
+    loadGeneralcatalogs();
+
+    function setDefaultCurrentStatus() {
+        let prealerted = false;
+        let driverAssigned = false;
+
+        // Buscar los valores
+        currenStatusData.forEach(item => {
+            if (item.text === 'Prealerted' && !prealerted) {
+                prealerted = true;
+            }
+            if (item.text === 'Driver Assigned' && !driverAssigned) {
+                driverAssigned = true;
+            }
+        });
+
+        let driverValue = $('#inputshipmentdriver').val();
+        const select = $('#inputshipmentcurrentstatus');
+
+        if (driverValue && driverAssigned) {
+            const driverAssignedItem = currenStatusData.find(item => item.text === 'Driver Assigned');
+            if (driverAssignedItem) {
+                select.val(driverAssignedItem.id).trigger('change');
+            }
+        } else if (!driverValue && prealerted) {
+            const prealertedItem = currenStatusData.find(item => item.text === 'Prealerted');
+            if (prealertedItem) {
+                select.val(prealertedItem.id).trigger('change');
+            }
+        }
+    }
+
     //Funcion para buscar el shipmenttype en la pantalla de empty trailer update
     function loadShipmentType() {
-        var availabilityRoute = $('#inputshipmentshipmenttype').data('url');
+        var shipmentTypeRoute = $('#inputshipmentshipmenttype').data('url');
           $.ajax({
-              url: availabilityRoute,
+              url: shipmentTypeRoute,
               method: 'GET',
               success: function (data) {
                   let select = $('#inputshipmentshipmenttype');
                   let selectedValue = select.val();
-                  //let selectedValue = "{{ old('inputavailabilityindicator') }}"; // Recupera el valor previo
                   select.empty(); // Limpia el select eliminando todas las opciones
                   //select.append('<option selected disabled hidden></option>'); // Opción inicial
 
@@ -32,7 +267,7 @@ $(document).ready(function () {
     }
 
     //$('#inputshipmentshipmenttype').on('focus', loadShipmentType);
-    loadShipmentType();
+    //loadShipmentType();
 
     //carga de los current status
     function LoadCurrentStatus() {
@@ -95,16 +330,16 @@ $(document).ready(function () {
     }
     
     // Ejecutar la función al enfocar el select y al cargar la página
-    $('#inputshipmentcurrentstatus').on('focus', LoadCurrentStatus);
-    $('#inputshipmentdriver').on('change', LoadCurrentStatus);
-    LoadCurrentStatus();
+    $('#inputshipmentcurrentstatus').on('focus', setDefaultCurrentStatus);
+    $('#inputshipmentdriver').on('change', setDefaultCurrentStatus);
+    //LoadCurrentStatus();
 
     //Busqueda de Driver en un nuevo registro
     var selectedsecuritycompanies = []; // Arreglo para almacenar todos los drivers seleccionados
 
     var isSecurityCompaniesLoaded = false; // Bandera para controlar la carga
 
-    loadSecurityCompaniesOnce();
+    //loadSecurityCompaniesOnce();
     
     function loadSecurityCompaniesOnce() {
         if (isSecurityCompaniesLoaded) return; // Evita cargar dos veces
@@ -143,13 +378,10 @@ $(document).ready(function () {
     }
 
     //Busqueda de Driver en un nuevo registro
-    var carrierRoute = $('#inputshipmentdriver').data('url');
-    var newlyCreatedCarrierId = null; // Variable para almacenar el ID del carrier recién creado
-    var selectedDrivers = []; // Arreglo para almacenar todos los drivers seleccionados
-
+    var newlyCreatedDriverId = null; // Variable para almacenar el ID del carrier recién creado
     var isDriversLoaded = false; // Bandera para controlar la carga
 
-    loadDriversOnce();
+    //loadDriversOnce();
     
     function loadDriversOnce() {
         if (isDriversLoaded) return; // Evita cargar dos veces
@@ -167,7 +399,7 @@ $(document).ready(function () {
                     if (!selectedDrivers.includes(driver.drivername)) {
                         selectedDrivers.push(driver.drivername); // Agregar al arreglo si no está ya
                     }
-                });
+                }); 
                 console.log("Drivers cargados desde la base de datos:", selectedDrivers);
     
                 // Inicializar Select2 sin AJAX
@@ -252,7 +484,7 @@ $(document).ready(function () {
         var selectedText = selectedOption ? selectedOption.text : ''; // Obtener el texto (nombre) de la opción seleccionada
 
         // Si no es el nuevo carrier, lo procesamos
-        if (selectedText  !== newlyCreatedCarrierId &&  selectedText.trim() !== '') {
+        if (selectedText  !== newlyCreatedDriverId &&  selectedText.trim() !== '') {
             console.log(selectedText);
             //saveNewDriver(selectedText);
             if (!selectedDrivers.includes(selectedText)) {
@@ -285,14 +517,14 @@ $(document).ready(function () {
                 $('#inputshipmentdriver').val(response.newDriver.pk_driver).trigger('change');
 
                 // Marcar el nuevo ID para evitar que se haga otra solicitud
-                newlyCreatedCarrierId = response.newDriver.drivername;
+                newlyCreatedDriverId = response.newDriver.drivername;
 
                 // Cuando el nuevo carrier sea creado, aseguramos que no se haga más AJAX para este carrier
                 $('#inputshipmentdriver').on('select2:select', function (e) {
                     var selectedId = e.params.data.id;
-                    if (selectedId === newlyCreatedCarrierId) {
+                    if (selectedId === newlyCreatedDriverId) {
                         // Evitar que se reenvíe la solicitud para el nuevo carrier
-                        newlyCreatedCarrierId = null;  // Restablecer el ID del carrier creado
+                        newlyCreatedDriverId = null;  // Restablecer el ID del carrier creado
                     }
                 });
             },
@@ -420,33 +652,143 @@ $(document).ready(function () {
         
     }
 
+    //Manejo para nuevos carries 
+    var newlyCreatedCarrierId = null;
+
+    // Cuando el usuario seleccione o ingrese un nuevo valor
+    $('#inputshipmentcarrier').on('change', function () {
+        var selectedOption = $(this).select2('data')[0]; // Obtener la opción seleccionada
+        var selectedText = selectedOption ? selectedOption.text : ''; // Obtener el texto (nombre) de la opción seleccionada
+        
+        // Si no es el nuevo carrier, lo procesamos
+        if (selectedText !== newlyCreatedCarrierId &&  selectedText.trim() !== '') {
+            console.log(selectedText);
+            if (!selectedCarriers.includes(selectedText)) {
+                selectedCarriers.push(selectedText);  // Agregar al arreglo solo si no existe
+                console.log(selectedCarriers);  // Mostrar el arreglo con todos los carrier seleccionados
+                saveNewCarrierShipment(selectedText);
+            }
+            if (!selectedTrailerOwners.includes(selectedText)) {
+                selectedTrailerOwners.push(selectedText);  
+                console.log(selectedTrailerOwners); 
+            }
+        }
+    });
+
+    // Guardar un nuevo carrier en la base de datos
+    function saveNewCarrierShipment(carrierName) {
+        $.ajax({
+            url: '/save-new-carrier',  // Ruta que manejará el backend
+            type: 'POST',
+            data: {
+                carrierName: carrierName,
+                _token: $('meta[name="csrf-token"]').attr('content')  // Asegúrate de incluir el CSRF token
+            },
+            success: function (response) {
+                console.log(response);
+
+                // Crear una nueva opción para el select2 con el nuevo carrier
+                var newOption = new Option(response.newCarrier.CoName, response.newCarrier.pk_company, true, true);
+                var newOption1 = new Option(response.newCarrier.CoName, response.newCarrier.pk_company, false, false);
+
+                // Agregar la nueva opción al select2
+                $('#inputshipmentcarrier').append(newOption).trigger('change');
+                // Agregar la nueva opción al select2
+                $('#inputshipmenttrailer').append(newOption1);
+
+                // Seleccionar el nuevo carrier automáticamente
+                $('#inputshipmentcarrier').val(response.newCarrier.pk_company).trigger('change');
+
+                // Marcar el nuevo ID para evitar que se haga otra solicitud
+                newlyCreatedCarrierId = response.newCarrier.CoName;
+                //loadCarriersShipment();
+
+                // Cuando el nuevo carrier sea creado, aseguramos que no se haga más AJAX para este carrier
+                $('#inputshipmentcarrier').on('select2:select', function (e) {
+                    var selectedId = e.params.data.id;
+                    if (selectedId === newlyCreatedCarrierId) {
+                        // Evitar que se reenvíe la solicitud para el nuevo carrier
+                        newlyCreatedCarrierId = null;  // Restablecer el ID del carrier creado
+                    }
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error('Error al guardar el carrier', error);
+            }
+        });
+    }
+
+    //Manejo para nuevos trailers 
+    var newlyCreatedTrailerId = null;
+
+    $('#inputshipmenttrailer').on('change', function () {
+        var selectedOption = $(this).select2('data')[0]; // Obtener la opción seleccionada
+        var selectedText = selectedOption ? selectedOption.text : ''; // Obtener el texto (nombre) de la opción seleccionada
+
+        if (selectedText !== newlyCreatedTrailerId &&  selectedText.trim() !== '') {
+            console.log(selectedText);
+            if (!selectedTrailerOwners.includes(selectedText)) {
+                selectedTrailerOwners.push(selectedText);  
+                console.log(selectedTrailerOwners); 
+                saveNewTrailerOwnerShipment(selectedText);
+            }
+            if (!selectedCarriers.includes(selectedText)) {
+                selectedCarriers.push(selectedText);  // Agregar al arreglo solo si no existe
+                console.log(selectedCarriers);  // Mostrar el arreglo con todos los carrier seleccionados
+            }
+        }
+    });
+
+    function saveNewTrailerOwnerShipment(carrierName) {
+        $.ajax({
+            url: '/save-new-trailerowner',  // Ruta que manejará el backend
+            type: 'POST',
+            data: {
+                carrierName: carrierName,
+                _token: $('meta[name="csrf-token"]').attr('content')  // Asegúrate de incluir el CSRF token
+            },
+            success: function (response) {
+                console.log(response);
+
+                // Crear una nueva opción para el select2 con el nuevo carrier
+                var newOption = new Option(response.newCarrier.CoName, response.newCarrier.pk_company, true, true);
+                var newOption1 = new Option(response.newCarrier.CoName, response.newCarrier.pk_company, false, false);
+
+                // Agregar la nueva opción al select2
+                $('#inputshipmenttrailer').append(newOption).trigger('change');
+                // Agregar la nueva opción al select2
+                $('#inputshipmentcarrier').append(newOption1);
+
+                // Seleccionar el nuevo carrier automáticamente
+                $('#inputshipmenttrailer').val(response.newCarrier.pk_company).trigger('change');
+
+                // Marcar el nuevo ID para evitar que se haga otra solicitud
+                newlyCreatedTrailerId = response.newCarrier.CoName;
+                //loadTrailerOwnersShipment();
+
+                // Cuando el nuevo carrier sea creado, aseguramos que no se haga más AJAX para este carrier
+                $('#inputshipmenttrailer').on('select2:select', function (e) {
+                    var selectedId = e.params.data.id;
+                    if (selectedId === newlyCreatedTrailerId) {
+                        // Evitar que se reenvíe la solicitud para el nuevo carrier
+                        newlyCreatedTrailerId = null;  // Restablecer el ID del carrier creado
+                    }
+                });
+            },
+            error: function (xhr, status, error) {
+                console.error('Error al guardar el Trailer Owner', error);
+            }
+        });
+    }
 });
 
 //Cargar Carries en la pantalla de registro de shipments
 $(document).ready(function () {
-    var selectedCarriers = []; // Arreglo para almacenar todos los carriers seleccionados
-    /*$.ajax({
-        url: 'carrier-emptytrailerAjax',  // Ruta que manejará la carga de los drivers existentes
-        type: 'GET',
-        dataType: 'json',
-        success: function (data) {
-            data.forEach(function (carrier) {
-                if (!selectedCarriers.includes(carrier.CoName)) {
-                    selectedCarriers.push(carrier.CoName); // Agregar al arreglo si no está ya
-                }
-            });
-            console.log("Carriers cargados desde la base de datos:", selectedCarriers);
-        },
-        error: function (xhr, status, error) {
-            console.error('Error al cargar los Carriers existentes:', error);
-        }
-    });*/
-
     var newlyCreatedCarrierId = null; // Asegúrate de que esta variable esté definida al inicio
     var carrierRoute = $('#inputshipmentcarrier').data('url');
     var selectedCarrierId = $('#inputshipmentcarrier').data('carrier'); // Recuperar el valor predeterminado
     console.log(selectedCarrierId)
-    if (selectedCarrierId) {
+    /*if (selectedCarrierId) {
         console.log(selectedCarrierId)
         $.ajax({
             url: 'carrier-emptytrailerAjax', // Llamamos a la misma API de carriers
@@ -469,11 +811,11 @@ $(document).ready(function () {
                 });
             }
         });
-    }
+    }*/
 
     var isCarriersLoaded = false; // Bandera para controlar la carga
     
-    loadCarriersShipmentOnce();
+    //loadCarriersShipmentOnce();
 
     function loadCarriersShipmentOnce() {
         if (isCarriersLoaded) return; // Evita cargar dos veces
@@ -555,7 +897,7 @@ $(document).ready(function () {
     });*/
 
     // Cuando el usuario seleccione o ingrese un nuevo valor
-    $('#inputshipmentcarrier').on('change', function () {
+    /*$('#inputshipmentcarrier').on('change', function () {
         var selectedOption = $(this).select2('data')[0]; // Obtener la opción seleccionada
         var selectedText = selectedOption ? selectedOption.text : ''; // Obtener el texto (nombre) de la opción seleccionada
         
@@ -569,10 +911,10 @@ $(document).ready(function () {
                 saveNewCarrierShipment(selectedText);
             }
         }
-    });
+    });*/
 
     // Guardar un nuevo carrier en la base de datos
-    function saveNewCarrierShipment(carrierName) {
+    /*function saveNewCarrierShipment(carrierName) {
         $.ajax({
             url: '/save-new-carrier',  // Ruta que manejará el backend
             type: 'POST',
@@ -609,7 +951,7 @@ $(document).ready(function () {
                 console.error('Error al guardar el carrier', error);
             }
         });
-    }
+    }*/
 });
 
 //Cargar Origins en la pantalla de registro de shipments
@@ -766,7 +1108,6 @@ $(document).ready(function () {
 
 //Cargar TrailerOwners en la pantalla de registro de shipments
 $(document).ready(function () {
-    var selectedTrailerOwners = []; // Arreglo para almacenar todos los Trailer Owners seleccionados
     /*$.ajax({
         url: 'trailerowner-emptytrailerAjax',  // Ruta que manejará la carga de los drivers existentes
         type: 'GET',
@@ -789,7 +1130,7 @@ $(document).ready(function () {
     var selectedCarrierId = $('#inputshipmenttrailer').data('trailerowner'); // Recuperar el valor predeterminado
     console.log(selectedCarrierId);
 
-    if (selectedCarrierId) {
+    /*if (selectedCarrierId) {
         console.log(selectedCarrierId)
         $.ajax({
             url: 'trailerowner-emptytrailerAjax', // Llamamos a la misma API de carriers
@@ -812,11 +1153,11 @@ $(document).ready(function () {
                 });
             }
         });
-    }
+    }*/
 
     var isTrailerOwnersLoaded = false; // Bandera para controlar la carga
     
-    loadTrailerOwnersShipmentOnce();
+    //loadTrailerOwnersShipmentOnce();
 
     function loadTrailerOwnersShipmentOnce() {
         if (isTrailerOwnersLoaded) return; // Evita cargar dos veces
@@ -955,35 +1296,6 @@ $(document).ready(function () {
         });
     }
 });
-
-//Cargar destinations 
-$(document).ready(function () {
-    /*$('#inputshipmentdestination').select2({
-        placeholder: "Select a destination",
-        //allowClear: true,
-        ajax: {
-            url: $('#inputshipmentdestination').data('url'),
-            dataType: 'json',
-            delay: 250, // Evita demasiadas peticiones
-            data: function (params) {
-                return {
-                    query: params.term // Lo que el usuario está escribiendo
-                };
-            },
-            processResults: function (data) {
-                return {
-                    results: data.map(item => ({
-                        id: item.pk_company,
-                        text: item.CoName
-                    }))
-                };
-            },
-            cache: true
-        },
-        minimumInputLength: 0 // Mínimo de caracteres antes de buscar
-    });*/
-});
-
 
 $(document).ready(function() {
  
