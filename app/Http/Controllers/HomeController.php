@@ -131,7 +131,7 @@ if (Auth::check()) {
         // Validar los datos enviados
         $validated = $request->validate([
             'updateinputpktrailer' => 'required', // pk_trailer
-            //'updateinputidtrailer' => 'required|unique:empty_trailer,trailer_num',
+            'updateinputidtrailer' => 'required',
             'updateinputdateofstatus' => 'required|date', // status
             'updateinputpalletsontrailer' => 'nullable|numeric', // pallets_on_trailer
             'updateinputpalletsonfloor' => 'nullable|numeric', // pallets_on_floor
@@ -140,7 +140,7 @@ if (Auth::check()) {
             'updateinputlocation' => 'required', // location
             'updateinputdatein' => 'required|date', // date_in
         ], [
-            //'updateinputidtrailer.required' => 'ID Trailer is required.',
+            'updateinputidtrailer.required' => 'ID Trailer is required.',
             //'updateinputidtrailer.unique' => 'The trailer number has already been taken.',
             'updateinputdateofstatus.required' => 'Status date is required.',
             'updateinputdateofstatus.date' => 'The status date field must be a valid date.',
@@ -162,7 +162,7 @@ if (Auth::check()) {
 
         // Mapear los datos del formulario a los nombres de las columnas
         $dataToUpdate = [
-            //'trailer_num' => $validated['updateinputidtrailer'],
+            'trailer_num' => $validated['updateinputidtrailer'],
             'status' => Carbon::createFromFormat('m/d/Y', $validated['updateinputdateofstatus'])->format('Y-m-d'),
             'pallets_on_trailer' => $validated['updateinputpalletsontrailer'],
             'pallets_on_floor' => $validated['updateinputpalletsonfloor'],
@@ -242,7 +242,7 @@ return redirect('/login');
         // Validaciones
         $validated = $request->validate([
 
-            'inputidtrailer' => 'required|unique:empty_trailer,trailer_num',
+            'inputidtrailer' => 'required',
             'inputdateofstatus' => 'required|date',
             'inputpalletsontrailer' => 'nullable|numeric',
             'inputpalletsonfloor' => 'nullable|numeric',
@@ -255,7 +255,7 @@ return redirect('/login');
             'inputusername' => 'nullable',
         ], [
             'inputidtrailer.required' => 'ID Trailer is required.',
-            'inputidtrailer.unique' => 'The trailer number has already been taken.',
+            //'inputidtrailer.unique' => 'The trailer number has already been taken.',
             //'inputidtrailer.string' => 'The Trailer ID field must be a text string.',
             //'inputidtrailer.max' => 'The Trailer ID field cannot exceed 50 characters.',
             'inputdateofstatus.required' => 'Status date is required.',

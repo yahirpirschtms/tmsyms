@@ -160,10 +160,10 @@ class Shipments extends Model
     }
 
     // Relación con la tabla `empty_trailer`
-    public function emptytrailer()
+    /*public function emptytrailer()
     {
         return $this->belongsTo(EmptyTrailer::class, 'id_trailer', 'trailer_num');
-    }
+    }*/
 
     // Relación con la tabla `companies`
     public function origin()

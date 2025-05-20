@@ -609,7 +609,7 @@
                                             <div class="mb-3">
                                                 <label for="updateinputidtrailer" class="form-label">ID Trailer</label>
 
-                                                <input disabled type="text" class="form-control" id="updateinputidtrailer" name="updateinputidtrailer" value="{{ old('updateinputidtrailer') }}">
+                                                <input type="text" class="form-control" id="updateinputidtrailer" name="updateinputidtrailer" value="{{ old('updateinputidtrailer') }}">
 
                                                 <div class="invalid-feedback" id="error-updateinputidtrailer"></div>
                                             </div>
