@@ -10,6 +10,7 @@ use App\Models\Facilities;
 use App\Models\Driver;
 use App\Models\SealsHistory;
 use App\Models\TruckHistory;
+use App\Models\LateReason;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -63,14 +64,16 @@ class ShipmentController extends Controller
             $shipmentType = GenericCatalog::where('gntc_group', 'SHIPMENT_TYPE')->get();
 
             // Obtener todas las compañías para los selects
+            $lateReasons = LateReason::where('group', 'LATE_REASON_TRSP_MEX')->where('status', 1)->get();
             $companies = Companies::where('notes', 'ym')->get();
+            $securityCompanies = GenericCatalog::where('gntc_group', 'SEC_COMPANY')->get();
 
             $facilities = Facilities::all();
             $trailers = EmptyTrailer::all();
             $drivers = Driver::all();
 
             // Pasar los datos a la vista
-            return view('home.all-shipments', compact('shipments', 'currentStatus', 'shipmentType', 'companies', 'facilities', 'trailers', 'drivers'));
+            return view('home.all-shipments', compact('shipments', 'currentStatus', 'shipmentType', 'companies', 'facilities', 'trailers', 'drivers', 'lateReasons','securityCompanies' ));
         }
 
         return redirect('/login');
@@ -110,6 +113,8 @@ public function liveshipmentsshow()
         // Obtener la lista de compañías de seguridad
         $securityCompanies = GenericCatalog::where('gntc_group', 'SEC_COMPANY')->get();
 
+        $lateReasons = LateReason::where('group', 'LATE_REASON_TRSP_MEX')->where('status', 1)->get();
+
         // Pasar los datos a la vista
         return view('home.liveshipments', compact(
             'shipments',
@@ -119,7 +124,8 @@ public function liveshipmentsshow()
             'facilities',
             'trailers',
             'drivers',
-            'securityCompanies'
+            'securityCompanies',
+            'lateReasons'
         ));
     }
 
@@ -208,7 +214,8 @@ public function liveshipmentsshow()
                 'dock_door_date' => 'nullable|string',
                 'door_number' => 'nullable|string',
                 'lane' => 'nullable|string',
-                'security_company' => 'nullable|integer'
+                'security_company' => 'nullable|integer',
+                'late_reason' => 'nullable|string'
             ]);
 
 
@@ -385,7 +392,7 @@ public function liveshipmentsshow()
             'inputshipmentdestination' => 'required',
             'inputshipmentprealertdatetime' => 'required|date',
             //'inputidtrailer' => 'required|unique:shipments,id_trailer|exists:empty_trailer,trailer_num',
-            'inputidtrailer' => 'required|unique:shipments,id_trailer',
+            'inputidtrailer' => 'required',
             //'inputshipmentcarrier' => 'required|exists:companies,pk_company',
             'inputshipmentcarrier' => 'nullable',
             'inputshipmenttrailer' => 'nullable',
@@ -481,7 +488,7 @@ public function liveshipmentsshow()
                 'location' => $request->inputorigin,
                 'date_in' => now(),
                 'username' => Auth::check() ? Auth::user()->username : 'system',
-                'availability' => 'Used',
+                //'availability' => 'Used',
                 'date_out' => now(), // Establece la fecha y hora actual
                 'transaction_date' => now() // También aquí
             ]
@@ -495,11 +502,25 @@ public function liveshipmentsshow()
                 'carrier' => $request->inputshipmentcarrier,
                 'location' => $request->inputorigin,
                 'username' => Auth::check() ? Auth::user()->username : 'system',
-                'availability' => 'Used',
+                //'availability' => 'Used',
                 'date_out' => now(),
                 'transaction_date' => now(),
             ]);
         }
+        /*$trailer = EmptyTrailer::create([
+            'trailer_num' => $request->inputidtrailer,
+            'status' => now(),
+            'pallets_on_trailer' => $request->inputpallets ?? 0,
+            'pallets_on_floor' => null,
+            'carrier' => $request->inputshipmentcarrier,
+            'gnct_id_availability_indicator' => null,
+            'location' => $request->inputorigin,
+            'date_in' => now(),
+            'username' => Auth::check() ? Auth::user()->username : 'system',
+            'availability' => 'Used',
+            'date_out' => now(),
+            'transaction_date' => now()
+        ]);*/
 
         // Obtener la fecha y hora actual
         $currentDateTime = now(); // Usa `now()` para obtener la fecha y hora actuales en Laravel
@@ -566,7 +587,7 @@ public function liveshipmentsshow()
 
     public function indexwhapptapproval(){
         if (Auth::check()) {
-            $shipments = Shipments::with(['shipmenttype', 'currentstatus', 'origin', 'destinations', 'carrier', 'emptytrailer', 'services', 'driverowner', 'drivers'])
+            $shipments = Shipments::with(['shipmenttype', 'currentstatus', 'origin', 'destinations', 'carrier', /*'emptytrailer',*/ 'services', 'driverowner', 'drivers'])
             /*->whereHas('destinations', function ($query) {
                 $query->where('fac_auth', 1); // Filtrar las relaciones destinations con fac_auth = 1
             })*/
@@ -669,7 +690,7 @@ public function liveshipmentsshow()
             $shipment->update($dataToUpdate);
 
             // return response()->json(['message' => 'Trailer successfully removed'], 200);
-            $shipments = Shipments::with(['shipmenttype', 'currentstatus', 'origin', 'destinations', 'carrier', 'emptytrailer', 'services', 'driverowner', 'drivers'])
+            $shipments = Shipments::with(['shipmenttype', 'currentstatus', 'origin', 'destinations', 'carrier', /*'emptytrailer',*/ 'services', 'driverowner', 'drivers'])
             ->whereNull('wh_auth_date')
             ->whereHas('destinations', function ($query) {
                 $query->join('facilities', 'companies.CoName', '=', 'facilities.fac_name')
@@ -696,7 +717,7 @@ public function liveshipmentsshow()
 
     public function getShipmentswh(Request $request){
     if (Auth::check()) {
-        $query = Shipments::with(['shipmenttype', 'currentstatus', 'origin', 'destinations', 'carrier', 'emptytrailer', 'services', 'driverowner', 'drivers'])
+        $query = Shipments::with(['shipmenttype', 'currentstatus', 'origin', 'destinations', 'carrier', /*'emptytrailer',*/ 'services', 'driverowner', 'drivers'])
             // Aplicar filtro de 'fac_auth' directamente
             /*->whereHas('destinations', function ($query) {
                     $query->where('fac_auth', 1); // Filtrar las relaciones destinations con fac_auth = 1

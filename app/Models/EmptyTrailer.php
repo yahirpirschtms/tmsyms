@@ -74,10 +74,10 @@ class EmptyTrailer extends Model
         }
 
         // Relación inversa con Shipments
-        public function emptytrailer()
+        /*public function emptytrailer()
         {
             return $this->hasMany(Shipments::class, 'id_trailer', 'trailer_num');
-        }
+        }*/
 
 
         //Convertir Fechas

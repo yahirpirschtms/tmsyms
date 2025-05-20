@@ -2728,7 +2728,7 @@ $(document).ready(function() {
 
     // Función de validación en tiempo real
     const formFields = [
-        //'updateinputidtrailer',
+        'updateinputidtrailer',
         'updateinputdateofstatus',
         'updateinputpalletsontrailer',
         'updateinputpalletsonfloor',
@@ -2797,9 +2797,10 @@ $(document).ready(function() {
                 $(field).siblings(".select2").find(".select2-selection").addClass("is-invalid");
                 field.classList.add('is-invalid');
                 errorElement.textContent = 'Location is required.';
-            }/*else if(field.id === 'updateinputpalletsontrailer'){
-                errorElement.textContent = 'Pallets on trailer are required.';
-            }*/else if(field.id === 'updateinputdateofstatus'){
+            }else if(field.id === 'updateinputidtrailer'){
+                errorElement.textContent = 'ID Trailer is required.';
+                field.classList.add('is-invalid');
+            }else if(field.id === 'updateinputdateofstatus'){
                 field.classList.add('is-invalid');
                 errorElement.textContent = 'Status date is required.';
             }else if(field.id === 'updateinputdatein'){
@@ -2953,9 +2954,10 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
                 $(field).siblings(".select2").find(".select2-selection").addClass("is-invalid");
                 field.classList.add('is-invalid');
                 errorElement.textContent = 'Location is required.';
-            }/*else if(field.id === 'updateinputpalletsontrailer'){
-                errorElement.textContent = 'Pallets on trailer are required.';
-            }*/else if(field.id === 'updateinputdateofstatus'){
+            }else if(field.id === 'updateinputidtrailer'){
+                errorElement.textContent = 'ID Trailer is required.';
+                field.classList.add('is-invalid');
+            }else if(field.id === 'updateinputdateofstatus'){
                 field.classList.add('is-invalid');
                 errorElement.textContent = 'Status date is required.';
             }else if(field.id === 'updateinputdatein'){
