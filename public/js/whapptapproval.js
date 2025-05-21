@@ -633,10 +633,10 @@ $(document).ready(function () {
                 tablewhetaapproval.draw(false); // Redibuja la tabla sin reiniciar la paginación
 
                 // Restaurar la búsqueda y los filtros
-                tablewhetaapproval.search(searchValue).draw(); // Restablece la búsqueda general
+                /*tablewhetaapproval.search(searchValue).draw(); // Restablece la búsqueda general
                 filters.each((value, index) => {
                     if (value) tablewhetaapproval.column(index).search(value).draw(); // Restablece los filtros por columna
-                });
+                });*/
 
                 $(document).off("click", ".clickable-row").on("click", ".clickable-row", function () {
                     const id = $(this).data("id");
