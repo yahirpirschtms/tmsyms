@@ -2096,11 +2096,11 @@ $(document).ready(function() {
 
         // Obtener los valores de los filtros
         // Función para agregar parámetros solo si tienen valor
-        function addParam(key, value) {
+        /*function addParam(key, value) {
             if (value && value.trim() !== '') {  // Solo agregar si tiene un valor
                 params.set(key, value);
             }
-        }
+        }*/
 
         const search = document.getElementById('searchemptytrailergeneral').value;
         const trailerNum = document.getElementById('emptytrailerfilterinputidtrailer').value;
@@ -2120,7 +2120,7 @@ $(document).ready(function() {
         //const transactionDateEnd = document.getElementById('emptytrailerfilterinputendtransactiondate').value;
         
         // Obtener todas las ubicaciones seleccionadas (checkboxes marcados)
-        let selectedLocationsCheckbox = [];
+        /*let selectedLocationsCheckbox = [];
         $('#locationCheckboxContainer input[type="checkbox"]:checked').each(function () {
             selectedLocationsCheckbox.push($(this).val()); // Agrega el ID de la ubicación
         });
@@ -2140,13 +2140,13 @@ $(document).ready(function() {
         });
 
         const indicators = selectedAvailabilityIndicatorCheckbox.join(','); // Convertir array en string separado por comas
-        
+        */
         // Construir la URL con los parámetros de filtro
         const url = new URL(document.getElementById('refreshemptytrailertable').getAttribute('data-url'));
         const params = new URLSearchParams(url.search);
     
         // Agregar solo los parámetros que tienen valor
-        addParam('search', search);
+        /*addParam('search', search);
         addParam('trailer_num', trailerNum);
         addParam('status_start', statusStart);
         addParam('status_end', statusEnd);
@@ -2157,12 +2157,12 @@ $(document).ready(function() {
         addParam('location', location);
         addParam('username', username);
         addParam('date_in_start', dateInStart);
-        addParam('date_in_end', dateInEnd);
+        addParam('date_in_end', dateInEnd);*/
 
         // Agregar los filtros de checkboxes (si están seleccionados)
-        if (locations) params.set('locations', locations);
+        /*if (locations) params.set('locations', locations);
         if (carriers) params.set('carrierscheckbox', carriers);
-        if (indicators) params.set('indicators', indicators);
+        if (indicators) params.set('indicators', indicators);*/
         /*// Agregar los filtros a los parámetros de la URL
         params.set('search', search);
         params.set('trailer_num', trailerNum);
@@ -2192,9 +2192,72 @@ $(document).ready(function() {
 
             // Actualiza la tabla de DataTables
             table.clear(); // Limpia la tabla actual
+            trailersData = {};
 
+            
+                            // Añadir las filas nuevas
+                            data.trailers.forEach(trailer => {
+                                // Guardar los datos actualizados en trailersData
+                                trailersData[trailer.pk_trailer] = trailer;
+                                // Agregar los datos a la tabla sin atributos
+                                const rowNode = table.row.add([
+                                    trailer.trailer_num ?? '',
+                                    trailer.status ?? '',
+                                    trailer.pallets_on_trailer ?? '',
+                                    trailer.pallets_on_floor ?? '',
+                                    trailer.carriers?.CoName ?? '',
+                                    trailer.availability_indicator && trailer.availability_indicator.gntc_description ? trailer.availability_indicator.gntc_description : '',
+                                    trailer.locations?.CoName ?? '',
+                                    trailer.date_in ?? '',
+                                    trailer.username ?? ''
+                                ]).node(); // Esto devuelve el nodo de la fila agregada
+
+                                // Ahora añadimos los atributos a la fila
+                                $(rowNode).attr({
+                                    'id': `trailer-${trailer.pk_trailer}`,
+                                    'class': 'clickable-row',
+                                    'data-bs-toggle': 'offcanvas',
+                                    'data-bs-target': '#emptytrailer',
+                                    'aria-controls': 'emptytrailer',
+                                    'data-id': trailer.pk_trailer
+                                });
+                            });
+                            // Asignar eventos correctamente incluso tras filtros
+                            $(document).off("click", ".clickable-row").on("click", ".clickable-row", function () {
+                                const id = $(this).data("id");
+                                const trailer = trailersData[id];
+
+                                if (trailer) {
+                                    document.getElementById("pk_trailer").textContent = trailer.pk_trailer;
+                                    document.getElementById("offcanvas-id").textContent = trailer.trailer_num;
+                                    document.getElementById("offcanvas-status").textContent = trailer.status;
+                                    document.getElementById("offcanvas-pallets-on-trailer").textContent = trailer.pallets_on_trailer;
+                                    document.getElementById("offcanvas-pallets-on-floor").textContent = trailer.pallets_on_floor;
+                                    document.getElementById("offcanvas-carrier").textContent = trailer.carriers?.CoName ?? '';
+                                    document.getElementById("offcanvas-availability").textContent = trailer.availability_indicator && trailer.availability_indicator.gntc_description ? trailer.availability_indicator.gntc_description : '';
+                                    document.getElementById("offcanvas-location").textContent = trailer.locations?.CoName ?? '';
+                                    document.getElementById("offcanvas-date-in").textContent = trailer.date_in;
+                                    document.getElementById("offcanvas-username").textContent = trailer.username;
+                                    document.getElementById("pk_availability").textContent = trailer.availability_indicator && trailer.availability_indicator.gnct_id ? trailer.availability_indicator.gnct_id : '';
+                                    document.getElementById("pk_location").textContent = trailer.locations?.pk_company ?? '';
+                                    document.getElementById("pk_carrier").textContent = trailer.carriers?.pk_company ?? '';
+                                } else {
+                                    console.error(`No data found for trailer ID ${id}`);
+                                }
+                            });
+
+
+                            // Redibujar la tabla con los nuevos datos
+                            //table.draw();
+                            /*table.draw(false); // Redibuja la tabla sin reiniciar la paginación
+
+                            // Restaurar la búsqueda y los filtros
+                            table.search(searchValue).draw(); // Restablece la búsqueda general
+                            filters.each((value, index) => {
+                                if (value) table.column(index).search(value).draw(); // Restablece los filtros por columna
+                            });*/
                 // Aquí va el código para actualizar trailersData
-                trailersData = data.reduce((acc, trailer) => {
+                /*trailersData = data.reduce((acc, trailer) => {
                     acc[trailer.pk_trailer] = trailer;
                     return acc;
                 }, {});
@@ -2225,36 +2288,7 @@ $(document).ready(function() {
                         'data-id': trailer.pk_trailer
                     });
                     
-                    /*const row = `
-                        <tr id="trailer-${trailer.pk_trailer}" class="clickable-row " 
-                            data-bs-toggle="offcanvas" 
-                            data-bs-target="#emptytrailer" 
-                            aria-controls="emptytrailer" 
-                            data-id="${trailer.pk_trailer ?? '' }">
-                            <td>${trailer.trailer_num ?? '' }</td>
-                            <td>${trailer.status ?? '' }</td>
-                            <td>${trailer.pallets_on_trailer ?? ''}</td>
-                            <td>${trailer.pallets_on_floor ?? ''}</td>
-                            <td>${trailer.carriers?.CoName ?? ''}</td>
-                            <td>${trailer.availability_indicator?.gntc_description ?? ''}</td>
-                            <!--<td>${trailer.locations?.CoName ?? ''}</td>-->
-                            <td>${trailer.date_in ?? '' }</td>
-                            <!-- <td>${trailer.date_out ?? '' }</td> -->
-                            <!-- <td>${trailer.transaction_date ?? '' }</td> -->
-                            <td>${trailer.username ?? '' }</td>
-                        </tr>
-                    `;
-                    tbody.innerHTML += row;*/
                 });
-
-                // Vuelve a agregar los listeners de clic después de actualizar la tabla
-                /*const rows = document.querySelectorAll(".clickable-row");
-                rows.forEach(row => {
-                    row.addEventListener("click", function () {
-                        const id = this.getAttribute("data-id");
-                        const trailer = trailersData[id]; // Busca los datos del tráiler*/
-                        //console.log(trailer);
-                
                 table.draw(false); // Redibuja la tabla sin reiniciar la paginación
 
                 // Restaurar la búsqueda y los filtros
@@ -2288,7 +2322,7 @@ $(document).ready(function() {
                             console.error(`No data found for trailer ID ${id}`);
                         }
                     //});
-                });
+                });*/
                 loadAvailabilityIndicatorupdate();
                 
             })
@@ -3223,6 +3257,7 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
         const url = this.getAttribute('data-url');
     
         // Obtener los valores de los campos en el offcanvas
+        const trailerPK = document.getElementById("pk_trailer").textContent;
         const trailerId = document.getElementById("offcanvas-id").textContent;
         const status = document.getElementById("offcanvas-status").textContent;
         const palletsontrailer = document.getElementById("offcanvas-pallets-on-trailer").textContent;
@@ -3244,7 +3279,8 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
         &carrier=${encodeURIComponent(carrier)}
         &availability=${encodeURIComponent(availability)}
         &datein=${encodeURIComponent(datein)}
-        &username=${encodeURIComponent(username)}`;
+        &username=${encodeURIComponent(username)}
+        &trailerPK=${encodeURIComponent(trailerPK)}`;
 
         /*
         &location=${encodeURIComponent(location)}

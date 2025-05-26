@@ -341,6 +341,7 @@ public function liveshipmentsshow()
     public function createWorkflowStartWithEmptyTrailer(Request $request){
         if (Auth::check()) {
             // Recuperar los datos de la URL o de la sesión
+            $trailerPK = $request->query('trailerPK', session('trailerPK'));
             $trailerId = $request->query('trailerId', session('trailer_id'));
             $status = $request->query('status', session('date_of_status'));
             $palletsontrailer = $request->query('palletsontrailer', session(''));
@@ -358,7 +359,7 @@ public function liveshipmentsshow()
 
             // Pasar los datos a la vista
             return view('home.trafficworkflowstart', compact('trailerId', 'status', 'palletsontrailer',
-            'palletsonfloor', 'carrier', 'availability', 'location', 'datein',/* 'dateout', 'transaction',*/ 'username',  'from_button'));
+            'palletsonfloor', 'carrier', 'availability', 'location', 'datein', 'trailerPK',/* 'transaction',*/ 'username',  'from_button'));
         }
 
         return redirect('/login');
@@ -372,8 +373,9 @@ public function liveshipmentsshow()
             $origin = session('shipment_origin');
             $trailerId = session('trailer_id');
             $status =  session('date_of_status');
+            $trailerPK =  session('date_of_status');
 
-            return view('home.trafficworkflowstart', compact('origin', 'trailerId', 'status', 'from_button'));
+            return view('home.trafficworkflowstart', compact('origin', 'trailerId', 'status', 'from_button', 'trailerPK'));
         }
 
         return redirect('/login');
@@ -393,6 +395,7 @@ public function liveshipmentsshow()
             'inputshipmentprealertdatetime' => 'required|date',
             //'inputidtrailer' => 'required|unique:shipments,id_trailer|exists:empty_trailer,trailer_num',
             'inputidtrailer' => 'required',
+            'inputpktrailer' => 'nullable',
             //'inputshipmentcarrier' => 'required|exists:companies,pk_company',
             'inputshipmentcarrier' => 'nullable',
             'inputshipmenttrailer' => 'nullable',
@@ -475,11 +478,14 @@ public function liveshipmentsshow()
         $bounded = $request->has('inputshipmentcheckbonded') ? true : false;
         //$bounded = $request->has('inputshipmentcheckbonded') ? 'Bonded' : 'Not Bonded';
 
+
+        
         // Buscar o crear el trailer
         $trailer = EmptyTrailer::firstOrCreate(
-            ['trailer_num' => $request->inputidtrailer],
+            //['trailer_num' => $request->inputidtrailer],
+            ['pk_trailer' => $request->inputpktrailer],
             [
-                //'trailer_num' => $request->inputidtrailer,
+                'trailer_num' => $request->inputidtrailer,
                 'status' => now(),
                 'pallets_on_trailer' => $request->inputpallets ?? 0,
                 'pallets_on_floor' => null,
@@ -497,6 +503,7 @@ public function liveshipmentsshow()
         // Si el trailer ya existía, actualizar los valores
         if (!$trailer->wasRecentlyCreated) {
             $trailer->update([
+                'trailer_num' => $request->inputidtrailer,
                 'status' => now(),
                 'pallets_on_trailer' => $request->inputpallets ?? 0,
                 'carrier' => $request->inputshipmentcarrier,

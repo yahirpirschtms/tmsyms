@@ -470,7 +470,12 @@ return redirect('/login');
         $emptyTrailers = $query->get();
         
         // Devolver los datos en formato JSON
-        return response()->json($emptyTrailers);
+        //return response()->json($emptyTrailers);
+
+        return response()->json([
+            'message' => 'Trailer .',
+            'trailers' => $emptyTrailers,// O puedes filtrar solo los necesarios
+        ], 200);
 
     }
     return redirect('/login');

@@ -2088,7 +2088,7 @@ $(document).ready(function() {
                                 // Restablece el formulario
                                 $('#createnewshipmentform')[0].reset();
 
-                                $('#inputshipmentcarrier, #inputshipmentdriver, #inputshipmenttrailer, #inputpallets, #inputidtrailer, #inputshipmentsecuritycompany').val(null).trigger('change');
+                                $('#inputshipmentcarrier, #inputpktrailer, #inputshipmentdriver, #inputshipmenttrailer, #inputpallets, #inputidtrailer, #inputshipmentsecuritycompany').val(null).trigger('change');
 
                                 // Elimina los inputs de trackers añadidos dinámicamente
                                 $('.trackers-container').empty();  // Elimina todo el contenido dentro de .trackers-container
