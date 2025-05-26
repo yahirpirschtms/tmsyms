@@ -3257,6 +3257,7 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
         const url = this.getAttribute('data-url');
     
         // Obtener los valores de los campos en el offcanvas
+        const trailerPK = document.getElementById("pk_trailer").textContent;
         const trailerId = document.getElementById("offcanvas-id").textContent;
         const status = document.getElementById("offcanvas-status").textContent;
         const palletsontrailer = document.getElementById("offcanvas-pallets-on-trailer").textContent;
@@ -3278,7 +3279,8 @@ document.getElementById("updatesaveButton").addEventListener("click", function (
         &carrier=${encodeURIComponent(carrier)}
         &availability=${encodeURIComponent(availability)}
         &datein=${encodeURIComponent(datein)}
-        &username=${encodeURIComponent(username)}`;
+        &username=${encodeURIComponent(username)}
+        &trailerPK=${encodeURIComponent(trailerPK)}`;
 
         /*
         &location=${encodeURIComponent(location)}

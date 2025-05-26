@@ -94,6 +94,13 @@
                     <div class="invalid-feedback"></div>
                 </div>
 
+                <div class="mb-3" style="display:none">
+                    <label for="inputpktrailer" class="form-label ">Trailer PK</label>
+                    <input type="text" class="form-control" id="inputpktrailer" name="inputpktrailer"  value="{{ ( $from_button == 1 ? $trailerPK : '') }}">
+                    <div class="invalid-feedback"></div>
+                    <!--<input type="hidden" name="inputidtrailer" value="{{ old('inputidtrailer', $from_button == 1 ? $trailerId : '') }}">-->
+                </div>
+
                 <div class="mb-3">
                     <label for="inputidtrailer" class="form-label ">Trailer ID</label>
                     <input type="text" class="form-control" id="inputidtrailer" name="inputidtrailer"  value="{{ ( $from_button == 1 ? $trailerId : '') }}">
