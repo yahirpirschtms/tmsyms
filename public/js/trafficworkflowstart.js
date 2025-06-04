@@ -1766,6 +1766,30 @@ $(document).ready(function() {
 
     //Crear nuevo Shipment
     $(document).ready(function() {
+        var yespallets = 0;
+        function confirmarCantidadPallets(valor, inputField, errorContainer) {
+            Swal.fire({
+                title: '¿Es correcta la cantidad de pallets?',
+                text: `Ingresaste: ${valor} pallets`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, es correcto',
+                cancelButtonText: 'No, quiero cambiarlo',
+            }).then((result) => {
+                if (!result.isConfirmed) {
+                    inputField.addClass('is-invalid');
+                    errorContainer.text('Corrige la cantidad de pallets.');
+                    yespallets = 0;
+                    setTimeout(() => {
+                        inputField.focus();
+                    }, 100);
+                } else {
+                    inputField.removeClass('is-invalid');
+                    errorContainer.text('');
+                    yespallets = 1;
+                }
+            });
+        }
 
         // Evento cuando se borra la selección con la "X"
         $('#inputshipmentsecuritycompany').on('select2:clear', function() {
@@ -1864,26 +1888,6 @@ $(document).ready(function() {
                 errorContainer.text('STM ID is required');
             }
     
-            /*if (fieldName === 'inputshipmentshipmenttype' && field.val().trim().length === 0) {
-                field.addClass('is-invalid');
-                errorContainer.text('Shipment Type is required.');
-            }*/
-
-            /*if (fieldName === 'inputshipmentreference' && field.val().trim().length === 0) {
-                field.addClass('is-invalid');
-                errorContainer.text('Reference is required.');
-            }*/
-    
-            /*if (fieldName === 'inputpalletsontrailer' && field.val().trim().length > 50) {
-                field.addClass('is-invalid');
-                errorContainer.text('El campo Pallets On Trailer no debe exceder los 50 caracteres.');
-            }
-    
-            if (fieldName === 'inputpalletsonfloor' && field.val().trim().length > 50) {
-                field.addClass('is-invalid');
-                errorContainer.text('El campo Pallets On Floor no debe exceder los 50 caracteres.');
-            }*/
-    
             if (fieldName === 'inputorigin' && field.val().trim().length === 0) {
                 field.addClass('is-invalid');
                 errorContainer.text('Origin is required.');
@@ -1904,38 +1908,10 @@ $(document).ready(function() {
                 field.addClass('is-invalid');
                 errorContainer.text('ID Trailer is required.');
             }
-    
-            /*if (fieldName === 'inputshipmentcarrier' && field.val().trim().length === 0) {
-                field.addClass('is-invalid');
-                errorContainer.text('Carrier is required.');
-            }*/
-    
-            /*if (fieldName === 'inputshipmentdriver' && field.val().trim().length === 0) {
-                field.addClass('is-invalid');
-                errorContainer.text('Driver is required');
-            }*/
-    
-            /*if (fieldName === 'inputshipmenttrailer' && field.val().trim().length === 0) {
-                field.addClass('is-invalid');
-                errorContainer.text('Trailer is required.');
-            }*/
-            /*if (fieldName === 'inputshipmenttruck' && field.val().trim().length === 0) {
-                field.addClass('is-invalid');
-                errorContainer.text('Truck is required.');
-            }*/
             if (fieldName === 'inputshipmentetd' && field.val().trim().length === 0) {
                 field.addClass('is-invalid');
                 errorContainer.text('Estimated date is required.');
             }
-            /*if (fieldName === 'inputshipmentsunits' && field.val().trim().length === 0) {
-                field.addClass('is-invalid');
-                errorContainer.text('Units are required.');
-            }
-
-            if (fieldName === 'inputshipmentsunits' && field.val().trim() === '0' || field.value <= 0) {
-                field.addClass('is-invalid');
-                errorContainer.text('Units must have a valid value.');
-            }*/
                 if (fieldName === 'inputshipmentsunits') {
                     const value = field.val().trim(); // Obtener el valor del campo
                 
@@ -1973,6 +1949,10 @@ $(document).ready(function() {
                         field.addClass('is-invalid');
                         errorContainer.text('Pallets must have a valid value.');
                     }
+                    // Verificar si el valor es mayor a 100
+                    else if (parseFloat(value) > 99) {
+                        confirmarCantidadPallets(value, field, errorContainer);
+                    }
                     // Verificar si el valor es una letra (no un número)
                     else if (isNaN(value)) {
                         field.addClass('is-invalid');
@@ -1984,19 +1964,6 @@ $(document).ready(function() {
                     }
                 }
                 
-            /*if (fieldName === 'inputpallets' && field.val().trim().length === 0) {
-                field.addClass('is-invalid');
-                errorContainer.text('Pallets are required.');
-            }
-
-            if (fieldName === 'inputpallets' && field.val().trim() === '0' || field.value <= 0) {
-                field.addClass('is-invalid');
-                errorContainer.text('The Pallets must have a valid value.');
-            }
-            if (fieldName === 'inputpallets' && field.value <= 0) {
-                field.addClass('is-invalid');
-                errorContainer.text('The Pallets must have a valid value.');
-            }*/
             // Validar que inputpallets no sea mayor que inputshipmentsunits
             if (fieldName === 'inputpallets') {
                 let units = parseInt($('#inputshipmentsunits').val().trim(), 10); // Obtener el valor de inputshipmentsunits
@@ -2024,6 +1991,35 @@ $(document).ready(function() {
         // Cuando el formulario se envía (al hacer clic en Save)
         $('#createnewshipmentform').submit(function(e) {
             e.preventDefault(); // Evita el envío del formulario
+
+            const fieldPallets = $('#inputpallets');
+            const errorContainer = fieldPallets.next('.invalid-feedback');
+            const palletsValue = parseFloat(fieldPallets.val().trim());
+
+            // Validar si no se ha confirmado todavía y el valor es mayor a 99
+            if (palletsValue > 99 && yespallets === 0) {
+                Swal.fire({
+                    title: '¿Es correcta la cantidad de pallets?',
+                    text: `Ingresaste: ${palletsValue} pallets`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, es correcto',
+                    cancelButtonText: 'No, quiero cambiarlo',
+                }).then((result) => {
+                    if (!result.isConfirmed) {
+                        fieldPallets.addClass('is-invalid');
+                        errorContainer.text('Corrige la cantidad de pallets.');
+                        yespallets = 0;
+                        setTimeout(() => fieldPallets.focus(), 100);
+                    } else {
+                        fieldPallets.removeClass('is-invalid');
+                        errorContainer.text('');
+                        yespallets = 1;
+                        $('#createnewshipmentform').submit(); // Vuelve a intentar enviar el formulario
+                    }
+                });
+                return; // Detiene el submit original mientras esperamos la respuesta del Swal
+            }
 
             let hasTracker = false;
             $('.trackers-container input').each(function() {
